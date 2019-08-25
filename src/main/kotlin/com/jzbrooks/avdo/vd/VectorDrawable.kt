@@ -1,12 +1,10 @@
 package com.jzbrooks.avdo.vd
 
-import com.jzbrooks.avdo.Graphic
-import com.jzbrooks.avdo.Group
-import com.jzbrooks.avdo.Path
+import com.jzbrooks.avdo.*
 
 data class VectorDrawable(
         override var paths: List<Path>,
         override val groups: List<Group>,
-        override val width: Int,
-        override val height: Int
+        override val size: Size,
+        override val viewbox: Viewbox = Viewbox(0, 0, size.width, size.height)
 ) : Graphic

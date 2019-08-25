@@ -2,6 +2,7 @@ package com.jzbrooks.avdo.vd
 
 import com.jzbrooks.avdo.Group
 import com.jzbrooks.avdo.Path
+import com.jzbrooks.avdo.Size
 import java.io.InputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -38,5 +39,5 @@ fun parse(input: InputStream): VectorDrawable {
         groups.add(Group(groupPathList))
     }
 
-    return VectorDrawable(paths, groups, width, height)
+    return VectorDrawable(paths, groups, Size(width, height))
 }
