@@ -1,5 +1,7 @@
 package com.jzbrooks.avdo
 
+import com.jzbrooks.avdo.graphic.Path
+import com.jzbrooks.avdo.graphic.Size
 import com.jzbrooks.avdo.util.xml.toList
 import com.jzbrooks.avdo.vd.VectorDrawable
 import com.jzbrooks.avdo.vd.write

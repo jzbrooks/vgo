@@ -14,8 +14,8 @@ fun write(graphic: VectorDrawable, outputStream: OutputStream) {
 
     val root = document.createElement("vector")
     root.setAttribute("xmlns:android", "https://schemas.android.com/apk/res/android")
-    root.setAttribute("android:viewportWidth", graphic.viewbox.width.toString())
-    root.setAttribute("android:viewportHeight", graphic.viewbox.height.toString())
+    root.setAttribute("android:viewportWidth", graphic.viewBox.width.toString())
+    root.setAttribute("android:viewportHeight", graphic.viewBox.height.toString())
     root.setAttribute("android:width", graphic.size.width.toString())
     root.setAttribute("android:height", graphic.size.height.toString())
 

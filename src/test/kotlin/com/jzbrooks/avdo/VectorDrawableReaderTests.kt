@@ -1,5 +1,6 @@
 package com.jzbrooks.avdo
 
+import com.jzbrooks.avdo.graphic.Graphic
 import com.jzbrooks.avdo.vd.parse
 import kotlin.test.Test
 import kotlin.test.assertEquals

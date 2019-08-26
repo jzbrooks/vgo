@@ -1,8 +1,8 @@
 package com.jzbrooks.avdo.vd
 
-import com.jzbrooks.avdo.Group
-import com.jzbrooks.avdo.Path
-import com.jzbrooks.avdo.Size
+import com.jzbrooks.avdo.graphic.Group
+import com.jzbrooks.avdo.graphic.Path
+import com.jzbrooks.avdo.graphic.Size
 import java.io.InputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
