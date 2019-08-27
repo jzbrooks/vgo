@@ -11,8 +11,8 @@ class VectorDrawableReaderTests {
         javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
             val graphic: Graphic = parse(it)
 
-            assertEquals(24, graphic.size.width)
-            assertEquals(24, graphic.size.height)
+            assertEquals(24, graphic.size.width.value)
+            assertEquals(24, graphic.size.height.value)
         }
     }
 

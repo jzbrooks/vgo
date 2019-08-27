@@ -1,5 +1,6 @@
 package com.jzbrooks.avdo.vd
 
+import com.jzbrooks.avdo.graphic.Dimension
 import com.jzbrooks.avdo.graphic.Group
 import com.jzbrooks.avdo.graphic.Path
 import com.jzbrooks.avdo.graphic.Size
@@ -10,8 +11,12 @@ fun parse(input: InputStream): VectorDrawable {
     val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
     document.documentElement.normalize()
 
-    val width = document.documentElement.attributes.getNamedItem("android:width").textContent.removeSuffix("dp").toInt()
-    val height = document.documentElement.attributes.getNamedItem("android:height").textContent.removeSuffix("dp").toInt()
+    val widthText = document.documentElement.attributes.getNamedItem("android:width").textContent
+    val width = widthText.removeSuffix("dp").toInt()
+    val widthDimension = if (widthText.endsWith("dp")) Dimension.Unit.Dp else Dimension.Unit.Px
+    val heightText = document.documentElement.attributes.getNamedItem("android:height").textContent
+    val height = heightText.removeSuffix("dp").toInt()
+    val heightDimension = if (heightText.endsWith("dp")) Dimension.Unit.Dp else Dimension.Unit.Px
 
     val paths = mutableListOf<Path>()
     val pathList = document.getElementsByTagName("path")
@@ -39,5 +44,5 @@ fun parse(input: InputStream): VectorDrawable {
         groups.add(Group(groupPathList))
     }
 
-    return VectorDrawable(paths, groups, Size(width, height))
+    return VectorDrawable(paths, groups, Size(Dimension(width, widthDimension), Dimension(height, heightDimension)))
 }
