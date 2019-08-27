@@ -1,5 +1,6 @@
 package com.jzbrooks.avdo.vd
 
+import com.jzbrooks.avdo.graphic.ClipPath
 import com.jzbrooks.avdo.graphic.Group
 import com.jzbrooks.avdo.graphic.Path
 import org.w3c.dom.Document
@@ -31,6 +32,10 @@ fun write(graphic: VectorDrawable, outputStream: OutputStream) {
             is Group -> {
                 val groupElement = document.createElement("group")
                 root.appendChild(groupElement)
+            }
+            is ClipPath -> {
+                val clipPathElement = document.createElement("clip-path")
+                root.appendChild(clipPathElement)
             }
         }
     }

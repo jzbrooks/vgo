@@ -25,6 +25,7 @@ fun parse(input: InputStream): VectorDrawable {
             when (element.nodeName) {
                 "group" -> elements.add(parseGroup(element))
                 "path" -> elements.add(parsePath(element))
+                "clip-path" -> elements.add(parseClipPath(element))
                 else -> System.err.println("Unknown document element: ${element.nodeName}")
             }
         }
@@ -50,4 +51,9 @@ private fun parsePath(pathNode: Node): Path {
     val data = pathNode.attributes.getNamedItem("android:pathData").textContent
     val strokeWidth = pathNode.attributes.getNamedItem("android:strokeWidth").textContent.toInt()
     return Path(data, strokeWidth)
+}
+
+private fun parseClipPath(pathNode: Node): ClipPath {
+    val data = pathNode.attributes.getNamedItem("android:pathData").textContent
+    return ClipPath(data)
 }
