@@ -1,5 +1,7 @@
 package com.jzbrooks.avdo.vd
 
+import com.jzbrooks.avdo.graphic.Group
+import com.jzbrooks.avdo.graphic.Path
 import org.w3c.dom.Document
 import java.io.OutputStream
 import javax.xml.parsers.DocumentBuilderFactory
@@ -19,11 +21,17 @@ fun write(graphic: VectorDrawable, outputStream: OutputStream) {
     root.setAttribute("android:width", graphic.size.width.value.toString())
     root.setAttribute("android:height", graphic.size.height.value.toString())
 
-    if (graphic.paths.isNotEmpty()) {
-        for (path in graphic.paths) {
-            val pathElement = document.createElement("path")
-            pathElement.setAttribute("android:pathData", path.data)
-            root.appendChild(pathElement)
+    for (path in graphic.elements) {
+        when (path) {
+            is Path -> {
+                val pathElement = document.createElement("path")
+                pathElement.setAttribute("android:pathData", path.data)
+                root.appendChild(pathElement)
+            }
+            is Group -> {
+                val groupElement = document.createElement("group")
+                root.appendChild(groupElement)
+            }
         }
     }
 
