@@ -22,22 +22,29 @@ fun write(graphic: VectorDrawable, outputStream: OutputStream) {
     root.setAttribute("android:width", graphic.size.width.value.toString())
     root.setAttribute("android:height", graphic.size.height.value.toString())
 
-    for (path in graphic.elements) {
-        when (path) {
+    loop@ for (element in graphic.elements) {
+        val node = when (element) {
             is Path -> {
                 val pathElement = document.createElement("path")
-                pathElement.setAttribute("android:pathData", path.data)
-                root.appendChild(pathElement)
+                pathElement.setAttribute("android:pathData", element.data)
+                pathElement
             }
             is Group -> {
-                val groupElement = document.createElement("group")
-                root.appendChild(groupElement)
+                document.createElement("group")
             }
             is ClipPath -> {
-                val clipPathElement = document.createElement("clip-path")
-                root.appendChild(clipPathElement)
+                document.createElement("clip-path")
             }
+            else -> continue@loop
         }
+        for (item in element.metadata) {
+            node.setAttribute(item.key, item.value)
+        }
+        root.appendChild(node)
+    }
+
+    for (item in graphic.metadata) {
+        root.setAttribute(item.key, item.value)
     }
 
     document.appendChild(root)

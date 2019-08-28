@@ -18,7 +18,13 @@ fun parse(input: InputStream): VectorDrawable {
     val heightDimension = if (heightText.endsWith("dp")) Dimension.Unit.Dp else Dimension.Unit.Px
 
     val elements = mutableListOf<Element>()
+    val rootMetadata = mutableMapOf<String, String>()
     val root = document.childNodes.item(0)
+
+    root.attributes.getNamedItem("android:name")?.let { node ->
+        rootMetadata[node.nodeName] = node.nodeValue
+    }
+
     for (index in 0 until root.childNodes.length) {
         val element = root.childNodes.item(index)
         if (element !is Text) {
@@ -31,29 +37,42 @@ fun parse(input: InputStream): VectorDrawable {
         }
     }
 
-    return VectorDrawable(elements, Size(Dimension(width, widthDimension), Dimension(height, heightDimension)))
+    return VectorDrawable(elements, Size(Dimension(width, widthDimension), Dimension(height, heightDimension)), rootMetadata.toMap())
 }
 
 private fun parseGroup(groupNode: Node): Group {
     val groupPathList = mutableListOf<Path>()
+    val groupMetadata = mutableMapOf<String, String>()
 
     for (child in 0 until groupNode.childNodes.length) {
+        val metadata = mutableMapOf<String, String>()
         val childPath = groupNode.childNodes.item(child)
+        childPath.attributes.getNamedItem("android:name")?.let { node ->
+            metadata[node.nodeName] = node.nodeValue
+        }
         val data = childPath.attributes.getNamedItem("android:pathData").textContent
         val strokeWidth = childPath.attributes.getNamedItem("android:strokeWidth").textContent.toInt()
-        groupPathList.add(Path(data, strokeWidth))
+        groupPathList.add(Path(data, strokeWidth, metadata.toMap()))
     }
 
-    return Group(groupPathList)
+    return Group(groupPathList, groupMetadata.toMap())
 }
 
 private fun parsePath(pathNode: Node): Path {
+    val metadata = mutableMapOf<String, String>()
+    pathNode.attributes.getNamedItem("android:name")?.let { node ->
+        metadata[node.nodeName] = node.nodeValue
+    }
     val data = pathNode.attributes.getNamedItem("android:pathData").textContent
     val strokeWidth = pathNode.attributes.getNamedItem("android:strokeWidth").textContent.toInt()
-    return Path(data, strokeWidth)
+    return Path(data, strokeWidth, metadata.toMap())
 }
 
 private fun parseClipPath(pathNode: Node): ClipPath {
+    val metadata = mutableMapOf<String, String>()
+    pathNode.attributes.getNamedItem("android:name")?.let { node ->
+        metadata[node.nodeName] = node.nodeValue
+    }
     val data = pathNode.attributes.getNamedItem("android:pathData").textContent
-    return ClipPath(data)
+    return ClipPath(data, metadata.toMap())
 }
