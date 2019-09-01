@@ -1,11 +1,13 @@
 package com.jzbrooks.avdo
 
+import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import com.jzbrooks.avdo.assertk.extensions.containsKey
 import com.jzbrooks.avdo.graphic.Graphic
 import com.jzbrooks.avdo.graphic.Path
 import com.jzbrooks.avdo.vd.parse
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class VectorDrawableReaderTests {
     @Test
@@ -13,8 +15,8 @@ class VectorDrawableReaderTests {
         javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
             val graphic: Graphic = parse(it)
 
-            assertEquals(24, graphic.size.width.value)
-            assertEquals(24, graphic.size.height.value)
+            assertThat(graphic.size.width.value).isEqualTo(24)
+            assertThat(graphic.size.height.value).isEqualTo(24)
         }
     }
 
@@ -24,8 +26,8 @@ class VectorDrawableReaderTests {
             val graphic: Graphic = parse(it)
 
             val path = graphic.elements.first() as Path
-            assertEquals("M 2 4.27 L 3.27 3 L 3.27 3 L 2 4.27 Z", path.data)
-            assertEquals(3, graphic.elements.size)
+            assertThat(path.data).isEqualTo("M 2 4.27 L 3.27 3 L 3.27 3 L 2 4.27 Z")
+            assertThat(graphic.elements).hasSize(3)
         }
     }
 
@@ -35,7 +37,7 @@ class VectorDrawableReaderTests {
             val graphic: Graphic = parse(it)
 
             val path = graphic.elements.first() as Path
-            assertTrue(path.metadata.containsKey("android:name"))
+            assertThat(path.metadata).containsKey("android:name")
         }
     }
 }

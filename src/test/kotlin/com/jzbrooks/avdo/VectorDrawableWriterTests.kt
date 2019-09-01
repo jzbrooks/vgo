@@ -1,5 +1,11 @@
 package com.jzbrooks.avdo
 
+import assertk.assertThat
+import assertk.assertions.endsWith
+import assertk.assertions.isEqualTo
+import assertk.assertions.startsWith
+import com.jzbrooks.avdo.assertk.extensions.hasName
+import com.jzbrooks.avdo.assertk.extensions.hasValue
 import com.jzbrooks.avdo.graphic.*
 import com.jzbrooks.avdo.util.xml.toList
 import com.jzbrooks.avdo.vd.VectorDrawable
@@ -9,9 +15,6 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.test.Test
-import kotlin.test.assert
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class VectorDrawableWriterTests {
     @Test
@@ -20,7 +23,7 @@ class VectorDrawableWriterTests {
             write(graphic, it)
 
             val output = it.toDocument()
-            assertEquals("vector", output.childNodes.item(0).nodeName)
+            assertThat(output.childNodes.item(0)).hasName("vector")
         }
     }
 
@@ -32,8 +35,8 @@ class VectorDrawableWriterTests {
             val output = it.toDocument()
             val rootAttributes = output.childNodes.item(0).attributes
 
-            assertEquals("24", rootAttributes.getNamedItem("android:viewportWidth").nodeValue)
-            assertEquals("24", rootAttributes.getNamedItem("android:viewportHeight").nodeValue)
+            assertThat(rootAttributes.getNamedItem("android:viewportWidth")).hasValue("24")
+            assertThat(rootAttributes.getNamedItem("android:viewportHeight")).hasValue("24")
         }
     }
 
@@ -45,8 +48,8 @@ class VectorDrawableWriterTests {
             val output = it.toDocument()
             val rootAttributes = output.childNodes.item(0).attributes
 
-            assertTrue(rootAttributes.getNamedItem("android:width").nodeValue.startsWith("24"))
-            assertTrue(rootAttributes.getNamedItem("android:height").nodeValue.startsWith("24"))
+            assertThat(rootAttributes.getNamedItem("android:width").nodeValue).startsWith("24")
+            assertThat(rootAttributes.getNamedItem("android:height").nodeValue).startsWith("24")
         }
     }
 
@@ -58,7 +61,9 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val firstGenNodes = output.childNodes.item(0).childNodes.toList()
 
-            assertEquals(2, firstGenNodes.count { it.nodeName == "path" })
+            assertThat(firstGenNodes)
+                    .transform { it.count { item -> item.nodeName == "path" } }
+                    .isEqualTo(2)
         }
     }
 
@@ -70,8 +75,8 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val rootAttributes = output.childNodes.item(0).attributes
 
-            assertTrue(rootAttributes.getNamedItem("android:height").nodeValue.endsWith("dp"))
-            assertTrue(rootAttributes.getNamedItem("android:width").nodeValue.endsWith("dp"))
+            assertThat(rootAttributes.getNamedItem("android:height").nodeValue).endsWith("dp")
+            assertThat(rootAttributes.getNamedItem("android:width").nodeValue).endsWith("dp")
         }
     }
 
@@ -83,9 +88,9 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val firstGenNodes = output.childNodes.item(0).childNodes.toList()
 
-            assertEquals("path", firstGenNodes[0].nodeName)
-            assertEquals("clip-path", firstGenNodes[1].nodeName)
-            assertEquals("path", firstGenNodes[2].nodeName)
+            assertThat(firstGenNodes[0]).hasName("path")
+            assertThat(firstGenNodes[1]).hasName("clip-path")
+            assertThat(firstGenNodes[2]).hasName("path")
         }
     }
 
@@ -97,7 +102,7 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val rootNode = output.childNodes.item(0)
 
-            assertEquals("visibilitystrike", rootNode.attributes.getNamedItem("android:name").nodeValue)
+            assertThat(rootNode.attributes.getNamedItem("android:name")).hasValue("visibilitystrike")
         }
     }
 
@@ -109,7 +114,7 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val firstPathNode = output.childNodes.item(0).childNodes.item(0)
 
-            assertEquals("strike_thru_path", firstPathNode.attributes.getNamedItem("android:name").nodeValue)
+            assertThat(firstPathNode.attributes.getNamedItem("android:name")).hasValue("strike_thru_path")
         }
     }
 
