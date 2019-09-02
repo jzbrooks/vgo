@@ -20,6 +20,19 @@ repositories {
     jcenter()
 }
 
+application {
+    // Define the main class for the application
+    mainClassName = "com.jzbrooks.avdo.AppKt"
+}
+
+kotlin {
+    tasks.withType<KotlinCompile>() {
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_1_8.toString()
+        }
+    }
+}
+
 dependencies {
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -34,17 +47,4 @@ dependencies {
 
     // Use the Kotlin JUnit integration.
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
-}
-
-application {
-    // Define the main class for the application
-    mainClassName = "com.jzbrooks.avdo.AppKt"
-}
-
-kotlin {
-    tasks.withType<KotlinCompile>() {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_1_8.toString()
-        }
-    }
 }
