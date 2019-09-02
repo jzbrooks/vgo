@@ -54,6 +54,8 @@ fun write(graphic: VectorDrawable, outputStream: OutputStream) {
 private fun write(document: Document, outputStream: OutputStream) {
     val transformer = TransformerFactory.newInstance().newTransformer()
     transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+    transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
     val source = DOMSource(document)
     val result = StreamResult(outputStream)
     transformer.transform(source, result)
