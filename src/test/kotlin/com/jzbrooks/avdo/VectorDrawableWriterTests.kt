@@ -9,7 +9,7 @@ import com.jzbrooks.avdo.assertk.extensions.hasValue
 import com.jzbrooks.avdo.graphic.*
 import com.jzbrooks.avdo.util.xml.toList
 import com.jzbrooks.avdo.vd.VectorDrawable
-import com.jzbrooks.avdo.vd.write
+import com.jzbrooks.avdo.vd.VectorDrawableWriter
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -20,7 +20,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testRootElementIsVector() {
         ByteArrayOutputStream().use {
-            write(graphic, it)
+            VectorDrawableWriter().write(graphic, it)
 
             val output = it.toDocument()
             assertThat(output.childNodes.item(0)).hasName("vector")
@@ -30,7 +30,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testIsViewboxWritten() {
         ByteArrayOutputStream().use {
-            write(graphic, it)
+            VectorDrawableWriter().write(graphic, it)
 
             val output = it.toDocument()
             val rootAttributes = output.childNodes.item(0).attributes
@@ -43,7 +43,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testIsSizeWritten() {
         ByteArrayOutputStream().use {
-            write(graphic, it)
+            VectorDrawableWriter().write(graphic, it)
 
             val output = it.toDocument()
             val rootAttributes = output.childNodes.item(0).attributes
@@ -56,7 +56,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testPathsWritten() {
         ByteArrayOutputStream().use {  memoryStream ->
-            write(graphic, memoryStream)
+            VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
             val firstGenNodes = output.childNodes.item(0).childNodes.toList()
@@ -70,7 +70,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testUnitsWritten() {
         ByteArrayOutputStream().use {  memoryStream ->
-            write(graphic, memoryStream)
+            VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
             val rootAttributes = output.childNodes.item(0).attributes
@@ -83,7 +83,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testElementOrderMaintained() {
         ByteArrayOutputStream().use {  memoryStream ->
-            write(graphic, memoryStream)
+            VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
             val firstGenNodes = output.childNodes.item(0).childNodes.toList()
@@ -97,7 +97,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testVectorMetadataWritten() {
         ByteArrayOutputStream().use {  memoryStream ->
-            write(graphic, memoryStream)
+            VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
             val rootNode = output.childNodes.item(0)
@@ -109,7 +109,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testPathMetadataWritten() {
         ByteArrayOutputStream().use {  memoryStream ->
-            write(graphic, memoryStream)
+            VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
             val firstPathNode = output.childNodes.item(0).childNodes.item(0)

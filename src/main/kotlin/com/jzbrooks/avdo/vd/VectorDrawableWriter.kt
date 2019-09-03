@@ -1,5 +1,6 @@
 package com.jzbrooks.avdo.vd
 
+import com.jzbrooks.avdo.Writer
 import com.jzbrooks.avdo.graphic.ClipPath
 import com.jzbrooks.avdo.graphic.Group
 import com.jzbrooks.avdo.graphic.Path
@@ -11,52 +12,59 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-fun write(graphic: VectorDrawable, outputStream: OutputStream) {
-    val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-    val document = builder.newDocument()
+class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()) : Writer {
 
-    val root = document.createElement("vector")
-    root.setAttribute("xmlns:android", "https://schemas.android.com/apk/res/android")
-    root.setAttribute("android:viewportWidth", graphic.viewBox.width.toString())
-    root.setAttribute("android:viewportHeight", graphic.viewBox.height.toString())
-    root.setAttribute("android:width", graphic.size.width.toString())
-    root.setAttribute("android:height", graphic.size.height.toString())
+    fun write(graphic: VectorDrawable, stream: OutputStream) {
+        val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        val document = builder.newDocument()
 
-    loop@ for (element in graphic.elements) {
-        val node = when (element) {
-            is Path -> {
-                val pathElement = document.createElement("path")
-                pathElement.setAttribute("android:pathData", element.data)
-                pathElement
+        val root = document.createElement("vector")
+        root.setAttribute("xmlns:android", "https://schemas.android.com/apk/res/android")
+        root.setAttribute("android:viewportWidth", graphic.viewBox.width.toString())
+        root.setAttribute("android:viewportHeight", graphic.viewBox.height.toString())
+        root.setAttribute("android:width", graphic.size.width.toString())
+        root.setAttribute("android:height", graphic.size.height.toString())
+
+        loop@ for (element in graphic.elements) {
+            val node = when (element) {
+                is Path -> {
+                    val pathElement = document.createElement("path")
+                    pathElement.setAttribute("android:pathData", element.data)
+                    pathElement
+                }
+                is Group -> {
+                    document.createElement("group")
+                }
+                is ClipPath -> {
+                    document.createElement("clip-path")
+                }
+                else -> continue@loop
             }
-            is Group -> {
-                document.createElement("group")
+            for (item in element.metadata) {
+                node.setAttribute(item.key, item.value)
             }
-            is ClipPath -> {
-                document.createElement("clip-path")
-            }
-            else -> continue@loop
+            root.appendChild(node)
         }
-        for (item in element.metadata) {
-            node.setAttribute(item.key, item.value)
+
+        for (item in graphic.metadata) {
+            root.setAttribute(item.key, item.value)
         }
-        root.appendChild(node)
+
+        document.appendChild(root)
+        write(document, stream)
     }
 
-    for (item in graphic.metadata) {
-        root.setAttribute(item.key, item.value)
+    private fun write(document: Document, outputStream: OutputStream) {
+        val transformer = TransformerFactory.newInstance().newTransformer()
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+
+        if (options.contains(Writer.Option.INDENT)) {
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        }
+
+        val source = DOMSource(document)
+        val result = StreamResult(outputStream)
+        transformer.transform(source, result)
     }
-
-    document.appendChild(root)
-    write(document, outputStream)
-}
-
-private fun write(document: Document, outputStream: OutputStream) {
-    val transformer = TransformerFactory.newInstance().newTransformer()
-    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-    transformer.setOutputProperty(OutputKeys.INDENT, "yes")
-    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-    val source = DOMSource(document)
-    val result = StreamResult(outputStream)
-    transformer.transform(source, result)
 }

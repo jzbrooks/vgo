@@ -1,24 +1,38 @@
 package com.jzbrooks.avdo
 
+import com.jzbrooks.avdo.vd.VectorDrawableWriter
 import com.jzbrooks.avdo.vd.parse
-import com.jzbrooks.avdo.vd.write
 import java.io.ByteArrayOutputStream
 import java.io.FileInputStream
 import java.io.FileOutputStream
 
 fun main(args: Array<String>) {
-    val (path, target) = args
+    val path = args.first()
+    val nonOptionArgs = args.filter { !it.startsWith("--") }
+    val optionArgs = args.filter { it.startsWith("--") }
+            .map { it.removePrefix("--") }
+            .toSet()
+
+    val writerOptions = if (optionArgs.contains("indent")) {
+        setOf(Writer.Option.INDENT)
+    } else {
+        emptySet()
+    }
+
+    val writer = VectorDrawableWriter(writerOptions)
 
     FileInputStream(path).use { inputStream ->
         val reader = parse(inputStream)
 
         ByteArrayOutputStream().use {
-            write(reader, it)
+            writer.write(reader, it)
             println(it.toString())
         }
 
-        FileOutputStream(target).use {
-            write(reader, it)
+        if (nonOptionArgs.size > 1) {
+            FileOutputStream(nonOptionArgs[1]).use {
+                writer.write(reader, it)
+            }
         }
     }
 }
