@@ -1,6 +1,7 @@
 package com.jzbrooks.avdo.vd
 
 import com.jzbrooks.avdo.graphic.*
+import com.jzbrooks.avdo.graphic.command.CommandString
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 import java.io.InputStream
