@@ -15,7 +15,7 @@ inline class CommandString(val data: String) {
                             val data = argumentPairs.findAll(command)
                                     .map { match ->
                                         val components = match.value.split(Regex("[,\\s]"))
-                                        components[0].toInt() to components[1].toInt()
+                                        components[0].toFloat() to components[1].toFloat()
                                     }
                                     .toList()
                             MoveTo(variant, data)
@@ -24,7 +24,7 @@ inline class CommandString(val data: String) {
                             val data = argumentPairs.findAll(command)
                                     .map { match ->
                                         val components = match.value.split(Regex("[,\\s]"))
-                                        components[0].toInt() to components[1].toInt()
+                                        components[0].toFloat() to components[1].toFloat()
                                     }
                                     .toList()
 
@@ -32,14 +32,14 @@ inline class CommandString(val data: String) {
                         }
                         upperCommand.startsWith("V") -> {
                             val data = arguments.findAll(command)
-                                    .map { it.value.toInt() }
+                                    .map { it.value.toFloat() }
                                     .toList()
 
                             VerticalLineTo(variant, data)
                         }
                         upperCommand.startsWith("H") -> {
                             val data = arguments.findAll(command)
-                                    .map { it.value.toInt() }
+                                    .map { it.value.toFloat() }
                                     .toList()
 
                             HorizontalLineTo(variant, data)

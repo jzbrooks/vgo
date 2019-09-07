@@ -7,6 +7,10 @@ import assertk.assertions.prop
 import kotlin.test.Test
 
 class ParserTests {
+    private val moveToSingle = MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1f to 1f))
+    private val moveToImplicit = MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1f to 1f, 1f to 2f))
+    private val lineToSingle = LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2f to 5f))
+    private val verticalLineToSingle = VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3f))
 
     @Test
     fun testParseCompactCommandString() {
@@ -15,11 +19,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1)))
+                .isEqualTo(moveToSingle)
         assertThat(commands[1])
-                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
+                .isEqualTo(lineToSingle)
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
+                .isEqualTo(verticalLineToSingle)
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -31,11 +35,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1)))
+                .isEqualTo(moveToSingle)
         assertThat(commands[1])
-                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
+                .isEqualTo(lineToSingle)
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
+                .isEqualTo(verticalLineToSingle)
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -47,11 +51,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1)))
+                .isEqualTo(moveToSingle)
         assertThat(commands[1])
-                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
+                .isEqualTo(lineToSingle)
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
+                .isEqualTo(verticalLineToSingle)
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -63,11 +67,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1, 1 to 2)))
+                .isEqualTo(moveToImplicit)
         assertThat(commands[1])
-                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
+                .isEqualTo(lineToSingle)
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
+                .isEqualTo(verticalLineToSingle)
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -79,11 +83,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1)))
+                .isEqualTo(moveToSingle)
         assertThat(commands[1])
-                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
+                .isEqualTo(lineToSingle)
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
+                .isEqualTo(verticalLineToSingle)
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -95,11 +99,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1, 1 to 2)))
+                .isEqualTo(moveToImplicit)
         assertThat(commands[1])
-                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
+                .isEqualTo(lineToSingle)
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
+                .isEqualTo(verticalLineToSingle)
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -111,11 +115,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1, 1 to 2)))
+                .isEqualTo(moveToImplicit)
         assertThat(commands[1])
-                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
+                .isEqualTo(lineToSingle)
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
+                .isEqualTo(verticalLineToSingle)
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -129,5 +133,29 @@ class ParserTests {
         assertThat(commands[0])
                 .prop("variant") { (it as VariantCommand).variant }
                 .isEqualTo(VariantCommand.Variant.RELATIVE)
+    }
+
+    @Test
+    fun testParseFloatingPointCoordinate() {
+        val pathCommandString = "l2.1 5"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        val lineCommand = commands[0] as LineTo
+
+        assertThat(lineCommand.arguments[0])
+                .isEqualTo(2.1f to 5f)
+    }
+
+    @Test
+    fun testExponentialNotationCoordinate() {
+        val pathCommandString = "l2e2 5"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        val lineCommand = commands[0] as LineTo
+
+        assertThat(lineCommand.arguments[0])
+                .isEqualTo(200f to 5f)
     }
 }
