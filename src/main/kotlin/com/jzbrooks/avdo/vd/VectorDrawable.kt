@@ -1,8 +1,9 @@
 package com.jzbrooks.avdo.vd
 
-import com.jzbrooks.avdo.Writer
-import com.jzbrooks.avdo.graphic.*
-import java.io.OutputStream
+import com.jzbrooks.avdo.graphic.Element
+import com.jzbrooks.avdo.graphic.Graphic
+import com.jzbrooks.avdo.graphic.Size
+import com.jzbrooks.avdo.graphic.ViewBox
 
 data class VectorDrawable(
         override val elements: List<Element>,

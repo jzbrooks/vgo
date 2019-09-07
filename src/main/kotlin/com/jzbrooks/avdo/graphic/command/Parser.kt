@@ -13,19 +13,13 @@ inline class CommandString(val data: String) {
                     when {
                         upperCommand.startsWith("M") -> {
                             val data = argumentPairs.findAll(command)
-                                    .map { match ->
-                                        val components = match.value.split(Regex("[,\\s]"))
-                                        components[0].toFloat() to components[1].toFloat()
-                                    }
+                                    .map(::mapArgumentPairs)
                                     .toList()
                             MoveTo(variant, data)
                         }
                         upperCommand.startsWith("L") -> {
                             val data = argumentPairs.findAll(command)
-                                    .map { match ->
-                                        val components = match.value.split(Regex("[,\\s]"))
-                                        components[0].toFloat() to components[1].toFloat()
-                                    }
+                                    .map(::mapArgumentPairs)
                                     .toList()
 
                             LineTo(variant, data)
@@ -48,6 +42,11 @@ inline class CommandString(val data: String) {
                         else -> throw IllegalStateException("Expected one of $commandRegex but was $command")
                     }
                 }.toList()
+    }
+
+    private fun mapArgumentPairs(match: MatchResult): Pair<Float, Float> {
+        val components = match.value.split(Regex("[,\\s]"))
+        return components[0].toFloat() to components[1].toFloat()
     }
 
     companion object {

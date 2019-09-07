@@ -1,7 +1,6 @@
 package com.jzbrooks.avdo.vd
 
 import com.jzbrooks.avdo.graphic.*
-import com.jzbrooks.avdo.graphic.command.CommandString
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 import java.io.InputStream
@@ -22,7 +21,7 @@ fun parse(input: InputStream): VectorDrawable {
     val rootMetadata = mutableMapOf<String, String>()
     val root = document.childNodes.item(0)
 
-    root.attributes.getNamedItem("android:name")?.let { node ->
+    root.getAndroidName()?.let { node ->
         rootMetadata[node.nodeName] = node.nodeValue
     }
 
@@ -48,7 +47,7 @@ private fun parseGroup(groupNode: Node): Group {
     for (child in 0 until groupNode.childNodes.length) {
         val metadata = mutableMapOf<String, String>()
         val childPath = groupNode.childNodes.item(child)
-        childPath.attributes.getNamedItem("android:name")?.let { node ->
+        childPath.getAndroidName()?.let { node ->
             metadata[node.nodeName] = node.nodeValue
         }
         val data = childPath.attributes.getNamedItem("android:pathData").textContent
@@ -61,7 +60,7 @@ private fun parseGroup(groupNode: Node): Group {
 
 private fun parsePath(pathNode: Node): Path {
     val metadata = mutableMapOf<String, String>()
-    pathNode.attributes.getNamedItem("android:name")?.let { node ->
+    pathNode.getAndroidName()?.let { node ->
         metadata[node.nodeName] = node.nodeValue
     }
     val data = pathNode.attributes.getNamedItem("android:pathData").textContent
@@ -71,9 +70,11 @@ private fun parsePath(pathNode: Node): Path {
 
 private fun parseClipPath(pathNode: Node): ClipPath {
     val metadata = mutableMapOf<String, String>()
-    pathNode.attributes.getNamedItem("android:name")?.let { node ->
+    pathNode.getAndroidName()?.let { node ->
         metadata[node.nodeName] = node.nodeValue
     }
     val data = pathNode.attributes.getNamedItem("android:pathData").textContent
     return ClipPath(data, metadata.toMap())
 }
+
+private fun Node.getAndroidName(): Node? = this.attributes.getNamedItem("android:name")

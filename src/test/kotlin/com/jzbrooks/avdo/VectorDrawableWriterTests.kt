@@ -6,8 +6,10 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.startsWith
 import com.jzbrooks.avdo.assertk.extensions.hasName
 import com.jzbrooks.avdo.assertk.extensions.hasValue
-import com.jzbrooks.avdo.graphic.*
-import com.jzbrooks.avdo.graphic.command.CommandString
+import com.jzbrooks.avdo.graphic.ClipPath
+import com.jzbrooks.avdo.graphic.Dimension
+import com.jzbrooks.avdo.graphic.Path
+import com.jzbrooks.avdo.graphic.Size
 import com.jzbrooks.avdo.util.xml.toList
 import com.jzbrooks.avdo.vd.VectorDrawable
 import com.jzbrooks.avdo.vd.VectorDrawableWriter
