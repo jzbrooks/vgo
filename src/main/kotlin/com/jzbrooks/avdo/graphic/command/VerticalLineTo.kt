@@ -1,3 +1,3 @@
 package com.jzbrooks.avdo.graphic.command
 
-data class VerticalLineTo(override val arguments: List<Int>) : ArgCommand
+data class VerticalLineTo(val arguments: List<Int>) : Command
