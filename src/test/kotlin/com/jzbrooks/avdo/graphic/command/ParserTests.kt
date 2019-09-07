@@ -7,9 +7,9 @@ import assertk.assertions.prop
 import kotlin.test.Test
 
 class ParserTests {
-    private val moveToSingle = MoveTo(CommandVariant.ABSOLUTE, listOf(1f to 1f))
-    private val moveToImplicit = MoveTo(CommandVariant.ABSOLUTE, listOf(1f to 1f, 1f to 2f))
-    private val lineToSingle = LineTo(CommandVariant.ABSOLUTE, listOf(2f to 5f))
+    private val moveToSingle = MoveTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 1f)))
+    private val moveToImplicit = MoveTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 1f), Point(1f, 2f)))
+    private val lineToSingle = LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 5f)))
     private val verticalLineToSingle = VerticalLineTo(CommandVariant.ABSOLUTE, listOf(3f))
 
     @Test
@@ -144,7 +144,7 @@ class ParserTests {
         val lineCommand = commands[0] as LineTo
 
         assertThat(lineCommand.arguments[0])
-                .isEqualTo(2.1f to 5f)
+                .isEqualTo(Point(2.1f, 5f))
     }
 
     @Test
@@ -156,6 +156,6 @@ class ParserTests {
         val lineCommand = commands[0] as LineTo
 
         assertThat(lineCommand.arguments[0])
-                .isEqualTo(200f to 5f)
+                .isEqualTo(Point(200f, 5f))
     }
 }

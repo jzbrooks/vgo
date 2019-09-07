@@ -44,9 +44,9 @@ inline class CommandString(val data: String) {
                 }.toList()
     }
 
-    private fun mapArgumentPairs(match: MatchResult): Pair<Float, Float> {
+    private fun mapArgumentPairs(match: MatchResult): Point<Float> {
         val components = match.value.split(Regex("[,\\s]"))
-        return components[0].toFloat() to components[1].toFloat()
+        return Point(components[0].toFloat(), components[1].toFloat())
     }
 
     companion object {
