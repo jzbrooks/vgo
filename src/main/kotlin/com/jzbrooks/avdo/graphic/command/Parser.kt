@@ -9,7 +9,7 @@ inline class CommandString(val data: String) {
                 .filter { it.isNotBlank() }
                 .map { command ->
                     val upperCommand = command.toUpperCase()
-                    val variant = if (command[0].isLowerCase()) VariantCommand.Variant.RELATIVE else VariantCommand.Variant.ABSOLUTE
+                    val variant = if (command[0].isLowerCase()) CommandVariant.RELATIVE else CommandVariant.ABSOLUTE
                     when {
                         upperCommand.startsWith("M") -> {
                             val data = argumentPairs.findAll(command)

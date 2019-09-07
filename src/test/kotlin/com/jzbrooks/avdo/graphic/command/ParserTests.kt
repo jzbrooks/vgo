@@ -7,10 +7,10 @@ import assertk.assertions.prop
 import kotlin.test.Test
 
 class ParserTests {
-    private val moveToSingle = MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1f to 1f))
-    private val moveToImplicit = MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1f to 1f, 1f to 2f))
-    private val lineToSingle = LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2f to 5f))
-    private val verticalLineToSingle = VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3f))
+    private val moveToSingle = MoveTo(CommandVariant.ABSOLUTE, listOf(1f to 1f))
+    private val moveToImplicit = MoveTo(CommandVariant.ABSOLUTE, listOf(1f to 1f, 1f to 2f))
+    private val lineToSingle = LineTo(CommandVariant.ABSOLUTE, listOf(2f to 5f))
+    private val verticalLineToSingle = VerticalLineTo(CommandVariant.ABSOLUTE, listOf(3f))
 
     @Test
     fun testParseCompactCommandString() {
@@ -132,7 +132,7 @@ class ParserTests {
 
         assertThat(commands[0])
                 .prop("variant") { (it as VariantCommand).variant }
-                .isEqualTo(VariantCommand.Variant.RELATIVE)
+                .isEqualTo(CommandVariant.RELATIVE)
     }
 
     @Test

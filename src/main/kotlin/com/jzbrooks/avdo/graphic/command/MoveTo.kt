@@ -1,3 +1,3 @@
 package com.jzbrooks.avdo.graphic.command
 
-data class MoveTo(override val variant: VariantCommand.Variant, val arguments: List<Pair<Float, Float>>) : VariantCommand
+data class MoveTo(override val variant: CommandVariant, val arguments: List<Pair<Float, Float>>) : VariantCommand
