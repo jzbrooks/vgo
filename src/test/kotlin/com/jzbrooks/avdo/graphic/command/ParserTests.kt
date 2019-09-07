@@ -13,6 +13,23 @@ class ParserTests {
     private val verticalLineToSingle = VerticalLineTo(CommandVariant.ABSOLUTE, listOf(3f))
 
     @Test
+    fun testParseQuadraticBezierCurve() {
+        val pathCommandString = "Q1,3 3,3"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        val expected = QuadraticBezierCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                        QuadraticBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f))
+                )
+        )
+
+        assertThat(commands[0])
+                .isEqualTo(expected)
+    }
+
+    @Test
     fun testParseCompactCommandString() {
         val pathCommandString = "M1,1L2,5V3Z"
 

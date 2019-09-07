@@ -13,13 +13,13 @@ inline class CommandString(val data: String) {
                     when {
                         upperCommand.startsWith("M") -> {
                             val data = argumentPairs.findAll(command)
-                                    .map(::mapArgumentPairs)
+                                    .map(::mapPoint)
                                     .toList()
                             MoveTo(variant, data)
                         }
                         upperCommand.startsWith("L") -> {
                             val data = argumentPairs.findAll(command)
-                                    .map(::mapArgumentPairs)
+                                    .map(::mapPoint)
                                     .toList()
 
                             LineTo(variant, data)
@@ -38,21 +38,38 @@ inline class CommandString(val data: String) {
 
                             HorizontalLineTo(variant, data)
                         }
+                        upperCommand.startsWith('Q') -> {
+                            val data = cubicBezierCurveParameters.findAll(command)
+                                    .map(::mapQuadraticBezierCurveParameter)
+                                    .toList()
+
+                            QuadraticBezierCurve(variant, data)
+                        }
                         command.startsWith("Z") -> ClosePath()
                         else -> throw IllegalStateException("Expected one of $commandRegex but was $command")
                     }
                 }.toList()
     }
 
-    private fun mapArgumentPairs(match: MatchResult): Point<Float> {
-        val components = match.value.split(Regex("[,\\s]"))
+    private fun mapPoint(match: MatchResult): Point<Float> {
+        val components = match.value.split(separator)
         return Point(components[0].toFloat(), components[1].toFloat())
+    }
+
+    private fun mapQuadraticBezierCurveParameter(match: MatchResult): QuadraticBezierCurve.Parameter {
+        val components = match.value.split(separator)
+        val control = Point(components[0].toFloat(), components[1].toFloat())
+        val end = Point(components[2].toFloat(), components[3].toFloat())
+
+        return QuadraticBezierCurve.Parameter(control, end)
     }
 
     companion object {
         private val commandRegex = Regex("(?=[MmLlHhVvCcSsQqTtAaZz])\\s*")
         private val number = Regex("[-+]?(?:\\d*\\.\\d+|\\d+\\.?)([eE][-+]?\\d+)?")
+        private val separator = Regex("[,\\s]")
         private val arguments = Regex("$number")
-        private val argumentPairs = Regex("$number[,\\s]$number")
+        private val argumentPairs = Regex("$number$separator$number")
+        private val cubicBezierCurveParameters = Regex("$number$separator$number$separator$number$separator$number")
     }
 }
