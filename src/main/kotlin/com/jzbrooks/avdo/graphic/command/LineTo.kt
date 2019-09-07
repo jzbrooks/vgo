@@ -1,3 +1,3 @@
 package com.jzbrooks.avdo.graphic.command
 
-data class LineTo(val arguments: List<Pair<Int, Int>>) : Command
+data class LineTo(override val variant: VariantCommand.Variant, val arguments: List<Pair<Int, Int>>) : VariantCommand

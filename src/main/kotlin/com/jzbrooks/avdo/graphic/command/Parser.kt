@@ -8,17 +8,19 @@ inline class CommandString(val data: String) {
                 .asSequence()
                 .filter { it.isNotBlank() }
                 .map { command ->
+                    val upperCommand = command.toUpperCase()
+                    val variant = if (command[0].isLowerCase()) VariantCommand.Variant.RELATIVE else VariantCommand.Variant.ABSOLUTE
                     when {
-                        command.startsWith("M") -> {
+                        upperCommand.startsWith("M") -> {
                             val data = argumentPairs.findAll(command)
                                     .map { match ->
                                         val components = match.value.split(Regex("[,\\s]"))
                                         components[0].toInt() to components[1].toInt()
                                     }
                                     .toList()
-                            MoveTo(data)
+                            MoveTo(variant, data)
                         }
-                        command.startsWith("L") -> {
+                        upperCommand.startsWith("L") -> {
                             val data = argumentPairs.findAll(command)
                                     .map { match ->
                                         val components = match.value.split(Regex("[,\\s]"))
@@ -26,21 +28,21 @@ inline class CommandString(val data: String) {
                                     }
                                     .toList()
 
-                            LineTo(data)
+                            LineTo(variant, data)
                         }
-                        command.startsWith("V") -> {
+                        upperCommand.startsWith("V") -> {
                             val data = arguments.findAll(command)
                                     .map { it.value.toInt() }
                                     .toList()
 
-                            VerticalLineTo(data)
+                            VerticalLineTo(variant, data)
                         }
-                        command.startsWith("H") -> {
+                        upperCommand.startsWith("H") -> {
                             val data = arguments.findAll(command)
                                     .map { it.value.toInt() }
                                     .toList()
 
-                            HorizontalLineTo(data)
+                            HorizontalLineTo(variant, data)
                         }
                         command.startsWith("Z") -> ClosePath()
                         else -> throw IllegalStateException("Expected one of $commandRegex but was $command")

@@ -3,6 +3,7 @@ package com.jzbrooks.avdo.graphic.command
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
+import assertk.assertions.prop
 import kotlin.test.Test
 
 class ParserTests {
@@ -14,11 +15,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(listOf(1 to 1)))
+                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1)))
         assertThat(commands[1])
-                .isEqualTo(LineTo(listOf(2 to 5)))
+                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(listOf(3)))
+                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -30,11 +31,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(listOf(1 to 1)))
+                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1)))
         assertThat(commands[1])
-                .isEqualTo(LineTo(listOf(2 to 5)))
+                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(listOf(3)))
+                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -46,11 +47,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(listOf(1 to 1)))
+                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1)))
         assertThat(commands[1])
-                .isEqualTo(LineTo(listOf(2 to 5)))
+                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(listOf(3)))
+                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -62,11 +63,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(listOf(1 to 1, 1 to 2)))
+                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1, 1 to 2)))
         assertThat(commands[1])
-                .isEqualTo(LineTo(listOf(2 to 5)))
+                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(listOf(3)))
+                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -78,11 +79,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(listOf(1 to 1)))
+                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1)))
         assertThat(commands[1])
-                .isEqualTo(LineTo(listOf(2 to 5)))
+                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(listOf(3)))
+                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -94,11 +95,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(listOf(1 to 1, 1 to 2)))
+                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1, 1 to 2)))
         assertThat(commands[1])
-                .isEqualTo(LineTo(listOf(2 to 5)))
+                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(listOf(3)))
+                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
     }
@@ -110,12 +111,23 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .isEqualTo(MoveTo(listOf(1 to 1, 1 to 2)))
+                .isEqualTo(MoveTo(VariantCommand.Variant.ABSOLUTE, listOf(1 to 1, 1 to 2)))
         assertThat(commands[1])
-                .isEqualTo(LineTo(listOf(2 to 5)))
+                .isEqualTo(LineTo(VariantCommand.Variant.ABSOLUTE, listOf(2 to 5)))
         assertThat(commands[2])
-                .isEqualTo(VerticalLineTo(listOf(3)))
+                .isEqualTo(VerticalLineTo(VariantCommand.Variant.ABSOLUTE, listOf(3)))
         assertThat(commands[3])
                 .isInstanceOf(ClosePath::class.java)
+    }
+
+    @Test
+    fun testParseRelativeCommandString() {
+        val pathCommandString = "l2 5"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        assertThat(commands[0])
+                .prop("variant") { (it as VariantCommand).variant }
+                .isEqualTo(VariantCommand.Variant.RELATIVE)
     }
 }
