@@ -45,12 +45,26 @@ inline class CommandString(val data: String) {
 
                             QuadraticBezierCurve(variant, parameters)
                         }
+                        upperCommand.startsWith('T') -> {
+                            val parameters = points.findAll(command)
+                                    .map(::mapPoint)
+                                    .toList()
+
+                            ShortcutQuadraticBezierCurve(variant, parameters)
+                        }
                         upperCommand.startsWith('C') -> {
                             val parameters = cubicBezierCurveParameters.findAll(command)
                                     .map(::mapCubicBezierCurveParameter)
                                     .toList()
 
                             CubicBezierCurve(variant, parameters)
+                        }
+                        upperCommand.startsWith('S') -> {
+                            val parameters = shortcutCubicBezierCurveParameters.findAll(command)
+                                    .map(::mapShortcutCubicBezierCurveParameter)
+                                    .toList()
+
+                            ShortcutCubicBezierCurve(variant, parameters)
                         }
                         upperCommand.startsWith('A') -> {
                             val parameters = arcCurveParameters.findAll(command)
@@ -87,6 +101,14 @@ inline class CommandString(val data: String) {
         return CubicBezierCurve.Parameter(startControl, endControl, end)
     }
 
+    private fun mapShortcutCubicBezierCurveParameter(match: MatchResult): ShortcutCubicBezierCurve.Parameter {
+        val components = match.value.split(separator)
+        val endControl = Point(components[0].toFloat(), components[1].toFloat())
+        val end = Point(components[2].toFloat(), components[3].toFloat())
+
+        return ShortcutCubicBezierCurve.Parameter(endControl, end)
+    }
+
     private fun mapEllipticalArcCurveParameter(match: MatchResult): EllipticalArcCurve.Parameter {
         val components = match.value.split(separator)
         val radiusX = components[0].toFloat()
@@ -106,6 +128,7 @@ inline class CommandString(val data: String) {
         private val points = Regex(Array(2) { number.pattern }.joinToString(separator = separator.pattern))
         private val quadraticBezierCurveParameters = Regex(Array(2) { points.pattern }.joinToString(separator = separator.pattern))
         private val cubicBezierCurveParameters = Regex(Array(3) { points.pattern }.joinToString(separator = separator.pattern))
+        private val shortcutCubicBezierCurveParameters = Regex(Array(2) { points.pattern }.joinToString(separator = separator.pattern))
         private val arcCurveParameters = Regex(Array(7) { number.pattern }.joinToString(separator = separator.pattern))
     }
 }

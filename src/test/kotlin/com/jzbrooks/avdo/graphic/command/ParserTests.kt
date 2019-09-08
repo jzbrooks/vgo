@@ -31,6 +31,18 @@ class ParserTests {
     }
 
     @Test
+    fun testParseShortcutQuadraticBezierCurve() {
+        val pathCommandString = "T1,3"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        val expected = ShortcutQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(1f, 3f)))
+
+        assertThat(commands[0])
+                .isEqualTo(expected)
+    }
+
+    @Test
     fun testParseCubicBezierCurve() {
         val pathCommandString = "C1,3 3,3 4,3"
 
@@ -41,6 +53,21 @@ class ParserTests {
                 listOf(
                         CubicBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f), Point(4f, 3f))
                 )
+        )
+
+        assertThat(commands[0])
+                .isEqualTo(expected)
+    }
+
+    @Test
+    fun testParseShortcutCubicBezierCurve() {
+        val pathCommandString = "S1,3 2,4"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        val expected = ShortcutCubicBezierCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(ShortcutCubicBezierCurve.Parameter(Point(1f, 3f), Point(2f, 4f)))
         )
 
         assertThat(commands[0])
