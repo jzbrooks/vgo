@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
+import java.lang.IllegalStateException
 import kotlin.test.Test
 
 class ParserTests {
@@ -201,7 +202,7 @@ class ParserTests {
 
         val lineCommand = commands[0] as LineTo
 
-        assertThat(lineCommand.arguments[0])
+        assertThat(lineCommand.parameters[0])
                 .isEqualTo(Point(2.1f, 5f))
     }
 
@@ -213,7 +214,14 @@ class ParserTests {
 
         val lineCommand = commands[0] as LineTo
 
-        assertThat(lineCommand.arguments[0])
+        assertThat(lineCommand.parameters[0])
                 .isEqualTo(Point(200f, 5f))
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun testInvalidCommandParsing() {
+        val pathCommandString = "G 3 2"
+
+        CommandString(pathCommandString).toCommandList()
     }
 }

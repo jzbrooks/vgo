@@ -11,55 +11,55 @@ inline class CommandString(val data: String) {
                     val upperCommand = command.toUpperCase()
                     val variant = if (command[0].isLowerCase()) CommandVariant.RELATIVE else CommandVariant.ABSOLUTE
                     when {
-                        upperCommand.startsWith("M") -> {
-                            val data = points.findAll(command)
+                        upperCommand.startsWith('M') -> {
+                            val parameters = points.findAll(command)
                                     .map(::mapPoint)
                                     .toList()
-                            MoveTo(variant, data)
+                            MoveTo(variant, parameters)
                         }
-                        upperCommand.startsWith("L") -> {
-                            val data = points.findAll(command)
+                        upperCommand.startsWith('L') -> {
+                            val parameters = points.findAll(command)
                                     .map(::mapPoint)
                                     .toList()
 
-                            LineTo(variant, data)
+                            LineTo(variant, parameters)
                         }
-                        upperCommand.startsWith("V") -> {
-                            val data = number.findAll(command)
+                        upperCommand.startsWith('V') -> {
+                            val parameters = number.findAll(command)
                                     .map { it.value.toFloat() }
                                     .toList()
 
-                            VerticalLineTo(variant, data)
+                            VerticalLineTo(variant, parameters)
                         }
-                        upperCommand.startsWith("H") -> {
-                            val data = number.findAll(command)
+                        upperCommand.startsWith('H') -> {
+                            val parameters = number.findAll(command)
                                     .map { it.value.toFloat() }
                                     .toList()
 
-                            HorizontalLineTo(variant, data)
+                            HorizontalLineTo(variant, parameters)
                         }
                         upperCommand.startsWith('Q') -> {
-                            val data = quadraticBezierCurveParameters.findAll(command)
+                            val parameters = quadraticBezierCurveParameters.findAll(command)
                                     .map(::mapQuadraticBezierCurveParameter)
                                     .toList()
 
-                            QuadraticBezierCurve(variant, data)
+                            QuadraticBezierCurve(variant, parameters)
                         }
                         upperCommand.startsWith('C') -> {
-                            val data = cubicBezierCurveParameters.findAll(command)
+                            val parameters = cubicBezierCurveParameters.findAll(command)
                                     .map(::mapCubicBezierCurveParameter)
                                     .toList()
 
-                            CubicBezierCurve(variant, data)
+                            CubicBezierCurve(variant, parameters)
                         }
                         upperCommand.startsWith('A') -> {
-                            val data = arcCurveParameters.findAll(command)
+                            val parameters = arcCurveParameters.findAll(command)
                                     .map(::mapEllipticalArcCurveParameter)
                                     .toList()
 
-                            EllipticalArcCurve(variant, data)
+                            EllipticalArcCurve(variant, parameters)
                         }
-                        command.startsWith("Z") -> ClosePath()
+                        command.startsWith('Z') -> ClosePath()
                         else -> throw IllegalStateException("Expected one of $commandRegex but was $command")
                     }
                 }.toList()
