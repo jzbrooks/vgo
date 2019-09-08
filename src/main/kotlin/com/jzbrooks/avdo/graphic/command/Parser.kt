@@ -79,7 +79,7 @@ inline class CommandString(val data: String) {
                 }.toList()
     }
 
-    private fun mapPoint(match: MatchResult): Point<Float> {
+    private fun mapPoint(match: MatchResult): Point {
         val components = match.value.split(separator)
         return Point(components[0].toFloat(), components[1].toFloat())
     }

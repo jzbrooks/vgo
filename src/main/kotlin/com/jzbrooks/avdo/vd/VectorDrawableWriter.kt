@@ -29,7 +29,7 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
             val node = when (element) {
                 is Path -> {
                     val pathElement = document.createElement("path")
-                    pathElement.setAttribute("android:pathData", element.data)
+                    pathElement.setAttribute("android:pathData", element.commands.joinToString(separator = ""))
                     pathElement
                 }
                 is Group -> {

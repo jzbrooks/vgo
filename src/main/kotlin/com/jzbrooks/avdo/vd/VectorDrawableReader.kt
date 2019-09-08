@@ -1,6 +1,7 @@
 package com.jzbrooks.avdo.vd
 
 import com.jzbrooks.avdo.graphic.*
+import com.jzbrooks.avdo.graphic.command.CommandString
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 import java.io.InputStream
@@ -50,9 +51,9 @@ private fun parseGroup(groupNode: Node): Group {
         childPath.getAndroidName()?.let { node ->
             metadata[node.nodeName] = node.nodeValue
         }
-        val data = childPath.attributes.getNamedItem("android:pathData").textContent
+        val data = CommandString(childPath.attributes.getNamedItem("android:pathData").textContent)
         val strokeWidth = childPath.attributes.getNamedItem("android:strokeWidth").textContent.toInt()
-        groupPathList.add(Path(data, strokeWidth, metadata.toMap()))
+        groupPathList.add(Path(data.toCommandList(), strokeWidth, metadata.toMap()))
     }
 
     return Group(groupPathList, groupMetadata.toMap())
@@ -63,9 +64,9 @@ private fun parsePath(pathNode: Node): Path {
     pathNode.getAndroidName()?.let { node ->
         metadata[node.nodeName] = node.nodeValue
     }
-    val data = pathNode.attributes.getNamedItem("android:pathData").textContent
+    val data = CommandString(pathNode.attributes.getNamedItem("android:pathData").textContent)
     val strokeWidth = pathNode.attributes.getNamedItem("android:strokeWidth").textContent.toInt()
-    return Path(data, strokeWidth, metadata.toMap())
+    return Path(data.toCommandList(), strokeWidth, metadata.toMap())
 }
 
 private fun parseClipPath(pathNode: Node): ClipPath {
@@ -73,8 +74,8 @@ private fun parseClipPath(pathNode: Node): ClipPath {
     pathNode.getAndroidName()?.let { node ->
         metadata[node.nodeName] = node.nodeValue
     }
-    val data = pathNode.attributes.getNamedItem("android:pathData").textContent
-    return ClipPath(data, metadata.toMap())
+    val data = CommandString(pathNode.attributes.getNamedItem("android:pathData").textContent)
+    return ClipPath(data.toCommandList(), metadata.toMap())
 }
 
 private fun Node.getAndroidName(): Node? = this.attributes.getNamedItem("android:name")

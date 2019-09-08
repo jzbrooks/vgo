@@ -1,3 +1,5 @@
 package com.jzbrooks.avdo.graphic.command
 
-data class Point<T : Number>(val x: T, val y: T)
+data class Point(val x: Float, val y: Float) {
+    override fun toString() = "${x.compactString()},${y.compactString()}"
+}
