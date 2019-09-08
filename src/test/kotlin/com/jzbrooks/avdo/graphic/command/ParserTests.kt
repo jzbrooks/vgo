@@ -30,6 +30,23 @@ class ParserTests {
     }
 
     @Test
+    fun testParseCubicBezierCurve() {
+        val pathCommandString = "C1,3 3,3 4,3"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        val expected = CubicBezierCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                        CubicBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f), Point(4f, 3f))
+                )
+        )
+
+        assertThat(commands[0])
+                .isEqualTo(expected)
+    }
+
+    @Test
     fun testParseCompactCommandString() {
         val pathCommandString = "M1,1L2,5V3Z"
 
