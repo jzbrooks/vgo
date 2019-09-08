@@ -47,6 +47,30 @@ class ParserTests {
     }
 
     @Test
+    fun testParseEllipticalArcCurve() {
+        val pathCommandString = "A 1 3 97 1 0 10 10"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        val expected = EllipticalArcCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                        EllipticalArcCurve.Parameter(
+                                1f,
+                                3f,
+                                97f,
+                                EllipticalArcCurve.ArcFlag.LARGE,
+                                EllipticalArcCurve.SweepFlag.ANTICLOCKWISE,
+                                Point(10f, 10f)
+                        )
+                )
+        )
+
+        assertThat(commands[0])
+                .isEqualTo(expected)
+    }
+
+    @Test
     fun testParseCompactCommandString() {
         val pathCommandString = "M1,1L2,5V3Z"
 

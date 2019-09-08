@@ -52,6 +52,13 @@ inline class CommandString(val data: String) {
 
                             CubicBezierCurve(variant, data)
                         }
+                        upperCommand.startsWith('A') -> {
+                            val data = arcCurveParameters.findAll(command)
+                                    .map(::mapEllipticalArcCurveParameter)
+                                    .toList()
+
+                            EllipticalArcCurve(variant, data)
+                        }
                         command.startsWith("Z") -> ClosePath()
                         else -> throw IllegalStateException("Expected one of $commandRegex but was $command")
                     }
@@ -80,6 +87,18 @@ inline class CommandString(val data: String) {
         return CubicBezierCurve.Parameter(startControl, endControl, end)
     }
 
+    private fun mapEllipticalArcCurveParameter(match: MatchResult): EllipticalArcCurve.Parameter {
+        val components = match.value.split(separator)
+        val radiusX = components[0].toFloat()
+        val radiusY = components[1].toFloat()
+        val angle = components[2].toFloat()
+        val arcFlag = if (components[3].toInt() == 1) EllipticalArcCurve.ArcFlag.LARGE else EllipticalArcCurve.ArcFlag.SMALL
+        val sweepFlag = if (components[4].toInt() == 1) EllipticalArcCurve.SweepFlag.CLOCKWISE else EllipticalArcCurve.SweepFlag.ANTICLOCKWISE
+        val end = Point(components[5].toFloat(), components[6].toFloat())
+
+        return EllipticalArcCurve.Parameter(radiusX, radiusY, angle, arcFlag, sweepFlag, end)
+    }
+
     companion object {
         private val commandRegex = Regex("(?=[MmLlHhVvCcSsQqTtAaZz])\\s*")
         private val number = Regex("[-+]?(?:\\d*\\.\\d+|\\d+\\.?)([eE][-+]?\\d+)?")
@@ -87,5 +106,6 @@ inline class CommandString(val data: String) {
         private val points = Regex(Array(2) { number.pattern }.joinToString(separator = separator.pattern))
         private val quadraticBezierCurveParameters = Regex(Array(2) { points.pattern }.joinToString(separator = separator.pattern))
         private val cubicBezierCurveParameters = Regex(Array(3) { points.pattern }.joinToString(separator = separator.pattern))
+        private val arcCurveParameters = Regex(Array(7) { number.pattern }.joinToString(separator = separator.pattern))
     }
 }
