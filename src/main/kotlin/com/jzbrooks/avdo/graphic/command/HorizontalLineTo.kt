@@ -1,6 +1,6 @@
 package com.jzbrooks.avdo.graphic.command
 
-data class HorizontalLineTo(override val variant: CommandVariant, val parameters: List<Float>) : VariantCommand {
+data class HorizontalLineTo(override var variant: CommandVariant, var parameters: List<Float>) : VariantCommand {
     override fun toString(): String {
         val command = when (variant) {
             CommandVariant.ABSOLUTE -> 'H'

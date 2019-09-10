@@ -1,6 +1,6 @@
 package com.jzbrooks.avdo.graphic.command
 
-data class QuadraticBezierCurve(override val variant: CommandVariant, val parameters: List<Parameter>) : VariantCommand {
+data class QuadraticBezierCurve(override var variant: CommandVariant, var parameters: List<Parameter>) : VariantCommand {
     override fun toString(): String {
         val command = when (variant) {
             CommandVariant.ABSOLUTE -> 'Q'
@@ -10,7 +10,7 @@ data class QuadraticBezierCurve(override val variant: CommandVariant, val parame
         return "$command${parameters.joinToString(separator = " ")}"
     }
 
-    data class Parameter(val control: Point, val end: Point) {
+    data class Parameter(var control: Point, var end: Point) {
         override fun toString() = "$control $end"
     }
 }

@@ -1,3 +1,3 @@
 package com.jzbrooks.avdo.graphic
 
-data class ViewBox(val minX: Int, val minY: Int, val width: Int, val height: Int)
+data class ViewBox(var minX: Int, var minY: Int, var width: Int, var height: Int)

@@ -1,7 +1,7 @@
 package com.jzbrooks.avdo.graphic
 
 interface Graphic : Element {
-    val elements: List<Element>
-    val size: Size
-    val viewBox: ViewBox
+    var elements: List<Element>
+    var size: Size
+    var viewBox: ViewBox
 }

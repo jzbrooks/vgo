@@ -1,6 +1,6 @@
 package com.jzbrooks.avdo.graphic.command
 
-data class ShortcutQuadraticBezierCurve(override val variant: CommandVariant, val parameters: List<Point>) : VariantCommand {
+data class ShortcutQuadraticBezierCurve(override var variant: CommandVariant, var parameters: List<Point>) : VariantCommand {
     override fun toString(): String {
         val command = when (variant) {
             CommandVariant.ABSOLUTE -> 'T'

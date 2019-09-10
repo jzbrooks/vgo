@@ -1,3 +1,3 @@
 package com.jzbrooks.avdo.graphic
 
-data class Size(val width: Dimension, val height: Dimension)
+data class Size(var width: Dimension, var height: Dimension)

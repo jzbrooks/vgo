@@ -1,6 +1,6 @@
 package com.jzbrooks.avdo.graphic.command
 
-data class EllipticalArcCurve(override val variant: CommandVariant, val parameters: List<Parameter>) : VariantCommand {
+data class EllipticalArcCurve(override var variant: CommandVariant, var parameters: List<Parameter>) : VariantCommand {
     override fun toString(): String {
         val command = when (variant) {
             CommandVariant.ABSOLUTE -> 'A'
@@ -10,7 +10,7 @@ data class EllipticalArcCurve(override val variant: CommandVariant, val paramete
         return "$command${parameters.joinToString(separator = " ")}"
     }
 
-    data class Parameter(val radiusX: Float, val radiusY: Float, val angle: Float, val arc: ArcFlag, val sweep: SweepFlag, val end: Point) {
+    data class Parameter(var radiusX: Float, var radiusY: Float, var angle: Float, var arc: ArcFlag, var sweep: SweepFlag, var end: Point) {
         override fun toString() = "${radiusX.compactString()},${radiusY.compactString()},${angle.compactString()},$arc,$sweep,$end"
     }
 

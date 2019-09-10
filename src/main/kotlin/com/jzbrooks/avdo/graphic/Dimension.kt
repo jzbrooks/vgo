@@ -1,6 +1,6 @@
 package com.jzbrooks.avdo.graphic
 
-data class Dimension(val value: Int, val unit: Unit = Unit.Px) {
+data class Dimension(var value: Int, var unit: Unit = Unit.Px) {
     override fun toString(): String {
         return value.toString() + unit.toString()
     }

@@ -1,3 +1,3 @@
 package com.jzbrooks.avdo.graphic
 
-data class Group(val paths: List<Path>, override val metadata: Map<String, String> = emptyMap()): Element
+data class Group(var paths: List<Path>, override var metadata: Map<String, String> = emptyMap()): Element
