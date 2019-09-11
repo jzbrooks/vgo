@@ -1,4 +1,4 @@
-package com.jzbrooks.avdo
+package com.jzbrooks.avdo.vd
 
 import assertk.assertThat
 import assertk.assertions.hasSize
@@ -7,7 +7,6 @@ import com.jzbrooks.avdo.assertk.extensions.containsKey
 import com.jzbrooks.avdo.graphic.Graphic
 import com.jzbrooks.avdo.graphic.Path
 import com.jzbrooks.avdo.graphic.command.*
-import com.jzbrooks.avdo.vd.parse
 import kotlin.test.Test
 
 class VectorDrawableReaderTests {

@@ -1,4 +1,4 @@
-package com.jzbrooks.avdo
+package com.jzbrooks.avdo.vd
 
 import assertk.assertThat
 import assertk.assertions.endsWith
@@ -12,8 +12,6 @@ import com.jzbrooks.avdo.graphic.Path
 import com.jzbrooks.avdo.graphic.Size
 import com.jzbrooks.avdo.graphic.command.*
 import com.jzbrooks.avdo.util.xml.toList
-import com.jzbrooks.avdo.vd.VectorDrawable
-import com.jzbrooks.avdo.vd.VectorDrawableWriter
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
