@@ -1,7 +1,10 @@
 package com.jzbrooks.avdo
 
+import com.jzbrooks.avdo.graphic.Path
+import com.jzbrooks.avdo.optimization.CommandVariantOptimization
 import com.jzbrooks.avdo.vd.VectorDrawableWriter
 import com.jzbrooks.avdo.vd.parse
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -22,16 +25,28 @@ fun main(args: Array<String>) {
     val writer = VectorDrawableWriter(writerOptions)
 
     FileInputStream(path).use { inputStream ->
-        val reader = parse(inputStream)
+        val bytes = inputStream.readBytes()
+        val sizeBefore = bytes.size
 
-        ByteArrayOutputStream().use {
-            writer.write(reader, it)
-            println(it.toString())
+        val vectorDrawable = ByteArrayInputStream(bytes).use {
+            parse(it)
         }
+
+        val opt = CommandVariantOptimization()
+        vectorDrawable.elements.asSequence().filterIsInstance<Path>().forEach(opt::visit)
+
+        val sizeAfter = ByteArrayOutputStream().use {
+            writer.write(vectorDrawable, it)
+            it.size()
+        }
+
+        println("Size before: $sizeBefore")
+        println("Size after: $sizeAfter")
+        println("Percent saved: ${((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100}")
 
         if (nonOptionArgs.size > 1) {
             FileOutputStream(nonOptionArgs[1]).use {
-                writer.write(reader, it)
+                writer.write(vectorDrawable, it)
             }
         }
     }
