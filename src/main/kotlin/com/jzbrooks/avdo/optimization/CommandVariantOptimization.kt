@@ -1,11 +1,11 @@
 package com.jzbrooks.avdo.optimization
 
-import com.jzbrooks.avdo.graphic.Path
+import com.jzbrooks.avdo.graphic.PathElement
 import com.jzbrooks.avdo.graphic.command.*
 import java.lang.IllegalStateException
 import java.util.Stack
 
-class CommandVariantOptimization : Optimization<Path> {
+class CommandVariantOptimization : Optimization<PathElement> {
     // Updated once per process call when computing
     // the other variant of the command. This works
     // because the coordinates are accurate regardless
@@ -13,7 +13,7 @@ class CommandVariantOptimization : Optimization<Path> {
     private var currentPoint = Point(0f, 0f)
     private val subPathStart = Stack<Point>()
 
-    override fun visit(element: Path) {
+    override fun visit(element: PathElement) {
         element.commands = element.commands.map { command ->
             when (command) {
                 is MoveTo -> process(command)

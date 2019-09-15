@@ -1,6 +1,6 @@
 package com.jzbrooks.avdo
 
-import com.jzbrooks.avdo.graphic.Path
+import com.jzbrooks.avdo.graphic.PathElement
 import com.jzbrooks.avdo.optimization.CommandVariantOptimization
 import com.jzbrooks.avdo.vd.VectorDrawableWriter
 import com.jzbrooks.avdo.vd.parse
@@ -28,12 +28,10 @@ fun main(args: Array<String>) {
         val bytes = inputStream.readBytes()
         val sizeBefore = bytes.size
 
-        val vectorDrawable = ByteArrayInputStream(bytes).use {
-            parse(it)
-        }
+        val vectorDrawable = ByteArrayInputStream(bytes).use(::parse)
 
         val opt = CommandVariantOptimization()
-        vectorDrawable.elements.asSequence().filterIsInstance<Path>().forEach(opt::visit)
+        vectorDrawable.elements.asSequence().filterIsInstance<PathElement>().forEach(opt::visit)
 
         val sizeAfter = ByteArrayOutputStream().use {
             writer.write(vectorDrawable, it)

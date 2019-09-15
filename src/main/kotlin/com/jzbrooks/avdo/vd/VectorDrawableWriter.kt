@@ -28,15 +28,17 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         loop@ for (element in graphic.elements) {
             val node = when (element) {
                 is Path -> {
-                    val pathElement = document.createElement("path")
-                    pathElement.setAttribute("android:pathData", element.commands.joinToString(separator = ""))
-                    pathElement
+                    document.createElement("path").apply {
+                        setAttribute("android:pathData", element.commands.joinToString(separator = ""))
+                    }
                 }
                 is Group -> {
                     document.createElement("group")
                 }
                 is ClipPath -> {
-                    document.createElement("clip-path")
+                    document.createElement("clip-path").apply {
+                        setAttribute("android:pathData", element.commands.joinToString(separator = ""))
+                    }
                 }
                 else -> continue@loop
             }
