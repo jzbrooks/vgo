@@ -2,10 +2,11 @@ package com.jzbrooks.avdo.optimization
 
 import com.jzbrooks.avdo.graphic.PathElement
 import com.jzbrooks.avdo.graphic.command.*
+import com.jzbrooks.avdo.graphic.command.CommandVariant
 import java.lang.IllegalStateException
 import java.util.Stack
 
-class CommandVariantOptimization : Optimization<PathElement> {
+class CommandVariant : Optimization<PathElement> {
     // Updated once per process call when computing
     // the other variant of the command. This works
     // because the coordinates are accurate regardless

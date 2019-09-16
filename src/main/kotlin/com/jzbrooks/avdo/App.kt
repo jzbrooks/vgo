@@ -1,7 +1,10 @@
 package com.jzbrooks.avdo
 
+import com.jzbrooks.avdo.graphic.Group
 import com.jzbrooks.avdo.graphic.PathElement
-import com.jzbrooks.avdo.optimization.CommandVariantOptimization
+import com.jzbrooks.avdo.optimization.CommandVariant
+import com.jzbrooks.avdo.optimization.MergeGroupPaths
+import com.jzbrooks.avdo.optimization.MergeGraphicPaths
 import com.jzbrooks.avdo.vd.VectorDrawableWriter
 import com.jzbrooks.avdo.vd.parse
 import java.io.ByteArrayInputStream
@@ -30,8 +33,14 @@ fun main(args: Array<String>) {
 
         val vectorDrawable = ByteArrayInputStream(bytes).use(::parse)
 
-        val opt = CommandVariantOptimization()
+        val opt = CommandVariant()
         vectorDrawable.elements.asSequence().filterIsInstance<PathElement>().forEach(opt::visit)
+
+        val opt2 = MergeGraphicPaths()
+        opt2.visit(vectorDrawable)
+
+        val opt3 = MergeGroupPaths()
+        vectorDrawable.elements.filterIsInstance<Group>().forEach(opt3::visit)
 
         val sizeAfter = ByteArrayOutputStream().use {
             writer.write(vectorDrawable, it)
