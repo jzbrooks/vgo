@@ -1,6 +1,7 @@
 package com.jzbrooks.avdo.vd
 
 import com.jzbrooks.avdo.graphic.*
+import com.jzbrooks.avdo.graphic.command.Command
 import com.jzbrooks.avdo.graphic.command.CommandString
 import org.w3c.dom.Node
 import org.w3c.dom.Text
@@ -22,7 +23,7 @@ fun parse(input: InputStream): VectorDrawable {
     val rootMetadata = mutableMapOf<String, String>()
     val root = document.childNodes.item(0)
 
-    root.getAndroidName()?.let { node ->
+    root.attributes.getNamedItem("android:name")?.let { node ->
         rootMetadata[node.nodeName] = node.nodeValue
     }
 
@@ -31,8 +32,8 @@ fun parse(input: InputStream): VectorDrawable {
         if (element !is Text) {
             when (element.nodeName) {
                 "group" -> elements.add(parseGroup(element))
-                "path" -> elements.add(parsePath(element))
-                "clip-path" -> elements.add(parseClipPath(element))
+                "path" -> elements.add(parsePathElement(element) { c, m -> Path(c, m) })
+                "clip-path" -> elements.add(parsePathElement(element) { c, m -> ClipPath(c, m) })
                 else -> System.err.println("Unknown document element: ${element.nodeName}")
             }
         }
@@ -46,36 +47,24 @@ private fun parseGroup(groupNode: Node): Group {
     val groupMetadata = mutableMapOf<String, String>()
 
     for (child in 0 until groupNode.childNodes.length) {
-        val metadata = mutableMapOf<String, String>()
-        val childPath = groupNode.childNodes.item(child)
-        childPath.getAndroidName()?.let { node ->
-            metadata[node.nodeName] = node.nodeValue
-        }
-        val data = CommandString(childPath.attributes.getNamedItem("android:pathData").textContent)
-        val strokeWidth = childPath.attributes.getNamedItem("android:strokeWidth").textContent.toInt()
-        groupPathList.add(Path(data.toCommandList(), strokeWidth, metadata.toMap()))
+        val pathNode = groupNode.childNodes.item(child)
+        val path = parsePathElement(pathNode) { c, m -> Path(c, m) }
+        groupPathList.add(path)
     }
 
     return Group(groupPathList, groupMetadata.toMap())
 }
 
-private fun parsePath(pathNode: Node): Path {
+private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Command>, Map<String, String>) -> T): T {
     val metadata = mutableMapOf<String, String>()
-    pathNode.getAndroidName()?.let { node ->
-        metadata[node.nodeName] = node.nodeValue
-    }
-    val data = CommandString(pathNode.attributes.getNamedItem("android:pathData").textContent)
-    val strokeWidth = pathNode.attributes.getNamedItem("android:strokeWidth").textContent.toInt()
-    return Path(data.toCommandList(), strokeWidth, metadata.toMap())
-}
 
-private fun parseClipPath(pathNode: Node): ClipPath {
-    val metadata = mutableMapOf<String, String>()
-    pathNode.getAndroidName()?.let { node ->
-        metadata[node.nodeName] = node.nodeValue
+    for (i in 0 until node.attributes.length) {
+        val attribute = node.attributes.item(i)
+        if (attribute.nodeName != "android:pathData") {
+            metadata[attribute.nodeName] = attribute.nodeValue
+        }
     }
-    val data = CommandString(pathNode.attributes.getNamedItem("android:pathData").textContent)
-    return ClipPath(data.toCommandList(), metadata.toMap())
-}
 
-private fun Node.getAndroidName(): Node? = this.attributes.getNamedItem("android:name")
+    val data = CommandString(node.attributes.getNamedItem("android:pathData").textContent)
+    return generator(data.toCommandList(), metadata.toMap())
+}

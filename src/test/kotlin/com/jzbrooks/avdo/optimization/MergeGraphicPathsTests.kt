@@ -11,18 +11,18 @@ class MergeGraphicPathsTests {
     @Test
     fun testMergePaths() {
         val paths = listOf(
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))), 1),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))), 1),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
                 Path(
                         listOf(
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                                 ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                        ),
-                        1),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), 1, mapOf("android:strokeWidth" to "1")),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))), 1),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))), 1)
+                        )
+                ),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mapOf("android:strokeWidth" to "1")),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
         )
 
         val graphic = object : Graphic {

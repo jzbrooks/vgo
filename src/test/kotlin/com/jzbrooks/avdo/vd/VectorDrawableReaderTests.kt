@@ -21,6 +21,28 @@ class VectorDrawableReaderTests {
     }
 
     @Test
+    fun testParseMetadataDoesNotContainPathData() {
+        javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
+            val graphic: Graphic = parse(it)
+
+            val path = graphic.elements.first() as Path
+
+            assertThat(path.metadata.containsKey("android:pathData")).isEqualTo(false)
+        }
+    }
+
+    @Test
+    fun testParseMetadata() {
+        javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
+            val graphic: Graphic = parse(it)
+
+            val path = graphic.elements.first() as Path
+
+            assertThat(path.metadata).hasSize(3)
+        }
+    }
+
+    @Test
     fun testParsePaths() {
         javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
             val graphic: Graphic = parse(it)

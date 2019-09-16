@@ -25,8 +25,7 @@ class CommandVariantTests {
                         ShortcutQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                         EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
                         ClosePath()
-                ),
-                1
+                )
         )
 
         val copy = path.copy()
@@ -48,8 +47,7 @@ class CommandVariantTests {
                         LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
                         HorizontalLineTo(CommandVariant.RELATIVE, listOf(0f)),
                         VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f))
-                ),
-                1
+                )
         )
 
         CommandVariant().visit(path)
@@ -66,8 +64,7 @@ class CommandVariantTests {
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(3f, 7f))),
                         HorizontalLineTo(CommandVariant.RELATIVE, listOf(0f)),
                         VerticalLineTo(CommandVariant.ABSOLUTE, listOf(-14f))
-                ),
-                1
+                )
         )
 
         CommandVariant().visit(path)
@@ -93,8 +90,7 @@ class CommandVariantTests {
                         ShortcutQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                         EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
                         ClosePath()
-                ),
-                1
+                )
         )
 
         val copy = path.copy()
@@ -115,8 +111,7 @@ class CommandVariantTests {
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(103f, 6f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f), Point(93f, 10f))),
                         ClosePath()
-                ),
-                1
+                )
         )
 
         val copy = path.copy()
