@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.jzbrooks.avdo.assertk.extensions.containsKey
+import com.jzbrooks.avdo.assertk.extensions.containsKeys
+import com.jzbrooks.avdo.assertk.extensions.doesNotContainKey
 import com.jzbrooks.avdo.graphic.Graphic
 import com.jzbrooks.avdo.graphic.Path
 import com.jzbrooks.avdo.graphic.command.*
@@ -27,7 +29,7 @@ class VectorDrawableReaderTests {
 
             val path = graphic.elements.first() as Path
 
-            assertThat(path.metadata.containsKey("android:pathData")).isEqualTo(false)
+            assertThat(path.metadata).doesNotContainKey("android:pathData")
         }
     }
 
@@ -38,7 +40,7 @@ class VectorDrawableReaderTests {
 
             val path = graphic.elements.first() as Path
 
-            assertThat(path.metadata).hasSize(3)
+            assertThat(path.metadata).containsKeys("android:name", "android:strokeWidth", "android:fillColor")
         }
     }
 
