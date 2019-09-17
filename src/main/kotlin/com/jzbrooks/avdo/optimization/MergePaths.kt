@@ -18,29 +18,23 @@ class MergeGraphicPaths : MergePaths(), Optimization<Graphic> {
 }
 
 abstract class MergePaths {
-    private val mergedPaths = mutableMapOf<Int, PathElement>()
-    private val removedPaths = mutableSetOf<PathElement>()
-
     protected fun merge(paths: List<PathElement>): List<PathElement> {
-        for ((index, current) in paths.withIndex()) {
-            if (mergedPaths.isEmpty()) {
-                mergedPaths[index] = current
-                continue
-            }
+        val mergedPaths = paths.toMutableList()
 
-            val previous = mergedPaths.values.last()
+        var removedPathElementCount = 0
+        for (index in 1 until paths.size) {
+            val current = paths[index]
+            val previous = paths[index - 1]
+
             if (current::class != previous::class || current.metadata != previous.metadata) {
-                mergedPaths[index] = current
                 continue
             }
 
             previous.commands += current.commands
-            removedPaths.add(current)
+            mergedPaths.removeAt(index - removedPathElementCount)
+            removedPathElementCount++
         }
 
-        return paths.asSequence()
-                .mapIndexed { index, existing -> mergedPaths[index] ?: existing }
-                .filter { pathElement -> !removedPaths.contains(pathElement) }
-                .toList()
+        return mergedPaths
     }
 }
