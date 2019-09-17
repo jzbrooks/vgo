@@ -1,15 +1,41 @@
 package com.jzbrooks.avdo.optimization
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
+import assertk.assertions.hasSize
 import com.jzbrooks.avdo.graphic.*
 import com.jzbrooks.avdo.graphic.command.*
 import com.jzbrooks.avdo.graphic.command.CommandVariant
 import org.junit.Test
 
-class MergeGraphicPathsTests {
+class MergePathsTests {
+
     @Test
-    fun testMergePaths() {
+    fun testMergeGroupPaths() {
+        val paths = listOf(
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
+                Path(
+                        listOf(
+                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
+                                ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
+                        )
+                ),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mapOf("android:strokeWidth" to "1")),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
+        )
+
+        val group = Group(paths)
+
+        val optimization = MergeGroupPaths()
+        optimization.visit(group)
+
+        assertThat(group.paths).hasSize(3)
+    }
+
+    @Test
+    fun testMergeGraphicPaths() {
         val paths = listOf(
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
@@ -35,6 +61,6 @@ class MergeGraphicPathsTests {
         val optimization = MergeGraphicPaths()
         optimization.visit(graphic)
 
-        assertThat(graphic.elements.size).isEqualTo(3)
+        assertThat(graphic.elements).hasSize(3)
     }
 }
