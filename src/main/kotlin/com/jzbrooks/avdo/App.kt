@@ -3,8 +3,8 @@ package com.jzbrooks.avdo
 import com.jzbrooks.avdo.graphic.Group
 import com.jzbrooks.avdo.graphic.PathElement
 import com.jzbrooks.avdo.optimization.CommandVariant
-import com.jzbrooks.avdo.optimization.MergeGroupPaths
 import com.jzbrooks.avdo.optimization.MergeGraphicPaths
+import com.jzbrooks.avdo.optimization.MergeGroupPaths
 import com.jzbrooks.avdo.vd.VectorDrawableWriter
 import com.jzbrooks.avdo.vd.parse
 import java.io.ByteArrayInputStream
