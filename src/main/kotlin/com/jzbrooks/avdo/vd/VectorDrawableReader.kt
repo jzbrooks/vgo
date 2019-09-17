@@ -32,8 +32,8 @@ fun parse(input: InputStream): VectorDrawable {
         if (element !is Text) {
             when (element.nodeName) {
                 "group" -> elements.add(parseGroup(element))
-                "path" -> elements.add(parsePathElement(element) { c, m -> Path(c, m) })
-                "clip-path" -> elements.add(parsePathElement(element) { c, m -> ClipPath(c, m) })
+                "path" -> elements.add(parsePathElement(element, ::Path))
+                "clip-path" -> elements.add(parsePathElement(element, ::ClipPath))
                 else -> System.err.println("Unknown document element: ${element.nodeName}")
             }
         }
@@ -48,7 +48,7 @@ private fun parseGroup(groupNode: Node): Group {
 
     for (child in 0 until groupNode.childNodes.length) {
         val pathNode = groupNode.childNodes.item(child)
-        val path = parsePathElement(pathNode) { c, m -> Path(c, m) }
+        val path = parsePathElement(pathNode, ::Path)
         groupPathList.add(path)
     }
 
