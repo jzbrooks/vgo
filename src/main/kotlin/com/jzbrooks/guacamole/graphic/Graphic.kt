@@ -1,7 +1,7 @@
 package com.jzbrooks.guacamole.graphic
 
-interface Graphic : Element {
-    var elements: List<Element>
+interface Graphic : ContainerElement {
+    override var elements: List<Element>
     var size: Size
     var viewBox: ViewBox
 }

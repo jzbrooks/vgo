@@ -28,14 +28,14 @@ class MergePathsTests {
 
         val group = Group(paths)
 
-        val optimization = MergeGroupPaths()
+        val optimization = MergePaths()
         optimization.visit(group)
 
-        assertThat(group.paths).hasSize(3)
+        assertThat(group.elements).hasSize(3)
     }
 
     @Test
-    fun testMergeGraphicPaths() {
+    fun testMergePaths() {
         val paths = listOf(
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
@@ -58,14 +58,14 @@ class MergePathsTests {
             override var metadata = emptyMap<String, String>()
         }
 
-        val optimization = MergeGraphicPaths()
+        val optimization = MergePaths()
         optimization.visit(graphic)
 
         assertThat(graphic.elements).hasSize(3)
     }
 
     @Test
-    fun testMergeGraphicPathsWithMixedElements() {
+    fun testMergePathsWithMixedElements() {
         val paths = listOf(
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
@@ -89,14 +89,14 @@ class MergePathsTests {
             override var metadata = emptyMap<String, String>()
         }
 
-        val optimization = MergeGraphicPaths()
+        val optimization = MergePaths()
         optimization.visit(graphic)
 
         assertThat(graphic.elements).hasSize(4)
     }
 
     @Test
-    fun testMergeGraphicPathsWithMixedPathElements() {
+    fun testMergePathsWithMixedPathElements() {
         val paths = listOf(
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
@@ -113,14 +113,14 @@ class MergePathsTests {
             override var metadata = emptyMap<String, String>()
         }
 
-        val optimization = MergeGraphicPaths()
+        val optimization = MergePaths()
         optimization.visit(graphic)
 
         assertThat(graphic.elements).hasSize(3)
     }
 
     @Test
-    fun testMergeGraphicPathsWithMetadataAfterMergedPathElement() {
+    fun testMergePathsWithMetadataAfterMergedPathElement() {
         val paths = listOf(
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
@@ -137,7 +137,7 @@ class MergePathsTests {
             override var metadata = emptyMap<String, String>()
         }
 
-        val optimization = MergeGraphicPaths()
+        val optimization = MergePaths()
         optimization.visit(graphic)
 
         assertThat(graphic.elements).hasSize(4)

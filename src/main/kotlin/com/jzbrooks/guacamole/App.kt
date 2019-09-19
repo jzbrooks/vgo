@@ -3,8 +3,7 @@ package com.jzbrooks.guacamole
 import com.jzbrooks.guacamole.graphic.Group
 import com.jzbrooks.guacamole.graphic.PathElement
 import com.jzbrooks.guacamole.optimization.CommandVariant
-import com.jzbrooks.guacamole.optimization.MergeGraphicPaths
-import com.jzbrooks.guacamole.optimization.MergeGroupPaths
+import com.jzbrooks.guacamole.optimization.MergePaths
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
 import com.jzbrooks.guacamole.vd.parse
 import java.io.ByteArrayInputStream
@@ -36,11 +35,9 @@ fun main(args: Array<String>) {
         val opt = CommandVariant()
         vectorDrawable.elements.asSequence().filterIsInstance<PathElement>().forEach(opt::visit)
 
-        val opt2 = MergeGraphicPaths()
+        val opt2 = MergePaths()
         opt2.visit(vectorDrawable)
-
-        val opt3 = MergeGroupPaths()
-        vectorDrawable.elements.filterIsInstance<Group>().forEach(opt3::visit)
+        vectorDrawable.elements.filterIsInstance<Group>().forEach(opt2::visit)
 
         val sizeAfter = ByteArrayOutputStream().use {
             writer.write(vectorDrawable, it)
