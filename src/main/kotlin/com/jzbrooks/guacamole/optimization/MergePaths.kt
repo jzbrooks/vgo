@@ -8,21 +8,17 @@ class MergePaths : Optimization<ContainerElement> {
         val elements = mutableListOf<Element>()
         var currentChunk = mutableListOf<PathElement>()
 
-        fun process(item: Element) {
-            // merge previous (back to chunk start)
-            if (currentChunk.isNotEmpty()) elements.addAll(merge(currentChunk))
-
-            // add item
-            elements.add(item)
-
-            currentChunk = mutableListOf()
-        }
-
         for (item in element.elements) {
             if (item is PathElement) {
                 currentChunk.add(item)
             } else {
-                process(item)
+                // merge previous (back to chunk start)
+                if (currentChunk.isNotEmpty()) elements.addAll(merge(currentChunk))
+
+                // add the current item
+                elements.add(item)
+
+                currentChunk = mutableListOf()
             }
         }
 
