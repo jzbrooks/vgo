@@ -37,7 +37,7 @@ class MergePaths : Optimization<ContainerElement> {
             val current = paths[index]
             val previous = paths[index - 1]
 
-            if (current::class != previous::class || current.metadata != previous.metadata) {
+            if (current::class != previous::class || current.attributes != previous.attributes) {
                 continue
             }
 

@@ -4,5 +4,5 @@ import com.jzbrooks.guacamole.graphic.command.Command
 
 data class ClipPath(
         override var commands: List<Command>,
-        override var metadata: Map<String, String> = emptyMap()
+        override var attributes: Map<String, String> = emptyMap()
 ) : PathElement

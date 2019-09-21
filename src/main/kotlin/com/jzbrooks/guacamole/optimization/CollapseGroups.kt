@@ -16,7 +16,7 @@ class CollapseGroups : Optimization<Graphic> {
         val newElements = mutableListOf<Element>()
         for (child in element.elements) {
             val foo = bottomUpVisit(child)
-            if (foo is Group && foo.elements.isNotEmpty() && foo.metadata.isEmpty()) {
+            if (foo is Group && foo.elements.isNotEmpty() && foo.attributes.isEmpty()) {
                 newElements.addAll(foo.elements)
             } else {
                 newElements.add(foo)

@@ -29,7 +29,7 @@ class VectorDrawableReaderTests {
 
             val path = graphic.elements.first() as Path
 
-            assertThat(path.metadata).doesNotContainKey("android:pathData")
+            assertThat(path.attributes).doesNotContainKey("android:pathData")
         }
     }
 
@@ -40,7 +40,7 @@ class VectorDrawableReaderTests {
 
             val path = graphic.elements.first() as Path
 
-            assertThat(path.metadata).containsKeys("android:name", "android:strokeWidth", "android:fillColor")
+            assertThat(path.attributes).containsKeys("android:name", "android:strokeWidth", "android:fillColor")
         }
     }
 
@@ -70,8 +70,8 @@ class VectorDrawableReaderTests {
 
             val path = graphic.elements.first() as Path
 
-            assertThat(path.metadata).containsKey("android:name")
-            assertThat(path.metadata["android:name"]).isEqualTo("strike_thru_path")
+            assertThat(path.attributes).containsKey("android:name")
+            assertThat(path.attributes["android:name"]).isEqualTo("strike_thru_path")
         }
     }
 }

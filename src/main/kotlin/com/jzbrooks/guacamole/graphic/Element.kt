@@ -1,5 +1,5 @@
 package com.jzbrooks.guacamole.graphic
 
 interface Element {
-    var metadata: Map<String, String>
+    var attributes: Map<String, String>
 }

@@ -42,13 +42,13 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                 }
                 else -> continue@loop
             }
-            for (item in element.metadata) {
+            for (item in element.attributes) {
                 node.setAttribute(item.key, item.value)
             }
             root.appendChild(node)
         }
 
-        for (item in graphic.metadata) {
+        for (item in graphic.attributes) {
             root.setAttribute(item.key, item.value)
         }
 

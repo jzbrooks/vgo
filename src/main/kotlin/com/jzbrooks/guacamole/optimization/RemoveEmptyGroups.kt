@@ -20,7 +20,7 @@ class RemoveEmptyGroups : Optimization<ContainerElement> {
     }
 
     private fun isEmpty(group: Group): Boolean {
-        if (group.elements.isEmpty() && group.metadata.isEmpty()) return true
+        if (group.elements.isEmpty() && group.attributes.isEmpty()) return true
 
         for (subgroup in group.elements.filterIsInstance<Group>()) {
             if (isEmpty(subgroup)) {
