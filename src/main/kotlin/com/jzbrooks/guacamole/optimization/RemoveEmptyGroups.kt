@@ -1,14 +1,14 @@
 package com.jzbrooks.guacamole.optimization
 
-import com.jzbrooks.guacamole.graphic.ContainerElement
 import com.jzbrooks.guacamole.graphic.Element
+import com.jzbrooks.guacamole.graphic.Graphic
 import com.jzbrooks.guacamole.graphic.Group
 
-class RemoveEmptyGroups : Optimization<ContainerElement> {
-    override fun visit(element: ContainerElement) {
+class RemoveEmptyGroups : Optimization {
+    override fun visit(graphic: Graphic) {
         val elements = mutableListOf<Element>()
 
-        for (item in element.elements) {
+        for (item in graphic.elements) {
             if (item is Group && isEmpty(item)) {
                 continue
             } else {
@@ -16,7 +16,7 @@ class RemoveEmptyGroups : Optimization<ContainerElement> {
             }
         }
 
-        element.elements = elements
+        graphic.elements = elements
     }
 
     private fun isEmpty(group: Group): Boolean {

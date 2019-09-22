@@ -1,7 +1,7 @@
 package com.jzbrooks.guacamole.optimization
 
-import com.jzbrooks.guacamole.graphic.Element
+import com.jzbrooks.guacamole.graphic.Graphic
 
-interface Optimization<T : Element> {
-    fun visit(element: T)
+interface Optimization {
+    fun visit(graphic: Graphic)
 }

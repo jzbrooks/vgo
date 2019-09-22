@@ -1,12 +1,12 @@
 package com.jzbrooks.guacamole.optimization
 
-import com.jzbrooks.guacamole.graphic.PathElement
+import com.jzbrooks.guacamole.graphic.*
 import com.jzbrooks.guacamole.graphic.command.*
 import com.jzbrooks.guacamole.graphic.command.CommandVariant
 import java.lang.IllegalStateException
 import java.util.Stack
 
-class CommandVariant : Optimization<PathElement> {
+class CommandVariant : Optimization {
     // Updated once per process call when computing
     // the other variant of the command. This works
     // because the coordinates are accurate regardless
@@ -14,7 +14,19 @@ class CommandVariant : Optimization<PathElement> {
     private var currentPoint = Point(0f, 0f)
     private val subPathStart = Stack<Point>()
 
-    override fun visit(element: PathElement) {
+    override fun visit(graphic: Graphic) {
+        topDownVisit(graphic)
+    }
+
+    private fun topDownVisit(element: Element): Element {
+        return when (element) {
+            is PathElement -> visit(element)
+            is ContainerElement -> element.apply { elements = elements.map(::topDownVisit) }
+            else -> element
+        }
+    }
+
+    private fun visit(element: PathElement): PathElement {
         element.commands = element.commands.map { command ->
             when (command) {
                 is MoveTo -> process(command)
@@ -30,6 +42,8 @@ class CommandVariant : Optimization<PathElement> {
                 else -> throw IllegalStateException("Unsupported command encountered: $command")
             }
         }
+
+        return element
     }
 
     private fun process(command: MoveTo): MoveTo {

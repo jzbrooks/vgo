@@ -3,7 +3,7 @@ package com.jzbrooks.guacamole.optimization
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isGreaterThan
-import com.jzbrooks.guacamole.graphic.Path
+import com.jzbrooks.guacamole.graphic.*
 import com.jzbrooks.guacamole.graphic.command.*
 import com.jzbrooks.guacamole.graphic.command.CommandVariant
 import org.junit.Test
@@ -30,7 +30,14 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        CommandVariant().visit(path)
+        val graphic = object : Graphic {
+            override var elements: List<Element> = listOf(path)
+            override var size = Size(Dimension(100), Dimension(100))
+            override var viewBox = ViewBox(0, 0, 100, 100)
+            override var attributes = emptyMap<String, String>()
+        }
+
+        CommandVariant().visit(graphic)
 
         // M100,1 L103,6 L106,7 93,10 C109,8 113,12 120,10 H101 V-8 H103 S113,39 105,-6 Q112,-10 109, -3 T100,0 A4,4,93,1,1,109,15 Z
         // M100,1 l3,5 l3,1 -13,3 c16,-2 20,2 27,0 H101 V-8 h2 s10,47 2,2 q7,-4 4,3 t-9,3 a4,3,93,1,1,9,15 Z
@@ -50,7 +57,14 @@ class CommandVariantTests {
                 )
         )
 
-        CommandVariant().visit(path)
+        val graphic = object : Graphic {
+            override var elements: List<Element> = listOf(path)
+            override var size = Size(Dimension(100), Dimension(100))
+            override var viewBox = ViewBox(0, 0, 100, 100)
+            override var attributes = emptyMap<String, String>()
+        }
+
+        CommandVariant().visit(graphic)
 
         assertThat(path.commands.filterIsInstance<VariantCommand>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(1)
     }
@@ -67,7 +81,14 @@ class CommandVariantTests {
                 )
         )
 
-        CommandVariant().visit(path)
+        val graphic = object : Graphic {
+            override var elements: List<Element> = listOf(path)
+            override var size = Size(Dimension(100), Dimension(100))
+            override var viewBox = ViewBox(0, 0, 100, 100)
+            override var attributes = emptyMap<String, String>()
+        }
+
+        CommandVariant().visit(graphic)
 
         assertThat(path.commands.filterIsInstance<VariantCommand>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(3)
     }
@@ -95,7 +116,14 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        CommandVariant().visit(path)
+        val graphic = object : Graphic {
+            override var elements: List<Element> = listOf(path)
+            override var size = Size(Dimension(100), Dimension(100))
+            override var viewBox = ViewBox(0, 0, 100, 100)
+            override var attributes = emptyMap<String, String>()
+        }
+
+        CommandVariant().visit(graphic)
 
         // M100,1 L103,6 L106,7 93,10 C109,8 113,12 120,10 M110,8 H101 V-8 Z H103 S113,39 105,-6 Q112,-10 109,-3 T100,0 A4,3,93,1,1,109,15 Z
         // M100,1 l3,5 l3,1 -13,3 c16,-2 20,2 27,0 M110,8 h-9 V-8 Z H103 s10,29 2,-16 q7,-4 4,3 t-9,3 a4,3,93,1,1,9,15 Z
@@ -116,7 +144,14 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        CommandVariant().visit(path)
+        val graphic = object : Graphic {
+            override var elements: List<Element> = listOf(path)
+            override var size = Size(Dimension(100), Dimension(100))
+            override var viewBox = ViewBox(0, 0, 100, 100)
+            override var attributes = emptyMap<String, String>()
+        }
+
+        CommandVariant().visit(graphic)
 
         // M100,1 101,1 L103,6 L106,7 93,10 Z
         // m100,1 1,0 l2,5 l3,1 -13,3 Z

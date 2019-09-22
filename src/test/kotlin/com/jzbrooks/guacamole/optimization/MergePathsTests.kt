@@ -28,10 +28,19 @@ class MergePathsTests {
 
         val group = Group(paths)
 
-        val optimization = MergePaths()
-        optimization.visit(group)
+        val graphic = object : Graphic {
+            override var elements: List<Element> = listOf(group)
+            override var size = Size(Dimension(100), Dimension(100))
+            override var viewBox = ViewBox(0, 0, 100, 100)
+            override var attributes = emptyMap<String, String>()
+        }
 
-        assertThat(group.elements).hasSize(3)
+        val optimization = MergePaths()
+        optimization.visit(graphic)
+
+        val newGroup = graphic.elements.first() as Group
+
+        assertThat(newGroup.elements).hasSize(3)
     }
 
     @Test

@@ -1,9 +1,27 @@
 package com.jzbrooks.guacamole.optimization
 
-import com.jzbrooks.guacamole.graphic.*
+import com.jzbrooks.guacamole.graphic.ContainerElement
+import com.jzbrooks.guacamole.graphic.Element
+import com.jzbrooks.guacamole.graphic.Graphic
+import com.jzbrooks.guacamole.graphic.PathElement
 
-class MergePaths : Optimization<ContainerElement> {
-    override fun visit(element: ContainerElement) {
+class MergePaths : Optimization {
+    override fun visit(graphic: Graphic) {
+        topDownVisit(graphic)
+    }
+
+    private fun topDownVisit(element: Element): Element {
+        return if (element is ContainerElement) {
+            for (child in element.elements) {
+                topDownVisit(child)
+            }
+            merge(element)
+        } else {
+            element
+        }
+    }
+
+    private fun merge(element: ContainerElement): Element {
         // merge consecutive path elements of the same type
         val elements = mutableListOf<Element>()
         var currentChunk = mutableListOf<PathElement>()
@@ -26,7 +44,7 @@ class MergePaths : Optimization<ContainerElement> {
             elements.addAll(merge(currentChunk))
         }
 
-        element.elements = elements
+        return element.apply { this.elements = elements }
     }
 
     private fun merge(paths: List<PathElement>): List<PathElement> {

@@ -5,9 +5,9 @@ import com.jzbrooks.guacamole.graphic.Element
 import com.jzbrooks.guacamole.graphic.Graphic
 import com.jzbrooks.guacamole.graphic.Group
 
-class CollapseGroups : Optimization<Graphic> {
-    override fun visit(element: Graphic) {
-        bottomUpVisit(element)
+class CollapseGroups : Optimization {
+    override fun visit(graphic: Graphic) {
+        bottomUpVisit(graphic)
     }
 
     private fun bottomUpVisit(element: Element): Element {
