@@ -2,9 +2,11 @@ package com.jzbrooks.guacamole.vd
 
 import com.jzbrooks.guacamole.Writer
 import com.jzbrooks.guacamole.graphic.ClipPath
+import com.jzbrooks.guacamole.graphic.Element
 import com.jzbrooks.guacamole.graphic.Group
 import com.jzbrooks.guacamole.graphic.Path
 import org.w3c.dom.Document
+import org.w3c.dom.Node
 import java.io.OutputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -19,41 +21,46 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         val document = builder.newDocument()
 
         val root = document.createElement("vector")
-        root.setAttribute("xmlns:android", "https://schemas.android.com/apk/res/android")
-        root.setAttribute("android:viewportWidth", graphic.viewBox.width.toString())
-        root.setAttribute("android:viewportHeight", graphic.viewBox.height.toString())
-        root.setAttribute("android:width", graphic.size.width.toString())
-        root.setAttribute("android:height", graphic.size.height.toString())
-
-        loop@ for (element in graphic.elements) {
-            val node = when (element) {
-                is Path -> {
-                    document.createElement("path").apply {
-                        setAttribute("android:pathData", element.commands.joinToString(separator = ""))
-                    }
-                }
-                is Group -> {
-                    document.createElement("group")
-                }
-                is ClipPath -> {
-                    document.createElement("clip-path").apply {
-                        setAttribute("android:pathData", element.commands.joinToString(separator = ""))
-                    }
-                }
-                else -> continue@loop
-            }
-            for (item in element.attributes) {
-                node.setAttribute(item.key, item.value)
-            }
-            root.appendChild(node)
-        }
-
         for (item in graphic.attributes) {
             root.setAttribute(item.key, item.value)
         }
-
         document.appendChild(root)
+
+        for (element in graphic.elements) {
+            write(root, element, document)
+        }
+
         write(document, stream)
+    }
+
+    private fun write(parent: org.w3c.dom.Element, element: Element, document: Document) {
+        val node = when (element) {
+            is Path -> {
+                document.createElement("path").apply {
+                    setAttribute("android:pathData", element.commands.joinToString(separator = ""))
+                }
+            }
+            is Group -> {
+                document.createElement("group").also {
+                    for (child in element.elements) {
+                        write(it, child, document)
+                    }
+                }
+            }
+            is ClipPath -> {
+                document.createElement("clip-path").apply {
+                    setAttribute("android:pathData", element.commands.joinToString(separator = ""))
+                }
+            }
+            else -> null
+        }
+
+        if (node != null) {
+            for (item in element.attributes) {
+                node.setAttribute(item.key, item.value)
+            }
+            parent.appendChild(node)
+        }
     }
 
     private fun write(document: Document, outputStream: OutputStream) {
