@@ -73,7 +73,7 @@ inline class CommandString(val data: String) {
 
                             EllipticalArcCurve(variant, parameters)
                         }
-                        command.startsWith('Z') -> ClosePath()
+                        upperCommand.startsWith('Z') -> ClosePath()
                         else -> throw IllegalStateException("Expected one of $commandRegex but was $command")
                     }
                 }.toList()
