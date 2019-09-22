@@ -3,10 +3,7 @@ package com.jzbrooks.guacamole
 import com.jzbrooks.guacamole.optimization.*
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
 import com.jzbrooks.guacamole.vd.parse
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.FileInputStream
-import java.io.FileOutputStream
+import java.io.*
 
 private val orchestrator = Orchestrator(
         listOf(
@@ -50,7 +47,10 @@ fun main(args: Array<String>) {
         println("Percent saved: ${((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100}")
 
         if (nonOptionArgs.size > 1) {
-            FileOutputStream(nonOptionArgs[1]).use {
+            val file = File(nonOptionArgs[1])
+            if (!file.exists()) file.createNewFile()
+
+            FileOutputStream(file).use {
                 writer.write(vectorDrawable, it)
             }
         }
