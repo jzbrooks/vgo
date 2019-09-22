@@ -43,25 +43,33 @@ fun parse(input: InputStream): VectorDrawable {
 }
 
 private fun parseGroup(groupNode: Node): Group {
-    val groupPathList = mutableListOf<Path>()
+    val groupChildElements = mutableListOf<Element>()
     val groupMetadata = mutableMapOf<String, String>()
 
-    for (child in 0 until groupNode.childNodes.length) {
-        val pathNode = groupNode.childNodes.item(child)
-        val path = parsePathElement(pathNode, ::Path)
-        groupPathList.add(path)
+    for (index in 0 until groupNode.childNodes.length) {
+        val child = groupNode.childNodes.item(index)
+        if (child !is Text) {
+            when (child.nodeName) {
+                "group" -> groupChildElements.add(parseGroup(child))
+                "path" -> groupChildElements.add(parsePathElement(child, ::Path))
+                "clip-path" -> groupChildElements.add(parsePathElement(child, ::ClipPath))
+                else -> System.err.println("Unknown document element: ${child.nodeName}")
+            }
+        }
     }
 
-    return Group(groupPathList, groupMetadata.toMap())
+    return Group(groupChildElements, groupMetadata.toMap())
 }
 
 private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Command>, Map<String, String>) -> T): T {
     val metadata = mutableMapOf<String, String>()
 
-    for (i in 0 until node.attributes.length) {
-        val attribute = node.attributes.item(i)
-        if (attribute.nodeName != "android:pathData") {
-            metadata[attribute.nodeName] = attribute.nodeValue
+    if (node.attributes != null) {
+        for (i in 0 until node.attributes.length) {
+            val attribute = node.attributes.item(i)
+            if (attribute.nodeName != "android:pathData") {
+                metadata[attribute.nodeName] = attribute.nodeValue
+            }
         }
     }
 
