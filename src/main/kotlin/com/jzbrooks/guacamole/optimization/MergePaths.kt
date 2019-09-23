@@ -4,6 +4,7 @@ import com.jzbrooks.guacamole.graphic.ContainerElement
 import com.jzbrooks.guacamole.graphic.Element
 import com.jzbrooks.guacamole.graphic.Graphic
 import com.jzbrooks.guacamole.graphic.PathElement
+import java.util.Stack
 
 class MergePaths : Optimization {
     override fun visit(graphic: Graphic) {
@@ -24,7 +25,7 @@ class MergePaths : Optimization {
     private fun merge(element: ContainerElement): Element {
         // merge consecutive path elements of the same type
         val elements = mutableListOf<Element>()
-        var currentChunk = mutableListOf<PathElement>()
+        val currentChunk = mutableListOf<PathElement>()
 
         for (item in element.elements) {
             if (item is PathElement) {
@@ -36,7 +37,7 @@ class MergePaths : Optimization {
                 // add the current item
                 elements.add(item)
 
-                currentChunk = mutableListOf()
+                currentChunk.clear()
             }
         }
 
@@ -48,20 +49,19 @@ class MergePaths : Optimization {
     }
 
     private fun merge(paths: List<PathElement>): List<PathElement> {
-        val mergedPaths = paths.toMutableList()
+        if (paths.isEmpty()) return emptyList()
 
-        var removedPathElementCount = 0
-        for (index in 1 until paths.size) {
-            val current = paths[index]
-            val previous = paths[index - 1]
+        val mergedPaths = Stack<PathElement>().apply {
+            add(paths.first())
+        }
 
-            if (current::class != previous::class || current.attributes != previous.attributes) {
-                continue
+        for (item in paths.slice(1 until paths.size)) {
+            val previous = mergedPaths.peek()
+            if (item::class != previous::class || item.attributes != previous.attributes) {
+                mergedPaths.push(item)
+            } else {
+                previous.commands += item.commands
             }
-
-            previous.commands += current.commands
-            mergedPaths.removeAt(index - removedPathElementCount)
-            removedPathElementCount++
         }
 
         return mergedPaths
