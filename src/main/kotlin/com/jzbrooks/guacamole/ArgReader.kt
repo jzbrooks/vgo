@@ -10,7 +10,7 @@ class ArgReader(private val args: MutableList<String>) {
 
         val names = name.split('|')
         if (names.size > 1)
-            return args.any(::readFlag)
+            return names.any(::readFlag)
 
         val index = args.indexOfFirst { isOptionArgument(name, it) }
         if (index == -1) return false
