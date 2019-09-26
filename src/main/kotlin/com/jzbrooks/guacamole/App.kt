@@ -26,6 +26,8 @@ fun main(args: Array<String>) {
         emptySet()
     }
 
+    val printStats = argReader.readFlag("stats|s")
+
     val writer = VectorDrawableWriter(writerOptions)
 
     val outputs = run {
@@ -59,14 +61,16 @@ fun main(args: Array<String>) {
 
             orchestrator.optimize(vectorDrawable)
 
-            val sizeAfter = ByteArrayOutputStream().use {
-                writer.write(vectorDrawable, it)
-                it.size()
-            }
+            if (printStats) {
+                val sizeAfter = ByteArrayOutputStream().use {
+                    writer.write(vectorDrawable, it)
+                    it.size()
+                }
 
-            println("Size before: $sizeBefore")
-            println("Size after: $sizeAfter")
-            println("Percent saved: ${((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100}")
+                println("Size before: $sizeBefore")
+                println("Size after: $sizeAfter")
+                println("Percent saved: ${((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100}")
+            }
 
             if (!output.exists()) output.createNewFile()
 
