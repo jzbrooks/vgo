@@ -5,13 +5,14 @@ Guacamole is a tool for optimizing vector artwork files that helps ensure your v
 ## Command Line Interface
 
 ```
-> guacamole [options] [file]
+> guacamole [options] [file/directory]
 
 Options:
-  -f --formatted  write the file printed writable
-  -i --input      file or directory
+  -h --help       print this message
   -o --output     file or directory, if not provided the input will be overwritten
-  -d --directory  optimizes and rewrite all files in a directory
+  -s --stats      print statistics on processed files to standard out
+  -v --version    print the version number
+  --indent=value  write files with value columns of indentation  
 ```
 
 ## Build instructions

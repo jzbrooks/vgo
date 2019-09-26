@@ -3,7 +3,10 @@ package com.jzbrooks.guacamole
 import com.jzbrooks.guacamole.optimization.*
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
 import com.jzbrooks.guacamole.vd.parse
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileInputStream
 
 private val orchestrator = Orchestrator(
         listOf(
@@ -15,13 +18,9 @@ private val orchestrator = Orchestrator(
 )
 
 fun main(args: Array<String>) {
-    val path = args.first()
-    val nonOptionArgs = args.filter { !it.startsWith("--") }
-    val optionArgs = args.filter { it.startsWith("--") }
-            .map { it.removePrefix("--") }
-            .toSet()
+    val argReader = ArgReader(args.toMutableList())
 
-    val writerOptions = if (optionArgs.contains("indent")) {
+    val writerOptions = if (argReader.readFlag("indent|i")) {
         setOf(Writer.Option.INDENT)
     } else {
         emptySet()
@@ -29,28 +28,49 @@ fun main(args: Array<String>) {
 
     val writer = VectorDrawableWriter(writerOptions)
 
-    FileInputStream(path).use { inputStream ->
-        val bytes = inputStream.readBytes()
-        val sizeBefore = bytes.size
-
-        val vectorDrawable = ByteArrayInputStream(bytes).use(::parse)
-
-        orchestrator.optimize(vectorDrawable)
-
-        val sizeAfter = ByteArrayOutputStream().use {
-            writer.write(vectorDrawable, it)
-            it.size()
+    val outputs = run {
+        val outputPaths = mutableListOf<String>()
+        var output = argReader.readOption("output|o")
+        while (output != null) {
+            outputPaths.add(output)
+            output = argReader.readOption("output|o")
         }
+        outputPaths.toList()
+    }
 
-        println("Size before: $sizeBefore")
-        println("Size after: $sizeAfter")
-        println("Percent saved: ${((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100}")
+    val inputs = argReader.readArguments()
 
-        if (nonOptionArgs.size > 1) {
-            val file = File(nonOptionArgs[1])
-            if (!file.exists()) file.createNewFile()
+    val inputOutputPair = if (outputs.isNotEmpty()) {
+        inputs.zip(outputs) { a, b ->
+            Pair(File(a), File(b))
+        }
+    } else {
+        inputs.zip(inputs) { a, b ->
+            Pair(File(a), File(b))
+        }
+    }
 
-            FileOutputStream(file).use {
+    for ((input, output) in inputOutputPair) {
+        FileInputStream(input).use { inputStream ->
+            val bytes = inputStream.readBytes()
+            val sizeBefore = bytes.size
+
+            val vectorDrawable = ByteArrayInputStream(bytes).use(::parse)
+
+            orchestrator.optimize(vectorDrawable)
+
+            val sizeAfter = ByteArrayOutputStream().use {
+                writer.write(vectorDrawable, it)
+                it.size()
+            }
+
+            println("Size before: $sizeBefore")
+            println("Size after: $sizeAfter")
+            println("Percent saved: ${((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100}")
+
+            if (!output.exists()) output.createNewFile()
+
+            output.outputStream().use {
                 writer.write(vectorDrawable, it)
             }
         }
