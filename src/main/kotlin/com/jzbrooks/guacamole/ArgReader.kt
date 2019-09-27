@@ -38,22 +38,21 @@ class ArgReader(private val args: MutableList<String>) {
         return value
     }
 
-    fun readArgument(): String {
-        val value = args.first()
-        if (isOption(value)) {
-            throw IllegalStateException("Unexpected option $value")
-        }
-
-        args.removeAt(0)
-        return value
-    }
-
     fun readArguments(): List<String> {
         val arguments = mutableListOf<String>()
         while (hasArguments) {
             arguments.add(readArgument())
         }
         return arguments
+    }
+
+    private fun readArgument(): String {
+        val value = args.first()
+
+        check(!isOption(value)) { "Unexpected option $value" }
+
+        args.removeAt(0)
+        return value
     }
 
     companion object {
