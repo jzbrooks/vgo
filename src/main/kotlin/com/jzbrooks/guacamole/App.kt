@@ -15,6 +15,7 @@ private val orchestrator = Orchestrator(
                 RemoveEmptyGroups()
         )
 )
+private var printStats = false
 
 fun main(args: Array<String>) {
     val argReader = ArgReader(args.toMutableList())
@@ -25,7 +26,7 @@ fun main(args: Array<String>) {
         emptySet()
     }
 
-    val printStats = argReader.readFlag("stats|s")
+    printStats = argReader.readFlag("stats|s")
 
     val writer = VectorDrawableWriter(writerOptions)
 
@@ -52,25 +53,38 @@ fun main(args: Array<String>) {
     }
 
     for ((input, output) in inputOutputPair) {
-        FileInputStream(input).use { inputStream ->
-            val bytes = inputStream.readBytes()
-            val sizeBefore = bytes.size
+        if (input.isFile && (output.isFile || !output.exists())) {
+            handleFile(input, output, writer)
+        } else if (input.isDirectory && (output.isDirectory || !output.exists())) {
+            input.listFiles { file -> !file.isHidden }?.forEach { handleFile(it, File(output, it.name), writer) }
+        } else {
+            System.err.println("Input and output must be either files or directories.")
+            System.err.println("Input is a " + if (input.isFile) "file" else "directory")
+            System.err.println("Output is a " + if (output.isFile) "file" else "directory")
+        }
+    }
+}
 
-            val vectorDrawable = ByteArrayInputStream(bytes).use(::parse)
+private fun handleFile(input: File, output: File, writer: Writer) {
+    FileInputStream(input).use { inputStream ->
+        val sizeBefore = inputStream.channel.size()
 
-            orchestrator.optimize(vectorDrawable)
+        val vectorDrawable = ByteArrayInputStream(inputStream.readBytes()).use(::parse)
 
-            if (!output.exists()) output.createNewFile()
+        orchestrator.optimize(vectorDrawable)
 
-            output.outputStream().use {
-                writer.write(vectorDrawable, it)
+        if (!output.parentFile.exists()) output.parentFile.mkdirs()
+        if (!output.exists()) output.createNewFile()
 
-                if (printStats) {
-                    val sizeAfter = it.channel.size()
-                    println("Size before: $sizeBefore")
-                    println("Size after: $sizeAfter")
-                    println("Percent saved: ${((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100}")
-                }
+        output.outputStream().use {
+            writer.write(vectorDrawable, it)
+
+            if (printStats) {
+                val sizeAfter = it.channel.size()
+                val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
+                println("Size before: $sizeBefore")
+                println("Size after: $sizeAfter")
+                println("Percent saved: $percentSaved")
             }
         }
     }

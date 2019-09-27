@@ -1,12 +1,8 @@
 package com.jzbrooks.guacamole.vd
 
 import com.jzbrooks.guacamole.Writer
-import com.jzbrooks.guacamole.graphic.ClipPath
-import com.jzbrooks.guacamole.graphic.Element
-import com.jzbrooks.guacamole.graphic.Group
-import com.jzbrooks.guacamole.graphic.Path
+import com.jzbrooks.guacamole.graphic.*
 import org.w3c.dom.Document
-import org.w3c.dom.Node
 import java.io.OutputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -16,7 +12,9 @@ import javax.xml.transform.stream.StreamResult
 
 class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()) : Writer {
 
-    fun write(graphic: VectorDrawable, stream: OutputStream) {
+    override fun write(graphic: Graphic, stream: OutputStream) {
+        require(graphic is VectorDrawable)
+
         val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val document = builder.newDocument()
 
