@@ -4,7 +4,6 @@ import com.jzbrooks.guacamole.optimization.*
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
 import com.jzbrooks.guacamole.vd.parse
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 
@@ -61,21 +60,17 @@ fun main(args: Array<String>) {
 
             orchestrator.optimize(vectorDrawable)
 
-            if (printStats) {
-                val sizeAfter = ByteArrayOutputStream().use {
-                    writer.write(vectorDrawable, it)
-                    it.size()
-                }
-
-                println("Size before: $sizeBefore")
-                println("Size after: $sizeAfter")
-                println("Percent saved: ${((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100}")
-            }
-
             if (!output.exists()) output.createNewFile()
 
             output.outputStream().use {
                 writer.write(vectorDrawable, it)
+
+                if (printStats) {
+                    val sizeAfter = it.channel.size()
+                    println("Size before: $sizeBefore")
+                    println("Size after: $sizeAfter")
+                    println("Percent saved: ${((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100}")
+                }
             }
         }
     }
