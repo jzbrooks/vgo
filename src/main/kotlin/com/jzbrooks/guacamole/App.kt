@@ -40,7 +40,19 @@ fun main(args: Array<String>) {
         outputPaths.toList()
     }
 
-    val inputs = argReader.readArguments()
+    var inputs = argReader.readArguments()
+    if (inputs.none()) {
+        require(outputs.isEmpty())
+
+        var path = readLine()
+        val standardInPaths = mutableListOf<String>()
+        while (path != null) {
+            standardInPaths.add(path)
+            path = readLine()
+        }
+
+        inputs = standardInPaths
+    }
 
     val inputOutputPair = if (outputs.isNotEmpty()) {
         inputs.zip(outputs) { a, b ->
