@@ -6,98 +6,118 @@ import com.jzbrooks.guacamole.vd.parse
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
+import java.util.jar.Manifest
 
-private val orchestrator = Orchestrator(
-        listOf(
-                CollapseGroups(),
-                MergePaths(),
-                CommandVariant(),
-                RemoveEmptyGroups()
-        )
-)
-private var printStats = false
+class App {
+    private var printStats = false
 
-fun main(args: Array<String>) {
-    val argReader = ArgReader(args.toMutableList())
+    fun run(args: Array<String>) {
+        val argReader = ArgReader(args.toMutableList())
 
-    val writerOptions = if (argReader.readFlag("indent|i")) {
-        setOf(Writer.Option.INDENT)
-    } else {
-        emptySet()
-    }
+        if (argReader.readFlag("version|v")) {
+            val resources = this.javaClass.classLoader.getResources("META-INF/MANIFEST.MF")
+            while (resources.hasMoreElements()) {
+                val resource = resources.nextElement()
+                val manifest = Manifest(resource?.openStream())
+                manifest.mainAttributes.getValue("Bundle-Version")?.let(::println)
+            }
 
-    printStats = argReader.readFlag("stats|s")
-
-    val writer = VectorDrawableWriter(writerOptions)
-
-    val outputs = run {
-        val outputPaths = mutableListOf<String>()
-        var output = argReader.readOption("output|o")
-        while (output != null) {
-            outputPaths.add(output)
-            output = argReader.readOption("output|o")
-        }
-        outputPaths.toList()
-    }
-
-    var inputs = argReader.readArguments()
-    if (inputs.none()) {
-        require(outputs.isEmpty())
-
-        var path = readLine()
-        val standardInPaths = mutableListOf<String>()
-        while (path != null) {
-            standardInPaths.add(path)
-            path = readLine()
+            return
         }
 
-        inputs = standardInPaths
-    }
-
-    val inputOutputPair = if (outputs.isNotEmpty()) {
-        inputs.zip(outputs) { a, b ->
-            Pair(File(a), File(b))
-        }
-    } else {
-        inputs.zip(inputs) { a, b ->
-            Pair(File(a), File(b))
-        }
-    }
-
-    for ((input, output) in inputOutputPair) {
-        if (input.isFile && (output.isFile || !output.exists())) {
-            handleFile(input, output, writer)
-        } else if (input.isDirectory && (output.isDirectory || !output.exists())) {
-            input.listFiles { file -> !file.isHidden }?.forEach { handleFile(it, File(output, it.name), writer) }
+        val writerOptions = if (argReader.readFlag("indent|i")) {
+            setOf(Writer.Option.INDENT)
         } else {
-            System.err.println("Input and output must be either files or directories.")
-            System.err.println("Input is a " + if (input.isFile) "file" else "directory")
-            System.err.println("Output is a " + if (output.isFile) "file" else "directory")
+            emptySet()
         }
-    }
-}
 
-private fun handleFile(input: File, output: File, writer: Writer) {
-    FileInputStream(input).use { inputStream ->
-        val sizeBefore = inputStream.channel.size()
+        printStats = argReader.readFlag("stats|s")
 
-        val vectorDrawable = ByteArrayInputStream(inputStream.readBytes()).use(::parse)
+        val writer = VectorDrawableWriter(writerOptions)
 
-        orchestrator.optimize(vectorDrawable)
+        val outputs = run {
+            val outputPaths = mutableListOf<String>()
+            var output = argReader.readOption("output|o")
+            while (output != null) {
+                outputPaths.add(output)
+                output = argReader.readOption("output|o")
+            }
+            outputPaths.toList()
+        }
 
-        if (!output.parentFile.exists()) output.parentFile.mkdirs()
-        if (!output.exists()) output.createNewFile()
+        var inputs = argReader.readArguments()
+        if (inputs.none()) {
+            require(outputs.isEmpty())
 
-        output.outputStream().use {
-            writer.write(vectorDrawable, it)
+            var path = readLine()
+            val standardInPaths = mutableListOf<String>()
+            while (path != null) {
+                standardInPaths.add(path)
+                path = readLine()
+            }
 
-            if (printStats) {
-                val sizeAfter = it.channel.size()
-                val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
-                println("Size before: $sizeBefore")
-                println("Size after: $sizeAfter")
-                println("Percent saved: $percentSaved")
+            inputs = standardInPaths
+        }
+
+        val inputOutputPair = if (outputs.isNotEmpty()) {
+            inputs.zip(outputs) { a, b ->
+                Pair(File(a), File(b))
+            }
+        } else {
+            inputs.zip(inputs) { a, b ->
+                Pair(File(a), File(b))
             }
         }
+
+        for ((input, output) in inputOutputPair) {
+            if (input.isFile && (output.isFile || !output.exists())) {
+                handleFile(input, output, writer)
+            } else if (input.isDirectory && (output.isDirectory || !output.exists())) {
+                input.listFiles { file -> !file.isHidden }?.forEach { handleFile(it, File(output, it.name), writer) }
+            } else {
+                System.err.println("Input and output must be either files or directories.")
+                System.err.println("Input is a " + if (input.isFile) "file" else "directory")
+                System.err.println("Output is a " + if (output.isFile) "file" else "directory")
+            }
+        }
+    }
+
+    private fun handleFile(input: File, output: File, writer: Writer) {
+        FileInputStream(input).use { inputStream ->
+            val sizeBefore = inputStream.channel.size()
+
+            val vectorDrawable = ByteArrayInputStream(inputStream.readBytes()).use(::parse)
+
+            ORCHESTRATOR.optimize(vectorDrawable)
+
+            if (!output.parentFile.exists()) output.parentFile.mkdirs()
+            if (!output.exists()) output.createNewFile()
+
+            output.outputStream().use {
+                writer.write(vectorDrawable, it)
+
+                if (printStats) {
+                    val sizeAfter = it.channel.size()
+                    val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
+                    println("Size before: $sizeBefore")
+                    println("Size after: $sizeAfter")
+                    println("Percent saved: $percentSaved")
+                }
+            }
+        }
+    }
+
+    companion object {
+        private val ORCHESTRATOR = Orchestrator(
+                listOf(
+                        CollapseGroups(),
+                        MergePaths(),
+                        CommandVariant(),
+                        RemoveEmptyGroups()
+                )
+        )
+
+        @JvmStatic
+        fun main(args: Array<String>) = App().run(args)
     }
 }

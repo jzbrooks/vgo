@@ -52,7 +52,8 @@ dependencies {
 
 val fatJar by tasks.registering(Jar::class) {
     manifest {
-        attributes("Main-Class" to "com.jzbrooks.guacamole.AppKt")
+        attributes["Main-Class"] = "com.jzbrooks.guacamole.App"
+        attributes["Bundle-Version"] = "0.0.1"
     }
 
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
