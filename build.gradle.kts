@@ -49,3 +49,12 @@ dependencies {
     // Use the Kotlin JUnit integration.
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
+
+val fatJar by tasks.registering(Jar::class) {
+    manifest {
+        attributes("Main-Class" to "com.jzbrooks.guacamole.AppKt")
+    }
+
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    with(tasks.jar.get() as CopySpec)
+}
