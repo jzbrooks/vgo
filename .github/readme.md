@@ -13,6 +13,20 @@ Options:
   -s --stats      print statistics on processed files to standard out
   -v --version    print the version number
   --indent=value  write files with value columns of indentation  
+
+Examples:
+
+# Optimize files specified from standard in
+> find ./**/ic_*.xml | guacamole
+
+# Optimize vector.xml and overwrite its contents
+> guacamole vector.xml
+
+# Optimize vector.xml and write the result into new_vector.xml
+> guacamole vector.xml -o new_vector.xml
+
+# Optimize multiple input sources write results to the
+> guacamole vector.xml -o new_vector.xml ./assets -o ./new_assets
 ```
 
 ## Build instructions
