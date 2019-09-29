@@ -8,5 +8,5 @@ fun NodeList.toList(): List<Node> {
     for (i in 0 until this.length) {
         list.add(this.item(i))
     }
-    return list.toList()
+    return list
 }
