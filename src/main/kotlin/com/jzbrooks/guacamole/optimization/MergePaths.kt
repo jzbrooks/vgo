@@ -4,7 +4,7 @@ import com.jzbrooks.guacamole.graphic.ContainerElement
 import com.jzbrooks.guacamole.graphic.Element
 import com.jzbrooks.guacamole.graphic.Graphic
 import com.jzbrooks.guacamole.graphic.PathElement
-import java.util.Stack
+import java.util.*
 
 class MergePaths : Optimization {
     override fun optimize(graphic: Graphic) {

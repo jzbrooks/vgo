@@ -2,7 +2,10 @@ package com.jzbrooks.guacamole.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
-import com.jzbrooks.guacamole.graphic.*
+import com.jzbrooks.guacamole.graphic.Element
+import com.jzbrooks.guacamole.graphic.Graphic
+import com.jzbrooks.guacamole.graphic.Group
+import com.jzbrooks.guacamole.graphic.Path
 import com.jzbrooks.guacamole.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.graphic.command.MoveTo
 import com.jzbrooks.guacamole.graphic.command.Point

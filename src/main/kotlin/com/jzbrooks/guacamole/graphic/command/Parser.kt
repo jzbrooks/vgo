@@ -1,7 +1,5 @@
 package com.jzbrooks.guacamole.graphic.command
 
-import java.lang.IllegalStateException
-
 inline class CommandString(val data: String) {
     fun toCommandList(): List<Command> {
         return data.split(commandRegex)

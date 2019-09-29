@@ -1,10 +1,12 @@
 package com.jzbrooks.guacamole.optimization
 
-import com.jzbrooks.guacamole.graphic.*
+import com.jzbrooks.guacamole.graphic.ContainerElement
+import com.jzbrooks.guacamole.graphic.Element
+import com.jzbrooks.guacamole.graphic.Graphic
+import com.jzbrooks.guacamole.graphic.PathElement
 import com.jzbrooks.guacamole.graphic.command.*
 import com.jzbrooks.guacamole.graphic.command.CommandVariant
-import java.lang.IllegalStateException
-import java.util.Stack
+import java.util.*
 
 class CommandVariant : Optimization {
     // Updated once per process call when computing

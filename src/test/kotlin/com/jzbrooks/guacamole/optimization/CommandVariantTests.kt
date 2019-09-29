@@ -3,7 +3,9 @@ package com.jzbrooks.guacamole.optimization
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isGreaterThan
-import com.jzbrooks.guacamole.graphic.*
+import com.jzbrooks.guacamole.graphic.Element
+import com.jzbrooks.guacamole.graphic.Graphic
+import com.jzbrooks.guacamole.graphic.Path
 import com.jzbrooks.guacamole.graphic.command.*
 import com.jzbrooks.guacamole.graphic.command.CommandVariant
 import org.junit.Test

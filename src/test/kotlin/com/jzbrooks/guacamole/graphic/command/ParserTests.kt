@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
-import java.lang.IllegalStateException
 import kotlin.test.Test
 
 class ParserTests {
