@@ -19,7 +19,7 @@ class CollapseGroupsTests {
             override var attributes = emptyMap<String, String>()
         }
 
-        CollapseGroups().visit(graphic)
+        CollapseGroups().optimize(graphic)
 
         assertThat(graphic.elements).containsExactly(innerPath)
     }
@@ -34,7 +34,7 @@ class CollapseGroupsTests {
             override var attributes = emptyMap<String, String>()
         }
 
-        CollapseGroups().visit(graphic)
+        CollapseGroups().optimize(graphic)
 
         assertThat(graphic.elements).containsExactly(innerPath)
     }
@@ -50,7 +50,7 @@ class CollapseGroupsTests {
             override var attributes = emptyMap<String, String>()
         }
 
-        CollapseGroups().visit(graphic)
+        CollapseGroups().optimize(graphic)
 
         assertThat(graphic.elements).containsExactly(innerGroupWithAttributes)
     }

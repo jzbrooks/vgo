@@ -14,7 +14,7 @@ class CommandVariant : Optimization {
     private var currentPoint = Point(0f, 0f)
     private val subPathStart = Stack<Point>()
 
-    override fun visit(graphic: Graphic) {
+    override fun optimize(graphic: Graphic) {
         topDownVisit(graphic)
     }
 

@@ -24,7 +24,7 @@ class MergePathsTests {
         }
 
         val optimization = MergePaths()
-        optimization.visit(graphic)
+        optimization.optimize(graphic)
 
         assertThat(graphic.elements.first()).isEqualTo(Path(listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
@@ -59,7 +59,7 @@ class MergePathsTests {
         }
 
         val optimization = MergePaths()
-        optimization.visit(graphic)
+        optimization.optimize(graphic)
 
         assertThat(graphic.elements).isEqualTo(listOf(
                 Group(listOf(
@@ -102,7 +102,7 @@ class MergePathsTests {
         }
 
         val optimization = MergePaths()
-        optimization.visit(graphic)
+        optimization.optimize(graphic)
 
         assertThat(graphic.elements).isEqualTo(listOf(
                 Path(listOf(
@@ -144,7 +144,7 @@ class MergePathsTests {
         }
 
         val optimization = MergePaths()
-        optimization.visit(graphic)
+        optimization.optimize(graphic)
 
         assertThat(graphic.elements).isEqualTo(listOf(
                 Path(listOf(
@@ -180,7 +180,7 @@ class MergePathsTests {
         }
 
         val optimization = MergePaths()
-        optimization.visit(graphic)
+        optimization.optimize(graphic)
 
         assertThat(graphic.elements).isEqualTo(listOf(
                 Path(listOf(
@@ -215,7 +215,7 @@ class MergePathsTests {
         }
 
         val optimization = MergePaths()
-        optimization.visit(graphic)
+        optimization.optimize(graphic)
 
         assertThat(graphic.elements).isEqualTo(listOf(
                 Path(listOf(

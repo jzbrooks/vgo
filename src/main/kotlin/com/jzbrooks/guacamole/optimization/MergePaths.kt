@@ -7,7 +7,7 @@ import com.jzbrooks.guacamole.graphic.PathElement
 import java.util.Stack
 
 class MergePaths : Optimization {
-    override fun visit(graphic: Graphic) {
+    override fun optimize(graphic: Graphic) {
         topDownVisit(graphic)
     }
 
