@@ -1,5 +1,7 @@
 package com.jzbrooks.guacamole.graphic.command
 
+import com.jzbrooks.guacamole.util.math.Point
+
 inline class CommandString(val data: String) {
     fun toCommandList(): List<Command> {
         return data.split(commandRegex)

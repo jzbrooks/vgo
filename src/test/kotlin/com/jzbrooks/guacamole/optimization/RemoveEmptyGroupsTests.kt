@@ -8,7 +8,7 @@ import com.jzbrooks.guacamole.graphic.Group
 import com.jzbrooks.guacamole.graphic.Path
 import com.jzbrooks.guacamole.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.graphic.command.MoveTo
-import com.jzbrooks.guacamole.graphic.command.Point
+import com.jzbrooks.guacamole.util.math.Point
 import org.junit.Test
 
 class RemoveEmptyGroupsTests {

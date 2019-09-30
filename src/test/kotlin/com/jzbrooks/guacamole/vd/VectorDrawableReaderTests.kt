@@ -9,6 +9,7 @@ import com.jzbrooks.guacamole.assertk.extensions.doesNotContainKey
 import com.jzbrooks.guacamole.graphic.Graphic
 import com.jzbrooks.guacamole.graphic.Path
 import com.jzbrooks.guacamole.graphic.command.*
+import com.jzbrooks.guacamole.util.math.Point
 import kotlin.test.Test
 
 class VectorDrawableReaderTests {

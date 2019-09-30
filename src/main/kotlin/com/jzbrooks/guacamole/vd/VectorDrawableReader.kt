@@ -3,6 +3,7 @@ package com.jzbrooks.guacamole.vd
 import com.jzbrooks.guacamole.graphic.*
 import com.jzbrooks.guacamole.graphic.command.Command
 import com.jzbrooks.guacamole.graphic.command.CommandString
+import com.jzbrooks.guacamole.util.math.Point
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 import java.io.InputStream

@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
+import com.jzbrooks.guacamole.util.math.Point
 import kotlin.test.Test
 
 class ParserTests {

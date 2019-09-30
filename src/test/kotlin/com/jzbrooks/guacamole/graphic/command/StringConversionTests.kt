@@ -2,6 +2,7 @@ package com.jzbrooks.guacamole.graphic.command
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.jzbrooks.guacamole.util.math.Point
 import kotlin.test.Test
 
 class StringConversionTests {

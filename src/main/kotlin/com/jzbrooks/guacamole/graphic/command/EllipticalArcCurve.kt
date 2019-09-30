@@ -1,5 +1,8 @@
 package com.jzbrooks.guacamole.graphic.command
 
+import com.jzbrooks.guacamole.util.math.Point
+import com.jzbrooks.guacamole.util.math.compactString
+
 data class EllipticalArcCurve(override var variant: CommandVariant, var parameters: List<Parameter>) : VariantCommand {
     override fun toString(): String {
         val command = when (variant) {
