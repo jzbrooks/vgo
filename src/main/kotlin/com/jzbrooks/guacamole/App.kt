@@ -110,6 +110,7 @@ class App {
     companion object {
         private val ORCHESTRATOR = Orchestrator(
                 listOf(
+                        BakeTransformations(),
                         CollapseGroups(),
                         MergePaths(),
                         CommandVariant(),

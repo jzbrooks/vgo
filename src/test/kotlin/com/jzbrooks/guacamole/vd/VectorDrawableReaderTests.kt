@@ -8,7 +8,10 @@ import com.jzbrooks.guacamole.assertk.extensions.containsKeys
 import com.jzbrooks.guacamole.assertk.extensions.doesNotContainKey
 import com.jzbrooks.guacamole.graphic.Graphic
 import com.jzbrooks.guacamole.graphic.Path
-import com.jzbrooks.guacamole.graphic.command.*
+import com.jzbrooks.guacamole.graphic.command.ClosePath
+import com.jzbrooks.guacamole.graphic.command.CommandVariant
+import com.jzbrooks.guacamole.graphic.command.LineTo
+import com.jzbrooks.guacamole.graphic.command.MoveTo
 import com.jzbrooks.guacamole.util.math.Point
 import kotlin.test.Test
 
