@@ -121,7 +121,9 @@ private fun parseGroup(groupNode: Node): Group {
     }
 
     val transform = listOf(pivot, rotate, translation, scale, antiPivot).reduce(Matrix3::times)
-    return Group(groupChildElements, groupMetadata.toMap(), transform)
+    val nonIdentityTransform = if (transform == Matrix3.IDENTITY) null else transform
+
+    return Group(groupChildElements, groupMetadata.toMap(), nonIdentityTransform)
 }
 
 private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Command>, Map<String, String>) -> T): T {
