@@ -6,17 +6,9 @@ import com.jzbrooks.guacamole.graphic.Group
 
 class RemoveEmptyGroups : Optimization {
     override fun optimize(graphic: Graphic) {
-        val elements = mutableListOf<Element>()
-
-        for (item in graphic.elements) {
-            if (item is Group && isEmpty(item)) {
-                continue
-            } else {
-                elements.add(item)
-            }
-        }
-
-        graphic.elements = elements
+        graphic.elements = graphic.elements.asSequence()
+                .dropWhile { item -> item is Group && isEmpty(item) }
+                .toList()
     }
 
     private fun isEmpty(group: Group): Boolean {
