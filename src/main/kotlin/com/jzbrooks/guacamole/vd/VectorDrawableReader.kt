@@ -13,7 +13,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-private val transforms = setOf(
+private val internallyRepresentedGroupAttributes = setOf(
         "android:scaleX",
         "android:scaleY",
         "android:translateX",
@@ -21,6 +21,10 @@ private val transforms = setOf(
         "android:pivotX",
         "android:pivotY",
         "android:rotation"
+)
+
+private val internallyRepresentedPathElementAttributes = setOf(
+        "android:pathData"
 )
 
 fun parse(input: InputStream): VectorDrawable {
@@ -74,7 +78,7 @@ private fun parseGroup(groupNode: Node): Group {
 
     for (index in 0 until groupNode.attributes.length) {
         val attribute = groupNode.attributes.item(index)
-        if (!transforms.contains(attribute.nodeName)) {
+        if (!internallyRepresentedGroupAttributes.contains(attribute.nodeName)) {
             groupMetadata[attribute.nodeName] = attribute.nodeValue
         }
     }
@@ -131,7 +135,7 @@ private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Comm
 
     for (i in 0 until node.attributes.length) {
         val attribute = node.attributes.item(i)
-        if (attribute.nodeName != "android:pathData") {
+        if (!internallyRepresentedPathElementAttributes.contains(attribute.nodeName)) {
             metadata[attribute.nodeName] = attribute.nodeValue
         }
     }
