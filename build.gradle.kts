@@ -22,7 +22,7 @@ repositories {
 
 application {
     // Define the main class for the application
-    mainClassName = "com.jzbrooks.guacamole.AppKt"
+    mainClassName = "com.jzbrooks.guacamole.App"
 }
 
 kotlin {
