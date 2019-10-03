@@ -14,6 +14,11 @@ class App {
     fun run(args: Array<String>) {
         val argReader = ArgReader(args.toMutableList())
 
+        if (argReader.readFlag("help|h")) {
+            println(HELP_MESSAGE)
+            return
+        }
+
         if (argReader.readFlag("version|v")) {
             val resources = this.javaClass.classLoader.getResources("META-INF/MANIFEST.MF")
             while (resources.hasMoreElements()) {
@@ -115,6 +120,17 @@ class App {
                         RemoveEmptyGroups()
                 )
         )
+
+        private const val HELP_MESSAGE = """
+> guacamole [options] [file/directory]
+
+Options:
+  -h --help       print this message
+  -o --output     file or directory, if not provided the input will be overwritten
+  -s --stats      print statistics on processed files to standard out
+  -v --version    print the version number
+  --indent=value  write files with value columns of indentation 
+        """
 
         @JvmStatic
         fun main(args: Array<String>) = App().run(args)
