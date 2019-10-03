@@ -84,8 +84,6 @@ class App {
 
     private fun handleFile(input: File, output: File, writer: Writer) {
         FileInputStream(input).use { inputStream ->
-            val sizeBefore = inputStream.channel.size()
-
             val vectorDrawable = ByteArrayInputStream(inputStream.readBytes()).use(::parse)
 
             ORCHESTRATOR.optimize(vectorDrawable)
@@ -93,11 +91,12 @@ class App {
             if (!output.parentFile.exists()) output.parentFile.mkdirs()
             if (!output.exists()) output.createNewFile()
 
-            output.outputStream().use {
-                writer.write(vectorDrawable, it)
+            output.outputStream().use { outputStream ->
+                writer.write(vectorDrawable, outputStream)
 
                 if (printStats) {
-                    val sizeAfter = it.channel.size()
+                    val sizeBefore = inputStream.channel.size()
+                    val sizeAfter = outputStream.channel.size()
                     val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
                     println("Size before: $sizeBefore")
                     println("Size after: $sizeAfter")
