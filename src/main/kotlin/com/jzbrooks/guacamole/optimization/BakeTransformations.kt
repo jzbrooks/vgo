@@ -42,6 +42,7 @@ class BakeTransformations : Optimization {
             }
 
             group.transform = null
+            group.attributes = group.attributes.filter { !TRANSFORM_ATTRIBUTES.contains(it.key) }
         }
     }
 
@@ -118,5 +119,17 @@ class BakeTransformations : Optimization {
             }
             else -> command
         }
+    }
+
+    companion object {
+        private val TRANSFORM_ATTRIBUTES = setOf(
+                "android:scaleX",
+                "android:scaleY",
+                "android:translateX",
+                "android:translateY",
+                "android:pivotX",
+                "android:pivotY",
+                "android:rotation"
+        )
     }
 }
