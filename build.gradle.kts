@@ -41,7 +41,7 @@ dependencies {
     // Use the Kotlin JDK 8 standard library.
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.19")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.20")
 
     // Use the Kotlin test library.
     testImplementation("org.jetbrains.kotlin:kotlin-test")
