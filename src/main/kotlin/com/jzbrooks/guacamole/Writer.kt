@@ -6,7 +6,7 @@ import java.io.OutputStream
 interface Writer {
     val options: Set<Option>
     fun write(graphic: Graphic, stream: OutputStream)
-    enum class Option {
-        INDENT
+    sealed class Option {
+        class Indent(val columns: Int) : Option()
     }
 }

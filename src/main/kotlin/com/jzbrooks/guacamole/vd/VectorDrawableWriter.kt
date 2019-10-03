@@ -65,9 +65,10 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         val transformer = TransformerFactory.newInstance().newTransformer()
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
 
-        if (options.contains(Writer.Option.INDENT)) {
+        val indent = options.filterIsInstance<Writer.Option.Indent>().singleOrNull()?.columns
+        if (indent != null) {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes")
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", indent.toString())
         }
 
         val source = DOMSource(document)

@@ -25,10 +25,9 @@ class App {
             return
         }
 
-        val writerOptions = if (argReader.readFlag("indent|i")) {
-            setOf(Writer.Option.INDENT)
-        } else {
-            emptySet()
+        val writerOptions = mutableSetOf<Writer.Option>()
+        argReader.readOption("indent")?.toIntOrNull()?.let { indentColumns ->
+            writerOptions.add(Writer.Option.Indent(indentColumns))
         }
 
         printStats = argReader.readFlag("stats|s")
