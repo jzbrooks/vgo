@@ -1,6 +1,8 @@
 ## Guacamole
 
-Guacamole is a tool for optimizing vector artwork files that helps ensure your vector artwork is represented compactly without compromising quality.
+Guacamole is a tool (similar to [avocado](https://github.com/alexjlockwood/avocado) and [svgo](https://github.com/svg/svgo)) for optimizing vector artwork files that helps ensure your vector artwork is represented compactly without compromising quality.
+
+[![Build Status](https://github.com/jzbrooks/guacamole/workflows/build/badge.svg)](https://github.com/jzbrooks/guacamole/actions?workflow=build)
 
 ## Command Line Interface
 
@@ -13,9 +15,11 @@ Options:
   -s --stats      print statistics on processed files to standard out
   -v --version    print the version number
   --indent=value  write files with value columns of indentation  
+```
 
-Examples:
+## Examples
 
+```
 # Optimize files specified from standard in
 > find ./**/ic_*.xml | guacamole
 
