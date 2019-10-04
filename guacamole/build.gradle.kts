@@ -2,10 +2,6 @@ plugins {
     id("org.jetbrains.kotlin.jvm")
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation(project(":guacamole-core"))
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
