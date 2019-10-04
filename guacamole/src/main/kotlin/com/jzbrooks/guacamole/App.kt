@@ -1,5 +1,6 @@
 package com.jzbrooks.guacamole
 
+import com.jzbrooks.guacamole.core.Writer
 import com.jzbrooks.guacamole.core.optimization.*
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
 import com.jzbrooks.guacamole.vd.parse

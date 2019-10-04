@@ -1,4 +1,4 @@
-package com.jzbrooks.guacamole
+package com.jzbrooks.guacamole.core
 
 import com.jzbrooks.guacamole.core.graphic.Graphic
 import java.io.OutputStream
