@@ -15,7 +15,7 @@ dependencies {
 tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "com.jzbrooks.guacamole.App"
-        attributes["Bundle-Version"] = "0.0.1"
+        attributes["Bundle-Version"] = "0.1.0"
     }
 
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
