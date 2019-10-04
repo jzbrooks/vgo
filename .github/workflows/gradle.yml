@@ -15,17 +15,17 @@ jobs:
         java-version: 1.8
     - name: Build with Gradle
       run: ./gradlew build
-    - name: guacamole
+    - name: Archive guacamole
       uses: actions/upload-artifact@v1
       with:
-        name: guacamole
+        name: guacamole.jar
         path: guacamole/build/libs/guacamole.jar
-    - name: Guacamole Test Results
+    - name: Archive Guacamole Test Results
       uses: actions/upload-artifact@v1
       with:
         name: guacamole_test_results
         path: guacamole/build/reports/tests/test/
-    - name: Guacamole Core Test Results
+    - name: Archive Guacamole Core Test Results
       uses: actions/upload-artifact@v1
       with:
         name: guacamole_core_test_results
