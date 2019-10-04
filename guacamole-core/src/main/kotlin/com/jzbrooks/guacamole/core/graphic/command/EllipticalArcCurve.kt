@@ -1,7 +1,7 @@
-package com.jzbrooks.guacamole.graphic.command
+package com.jzbrooks.guacamole.core.graphic.command
 
-import com.jzbrooks.guacamole.util.math.Point
-import com.jzbrooks.guacamole.util.math.compactString
+import com.jzbrooks.guacamole.core.util.math.Point
+import com.jzbrooks.guacamole.core.util.math.compactString
 
 data class EllipticalArcCurve(override var variant: CommandVariant, var parameters: List<Parameter>) : VariantCommand {
     override fun toString(): String {

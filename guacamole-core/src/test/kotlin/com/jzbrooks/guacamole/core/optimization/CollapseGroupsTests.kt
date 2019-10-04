@@ -1,14 +1,14 @@
-package com.jzbrooks.guacamole.optimization
+package com.jzbrooks.guacamole.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
-import com.jzbrooks.guacamole.graphic.Element
-import com.jzbrooks.guacamole.graphic.Graphic
-import com.jzbrooks.guacamole.graphic.Group
-import com.jzbrooks.guacamole.graphic.Path
-import com.jzbrooks.guacamole.graphic.command.CommandVariant
-import com.jzbrooks.guacamole.graphic.command.MoveTo
-import com.jzbrooks.guacamole.util.math.Point
+import com.jzbrooks.guacamole.core.graphic.Element
+import com.jzbrooks.guacamole.core.graphic.Graphic
+import com.jzbrooks.guacamole.core.graphic.Group
+import com.jzbrooks.guacamole.core.graphic.Path
+import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
+import com.jzbrooks.guacamole.core.graphic.command.MoveTo
+import com.jzbrooks.guacamole.core.util.math.Point
 import org.junit.Test
 
 class CollapseGroupsTests {

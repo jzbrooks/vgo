@@ -1,6 +1,6 @@
 package com.jzbrooks.guacamole
 
-import com.jzbrooks.guacamole.graphic.Graphic
+import com.jzbrooks.guacamole.core.graphic.Graphic
 import java.io.OutputStream
 
 interface Writer {

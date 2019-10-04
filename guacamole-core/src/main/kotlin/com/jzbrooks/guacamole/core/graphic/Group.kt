@@ -1,6 +1,6 @@
-package com.jzbrooks.guacamole.graphic
+package com.jzbrooks.guacamole.core.graphic
 
-import com.jzbrooks.guacamole.util.math.Matrix3
+import com.jzbrooks.guacamole.core.util.math.Matrix3
 
 data class Group(
         override var elements: List<Element>,

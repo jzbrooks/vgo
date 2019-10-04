@@ -1,12 +1,12 @@
 package com.jzbrooks.guacamole.vd
 
-import com.jzbrooks.guacamole.graphic.*
-import com.jzbrooks.guacamole.graphic.command.Command
-import com.jzbrooks.guacamole.graphic.command.CommandString
-import com.jzbrooks.guacamole.util.math.Matrix3
-import com.jzbrooks.guacamole.util.math.MutableMatrix3
-import com.jzbrooks.guacamole.util.xml.asSequence
-import com.jzbrooks.guacamole.util.xml.toMap
+import com.jzbrooks.guacamole.core.graphic.*
+import com.jzbrooks.guacamole.core.graphic.command.Command
+import com.jzbrooks.guacamole.core.graphic.command.CommandString
+import com.jzbrooks.guacamole.core.util.math.Matrix3
+import com.jzbrooks.guacamole.core.util.math.MutableMatrix3
+import com.jzbrooks.guacamole.core.util.xml.asSequence
+import com.jzbrooks.guacamole.core.util.xml.toMap
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 import java.io.InputStream

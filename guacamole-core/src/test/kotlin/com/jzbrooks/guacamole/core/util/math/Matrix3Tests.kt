@@ -1,4 +1,4 @@
-package com.jzbrooks.guacamole.util.math
+package com.jzbrooks.guacamole.core.util.math
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo

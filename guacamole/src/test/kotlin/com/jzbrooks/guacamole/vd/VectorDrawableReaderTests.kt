@@ -6,13 +6,13 @@ import assertk.assertions.isEqualTo
 import com.jzbrooks.guacamole.assertk.extensions.containsKey
 import com.jzbrooks.guacamole.assertk.extensions.containsKeys
 import com.jzbrooks.guacamole.assertk.extensions.doesNotContainKey
-import com.jzbrooks.guacamole.graphic.Graphic
-import com.jzbrooks.guacamole.graphic.Path
-import com.jzbrooks.guacamole.graphic.command.ClosePath
-import com.jzbrooks.guacamole.graphic.command.CommandVariant
-import com.jzbrooks.guacamole.graphic.command.LineTo
-import com.jzbrooks.guacamole.graphic.command.MoveTo
-import com.jzbrooks.guacamole.util.math.Point
+import com.jzbrooks.guacamole.core.graphic.Graphic
+import com.jzbrooks.guacamole.core.graphic.Path
+import com.jzbrooks.guacamole.core.graphic.command.ClosePath
+import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
+import com.jzbrooks.guacamole.core.graphic.command.LineTo
+import com.jzbrooks.guacamole.core.graphic.command.MoveTo
+import com.jzbrooks.guacamole.core.util.math.Point
 import kotlin.test.Test
 
 class VectorDrawableReaderTests {

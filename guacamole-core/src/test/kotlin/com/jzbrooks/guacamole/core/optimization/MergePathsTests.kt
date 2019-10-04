@@ -1,13 +1,13 @@
-package com.jzbrooks.guacamole.optimization
+package com.jzbrooks.guacamole.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.jzbrooks.guacamole.graphic.*
-import com.jzbrooks.guacamole.graphic.command.CommandVariant
-import com.jzbrooks.guacamole.graphic.command.LineTo
-import com.jzbrooks.guacamole.graphic.command.MoveTo
-import com.jzbrooks.guacamole.graphic.command.ShortcutCubicBezierCurve
-import com.jzbrooks.guacamole.util.math.Point
+import com.jzbrooks.guacamole.core.graphic.*
+import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
+import com.jzbrooks.guacamole.core.graphic.command.LineTo
+import com.jzbrooks.guacamole.core.graphic.command.MoveTo
+import com.jzbrooks.guacamole.core.graphic.command.ShortcutCubicBezierCurve
+import com.jzbrooks.guacamole.core.util.math.Point
 import org.junit.Test
 
 class MergePathsTests {

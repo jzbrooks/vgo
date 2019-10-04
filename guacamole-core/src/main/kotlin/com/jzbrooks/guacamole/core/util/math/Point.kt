@@ -1,4 +1,4 @@
-package com.jzbrooks.guacamole.util.math
+package com.jzbrooks.guacamole.core.util.math
 
 data class Point(var x: Float, var y: Float) {
     override fun toString() = "${x.compactString()},${y.compactString()}"

@@ -1,9 +1,9 @@
-package com.jzbrooks.guacamole.optimization
+package com.jzbrooks.guacamole.core.optimization
 
-import com.jzbrooks.guacamole.graphic.*
-import com.jzbrooks.guacamole.graphic.command.*
-import com.jzbrooks.guacamole.util.math.Matrix3
-import com.jzbrooks.guacamole.util.math.Vector3
+import com.jzbrooks.guacamole.core.graphic.*
+import com.jzbrooks.guacamole.core.graphic.command.*
+import com.jzbrooks.guacamole.core.util.math.Matrix3
+import com.jzbrooks.guacamole.core.util.math.Vector3
 
 class BakeTransformations : Optimization {
     override fun optimize(graphic: Graphic) {

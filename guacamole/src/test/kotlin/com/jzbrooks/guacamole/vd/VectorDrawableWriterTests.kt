@@ -6,11 +6,11 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.startsWith
 import com.jzbrooks.guacamole.assertk.extensions.hasName
 import com.jzbrooks.guacamole.assertk.extensions.hasValue
-import com.jzbrooks.guacamole.graphic.ClipPath
-import com.jzbrooks.guacamole.graphic.Group
-import com.jzbrooks.guacamole.graphic.Path
-import com.jzbrooks.guacamole.graphic.command.CommandString
-import com.jzbrooks.guacamole.util.xml.toList
+import com.jzbrooks.guacamole.core.graphic.ClipPath
+import com.jzbrooks.guacamole.core.graphic.Group
+import com.jzbrooks.guacamole.core.graphic.Path
+import com.jzbrooks.guacamole.core.graphic.command.CommandString
+import com.jzbrooks.guacamole.core.util.xml.toList
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

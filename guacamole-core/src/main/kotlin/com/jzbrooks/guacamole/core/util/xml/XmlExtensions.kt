@@ -1,4 +1,4 @@
-package com.jzbrooks.guacamole.util.xml
+package com.jzbrooks.guacamole.core.util.xml
 
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node

@@ -1,4 +1,4 @@
-package com.jzbrooks.guacamole.util.math
+package com.jzbrooks.guacamole.core.util.math
 
 open class Matrix3 {
     protected val data = Array(3) { Array(3) { 0f } }

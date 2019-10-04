@@ -1,3 +1,3 @@
-package com.jzbrooks.guacamole.graphic.command
+package com.jzbrooks.guacamole.core.graphic.command
 
 interface Command

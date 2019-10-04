@@ -1,8 +1,7 @@
-package com.jzbrooks.guacamole.optimization
+package com.jzbrooks.guacamole.core.optimization
 
-import com.jzbrooks.guacamole.graphic.Element
-import com.jzbrooks.guacamole.graphic.Graphic
-import com.jzbrooks.guacamole.graphic.Group
+import com.jzbrooks.guacamole.core.graphic.Graphic
+import com.jzbrooks.guacamole.core.graphic.Group
 
 class RemoveEmptyGroups : Optimization {
     override fun optimize(graphic: Graphic) {

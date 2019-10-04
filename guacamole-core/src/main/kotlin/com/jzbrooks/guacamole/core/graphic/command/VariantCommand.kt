@@ -1,4 +1,4 @@
-package com.jzbrooks.guacamole.graphic.command
+package com.jzbrooks.guacamole.core.graphic.command
 
 interface VariantCommand : Command {
     var variant: CommandVariant

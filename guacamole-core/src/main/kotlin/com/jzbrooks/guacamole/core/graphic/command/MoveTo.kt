@@ -1,6 +1,6 @@
-package com.jzbrooks.guacamole.graphic.command
+package com.jzbrooks.guacamole.core.graphic.command
 
-import com.jzbrooks.guacamole.util.math.Point
+import com.jzbrooks.guacamole.core.util.math.Point
 
 data class MoveTo(override var variant: CommandVariant, var parameters: List<Point>) : VariantCommand {
     override fun toString(): String {
