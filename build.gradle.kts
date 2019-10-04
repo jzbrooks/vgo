@@ -9,20 +9,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.3.50"
-
-    // Apply the application plugin to add support for building a CLI application.
-    application
 }
 
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
-}
-
-application {
-    // Define the main class for the application
-    mainClassName = "com.jzbrooks.guacamole.App"
 }
 
 kotlin {
@@ -50,12 +42,11 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
 
-val fatJar by tasks.registering(Jar::class) {
+tasks.withType<Jar> {
     manifest {
         attributes["Main-Class"] = "com.jzbrooks.guacamole.App"
         attributes["Bundle-Version"] = "0.0.1"
     }
 
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-    with(tasks.jar.get() as CopySpec)
 }
