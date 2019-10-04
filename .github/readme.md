@@ -37,7 +37,7 @@ Options:
 
 This project uses the Gradle build system.
 
-To run the application: `/.gradlew run --args="./path/to/file.xml"`
+To build the application: `/.gradlew jar`
 
 To run the tests: `./gradlew test`
 
