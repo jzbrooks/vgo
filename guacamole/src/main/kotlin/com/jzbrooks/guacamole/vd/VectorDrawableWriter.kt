@@ -1,7 +1,7 @@
 package com.jzbrooks.guacamole.vd
 
-import com.jzbrooks.guacamole.core.graphic.*
 import com.jzbrooks.guacamole.core.Writer
+import com.jzbrooks.guacamole.core.graphic.*
 import org.w3c.dom.Document
 import java.io.OutputStream
 import javax.xml.parsers.DocumentBuilderFactory
