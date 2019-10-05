@@ -24,6 +24,9 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         val optimization = MergePaths()
@@ -59,6 +62,9 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         val optimization = MergePaths()
@@ -102,6 +108,9 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         val optimization = MergePaths()
@@ -144,6 +153,9 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         val optimization = MergePaths()
@@ -180,6 +192,9 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         val optimization = MergePaths()
@@ -215,6 +230,9 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         val optimization = MergePaths()

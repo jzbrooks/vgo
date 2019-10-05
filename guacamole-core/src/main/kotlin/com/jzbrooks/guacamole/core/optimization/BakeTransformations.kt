@@ -5,7 +5,7 @@ import com.jzbrooks.guacamole.core.graphic.command.*
 import com.jzbrooks.guacamole.core.util.math.Matrix3
 import com.jzbrooks.guacamole.core.util.math.Vector3
 
-class BakeTransformations : Optimization {
+class BakeTransformations(private val transformationPropertyNames: Set<String> = emptySet()) : Optimization {
     override fun optimize(graphic: Graphic) {
         topDownVisit(graphic)
     }
@@ -42,7 +42,7 @@ class BakeTransformations : Optimization {
             }
 
             group.transform = null
-            group.attributes = group.attributes.filter { !TRANSFORM_ATTRIBUTES.contains(it.key) }
+            group.attributes = group.attributes.filter { !transformationPropertyNames.contains(it.key) }
         }
     }
 
@@ -119,17 +119,5 @@ class BakeTransformations : Optimization {
             }
             else -> command
         }
-    }
-
-    companion object {
-        private val TRANSFORM_ATTRIBUTES = setOf(
-                "android:scaleX",
-                "android:scaleY",
-                "android:translateX",
-                "android:translateY",
-                "android:pivotX",
-                "android:pivotY",
-                "android:rotation"
-        )
     }
 }

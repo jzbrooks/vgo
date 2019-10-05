@@ -91,7 +91,7 @@ class App {
         FileInputStream(input).use { inputStream ->
             val vectorDrawable = ByteArrayInputStream(inputStream.readBytes()).use(::parse)
 
-            ORCHESTRATOR.optimize(vectorDrawable)
+            vectorDrawable.optimizationRegistry.optimizations.forEach { it.optimize(vectorDrawable) }
 
             if (!output.parentFile.exists()) output.parentFile.mkdirs()
             if (!output.exists()) output.createNewFile()
@@ -112,16 +112,6 @@ class App {
     }
 
     companion object {
-        private val ORCHESTRATOR = Orchestrator(
-                listOf(
-                        BakeTransformations(),
-                        CollapseGroups(),
-                        MergePaths(),
-                        CommandVariant(),
-                        RemoveEmptyGroups()
-                )
-        )
-
         private const val HELP_MESSAGE = """
 > guacamole [options] [file/directory]
 

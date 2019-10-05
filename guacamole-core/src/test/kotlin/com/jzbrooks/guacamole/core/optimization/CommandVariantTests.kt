@@ -36,6 +36,9 @@ class CommandVariantTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         CommandVariant().optimize(graphic)
@@ -61,6 +64,9 @@ class CommandVariantTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         CommandVariant().optimize(graphic)
@@ -83,6 +89,9 @@ class CommandVariantTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         CommandVariant().optimize(graphic)
@@ -116,6 +125,9 @@ class CommandVariantTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         CommandVariant().optimize(graphic)
@@ -142,6 +154,9 @@ class CommandVariantTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
             override var attributes = emptyMap<String, String>()
+            override val optimizationRegistry = object : OptimizationRegistry {
+                override val optimizations = emptyList<Optimization>()
+            }
         }
 
         CommandVariant().optimize(graphic)
