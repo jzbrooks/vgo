@@ -1,6 +1,7 @@
 package com.jzbrooks.guacamole
 
 import com.jzbrooks.guacamole.core.Writer
+import com.jzbrooks.guacamole.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
 import com.jzbrooks.guacamole.vd.parse
 import java.io.ByteArrayInputStream
@@ -90,7 +91,8 @@ class App {
         FileInputStream(input).use { inputStream ->
             val vectorDrawable = ByteArrayInputStream(inputStream.readBytes()).use(::parse)
 
-            vectorDrawable.optimizationRegistry.optimizations.forEach { it.optimize(vectorDrawable) }
+            val optimizationRegistry = VectorDrawableOptimizationRegistry()
+            optimizationRegistry.apply(vectorDrawable)
 
             if (!output.parentFile.exists()) output.parentFile.mkdirs()
             if (!output.exists()) output.createNewFile()

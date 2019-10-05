@@ -19,9 +19,6 @@ class RemoveEmptyGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
             override var attributes = emptyMap<String, String>()
-            override val optimizationRegistry = object : OptimizationRegistry {
-                override val optimizations = emptyList<Optimization>()
-            }
         }
 
         val emptyGroups = RemoveEmptyGroups()
@@ -37,9 +34,6 @@ class RemoveEmptyGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
             override var attributes = emptyMap<String, String>()
-            override val optimizationRegistry = object : OptimizationRegistry {
-                override val optimizations = emptyList<Optimization>()
-            }
         }
 
         val emptyGroups = RemoveEmptyGroups()
@@ -55,9 +49,6 @@ class RemoveEmptyGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
             override var attributes = emptyMap<String, String>()
-            override val optimizationRegistry = object : OptimizationRegistry {
-                override val optimizations = emptyList<Optimization>()
-            }
         }
 
         val emptyGroups = RemoveEmptyGroups()
@@ -76,9 +67,6 @@ class RemoveEmptyGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
             override var attributes = emptyMap<String, String>()
-            override val optimizationRegistry = object : OptimizationRegistry {
-                override val optimizations = emptyList<Optimization>()
-            }
         }
 
         val emptyGroups = RemoveEmptyGroups()

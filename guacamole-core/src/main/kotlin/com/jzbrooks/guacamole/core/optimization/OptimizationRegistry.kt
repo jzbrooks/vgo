@@ -1,5 +1,7 @@
 package com.jzbrooks.guacamole.core.optimization
 
+import com.jzbrooks.guacamole.core.graphic.Graphic
+
 interface OptimizationRegistry {
-    val optimizations: List<Optimization>
+    fun apply(graphic: Graphic)
 }

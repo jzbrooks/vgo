@@ -34,9 +34,6 @@ class BakeTransformationsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = elements
             override var attributes: Map<String, String> = emptyMap()
-            override val optimizationRegistry = object : OptimizationRegistry {
-                override val optimizations = emptyList<Optimization>()
-            }
         }
 
         BakeTransformations().optimize(graphic)
@@ -67,9 +64,6 @@ class BakeTransformationsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = elements
             override var attributes: Map<String, String> = emptyMap()
-            override val optimizationRegistry = object : OptimizationRegistry {
-                override val optimizations = emptyList<Optimization>()
-            }
         }
 
         BakeTransformations().optimize(graphic)
