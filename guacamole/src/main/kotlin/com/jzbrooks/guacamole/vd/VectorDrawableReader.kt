@@ -36,7 +36,7 @@ private fun parseElement(node: Node): Element? {
             "group" -> parseGroup(node)
             "path" -> parsePathElement(node, ::Path)
             "clip-path" -> parsePathElement(node, ::ClipPath)
-            else -> { System.err.println("Skipping unknown document element: ${node.nodeName}"); null }
+            else -> parseExtraElement(node)
         }
     } else {
         null
@@ -105,4 +105,14 @@ private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Comm
 
     val data = CommandString(node.attributes.getNamedItem("android:pathData").textContent)
     return generator(data.toCommandList(), metadata)
+}
+
+private fun parseExtraElement(node: Node): Extra {
+    val containedElements = node.childNodes.asSequence()
+            .map(::parseElement)
+            .filterNotNull()
+            .toList()
+    val attributes = node.attributes?.toMap() ?: emptyMap()
+
+    return Extra(node.nodeValue ?: node.nodeName, containedElements, attributes)
 }

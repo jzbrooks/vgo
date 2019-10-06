@@ -50,6 +50,13 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                     setAttribute("android:pathData", element.commands.joinToString(separator = ""))
                 }
             }
+            is Extra -> {
+                document.createElement(element.name).also {
+                    for (child in element.elements) {
+                        write(it, child, document)
+                    }
+                }
+            }
             else -> null
         }
 
