@@ -4,6 +4,7 @@
     <bytecodeTargetLevel>
       <module name="guacamole.guacamole-core.main" target="1.8" />
       <module name="guacamole.guacamole-core.test" target="1.8" />
+      <module name="guacamole.guacamole.integrationTest" target="1.8" />
       <module name="guacamole.guacamole.main" target="1.8" />
       <module name="guacamole.guacamole.test" target="1.8" />
     </bytecodeTargetLevel>

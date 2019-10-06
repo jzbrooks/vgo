@@ -7,8 +7,10 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.test.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.integrationTest.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.integrationTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.main.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.test.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/projects.guacamole.iml" filepath="$PROJECT_DIR$/.idea/modules/projects.guacamole.iml" />
     </modules>
   </component>
 </project>

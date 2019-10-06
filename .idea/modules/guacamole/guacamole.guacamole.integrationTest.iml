@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":guacamole:test" external.linked.project.path="$MODULE_DIR$/../../../guacamole" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="guacamole" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":guacamole:integrationTest" external.linked.project.path="$MODULE_DIR$/../../../guacamole" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="guacamole" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
       <configuration version="3" platform="JVM 1.8" allPlatforms="JVM [1.8]" useProjectSettings="false" pureKotlinSourceFolders="$MODULE_DIR$/../../../guacamole/src/test/kotlin;/Users/justin/projects/guacamole/guacamole/src/main/kotlin;/Users/justin/projects/guacamole/guacamole/src/integrationTest/kotlin;/Users/justin/projects/guacamole/guacamole/src/integration-test/kotlin">
@@ -7,18 +7,12 @@
           <option name="additionalArguments" value="-Xallow-no-source-files -Xinline-classes" />
         </compilerSettings>
         <compilerArguments>
-          <option name="destination" value="$MODULE_DIR$/../../../guacamole/build/classes/kotlin/test" />
-          <option name="classpath" value="$MODULE_DIR$/../../../guacamole/build/classes/kotlin/main:/Users/justin/projects/guacamole/guacamole-core/build/libs/guacamole-core.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.3.50/bf65725d4ae2cf00010d84e945fcbc201f590e11/kotlin-stdlib-jdk8-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/com.willowtreeapps.assertk/assertk-jvm/0.20/159426ab8ebf75f0ae6ad468a17f873c9ef0232e/assertk-jvm-0.20.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test-junit/1.3.50/683d3cf68b1bf58e0fb4529abd46c796d55fb7cd/kotlin-test-junit-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test/1.3.50/92a66b17cc20735cfb1438512210b643813f7516/kotlin-test-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.3.50/50ad05ea1c2595fb31b800e76db464d08d599af3/kotlin-stdlib-jdk7-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.50/b529d1738c7e98bbfa36a4134039528f2ce78ebf/kotlin-stdlib-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test-common/1.3.50/667fd8bfc2db0bd546f3b90fe15fe83648437bea/kotlin-test-common-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test-annotations-common/1.3.50/714afde80cb3ee60d41775469cf7412ae622869b/kotlin-test-annotations-common-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.50/3d9cd3e1bc7b92e95f43d45be3bfbcf38e36ab87/kotlin-stdlib-common-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/2973d150c0dc1fefe998f834810d68f278ea58ec/junit-4.12.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar" />
+          <option name="destination" value="$MODULE_DIR$/../../../guacamole/build/classes/kotlin/integrationTest" />
+          <option name="classpath" value="$MODULE_DIR$/../../../guacamole/build/classes/kotlin/main:/Users/justin/projects/guacamole/guacamole-core/build/libs/guacamole-core.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/com.willowtreeapps.assertk/assertk-jvm/0.20/159426ab8ebf75f0ae6ad468a17f873c9ef0232e/assertk-jvm-0.20.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/com.willowtreeapps.opentest4k/opentest4k-jvm/1.1.3/79158ac6d57e5590ad75c1ed5568681a1d5d2041/opentest4k-jvm-1.1.3.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.3.50/bf65725d4ae2cf00010d84e945fcbc201f590e11/kotlin-stdlib-jdk8-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test-junit/1.3.50/683d3cf68b1bf58e0fb4529abd46c796d55fb7cd/kotlin-test-junit-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test/1.3.50/92a66b17cc20735cfb1438512210b643813f7516/kotlin-test-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.3.50/50ad05ea1c2595fb31b800e76db464d08d599af3/kotlin-stdlib-jdk7-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.50/b529d1738c7e98bbfa36a4134039528f2ce78ebf/kotlin-stdlib-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test-common/1.3.50/667fd8bfc2db0bd546f3b90fe15fe83648437bea/kotlin-test-common-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test-annotations-common/1.3.50/714afde80cb3ee60d41775469cf7412ae622869b/kotlin-test-annotations-common-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.50/3d9cd3e1bc7b92e95f43d45be3bfbcf38e36ab87/kotlin-stdlib-common-1.3.50.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/junit/junit/4.12/2973d150c0dc1fefe998f834810d68f278ea58ec/junit-4.12.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.3/42a25dc3219429f0e5d060061f71acb49bf010a0/hamcrest-core-1.3.jar:/Users/justin/.gradle/caches/modules-2/files-2.1/org.opentest4j/opentest4j/1.1.1/efd9f971e91074491ea55b19f67b13470cf4fcdd/opentest4j-1.1.1.jar" />
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
-          <option name="moduleName" value="guacamole" />
+          <option name="moduleName" value="guacamole_integrationTest" />
           <option name="jvmTarget" value="1.8" />
-          <option name="friendPaths">
-            <array>
-              <option value="$MODULE_DIR$/../../../guacamole/build/classes/kotlin/main" />
-              <option value="$MODULE_DIR$/../../../guacamole/build/classes/java/main" />
-            </array>
-          </option>
           <option name="languageVersion" value="1.3" />
           <option name="apiVersion" value="1.3" />
           <option name="pluginOptions">
@@ -44,22 +38,23 @@
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
-    <output-test url="file://$MODULE_DIR$/../../../guacamole/build/classes/java/test" />
+    <output url="file://$MODULE_DIR$/../../../guacamole/build/classes/java/integrationTest" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../../guacamole/src/test">
-      <sourceFolder url="file://$MODULE_DIR$/../../../guacamole/src/test/kotlin" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../guacamole/src/test/resources" type="java-test-resource" />
+    <content url="file://$MODULE_DIR$/../../../guacamole/src/integration-test">
+      <sourceFolder url="file://$MODULE_DIR$/../../../guacamole/src/integration-test/kotlin" isTestSource="false" />
     </content>
+    <content url="file://$MODULE_DIR$/../../../guacamole/src/integrationTest" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="guacamole.guacamole.main" />
     <orderEntry type="module" module-name="guacamole.guacamole-core.main" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.50" level="project" />
+    <orderEntry type="module" module-name="guacamole.guacamole.test" scope="RUNTIME" production-on-test="" />
     <orderEntry type="library" name="Gradle: com.willowtreeapps.assertk:assertk-jvm:0.20" level="project" />
+    <orderEntry type="library" name="Gradle: com.willowtreeapps.opentest4k:opentest4k-jvm:1.1.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.50" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-test-junit:1.3.50" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-test:1.3.50" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.50" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: com.willowtreeapps.opentest4k:opentest4k-jvm:1.1.3" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.3.50" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-test-common:1.3.50" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-test-annotations-common:1.3.50" level="project" />
@@ -67,7 +62,6 @@
     <orderEntry type="library" name="Gradle: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.opentest4j:opentest4j:1.1.1" level="project" />
+    <orderEntry type="library" name="Gradle: org.opentest4j:opentest4j:1.1.1" level="project" />
   </component>
-  <component name="TestModuleProperties" production-module="guacamole.guacamole.main" />
 </module>
