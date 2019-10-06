@@ -42,7 +42,7 @@ class BakeTransformations(private val transformationPropertyNames: Set<String> =
             }
 
             group.transform = null
-            group.attributes = group.attributes.filter { !transformationPropertyNames.contains(it.key) }
+            group.attributes = group.attributes.filterNot { transformationPropertyNames.contains(it.key) }
         }
     }
 
