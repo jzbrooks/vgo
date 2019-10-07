@@ -2,16 +2,18 @@ package com.jzbrooks.guacamole.vd
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.jzbrooks.guacamole.App
 import org.junit.Test
 
 class AvocadoExampleTests {
-    private val avocadoExampleRelativePath = "src/integrationTest/resources/avacado_example.xml"
+    private val avocadoExampleRelativePath = "src/integration-test/resources/avocado_example.xml"
+
     @Test
     fun testOptimizationFinishes() {
         val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/test.xml")
-        val process = ProcessBuilder("java", "-jar", "build/libs/guacamole.jar", *arguments)
-                .start()
 
-        assertThat(process.waitFor()).isEqualTo(0)
+        val exitCode = App().run(arguments)
+
+        assertThat(exitCode).isEqualTo(0)
     }
 }

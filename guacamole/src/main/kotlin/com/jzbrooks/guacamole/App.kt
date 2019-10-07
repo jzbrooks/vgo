@@ -8,16 +8,17 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.io.FileInputStream
 import java.util.jar.Manifest
+import kotlin.system.exitProcess
 
 class App {
     private var printStats = false
 
-    fun run(args: Array<String>) {
+    fun run(args: Array<String>): Int {
         val argReader = ArgReader(args.toMutableList())
 
         if (argReader.readFlag("help|h")) {
             println(HELP_MESSAGE)
-            return
+            return 0
         }
 
         if (argReader.readFlag("version|v")) {
@@ -28,7 +29,7 @@ class App {
                 manifest.mainAttributes.getValue("Bundle-Version")?.let(::println)
             }
 
-            return
+            return 0
         }
 
         val writerOptions = mutableSetOf<Writer.Option>()
@@ -83,8 +84,11 @@ class App {
                 System.err.println("Input and output must be either files or directories.")
                 System.err.println("Input is a " + if (input.isFile) "file" else "directory")
                 System.err.println("Output is a " + if (output.isFile) "file" else "directory")
+                return 1
             }
         }
+
+        return 0
     }
 
     private fun handleFile(input: File, output: File, writer: Writer) {
@@ -125,6 +129,6 @@ Options:
         """
 
         @JvmStatic
-        fun main(args: Array<String>) = App().run(args)
+        fun main(args: Array<String>): Unit = exitProcess(App().run(args))
     }
 }
