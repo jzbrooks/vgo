@@ -95,6 +95,15 @@ class CommandLineInterfaceTests {
         assertThat(systemOutput.toString()).contains("Percent saved:")
     }
 
+    @Test
+    fun testIndentOption() {
+        val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/indent-test.xml", "--indent", "4")
+        val exitCode = App().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        val output = File("build/integrationTest/indent-test.xml").readText()
+        assertThat(output).contains("    <path")
+    }
+
     companion object {
         @BeforeClass
         fun createTempDir() {
