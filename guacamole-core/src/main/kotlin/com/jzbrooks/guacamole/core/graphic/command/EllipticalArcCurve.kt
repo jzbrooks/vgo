@@ -14,24 +14,16 @@ data class EllipticalArcCurve(override var variant: CommandVariant, var paramete
     }
 
     data class Parameter(var radiusX: Float, var radiusY: Float, var angle: Float, var arc: ArcFlag, var sweep: SweepFlag, var end: Point) {
-        override fun toString() = "${radiusX.compactString()},${radiusY.compactString()},${angle.compactString()},$arc,$sweep,$end"
+        override fun toString() = "${radiusX.compactString()},${radiusY.compactString()},${angle.compactString()},${arc.ordinal},${sweep.ordinal},$end"
     }
 
     enum class ArcFlag {
-        LARGE {
-            override fun toString() = "1"
-        },
-        SMALL {
-            override fun toString() = "0"
-        }
+        SMALL,
+        LARGE
     }
 
     enum class SweepFlag {
-        CLOCKWISE {
-            override fun toString() = "1"
-        },
-        ANTICLOCKWISE {
-            override fun toString() = "0"
-        }
+        ANTICLOCKWISE,
+        CLOCKWISE
     }
 }
