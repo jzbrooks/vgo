@@ -23,8 +23,7 @@ fun parse(input: InputStream): VectorDrawable {
     val rootMetadata = root.attributes.toMap()
 
     val elements = root.childNodes.asSequence()
-            .map(::parseElement)
-            .filterNotNull()
+            .mapNotNull(::parseElement)
             .toList()
 
     return VectorDrawable(elements, rootMetadata)
@@ -45,8 +44,7 @@ private fun parseElement(node: Node): Element? {
 
 private fun parseGroup(groupNode: Node): Group {
     val groupChildElements = groupNode.childNodes.asSequence()
-            .map(::parseElement)
-            .filterNotNull()
+            .mapNotNull(::parseElement)
             .toList()
     val groupMetadata = groupNode.attributes.toMap()
 
@@ -109,8 +107,7 @@ private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Comm
 
 private fun parseExtraElement(node: Node): Extra {
     val containedElements = node.childNodes.asSequence()
-            .map(::parseElement)
-            .filterNotNull()
+            .mapNotNull(::parseElement)
             .toList()
     val attributes = node.attributes?.toMap() ?: emptyMap()
 
