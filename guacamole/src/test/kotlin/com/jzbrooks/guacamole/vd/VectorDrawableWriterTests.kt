@@ -57,7 +57,7 @@ class VectorDrawableWriterTests {
 
     @Test
     fun testPathsWritten() {
-        ByteArrayOutputStream().use {  memoryStream ->
+        ByteArrayOutputStream().use { memoryStream ->
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
@@ -68,10 +68,10 @@ class VectorDrawableWriterTests {
                     .isEqualTo(2)
         }
     }
-    
+
     @Test
     fun testUnitsWritten() {
-        ByteArrayOutputStream().use {  memoryStream ->
+        ByteArrayOutputStream().use { memoryStream ->
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
@@ -84,7 +84,7 @@ class VectorDrawableWriterTests {
 
     @Test
     fun testElementOrderMaintained() {
-        ByteArrayOutputStream().use {  memoryStream ->
+        ByteArrayOutputStream().use { memoryStream ->
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
@@ -99,7 +99,7 @@ class VectorDrawableWriterTests {
 
     @Test
     fun testVectorAttributesWritten() {
-        ByteArrayOutputStream().use {  memoryStream ->
+        ByteArrayOutputStream().use { memoryStream ->
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
@@ -111,7 +111,7 @@ class VectorDrawableWriterTests {
 
     @Test
     fun testPathMetadataWritten() {
-        ByteArrayOutputStream().use {  memoryStream ->
+        ByteArrayOutputStream().use { memoryStream ->
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
@@ -124,7 +124,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testGroupChildrenWritten() {
         val graphicWithGroup = VectorDrawable(listOf(Group(graphic.elements)), attributes)
-        ByteArrayOutputStream().use {  memoryStream ->
+        ByteArrayOutputStream().use { memoryStream ->
             VectorDrawableWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
@@ -137,7 +137,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testExtraWritten() {
         val graphicWithGroup = VectorDrawable(graphic.elements, attributes)
-        ByteArrayOutputStream().use {  memoryStream ->
+        ByteArrayOutputStream().use { memoryStream ->
             VectorDrawableWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
@@ -150,7 +150,7 @@ class VectorDrawableWriterTests {
     @Test
     fun testExtraChildrenWritten() {
         val graphicWithGroup = VectorDrawable(graphic.elements, attributes)
-        ByteArrayOutputStream().use {  memoryStream ->
+        ByteArrayOutputStream().use { memoryStream ->
             VectorDrawableWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
