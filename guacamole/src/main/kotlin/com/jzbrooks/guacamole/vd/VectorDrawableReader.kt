@@ -7,6 +7,7 @@ import com.jzbrooks.guacamole.core.util.math.Matrix3
 import com.jzbrooks.guacamole.core.util.math.MutableMatrix3
 import com.jzbrooks.guacamole.core.util.xml.asSequence
 import com.jzbrooks.guacamole.core.util.xml.toMap
+import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 import java.io.InputStream
@@ -15,9 +16,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-fun parse(input: InputStream): VectorDrawable {
-    val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
-    document.documentElement.normalize()
+fun parse(document: Document): VectorDrawable {
 
     val root = document.childNodes.item(0)
     val rootMetadata = root.attributes.toMap()

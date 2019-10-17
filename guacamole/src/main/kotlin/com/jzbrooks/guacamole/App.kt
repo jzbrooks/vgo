@@ -1,13 +1,13 @@
 package com.jzbrooks.guacamole
 
 import com.jzbrooks.guacamole.core.Writer
+import com.jzbrooks.guacamole.svg.ScalableVectorGraphicWriter
+import com.jzbrooks.guacamole.vd.VectorDrawable
 import com.jzbrooks.guacamole.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
-import com.jzbrooks.guacamole.vd.parse
-import java.io.ByteArrayInputStream
 import java.io.File
-import java.io.FileInputStream
 import java.util.jar.Manifest
+import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.system.exitProcess
 
 class App {
@@ -38,8 +38,6 @@ class App {
         }
 
         printStats = argReader.readFlag("stats|s")
-
-        val writer = VectorDrawableWriter(writerOptions)
 
         val outputs = run {
             val outputPaths = mutableListOf<String>()
@@ -77,9 +75,9 @@ class App {
 
         for ((input, output) in inputOutputPair) {
             if (input.isFile && (output.isFile || !output.exists())) {
-                handleFile(input, output, writer)
+                handleFile(input, output, writerOptions)
             } else if (input.isDirectory && (output.isDirectory || !output.exists())) {
-                input.listFiles { file -> !file.isHidden }?.forEach { handleFile(it, File(output, it.name), writer) }
+                input.listFiles { file -> !file.isHidden }?.forEach { handleFile(it, File(output, it.name), writerOptions) }
             } else {
                 System.err.println("Input and output must be either files or directories.")
                 System.err.println("Input is a " + if (input.isFile) "file" else "directory")
@@ -91,9 +89,17 @@ class App {
         return 0
     }
 
-    private fun handleFile(input: File, output: File, writer: Writer) {
-        FileInputStream(input).use { inputStream ->
-            val vectorDrawable = ByteArrayInputStream(inputStream.readBytes()).use(::parse)
+    private fun handleFile(input: File, output: File, options: Set<Writer.Option>) {
+        input.inputStream().use { inputStream ->
+            val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
+                documentElement.normalize()
+            }
+
+            val vectorDrawable = if (document.childNodes.item(0).nodeName == "svg") {
+                com.jzbrooks.guacamole.svg.parse(document)
+            } else {
+                com.jzbrooks.guacamole.vd.parse(document)
+            }
 
             val optimizationRegistry = VectorDrawableOptimizationRegistry()
             optimizationRegistry.apply(vectorDrawable)
@@ -102,7 +108,13 @@ class App {
             if (!output.exists()) output.createNewFile()
 
             output.outputStream().use { outputStream ->
-                writer.write(vectorDrawable, outputStream)
+                if (vectorDrawable is VectorDrawable) {
+                    val writer = VectorDrawableWriter(options)
+                    writer.write(vectorDrawable, outputStream)
+                } else {
+                    val writer = ScalableVectorGraphicWriter(options)
+                    writer.write(vectorDrawable, outputStream)
+                }
 
                 if (printStats) {
                     val sizeBefore = inputStream.channel.size()

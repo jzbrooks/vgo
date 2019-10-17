@@ -8,54 +8,60 @@ import assertk.assertions.isEqualTo
 import com.jzbrooks.guacamole.assertk.extensions.containsKey
 import com.jzbrooks.guacamole.assertk.extensions.containsKeys
 import com.jzbrooks.guacamole.assertk.extensions.doesNotContainKey
+import com.jzbrooks.guacamole.core.graphic.Extra
 import com.jzbrooks.guacamole.core.graphic.Graphic
 import com.jzbrooks.guacamole.core.graphic.Path
-import com.jzbrooks.guacamole.core.graphic.Extra
 import com.jzbrooks.guacamole.core.graphic.command.ClosePath
 import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.graphic.command.LineTo
 import com.jzbrooks.guacamole.core.graphic.command.MoveTo
 import com.jzbrooks.guacamole.core.util.math.Point
+import org.junit.Before
+import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
+import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.test.Test
 
 class VectorDrawableReaderTests {
+    private lateinit var document: Document
+
+    @Before
+    fun setup() {
+        javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use { input ->
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
+            document.documentElement.normalize()
+        }
+    }
+
     @Test
     fun testParseDimensions() {
-        javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
-            val graphic: Graphic = parse(it)
+        val graphic: Graphic = parse(document)
 
-            assertThat(graphic.attributes["android:width"]).isEqualTo("24dp")
-            assertThat(graphic.attributes["android:height"]).isEqualTo("24dp")
-        }
+        assertThat(graphic.attributes["android:width"]).isEqualTo("24dp")
+        assertThat(graphic.attributes["android:height"]).isEqualTo("24dp")
     }
 
     @Test
     fun testParseMetadataDoesNotContainPathData() {
-        javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
-            val graphic: Graphic = parse(it)
+            val graphic: Graphic = parse(document)
 
             val path = graphic.elements.first() as Path
 
             assertThat(path.attributes).doesNotContainKey("android:pathData")
-        }
     }
 
     @Test
     fun testParseMetadata() {
-        javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
-            val graphic: Graphic = parse(it)
+            val graphic: Graphic = parse(document)
 
             val path = graphic.elements.first() as Path
 
             assertThat(path.attributes).containsKeys("android:name", "android:strokeWidth", "android:fillColor")
-        }
     }
 
     @Test
     fun testParsePaths() {
-        javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
-            val graphic: Graphic = parse(it)
+            val graphic: Graphic = parse(document)
 
             val path = graphic.elements.first() as Path
             assertThat(path.commands).isEqualTo(
@@ -68,55 +74,64 @@ class VectorDrawableReaderTests {
                     )
             )
             assertThat(graphic.elements).hasSize(3)
-        }
     }
 
     @Test
     fun testStoreNameForPath() {
-        javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use {
-            val graphic: Graphic = parse(it)
+            val graphic: Graphic = parse(document)
 
             val path = graphic.elements.first() as Path
 
             assertThat(path.attributes).containsKey("android:name")
             assertThat(path.attributes["android:name"]).isEqualTo("strike_thru_path")
-        }
     }
 
     @Test
     fun testParseComment() {
-        ByteArrayInputStream("<vector><!-- test comment --></vector>".toByteArray()).use {
-            val graphic: Graphic = parse(it)
-
-            val unknown = graphic.elements.first() as Extra
-
-            assertThat(unknown.name).isEqualTo(" test comment ")
-            assertThat(unknown.elements).isEmpty()
+        val commentDocument = ByteArrayInputStream("<vector><!-- test comment --></vector>".toByteArray()).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
         }
+
+        val graphic: Graphic = parse(commentDocument)
+
+        val unknown = graphic.elements.first() as Extra
+
+        assertThat(unknown.name).isEqualTo(" test comment ")
+        assertThat(unknown.elements).isEmpty()
     }
 
     @Test
     fun testParseSelfClosedUnknownElementWithoutChildren() {
-        ByteArrayInputStream("<vector><bicycle /></vector>".toByteArray()).use {
-            val graphic: Graphic = parse(it)
-
-            val unknown = graphic.elements.first() as Extra
-
-            assertThat(unknown.name).isEqualTo("bicycle")
-            assertThat(unknown.elements).isEmpty()
+        val unknownElementDocument = ByteArrayInputStream("<vector><bicycle /></vector>".toByteArray()).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
         }
+
+        val graphic: Graphic = parse(unknownElementDocument)
+
+        val unknown = graphic.elements.first() as Extra
+
+        assertThat(unknown.name).isEqualTo("bicycle")
+        assertThat(unknown.elements).isEmpty()
     }
 
     @Test
     fun testParseUnknownElementWithoutChildren() {
-        ByteArrayInputStream("<vector><bicycle></bicycle></vector>".toByteArray()).use {
-            val graphic: Graphic = parse(it)
-
-            val unknown = graphic.elements.first() as Extra
-
-            assertThat(unknown.name).isEqualTo("bicycle")
-            assertThat(unknown.elements).isEmpty()
+        val unknownElementDocument = ByteArrayInputStream("<vector><bicycle></bicycle></vector>".toByteArray()).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
         }
+
+        val graphic: Graphic = parse(unknownElementDocument)
+
+        val unknown = graphic.elements.first() as Extra
+
+        assertThat(unknown.name).isEqualTo("bicycle")
+        assertThat(unknown.elements).isEmpty()
     }
 
     @Test
@@ -130,15 +145,18 @@ class VectorDrawableReaderTests {
             |""".trimMargin().toByteArray()
 
         val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f,0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath()))
-        ByteArrayInputStream(vectorText).use {
-            val graphic: Graphic = parse(it)
 
-            val unknown = graphic.elements.first() as Extra
-
-
-
-            assertThat(unknown.name).isEqualTo("bicycle")
-            assertThat(unknown.elements).containsExactly(expectedChild)
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
         }
+
+        val graphic: Graphic = parse(unknownElementDocument)
+
+        val unknown = graphic.elements.first() as Extra
+
+        assertThat(unknown.name).isEqualTo("bicycle")
+        assertThat(unknown.elements).containsExactly(expectedChild)
     }
 }
