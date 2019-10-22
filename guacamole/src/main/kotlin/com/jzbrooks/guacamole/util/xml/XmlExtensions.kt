@@ -1,4 +1,4 @@
-package com.jzbrooks.guacamole.core.util.xml
+package com.jzbrooks.guacamole.util.xml
 
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
@@ -22,7 +22,7 @@ fun NamedNodeMap.asSequence(): Sequence<Node> {
     return generateSequence { this.item(i).also { i++ } }
 }
 
-fun NamedNodeMap.toMap(): Map<String, String> {
+fun NamedNodeMap.toMutableMap(): MutableMap<String, String> {
     val map = mutableMapOf<String, String>()
     for (i in 0 until this.length) {
         val item = this.item(i)

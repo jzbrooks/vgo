@@ -23,7 +23,7 @@ class MergePathsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val optimization = MergePaths()
@@ -49,7 +49,7 @@ class MergePathsTests {
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                         )
                 ),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mapOf("android:strokeWidth" to "1")),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mutableMapOf("android:strokeWidth" to "1")),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
         )
@@ -58,7 +58,7 @@ class MergePathsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val optimization = MergePaths()
@@ -73,7 +73,7 @@ class MergePathsTests {
                                 ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                         )),
-                        Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mapOf("android:strokeWidth" to "1")),
+                        Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mutableMapOf("android:strokeWidth" to "1")),
                         Path(listOf(
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
@@ -94,14 +94,14 @@ class MergePathsTests {
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                         )
                 ),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mapOf("android:strokeWidth" to "1")),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mutableMapOf("android:strokeWidth" to "1")),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
         )
 
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val optimization = MergePaths()
@@ -115,7 +115,7 @@ class MergePathsTests {
                         ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                 )),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mapOf("android:strokeWidth" to "1")),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mutableMapOf("android:strokeWidth" to "1")),
                 Path(listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
@@ -135,7 +135,7 @@ class MergePathsTests {
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                         )
                 ),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mapOf("android:strokeWidth" to "1")),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mutableMapOf("android:strokeWidth" to "1")),
                 Group(emptyList()),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
@@ -143,7 +143,7 @@ class MergePathsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val optimization = MergePaths()
@@ -157,7 +157,7 @@ class MergePathsTests {
                         ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                 )),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mapOf("android:strokeWidth" to "1")),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mutableMapOf("android:strokeWidth" to "1")),
                 Group(emptyList()),
                 Path(listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
@@ -179,7 +179,7 @@ class MergePathsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val optimization = MergePaths()
@@ -208,13 +208,13 @@ class MergePathsTests {
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
                 ClipPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))))),
                 ClipPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))), mapOf("android:fillColor" to "#FF0011FF")),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))), mutableMapOf("android:fillColor" to "#FF0011FF")),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
         )
 
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val optimization = MergePaths()
@@ -229,7 +229,7 @@ class MergePathsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
                 )),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))), mapOf("android:fillColor" to "#FF0011FF")),
+                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))), mutableMapOf("android:fillColor" to "#FF0011FF")),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
         ))
     }

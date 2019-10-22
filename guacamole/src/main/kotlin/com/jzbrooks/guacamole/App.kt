@@ -1,9 +1,9 @@
 package com.jzbrooks.guacamole
 
 import com.jzbrooks.guacamole.core.Writer
+import com.jzbrooks.guacamole.svg.ScalableVectorGraphic
 import com.jzbrooks.guacamole.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.guacamole.vd.VectorDrawable
-import com.jzbrooks.guacamole.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
 import java.io.File
 import java.util.jar.Manifest
@@ -95,25 +95,30 @@ class App {
                 documentElement.normalize()
             }
 
-            val vectorDrawable = if (document.childNodes.item(0).nodeName == "svg") {
+            val graphic = if (document.childNodes.item(0).nodeName == "svg") {
                 com.jzbrooks.guacamole.svg.parse(document)
             } else {
                 com.jzbrooks.guacamole.vd.parse(document)
             }
 
-            val optimizationRegistry = VectorDrawableOptimizationRegistry()
-            optimizationRegistry.apply(vectorDrawable)
+            val optimizationRegistry = when (graphic) {
+                is VectorDrawable -> com.jzbrooks.guacamole.vd.OptimizationRegistry()
+                is ScalableVectorGraphic -> com.jzbrooks.guacamole.svg.OptimizationRegistry()
+                else -> null
+            }
+
+            optimizationRegistry?.apply(graphic)
 
             if (!output.parentFile.exists()) output.parentFile.mkdirs()
             if (!output.exists()) output.createNewFile()
 
             output.outputStream().use { outputStream ->
-                if (vectorDrawable is VectorDrawable) {
+                if (graphic is VectorDrawable) {
                     val writer = VectorDrawableWriter(options)
-                    writer.write(vectorDrawable, outputStream)
+                    writer.write(graphic, outputStream)
                 } else {
                     val writer = ScalableVectorGraphicWriter(options)
-                    writer.write(vectorDrawable, outputStream)
+                    writer.write(graphic, outputStream)
                 }
 
                 if (printStats) {

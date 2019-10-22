@@ -35,7 +35,7 @@ class CommandVariantTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         CommandVariant().optimize(graphic)
@@ -60,7 +60,7 @@ class CommandVariantTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         CommandVariant().optimize(graphic)
@@ -82,7 +82,7 @@ class CommandVariantTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         CommandVariant().optimize(graphic)
@@ -115,7 +115,7 @@ class CommandVariantTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         CommandVariant().optimize(graphic)
@@ -141,7 +141,7 @@ class CommandVariantTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(path)
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         CommandVariant().optimize(graphic)

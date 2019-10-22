@@ -19,7 +19,7 @@ class CollapseGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         CollapseGroups().optimize(graphic)
@@ -34,7 +34,7 @@ class CollapseGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         CollapseGroups().optimize(graphic)
@@ -45,12 +45,12 @@ class CollapseGroupsTests {
     @Test
     fun testRetainNestedGroupWithAttributes() {
         val innerPath = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
-        val innerGroupWithAttributes = Group(listOf(innerPath), mapOf("android:scaleX" to "20"))
+        val innerGroupWithAttributes = Group(listOf(innerPath), mutableMapOf("android:scaleX" to "20"))
         val group = Group(listOf(innerGroupWithAttributes))
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         CollapseGroups().optimize(graphic)

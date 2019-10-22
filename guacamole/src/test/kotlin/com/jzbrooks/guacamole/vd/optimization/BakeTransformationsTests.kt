@@ -1,7 +1,8 @@
-package com.jzbrooks.guacamole.core.optimization
+package com.jzbrooks.guacamole.vd.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import com.jzbrooks.guacamole.assertk.extensions.doesNotContainKey
 import com.jzbrooks.guacamole.core.graphic.Element
 import com.jzbrooks.guacamole.core.graphic.Graphic
 import com.jzbrooks.guacamole.core.graphic.Group
@@ -9,7 +10,6 @@ import com.jzbrooks.guacamole.core.graphic.Path
 import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.graphic.command.LineTo
 import com.jzbrooks.guacamole.core.graphic.command.MoveTo
-import com.jzbrooks.guacamole.core.util.math.MutableMatrix3
 import com.jzbrooks.guacamole.core.util.math.Point
 import org.junit.Test
 
@@ -25,23 +25,22 @@ class BakeTransformationsTests {
                                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
                                         ))))
                         ),
-                        transform = MutableMatrix3().apply {
-                            this[0, 2] = 14f
-                            this[1, 2] = 14f
-                        }
+                        mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
                 )
         )
         val graphic = object : Graphic {
             override var elements: List<Element> = elements
-            override var attributes: Map<String, String> = emptyMap()
+            override var attributes: MutableMap<String, String> = mutableMapOf()
         }
 
         BakeTransformations().optimize(graphic)
 
-        val firstGroup = graphic.elements.first() as Group
-        val secondGroup = firstGroup.elements.first() as Group
-        val groupTransforms = listOf(firstGroup.transform, secondGroup.transform)
-        assertThat(groupTransforms).containsExactly(null, null)
+        val parentGroup = graphic.elements.first() as Group
+        val childGroup = parentGroup.elements.first() as Group
+        assertThat(parentGroup.attributes).doesNotContainKey("android:translateX")
+        assertThat(parentGroup.attributes).doesNotContainKey("android:translateY")
+        assertThat(childGroup.attributes).doesNotContainKey("android:translateX")
+        assertThat(childGroup.attributes).doesNotContainKey("android:translateY")
     }
 
     @Test
@@ -55,15 +54,12 @@ class BakeTransformationsTests {
                                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
                                         ))))
                         ),
-                        transform = MutableMatrix3().apply {
-                            this[0, 2] = 14f
-                            this[1, 2] = 14f
-                        }
+                        mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
                 )
         )
         val graphic = object : Graphic {
             override var elements: List<Element> = elements
-            override var attributes: Map<String, String> = emptyMap()
+            override var attributes: MutableMap<String, String> = mutableMapOf()
         }
 
         BakeTransformations().optimize(graphic)

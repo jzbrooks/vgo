@@ -3,22 +3,15 @@ package com.jzbrooks.guacamole.svg
 import com.jzbrooks.guacamole.core.graphic.*
 import com.jzbrooks.guacamole.core.graphic.command.Command
 import com.jzbrooks.guacamole.core.graphic.command.CommandString
-import com.jzbrooks.guacamole.core.util.math.Matrix3
-import com.jzbrooks.guacamole.core.util.math.MutableMatrix3
-import com.jzbrooks.guacamole.core.util.xml.asSequence
-import com.jzbrooks.guacamole.core.util.xml.toMap
+import com.jzbrooks.guacamole.util.xml.asSequence
+import com.jzbrooks.guacamole.util.xml.toMutableMap
 import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.w3c.dom.Text
-import java.io.InputStream
-import javax.xml.parsers.DocumentBuilderFactory
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 
 fun parse(document: Document): ScalableVectorGraphic {
     val root = document.childNodes.item(0)
-    val rootMetadata = root.attributes.toMap()
+    val rootMetadata = root.attributes.toMutableMap()
 
     val elements = root.childNodes.asSequence()
             .mapNotNull(::parseElement)
@@ -44,7 +37,7 @@ private fun parseGroup(groupNode: Node): Group {
     val groupChildElements = groupNode.childNodes.asSequence()
             .mapNotNull(::parseElement)
             .toList()
-    val groupMetadata = groupNode.attributes.toMap()
+    val groupMetadata = groupNode.attributes.toMutableMap()
 
 //    val scaleX = groupMetadata["android:scaleX"]?.toFloat()
 //    val scaleY = groupMetadata["android:scaleY"]?.toFloat()
@@ -90,14 +83,14 @@ private fun parseGroup(groupNode: Node): Group {
 //    val transform = listOf(pivot, rotate, translation, scale, antiPivot).reduce(Matrix3::times)
 //    val nonIdentityTransform = if (transform == Matrix3.IDENTITY) null else transform
 
-    return Group(groupChildElements, groupMetadata, null)
+    return Group(groupChildElements, groupMetadata)
 }
 
-private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Command>, Map<String, String>) -> T): T {
+private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Command>, MutableMap<String, String>) -> T): T {
     val metadata = node.attributes.asSequence()
             .filter { attribute -> attribute.nodeName != "d" }
             .associate { attribute -> attribute.nodeName to attribute.nodeValue }
-            .toMap()
+            .toMutableMap()
 
     val data = CommandString(node.attributes.getNamedItem("d").textContent)
     return generator(data.toCommandList(), metadata)
@@ -107,7 +100,7 @@ private fun parseExtraElement(node: Node): Extra {
     val containedElements = node.childNodes.asSequence()
             .mapNotNull(::parseElement)
             .toList()
-    val attributes = node.attributes?.toMap() ?: emptyMap()
+    val attributes = node.attributes?.toMutableMap() ?: mutableMapOf()
 
     return Extra(node.nodeValue ?: node.nodeName, containedElements, attributes)
 }

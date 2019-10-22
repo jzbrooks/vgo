@@ -18,7 +18,7 @@ class RemoveEmptyGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val emptyGroups = RemoveEmptyGroups()
@@ -33,7 +33,7 @@ class RemoveEmptyGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val emptyGroups = RemoveEmptyGroups()
@@ -44,11 +44,11 @@ class RemoveEmptyGroupsTests {
 
     @Test
     fun testAvoidCollapsingNestedGroupWithAttributes() {
-        val nestedEmptyGroups = listOf(Group(listOf(Group(listOf(Group(emptyList(), mapOf("android:name" to "base")))))))
+        val nestedEmptyGroups = listOf(Group(listOf(Group(listOf(Group(emptyList(), mutableMapOf("android:name" to "base")))))))
 
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val emptyGroups = RemoveEmptyGroups()
@@ -66,7 +66,7 @@ class RemoveEmptyGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
-            override var attributes = emptyMap<String, String>()
+            override var attributes = mutableMapOf<String, String>()
         }
 
         val emptyGroups = RemoveEmptyGroups()

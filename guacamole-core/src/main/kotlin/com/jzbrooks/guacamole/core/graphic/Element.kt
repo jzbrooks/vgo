@@ -1,5 +1,5 @@
 package com.jzbrooks.guacamole.core.graphic
 
 interface Element {
-    var attributes: Map<String, String>
+    val attributes: MutableMap<String, String>
 }
