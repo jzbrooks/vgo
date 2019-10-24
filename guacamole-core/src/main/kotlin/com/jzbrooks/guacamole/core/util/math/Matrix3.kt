@@ -6,25 +6,40 @@ interface Matrix3 {
     operator fun times(other: Vector3): Vector3
 
     companion object {
-        val IDENTITY = from()
-        fun from(
-                data: Array<Array<Float>> = Array(3) { j -> Array(3) { i -> if (i == j) 1f else 0f } }
-        ): Matrix3 = ArrayMatrix3(data)
+        val IDENTITY = object : Matrix3 {
+            override fun get(row: Int, column: Int) = if (row == column) 1f else 0f
+
+            override fun times(other: Matrix3): Matrix3 {
+                val data = Array(3) { Array(3) { 0f } }
+
+                for (i in 0..2) {
+                    for (j in 0..2) {
+                        data[i][j] = other[i, j]
+                    }
+                }
+
+                return ArrayMatrix3(data)
+            }
+
+            override fun times(other: Vector3): Vector3 = other.copy()
+        }
+        fun from(data: Array<Array<Float>>): Matrix3 = ArrayMatrix3(data)
     }
 }
 
 interface MutableMatrix3 : Matrix3 {
     operator fun set(row: Int, column: Int, value: Float)
     companion object {
-        fun from(
-                data: Array<Array<Float>> = Array(3) { j -> Array(3) { i -> if (i == j) 1f else 0f } }
-        ): MutableMatrix3 = ArrayMatrix3(data)
+        fun identity(): MutableMatrix3 = ArrayMatrix3(arrayOf(
+                arrayOf(1f, 0f, 0f),
+                arrayOf(1f, 1f, 0f),
+                arrayOf(1f, 0f, 1f)
+        ))
+        fun from(data: Array<Array<Float>>): MutableMatrix3 = ArrayMatrix3(data)
     }
 }
 
-private class ArrayMatrix3(
-    internal val data: Array<Array<Float>> = Array(3) { Array(3) { 0f } }
-) : MutableMatrix3 {
+private class ArrayMatrix3(private val data: Array<Array<Float>>) : MutableMatrix3 {
 
     override fun equals(other: Any?): Boolean {
         if (other !is Matrix3) return false
@@ -59,17 +74,19 @@ private class ArrayMatrix3(
     }
 
     override operator fun times(other: Matrix3): Matrix3 {
-        return ArrayMatrix3().apply {
-            this[0, 0] = this@ArrayMatrix3[0, 0] * other[0, 0] + this@ArrayMatrix3[0, 1] * other[1, 0] + this@ArrayMatrix3[0, 2] * other[2, 0]
-            this[0, 1] = this@ArrayMatrix3[0, 0] * other[0, 1] + this@ArrayMatrix3[0, 1] * other[1, 1] + this@ArrayMatrix3[0, 2] * other[2, 1]
-            this[0, 2] = this@ArrayMatrix3[0, 0] * other[0, 2] + this@ArrayMatrix3[0, 1] * other[1, 2] + this@ArrayMatrix3[0, 2] * other[2, 2]
-            this[1, 0] = this@ArrayMatrix3[1, 0] * other[0, 0] + this@ArrayMatrix3[1, 1] * other[1, 0] + this@ArrayMatrix3[1, 2] * other[2, 0]
-            this[1, 1] = this@ArrayMatrix3[1, 0] * other[0, 1] + this@ArrayMatrix3[1, 1] * other[1, 1] + this@ArrayMatrix3[1, 2] * other[2, 1]
-            this[1, 2] = this@ArrayMatrix3[1, 0] * other[0, 2] + this@ArrayMatrix3[1, 1] * other[1, 2] + this@ArrayMatrix3[1, 2] * other[2, 2]
-            this[2, 0] = this@ArrayMatrix3[2, 0] * other[0, 0] + this@ArrayMatrix3[2, 1] * other[1, 0] + this@ArrayMatrix3[2, 2] * other[2, 0]
-            this[2, 1] = this@ArrayMatrix3[2, 0] * other[0, 1] + this@ArrayMatrix3[2, 1] * other[1, 1] + this@ArrayMatrix3[2, 2] * other[2, 1]
-            this[2, 2] = this@ArrayMatrix3[2, 0] * other[0, 2] + this@ArrayMatrix3[2, 1] * other[1, 2] + this@ArrayMatrix3[2, 2] * other[2, 2]
-        }
+        val data = Array(3) { Array(3) { 0f }}
+
+        data[0][0] = this[0, 0] * other[0, 0] + this[0, 1] * other[1, 0] + this[0, 2] * other[2, 0]
+        data[0][1] = this[0, 0] * other[0, 1] + this[0, 1] * other[1, 1] + this[0, 2] * other[2, 1]
+        data[0][2] = this[0, 0] * other[0, 2] + this[0, 1] * other[1, 2] + this[0, 2] * other[2, 2]
+        data[1][0] = this[1, 0] * other[0, 0] + this[1, 1] * other[1, 0] + this[1, 2] * other[2, 0]
+        data[1][1] = this[1, 0] * other[0, 1] + this[1, 1] * other[1, 1] + this[1, 2] * other[2, 1]
+        data[1][2] = this[1, 0] * other[0, 2] + this[1, 1] * other[1, 2] + this[1, 2] * other[2, 2]
+        data[2][0] = this[2, 0] * other[0, 0] + this[2, 1] * other[1, 0] + this[2, 2] * other[2, 0]
+        data[2][1] = this[2, 0] * other[0, 1] + this[2, 1] * other[1, 1] + this[2, 2] * other[2, 1]
+        data[2][2] = this[2, 0] * other[0, 2] + this[2, 1] * other[1, 2] + this[2, 2] * other[2, 2]
+
+        return ArrayMatrix3(data)
     }
 
     override operator fun times(other: Vector3): Vector3 {
