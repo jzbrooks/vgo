@@ -17,39 +17,27 @@ class Matrix3Tests {
 
     @Test
     fun testMultiply() {
-        val first = MutableMatrix3().apply {
-            this[0, 0] = 10f
-            this[0, 1] = 20f
-            this[0, 2] = 10f
-            this[1, 0] = 4f
-            this[1, 1] = 5f
-            this[1, 2] = 6f
-            this[2, 0] = 2f
-            this[2, 1] = 3f
-            this[2, 2] = 5f
-        }
-        val second = MutableMatrix3().apply {
-            this[0, 0] = 3f
-            this[0, 1] = 2f
-            this[0, 2] = 4f
-            this[1, 0] = 3f
-            this[1, 1] = 3f
-            this[1, 2] = 9f
-            this[2, 0] = 4f
-            this[2, 1] = 4f
-            this[2, 2] = 2f
-        }
-        val expected = MutableMatrix3().apply {
-            this[0, 0] = 130f
-            this[0, 1] = 120f
-            this[0, 2] = 240f
-            this[1, 0] = 51f
-            this[1, 1] = 47f
-            this[1, 2] = 73f
-            this[2, 0] = 35f
-            this[2, 1] = 33f
-            this[2, 2] = 45f
-        }
+        val first = Matrix3.from(
+                arrayOf(
+                        arrayOf(10f, 20f, 10f),
+                        arrayOf(4f, 5f, 6f),
+                        arrayOf(2f, 3f, 5f)
+                )
+        )
+        val second = Matrix3.from(
+                arrayOf(
+                        arrayOf(3f, 2f, 4f),
+                        arrayOf(3f, 3f, 9f),
+                        arrayOf(4f, 4f, 2f)
+                )
+        )
+        val expected = Matrix3.from(
+                arrayOf(
+                        arrayOf(130f, 120f, 240f),
+                        arrayOf(51f, 47f, 73f),
+                        arrayOf(35f, 33f, 45f)
+                )
+        )
 
         val third = first * second
 
@@ -58,11 +46,13 @@ class Matrix3Tests {
 
     @Test
     fun testMatrixVectorMultiplication() {
-        val matrix = MutableMatrix3().apply {
-            this[0, 0] = 10f
-            this[0, 1] = 10f
-            this[0, 2] = 4f
-        }
+        val matrix = Matrix3.from(
+                arrayOf(
+                        arrayOf(10f, 10f, 4f),
+                        arrayOf(0f, 1f, 0f),
+                        arrayOf(0f, 0f, 1f)
+                )
+        )
         val vector = Vector3(10f, 9f, 8f)
 
         val newVector = matrix * vector

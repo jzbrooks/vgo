@@ -4,7 +4,6 @@ import com.jzbrooks.guacamole.core.graphic.*
 import com.jzbrooks.guacamole.core.graphic.command.*
 import com.jzbrooks.guacamole.core.optimization.Optimization
 import com.jzbrooks.guacamole.core.util.math.Matrix3
-import com.jzbrooks.guacamole.core.util.math.MutableMatrix3
 import com.jzbrooks.guacamole.core.util.math.Vector3
 import kotlin.math.*
 
@@ -151,35 +150,38 @@ class BakeTransformations : Optimization {
 
         val rotation = group.attributes["android:rotation"]?.toFloat()
 
-        val scale : Matrix3 = MutableMatrix3().apply {
-            this[0, 0] = scaleX ?: 1f
-            this[1, 1] = scaleY ?: 1f
-        }
+        val scale = Matrix3.from(arrayOf(
+                arrayOf(scaleX ?: 1f, 0f, 0f),
+                arrayOf(0f, scaleY ?: 1f, 0f),
+                arrayOf(0f, 0f, 1f)
+        ))
 
-        val translation: Matrix3 = MutableMatrix3().apply {
-            this[0, 2] = translationX ?: 0f
-            this[1, 2] = translationY ?: 0f
-        }
+        val translation = Matrix3.from(arrayOf(
+                arrayOf(1f, 0f, translationX ?: 0f),
+                arrayOf(0f, 1f, translationY ?: 0f),
+                arrayOf(0f, 0f, 1f)
+        ))
 
-        val pivot: Matrix3 = MutableMatrix3().apply {
-            this[0, 2] = pivotX ?: 0f
-            this[1, 2] = pivotY ?: 0f
-        }
+        val pivot = Matrix3.from(arrayOf(
+                arrayOf(1f, 0f, pivotX ?: 0f),
+                arrayOf(0f, 1f, pivotY ?: 0f),
+                arrayOf(0f, 0f, 1f)
+        ))
 
-        val antiPivot: Matrix3 = MutableMatrix3().apply {
-            this[0, 2] = (pivotX ?: 0f) * -1
-            this[1, 2] = (pivotY ?: 0f) * -1
-        }
+        val antiPivot = Matrix3.from(arrayOf(
+                arrayOf(1f, 0f, (pivotX ?: 0f) * -1),
+                arrayOf(0f, 1f, (pivotY ?: 0f) * -1),
+                arrayOf(0f, 0f, 1f)
+        ))
 
-        val rotate: Matrix3 = MutableMatrix3().apply {
-            rotation?.let {
-                val radians = it * PI.toFloat() / 180f
-                this[0, 0] = cos(radians)
-                this[0, 1] = -sin(radians)
-                this[1, 0] = sin(radians)
-                this[1, 1] = cos(radians)
-            }
-        }
+        val rotate = rotation?.let {
+            val radians = it * PI.toFloat() / 180f
+            Matrix3.from(arrayOf(
+                    arrayOf(cos(radians), -sin(radians), 0f),
+                    arrayOf(sin(radians), cos(radians), 0f),
+                    arrayOf(0f, 0f, 1f)
+            ))
+        } ?: Matrix3.IDENTITY
 
         return listOf(pivot, translation, rotate, scale, antiPivot).reduce(Matrix3::times)
     }

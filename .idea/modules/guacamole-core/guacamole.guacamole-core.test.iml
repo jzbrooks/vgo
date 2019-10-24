@@ -43,7 +43,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_13">
     <output-test url="file://$MODULE_DIR$/../../../guacamole-core/build/classes/java/test" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../guacamole-core/src/test">
