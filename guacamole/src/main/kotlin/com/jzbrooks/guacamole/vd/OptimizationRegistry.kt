@@ -19,6 +19,7 @@ class OptimizationRegistry : OptimizationRegistry {
                 MergePaths(),
                 BreakoutImplicitCommands(),
                 CommandVariant(),
+                RemoveRedundantCommands(),
                 RemoveEmptyGroups()
         )
     }

@@ -11,9 +11,6 @@ import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.util.math.Point
 import org.junit.Test
 
-/**
- * Enables more resolution in the the command variant optimization
- */
 class BreakoutImplicitCommandsTests {
     @Test
     fun testImplicitCommandsBrokenOut() {

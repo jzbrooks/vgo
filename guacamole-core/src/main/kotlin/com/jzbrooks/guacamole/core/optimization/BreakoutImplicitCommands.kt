@@ -6,6 +6,10 @@ import com.jzbrooks.guacamole.core.graphic.Graphic
 import com.jzbrooks.guacamole.core.graphic.PathElement
 import com.jzbrooks.guacamole.core.graphic.command.*
 
+/**
+ * Enables more resolution in the the other command
+ * related optimizations like [CommandVariant] and [RemoveRedundantCommands]
+ */
 class BreakoutImplicitCommands : Optimization {
     override fun optimize(graphic: Graphic) {
         topDownOptimize(graphic)
