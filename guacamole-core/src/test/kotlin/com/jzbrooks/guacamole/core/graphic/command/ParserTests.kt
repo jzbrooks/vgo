@@ -217,7 +217,7 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .prop("variant") { (it as VariantCommand).variant }
+                .prop("variant") { (it as ParameterizedCommand<*>).variant }
                 .isEqualTo(CommandVariant.RELATIVE)
     }
 

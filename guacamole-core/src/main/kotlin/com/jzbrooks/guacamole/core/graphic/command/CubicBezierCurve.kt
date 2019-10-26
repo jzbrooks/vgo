@@ -2,7 +2,10 @@ package com.jzbrooks.guacamole.core.graphic.command
 
 import com.jzbrooks.guacamole.core.util.math.Point
 
-data class CubicBezierCurve(override var variant: CommandVariant, var parameters: List<Parameter>) : VariantCommand {
+data class CubicBezierCurve(
+        override var variant: CommandVariant,
+        override var parameters: List<Parameter>
+) : ParameterizedCommand<CubicBezierCurve.Parameter> {
     override fun toString(): String {
         val command = when (variant) {
             CommandVariant.ABSOLUTE -> 'C'

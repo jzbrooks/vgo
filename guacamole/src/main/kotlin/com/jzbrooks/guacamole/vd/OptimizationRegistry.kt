@@ -17,6 +17,7 @@ class OptimizationRegistry : OptimizationRegistry {
                 BakeTransformations(),
                 CollapseGroups(),
                 MergePaths(),
+                BreakoutImplicitCommands(),
                 CommandVariant(),
                 RemoveEmptyGroups()
         )

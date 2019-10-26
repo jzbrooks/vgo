@@ -3,7 +3,10 @@ package com.jzbrooks.guacamole.core.graphic.command
 import com.jzbrooks.guacamole.core.util.math.Point
 import com.jzbrooks.guacamole.core.util.math.compactString
 
-data class EllipticalArcCurve(override var variant: CommandVariant, var parameters: List<Parameter>) : VariantCommand {
+data class EllipticalArcCurve(
+        override var variant: CommandVariant,
+        override var parameters: List<Parameter>
+) : ParameterizedCommand<EllipticalArcCurve.Parameter> {
     override fun toString(): String {
         val command = when (variant) {
             CommandVariant.ABSOLUTE -> 'A'
