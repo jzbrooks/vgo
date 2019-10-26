@@ -10,7 +10,7 @@ import java.nio.file.Path
 abstract class BaselineTest(private val unoptimizedAsset: Path, private val baselineAsset: Path) {
     @Test
     fun testOptimizationFinishes() {
-        val outputFilePath = "build/integrationTest/visibility-strike/testOptimizationFinishes.xml"
+        val outputFilePath = "build/integrationTest/${this::class.java.simpleName}/testOptimizationFinishes.xml"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
         val exitCode = App().run(arguments)
@@ -20,7 +20,7 @@ abstract class BaselineTest(private val unoptimizedAsset: Path, private val base
 
     @Test
     fun testOptimizedAssetIsEquivalentToBaseline() {
-        val outputFilePath = "build/integrationTest/visibility-strike/testOptimizationIsCompact.xml"
+        val outputFilePath = "build/integrationTest/${this::class.java.simpleName}/testOptimizationIsCompact.xml"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
         App().run(arguments)
@@ -32,7 +32,7 @@ abstract class BaselineTest(private val unoptimizedAsset: Path, private val base
 
     @Test
     fun testOptimizedAssetIsNotLargerThanBaseline() {
-        val outputFilePath = "build/integrationTest/visibility-strike/testOptimizedAssetIsNotLargerThanBaseline.xml"
+        val outputFilePath = "build/integrationTest/${this::class.java.simpleName}/testOptimizedAssetIsNotLargerThanBaseline.xml"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
         App().run(arguments)
