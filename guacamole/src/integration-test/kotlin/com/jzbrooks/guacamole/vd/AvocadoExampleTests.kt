@@ -40,7 +40,7 @@ class AvocadoExampleTests {
         App().run(arguments)
 
         val optimizedAssetSize = File(outputFilePath).length()
-        val baselineAssetSize = File("src/integration-test/resources/baseline/avocado_example_optimized.xml").length()
+        val baselineAssetSize = File(baselineAvocadoExamplePath).length()
 
         assertThat(optimizedAssetSize).isLessThanOrEqualTo(baselineAssetSize)
     }
