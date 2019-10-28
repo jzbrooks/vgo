@@ -17,14 +17,13 @@ class BreakoutImplicitCommands : Optimization {
 
     private fun topDownOptimize(element: Element): Element {
         return when (element) {
-            is PathElement -> merge(element)
+            is PathElement -> process(element)
             is ContainerElement -> element.apply { elements = element.elements.map(::topDownOptimize) }
             else -> element
         }
     }
 
-    private fun merge(pathElement: PathElement): PathElement {
-        // merge consecutive path commands of the same type
+    private fun process(pathElement: PathElement): PathElement {
         val commands = mutableListOf<Command>()
         for (current in pathElement.commands) {
             if (current is ParameterizedCommand<*> && current.parameters.size > 1) {
