@@ -20,6 +20,7 @@ class OptimizationRegistry : OptimizationRegistry {
                 BreakoutImplicitCommands(),
                 CommandVariant(),
                 RemoveRedundantCommands(),
+                SimplifyLineCommands(0.00001f),
                 RemoveEmptyGroups()
         )
     }
