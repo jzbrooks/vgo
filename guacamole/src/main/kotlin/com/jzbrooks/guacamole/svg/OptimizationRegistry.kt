@@ -15,7 +15,10 @@ class OptimizationRegistry : OptimizationRegistry {
         private val optimizations = listOf(
                 CollapseGroups(),
                 MergePaths(),
+                BreakoutImplicitCommands(),
                 CommandVariant(),
+                RemoveRedundantCommands(),
+                SimplifyLineCommands(0.00001f),
                 RemoveEmptyGroups()
         )
     }
