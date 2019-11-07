@@ -95,7 +95,7 @@ class App {
                 documentElement.normalize()
             }
 
-            val graphic = if (document.childNodes.item(0).nodeName == "svg") {
+            val graphic = if (document.firstChild.nodeName == "svg") {
                 com.jzbrooks.guacamole.svg.parse(document)
             } else {
                 com.jzbrooks.guacamole.vd.parse(document)

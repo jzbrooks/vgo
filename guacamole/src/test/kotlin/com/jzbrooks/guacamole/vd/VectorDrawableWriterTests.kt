@@ -25,7 +25,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, it)
 
             val output = it.toDocument()
-            assertThat(output.childNodes.item(0)).hasName("vector")
+            assertThat(output.firstChild).hasName("vector")
         }
     }
 
@@ -35,7 +35,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, it)
 
             val output = it.toDocument()
-            val rootAttributes = output.childNodes.item(0).attributes
+            val rootAttributes = output.firstChild.attributes
 
             assertThat(rootAttributes.getNamedItem("android:viewportWidth")).hasValue("24")
             assertThat(rootAttributes.getNamedItem("android:viewportHeight")).hasValue("24")
@@ -48,7 +48,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, it)
 
             val output = it.toDocument()
-            val rootAttributes = output.childNodes.item(0).attributes
+            val rootAttributes = output.firstChild.attributes
 
             assertThat(rootAttributes.getNamedItem("android:width").nodeValue).startsWith("24")
             assertThat(rootAttributes.getNamedItem("android:height").nodeValue).startsWith("24")
@@ -61,7 +61,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val firstGenNodes = output.childNodes.item(0).childNodes.toList()
+            val firstGenNodes = output.firstChild.childNodes.toList()
 
             assertThat(firstGenNodes)
                     .transform { it.count { item -> item.nodeName == "path" } }
@@ -75,7 +75,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val rootAttributes = output.childNodes.item(0).attributes
+            val rootAttributes = output.firstChild.attributes
 
             assertThat(rootAttributes.getNamedItem("android:height").nodeValue).endsWith("dp")
             assertThat(rootAttributes.getNamedItem("android:width").nodeValue).endsWith("dp")
@@ -88,7 +88,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val firstGenNodes = output.childNodes.item(0).childNodes.toList()
+            val firstGenNodes = output.firstChild.childNodes.toList()
 
             assertThat(firstGenNodes[0]).hasName("path")
             assertThat(firstGenNodes[1]).hasName("bicycle")
@@ -103,7 +103,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val rootNode = output.childNodes.item(0)
+            val rootNode = output.firstChild
 
             assertThat(rootNode.attributes.length).isEqualTo(attributes.size)
         }
@@ -115,7 +115,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val firstPathNode = output.childNodes.item(0).childNodes.item(0)
+            val firstPathNode = output.firstChild.firstChild
 
             assertThat(firstPathNode.attributes.getNamedItem("android:name")).hasValue("strike_thru_path")
         }
@@ -128,7 +128,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
-            val groupNode = output.childNodes.item(0).childNodes.item(0)
+            val groupNode = output.firstChild.firstChild
 
             assertThat(groupNode.childNodes.length).isEqualTo(graphic.elements.size)
         }
@@ -141,7 +141,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
-            val extraNode = output.childNodes.item(0).childNodes.item(1)
+            val extraNode = output.firstChild.childNodes.item(1)
 
             assertThat(extraNode.nodeName).isEqualTo("bicycle")
         }
@@ -154,9 +154,9 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
-            val extraNode = output.childNodes.item(0).childNodes.item(1)
+            val extraNode = output.firstChild.childNodes.item(1)
 
-            assertThat(extraNode.childNodes.item(0)).hasName("group")
+            assertThat(extraNode.firstChild).hasName("group")
         }
     }
 

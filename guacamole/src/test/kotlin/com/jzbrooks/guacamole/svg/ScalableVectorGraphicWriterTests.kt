@@ -23,7 +23,7 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, it)
 
             val output = it.toDocument()
-            assertThat(output.childNodes.item(0)).hasName("svg")
+            assertThat(output.firstChild).hasName("svg")
         }
     }
 
@@ -33,7 +33,7 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, it)
 
             val output = it.toDocument()
-            val rootAttributes = output.childNodes.item(0).attributes
+            val rootAttributes = output.firstChild.attributes
 
             assertThat(rootAttributes.getNamedItem("viewbox").nodeValue).isEqualTo("0 0 100 100")
         }
@@ -45,7 +45,7 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val firstGenNodes = output.childNodes.item(0).childNodes.toList()
+            val firstGenNodes = output.firstChild.childNodes.toList()
 
             assertThat(firstGenNodes)
                     .transform { it.count { item -> item.nodeName == "path" } }
@@ -59,7 +59,7 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val firstGenNodes = output.childNodes.item(0).childNodes.toList()
+            val firstGenNodes = output.firstChild.childNodes.toList()
 
             assertThat(firstGenNodes[0]).hasName("path")
             assertThat(firstGenNodes[1]).hasName("bicycle")
@@ -74,7 +74,7 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val rootNode = output.childNodes.item(0)
+            val rootNode = output.firstChild
 
             assertThat(rootNode.attributes.length).isEqualTo(attributes.size)
         }
@@ -86,7 +86,7 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val firstPathNode = output.childNodes.item(0).childNodes.item(0)
+            val firstPathNode = output.firstChild.firstChild
 
             assertThat(firstPathNode.attributes.getNamedItem("id")).hasValue("strike_thru_path")
         }
@@ -99,7 +99,7 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
-            val groupNode = output.childNodes.item(0).childNodes.item(0)
+            val groupNode = output.firstChild.firstChild
 
             assertThat(groupNode.childNodes.length).isEqualTo(graphic.elements.size)
         }
@@ -112,7 +112,7 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
-            val extraNode = output.childNodes.item(0).childNodes.item(1)
+            val extraNode = output.firstChild.childNodes.item(1)
 
             assertThat(extraNode.nodeName).isEqualTo("bicycle")
         }
@@ -125,9 +125,9 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
-            val extraNode = output.childNodes.item(0).childNodes.item(1)
+            val extraNode = output.firstChild.childNodes.item(1)
 
-            assertThat(extraNode.childNodes.item(0)).hasName("g")
+            assertThat(extraNode.firstChild).hasName("g")
         }
     }
 

@@ -11,7 +11,7 @@ import org.w3c.dom.Text
 
 fun parse(document: Document): VectorDrawable {
 
-    val root = document.childNodes.item(0)
+    val root = document.firstChild
     val rootMetadata = root.attributes.toMutableMap()
 
     val elements = root.childNodes.asSequence()
