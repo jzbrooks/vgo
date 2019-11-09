@@ -9,13 +9,15 @@ import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.util.math.Point
 import java.util.*
 
+// todo: handle precision better. Converted commands can be longer because they have more decimal places.
 class CommandVariant : Optimization {
+    private val subPathStart = Stack<Point>()
+
     // Updated once per process call when computing
     // the other variant of the command. This works
     // because the coordinates are accurate regardless
     // of their absolute or relative nature.
-    private var currentPoint = Point(0f, 0f)
-    private val subPathStart = Stack<Point>()
+    private lateinit var currentPoint: Point
 
     override fun optimize(graphic: Graphic) {
         topDownVisit(graphic)
@@ -30,7 +32,11 @@ class CommandVariant : Optimization {
     }
 
     private fun visit(element: PathElement): PathElement {
-        element.commands = element.commands.map { command ->
+        val initialMoveTo = element.commands.first() as MoveTo
+        currentPoint = initialMoveTo.parameters.last()
+        subPathStart.clear()
+
+        element.commands = listOf(initialMoveTo) + element.commands.slice(1 until element.commands.size).map { command ->
             when (command) {
                 is MoveTo -> process(command)
                 is LineTo -> process(command)
@@ -50,16 +56,20 @@ class CommandVariant : Optimization {
     }
 
     private fun process(command: MoveTo): MoveTo {
-        subPathStart.push(currentPoint)
-
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
-            command.copy(variant = CommandVariant.ABSOLUTE, parameters = command.parameters.map { commandPoint ->
-                (commandPoint + currentPoint).also { currentPoint += it }
-            })
+            command.copy(
+                    variant = CommandVariant.ABSOLUTE,
+                    parameters = command.parameters.map { commandPoint ->
+                        (commandPoint + currentPoint)
+                    }.also { currentPoint = it.last() }
+            )
         } else {
-            command.copy(variant = CommandVariant.RELATIVE, parameters = command.parameters.map { commandPoint ->
-                (commandPoint - currentPoint).also { currentPoint += it }
-            })
+            command.copy(
+                    variant = CommandVariant.RELATIVE,
+                    parameters = command.parameters.map { commandPoint ->
+                        (commandPoint - currentPoint)
+                    }.also { currentPoint += it.last() } // always relative to 0,0
+            )
         }
 
         return if (convertedCommand.toString().length < command.toString().length) {
@@ -71,13 +81,19 @@ class CommandVariant : Optimization {
 
     private fun process(command: LineTo): LineTo {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
-            command.copy(variant = CommandVariant.ABSOLUTE, parameters = command.parameters.map { commandPoint ->
-                (commandPoint + currentPoint).also { currentPoint += it }
-            })
+            command.copy(
+                    variant = CommandVariant.ABSOLUTE,
+                    parameters = command.parameters.map { commandPoint ->
+                        (commandPoint + currentPoint)
+                    }.also { currentPoint = it.last() }
+            )
         } else {
-            command.copy(variant = CommandVariant.RELATIVE, parameters = command.parameters.map { commandPoint ->
-                (commandPoint - currentPoint).also { currentPoint += it }
-            })
+            command.copy(
+                    variant = CommandVariant.RELATIVE,
+                    parameters = command.parameters.map { commandPoint ->
+                        (commandPoint - currentPoint)
+                    }.also { currentPoint += it.last() }
+            )
         }
 
         return if (convertedCommand.toString().length < command.toString().length) {
@@ -89,13 +105,19 @@ class CommandVariant : Optimization {
 
     private fun process(command: HorizontalLineTo): HorizontalLineTo {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
-            command.copy(variant = CommandVariant.ABSOLUTE, parameters = command.parameters.map { x ->
-                (x + currentPoint.x).also { currentPoint.x += it }
-            })
+            command.copy(
+                    variant = CommandVariant.ABSOLUTE,
+                    parameters = command.parameters.map { x ->
+                        (x + currentPoint.x)
+                    }.also { currentPoint.x = it.last() }
+            )
         } else {
-            command.copy(variant = CommandVariant.RELATIVE, parameters = command.parameters.map { x ->
-                (x - currentPoint.x).also { currentPoint.x += it }
-            })
+            command.copy(
+                    variant = CommandVariant.RELATIVE,
+                    parameters = command.parameters.map { x ->
+                        (x - currentPoint.x)
+                    }.also { currentPoint.x += it.last() }
+            )
         }
 
         return if (convertedCommand.toString().length < command.toString().length) {
@@ -107,13 +129,23 @@ class CommandVariant : Optimization {
 
     private fun process(command: VerticalLineTo): VerticalLineTo {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
-            command.copy(variant = CommandVariant.ABSOLUTE, parameters = command.parameters.map { y ->
-                (y + currentPoint.y).also { currentPoint.y += it }
-            })
+            command.copy(
+                    variant = CommandVariant.ABSOLUTE,
+                    parameters = command.parameters.map { y ->
+                        (y + currentPoint.y)
+                    }.also {
+                        currentPoint.y = it.last()
+                    }
+            )
         } else {
-            command.copy(variant = CommandVariant.RELATIVE, parameters = command.parameters.map { y ->
-                (y - currentPoint.y).also { currentPoint.y += it }
-            })
+            command.copy(
+                    variant = CommandVariant.RELATIVE,
+                    parameters = command.parameters.map { y ->
+                        (y - currentPoint.y)
+                    }.also {
+                        currentPoint.y += it.last()
+                    }
+            )
         }
 
         return if (convertedCommand.toString().length < command.toString().length) {
@@ -132,9 +164,9 @@ class CommandVariant : Optimization {
                             startControl = it.startControl + currentPoint,
                             endControl = it.endControl + currentPoint,
                             end = it.end + currentPoint
-                    ).also { absoluteParam ->
-                        currentPoint += absoluteParam.end
-                    }
+                    )
+                }.also {
+                    currentPoint = it.last().end
                 }
             )
         } else {
@@ -145,9 +177,9 @@ class CommandVariant : Optimization {
                             startControl = it.startControl - currentPoint,
                             endControl = it.endControl - currentPoint,
                             end = it.end - currentPoint
-                    ).also { relativeParam ->
-                        currentPoint += relativeParam.end
-                    }
+                    )
+                }.also {
+                    currentPoint += it.last().end
                 }
             )
         }
@@ -167,9 +199,9 @@ class CommandVariant : Optimization {
                         it.copy(
                                 endControl = it.endControl + currentPoint,
                                 end = it.end + currentPoint
-                        ).also { absoluteParam ->
-                            currentPoint += absoluteParam.end
-                        }
+                        )
+                    }.also {
+                        currentPoint = it.last().end
                     }
             )
         } else {
@@ -179,9 +211,9 @@ class CommandVariant : Optimization {
                         it.copy(
                                 endControl = it.endControl - currentPoint,
                                 end = it.end - currentPoint
-                        ).also { relativeParam ->
-                            currentPoint += relativeParam.end
-                        }
+                        )
+                    }.also {
+                        currentPoint += it.last().end
                     }
             )
         }
@@ -201,9 +233,9 @@ class CommandVariant : Optimization {
                         it.copy(
                                 control = it.control + currentPoint,
                                 end = it.end + currentPoint
-                        ).also { absoluteParam ->
-                            currentPoint += absoluteParam.end
-                        }
+                        )
+                    }.also {
+                        currentPoint = it.last().end
                     }
             )
         } else {
@@ -213,9 +245,9 @@ class CommandVariant : Optimization {
                         it.copy(
                                 control = it.control - currentPoint,
                                 end = it.end - currentPoint
-                        ).also { relativeParam ->
-                            currentPoint += relativeParam.end
-                        }
+                        )
+                    }.also {
+                        currentPoint += it.last().end
                     }
             )
         }
@@ -233,9 +265,14 @@ class CommandVariant : Optimization {
                 (commandPoint + currentPoint).also { currentPoint += it }
             })
         } else {
-            command.copy(variant = CommandVariant.RELATIVE, parameters = command.parameters.map { commandPoint ->
-                (commandPoint - currentPoint).also { currentPoint += it }
-            })
+            command.copy(
+                    variant = CommandVariant.RELATIVE,
+                    parameters = command.parameters.map { commandPoint ->
+                        (commandPoint - currentPoint)
+                    }.also {
+                        currentPoint += it.last()
+                    }
+            )
         }
 
         return if (convertedCommand.toString().length < command.toString().length) {
@@ -250,18 +287,18 @@ class CommandVariant : Optimization {
             command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters = command.parameters.map {
-                        it.copy(end = it.end + currentPoint).also { absoluteParam ->
-                            currentPoint += absoluteParam.end
-                        }
+                        it.copy(end = it.end + currentPoint)
+                    }.also {
+                        currentPoint = it.last().end
                     }
             )
         } else {
             command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters = command.parameters.map {
-                        it.copy(end = it.end - currentPoint).also { relativeParam ->
-                            currentPoint += relativeParam.end
-                        }
+                        it.copy(end = it.end - currentPoint)
+                    }.also {
+                        currentPoint += it.last().end
                     }
             )
         }
@@ -274,7 +311,10 @@ class CommandVariant : Optimization {
     }
 
     private fun process(command: ClosePath): ClosePath {
-        currentPoint = subPathStart.pop()
+        if (subPathStart.isNotEmpty()) {
+            currentPoint = subPathStart.pop()
+        }
+
         return command
     }
 }

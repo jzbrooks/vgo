@@ -26,9 +26,8 @@ class RemoveRedundantCommands : Optimization {
             for (current in pathElement.commands.slice(1 until commandCount)) {
                 val lastAdded = commands.last()
 
-                if (current != lastAdded) {
-                    commands.add(current)
-                }
+                // todo: might break the simple heart
+                if (lastAdded != current) commands.add(current)
             }
 
             pathElement.commands = commands

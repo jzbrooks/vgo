@@ -121,8 +121,8 @@ class CommandVariantTests {
         CommandVariant().optimize(graphic)
 
         // M100,1 L103,6 L106,7 93,10 C109,8 113,12 120,10 M110,8 H101 V-8 Z H103 S113,39 105,-6 Q112,-10 109,-3 T100,0 A4,3,93,1,1,109,15 Z
-        // M100,1 l3,5 l3,1 -13,3 c16,-2 20,2 27,0 M110,8 h-9 V-8 Z H103 s10,29 2,-16 q7,-4 4,3 t-9,3 a4,3,93,1,1,9,15 Z
-        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(8)
+        // M100,1l3,5l3,1 -10,4c16,-2 20,2 27,0M103,8h-9V-8Zh-7s10,31 2,-14q7,-4 4,3t-9,3a4,3,93,1,1,9,15Z
+        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(9)
         assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)
     }
 
@@ -147,8 +147,33 @@ class CommandVariantTests {
         CommandVariant().optimize(graphic)
 
         // M100,1 101,1 L103,6 L106,7 93,10 Z
-        // m100,1 1,0 l2,5 l3,1 -13,3 Z
-        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(3)
+        // M100,1 101,1 l2,5 l3,1 -13,3 Z
+        // todo: the case of implicit commands in the initial moveto could be handled better
+        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(2)
+        assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)
+    }
+
+    @Test
+    fun testComputedRelativeCommandUpdatesCurrentPointByAllComponents() {
+        val path = Path(
+                listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                        CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(CubicBezierCurve.Parameter(Point(105f, 8f), Point(115f, 10f), Point(100f, 10f)))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
+                        ClosePath()
+                )
+        )
+
+        val copy = path.copy()
+
+        val graphic = object : Graphic {
+            override var elements: List<Element> = listOf(path)
+            override var attributes = mutableMapOf<String, String>()
+        }
+
+        CommandVariant().optimize(graphic)
+
+        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(2)
         assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)
     }
 }
