@@ -39,6 +39,8 @@ This project uses the Gradle build system.
 
 To build the application: `/.gradlew jar`
 
-To run the tests: `./gradlew test`
+To run the tests: `./gradlew check`
 
 To see all available tasks: `./gradlew tasks`
+
+![guacamole](https://user-images.githubusercontent.com/5142575/68550403-2f4adf80-03c8-11ea-8bd8-f845cd857940.png)
