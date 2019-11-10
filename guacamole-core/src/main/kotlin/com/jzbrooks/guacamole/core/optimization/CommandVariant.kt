@@ -32,11 +32,12 @@ class CommandVariant : Optimization {
     }
 
     private fun visit(element: PathElement): PathElement {
-        val initialMoveTo = element.commands.first() as MoveTo
-        currentPoint = initialMoveTo.parameters.last()
         subPathStart.clear()
 
-        element.commands = listOf(initialMoveTo) + element.commands.slice(1 until element.commands.size).map { command ->
+        val initialMoveTo = element.commands.first() as MoveTo
+        currentPoint = initialMoveTo.parameters.last().copy()
+
+        element.commands = listOf(initialMoveTo) + element.commands.asSequence().drop(1).map { command ->
             when (command) {
                 is MoveTo -> process(command)
                 is LineTo -> process(command)
@@ -61,14 +62,14 @@ class CommandVariant : Optimization {
                     variant = CommandVariant.ABSOLUTE,
                     parameters = command.parameters.map { commandPoint ->
                         (commandPoint + currentPoint)
-                    }.also { currentPoint = it.last() }
+                    }.also { currentPoint = it.last().copy() }
             )
         } else {
             command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters = command.parameters.map { commandPoint ->
                         (commandPoint - currentPoint)
-                    }.also { currentPoint += it.last() } // always relative to 0,0
+                    }.also { currentPoint += it.last() }
             )
         }
 
@@ -85,7 +86,7 @@ class CommandVariant : Optimization {
                     variant = CommandVariant.ABSOLUTE,
                     parameters = command.parameters.map { commandPoint ->
                         (commandPoint + currentPoint)
-                    }.also { currentPoint = it.last() }
+                    }.also { currentPoint = it.last().copy() }
             )
         } else {
             command.copy(
@@ -166,7 +167,7 @@ class CommandVariant : Optimization {
                             end = it.end + currentPoint
                     )
                 }.also {
-                    currentPoint = it.last().end
+                    currentPoint = it.last().end.copy()
                 }
             )
         } else {
@@ -201,7 +202,7 @@ class CommandVariant : Optimization {
                                 end = it.end + currentPoint
                         )
                     }.also {
-                        currentPoint = it.last().end
+                        currentPoint = it.last().end.copy()
                     }
             )
         } else {
@@ -235,7 +236,7 @@ class CommandVariant : Optimization {
                                 end = it.end + currentPoint
                         )
                     }.also {
-                        currentPoint = it.last().end
+                        currentPoint = it.last().end.copy()
                     }
             )
         } else {
@@ -261,9 +262,12 @@ class CommandVariant : Optimization {
 
     private fun process(command: ShortcutQuadraticBezierCurve): ShortcutQuadraticBezierCurve {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
-            command.copy(variant = CommandVariant.ABSOLUTE, parameters = command.parameters.map { commandPoint ->
-                (commandPoint + currentPoint).also { currentPoint += it }
-            })
+            command.copy(
+                    variant = CommandVariant.ABSOLUTE,
+                    parameters = command.parameters.map { commandPoint ->
+                        (commandPoint + currentPoint)
+                    }.also { currentPoint = it.last().copy() }
+            )
         } else {
             command.copy(
                     variant = CommandVariant.RELATIVE,
@@ -289,7 +293,7 @@ class CommandVariant : Optimization {
                     parameters = command.parameters.map {
                         it.copy(end = it.end + currentPoint)
                     }.also {
-                        currentPoint = it.last().end
+                        currentPoint = it.last().end.copy()
                     }
             )
         } else {
