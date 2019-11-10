@@ -35,7 +35,7 @@ class CommandLineInterfaceTests {
     fun testLongVersionFlag() {
         val arguments = arrayOf("--version")
         val standardOutput = File("build/integrationTest/version.tmp").apply { deleteOnExit() }
-        val process = ProcessBuilder("java", "-jar", "build/libs/guacamole.jar", *arguments)
+        val process = ProcessBuilder("java", "-jar", "build/libs/debug/guacamole.jar", *arguments)
                 .redirectOutput(standardOutput)
                 .start()
 
@@ -47,7 +47,7 @@ class CommandLineInterfaceTests {
     fun testShortVersionFlag() {
         val arguments = arrayOf("-v")
         val standardOutput = File("build/integrationTest/version.tmp").apply { deleteOnExit() }
-        val process = ProcessBuilder("java", "-jar", "build/libs/guacamole.jar", *arguments)
+        val process = ProcessBuilder("java", "-jar", "build/libs/debug/guacamole.jar", *arguments)
                 .redirectOutput(standardOutput)
                 .start()
 

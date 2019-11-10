@@ -30,7 +30,7 @@ jobs:
       with:
         name: integration_test_results
         path: guacamole/build/reports/tests/integrationTest
-    - name: build
+    - name: optimize
       run: ./gradlew optimize
     - name: archive guacamole
       uses: actions/upload-artifact@v1
