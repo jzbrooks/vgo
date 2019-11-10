@@ -15,11 +15,6 @@ jobs:
         java-version: 12
     - name: build
       run: ./gradlew build
-    - name: archive guacamole
-      uses: actions/upload-artifact@v1
-      with:
-        name: guacamole.jar
-        path: guacamole/build/libs/guacamole.jar
     - name: archive guacamole test results
       uses: actions/upload-artifact@v1
       with:
@@ -35,3 +30,10 @@ jobs:
       with:
         name: integration_test_results
         path: guacamole/build/reports/tests/integrationTest
+    - name: build
+      run: ./gradlew optimize
+    - name: archive guacamole
+      uses: actions/upload-artifact@v1
+      with:
+        name: guacamole.jar
+        path: guacamole/build/libs/guacamole.jar

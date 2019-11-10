@@ -26,12 +26,26 @@ dependencies {
 
 tasks {
     withType<Jar> {
+        destinationDir = file("$buildDir/libs/debug")
         manifest {
             attributes["Main-Class"] = "com.jzbrooks.guacamole.App"
             attributes["Bundle-Version"] = "0.1.0"
         }
 
         from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+    }
+
+    val optimize by registering {
+        description = "Runs proguard on the jar application."
+        group = "build"
+
+        doLast {
+            exec {
+                workingDir(rootDir)
+                commandLine("java", "-jar", "$rootDir/tools/proguard.jar", "@$rootDir/optimize.pro")
+            }
+        }
+        dependsOn(getByName("jar"))
     }
 
     val integrationTest by registering(Test::class) {

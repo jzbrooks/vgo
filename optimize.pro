@@ -1,5 +1,5 @@
--injars       guacamole/build/libs/guacamole.jar
--outjars      guacamole/build/libs/guacamole_opt.jar
+-injars       guacamole/build/libs/debug/guacamole.jar
+-outjars      guacamole/build/libs/guacamole.jar
 -libraryjars  <java.home>/jmods
 
 -dontobfuscate
