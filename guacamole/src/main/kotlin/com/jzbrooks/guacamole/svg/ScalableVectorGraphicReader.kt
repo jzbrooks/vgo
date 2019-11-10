@@ -25,7 +25,6 @@ private fun parseElement(node: Node): Element? {
         when (node.nodeName) {
             "g" -> parseGroup(node)
             "path" -> parsePathElement(node, ::Path)
-            "clipPath" -> parsePathElement(node, ::ClipPath)
             else -> parseExtraElement(node)
         }
     } else {
@@ -38,50 +37,6 @@ private fun parseGroup(groupNode: Node): Group {
             .mapNotNull(::parseElement)
             .toList()
     val groupMetadata = groupNode.attributes.toMutableMap()
-
-//    val scaleX = groupMetadata["android:scaleX"]?.toFloat()
-//    val scaleY = groupMetadata["android:scaleY"]?.toFloat()
-//
-//    val translationX = groupMetadata["android:translateX"]?.toFloat()
-//    val translationY = groupMetadata["android:translateY"]?.toFloat()
-//
-//    val pivotX = groupMetadata["android:pivotX"]?.toFloat()
-//    val pivotY = groupMetadata["android:pivotY"]?.toFloat()
-//
-//    val rotation = groupMetadata["android:rotation"]?.toFloat()
-//
-//    val scale : Matrix3 = MutableMatrix3().apply {
-//        this[0, 0] = scaleX ?: 1f
-//        this[1, 1] = scaleY ?: 1f
-//    }
-//
-//    val translation: Matrix3 = MutableMatrix3().apply {
-//        this[0, 2] = translationX ?: 0f
-//        this[1, 2] = translationY ?: 0f
-//    }
-//
-//    val pivot: Matrix3 = MutableMatrix3().apply {
-//        this[0, 2] = pivotX ?: 0f
-//        this[1, 2] = pivotY ?: 0f
-//    }
-//
-//    val antiPivot: Matrix3 = MutableMatrix3().apply {
-//        this[0, 2] = (pivotX ?: 0f) * -1
-//        this[1, 2] = (pivotY ?: 0f) * -1
-//    }
-//
-//    val rotate: Matrix3 = MutableMatrix3().apply {
-//        rotation?.let {
-//            val radians = it * PI.toFloat() / 180f
-//            this[0, 0] = cos(radians)
-//            this[0, 1] = -sin(radians)
-//            this[1, 0] = sin(radians)
-//            this[1, 1] = cos(radians)
-//        }
-//    }
-//
-//    val transform = listOf(pivot, rotate, translation, scale, antiPivot).reduce(Matrix3::times)
-//    val nonIdentityTransform = if (transform == Matrix3.IDENTITY) null else transform
 
     return Group(groupChildElements, groupMetadata)
 }
