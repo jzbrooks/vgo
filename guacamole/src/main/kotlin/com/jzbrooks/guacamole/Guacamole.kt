@@ -3,9 +3,12 @@ package com.jzbrooks.guacamole
 import com.jzbrooks.guacamole.core.Writer
 import com.jzbrooks.guacamole.svg.ScalableVectorGraphic
 import com.jzbrooks.guacamole.svg.ScalableVectorGraphicWriter
+import com.jzbrooks.guacamole.util.xml.asSequence
 import com.jzbrooks.guacamole.vd.VectorDrawable
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
+import org.w3c.dom.Document
 import java.io.File
+import java.lang.UnsupportedOperationException
 import java.util.jar.Manifest
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.system.exitProcess
@@ -97,10 +100,14 @@ class Guacamole {
                 documentElement.normalize()
             }
 
-            val graphic = if (document.firstChild.nodeName == "svg") {
-                com.jzbrooks.guacamole.svg.parse(document)
-            } else {
-                com.jzbrooks.guacamole.vd.parse(document)
+            val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
+            val graphic = when {
+                rootNodes.any { it.nodeName == "svg" } -> com.jzbrooks.guacamole.svg.parse(rootNodes.first())
+                rootNodes.any { it.nodeName == "vector" } -> com.jzbrooks.guacamole.vd.parse(rootNodes.first())
+                else -> throw UnsupportedOperationException(
+                        """No supported formats were found in the document.
+                           |roots:${rootNodes.map { it.nodeName }}""".trimMargin()
+                )
             }
 
             val optimizationRegistry = when (graphic) {

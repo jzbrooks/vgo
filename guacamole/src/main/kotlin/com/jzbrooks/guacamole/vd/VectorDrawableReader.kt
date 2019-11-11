@@ -6,13 +6,10 @@ import com.jzbrooks.guacamole.core.graphic.command.CommandString
 import com.jzbrooks.guacamole.util.xml.asSequence
 import com.jzbrooks.guacamole.util.xml.toMutableMap
 import com.jzbrooks.guacamole.vd.graphic.ClipPath
-import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 
-fun parse(document: Document): VectorDrawable {
-
-    val root = document.firstChild
+fun parse(root: Node): VectorDrawable {
     val rootMetadata = root.attributes.toMutableMap()
 
     val elements = root.childNodes.asSequence()

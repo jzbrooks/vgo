@@ -5,13 +5,11 @@ import com.jzbrooks.guacamole.core.graphic.command.Command
 import com.jzbrooks.guacamole.core.graphic.command.CommandString
 import com.jzbrooks.guacamole.util.xml.asSequence
 import com.jzbrooks.guacamole.util.xml.toMutableMap
-import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 
-fun parse(document: Document): ScalableVectorGraphic {
-    val root = document.firstChild
-    val rootMetadata = root.attributes.toMutableMap()
+fun parse(root: Node): ScalableVectorGraphic {
+    val rootMetadata = root.attributes?.toMutableMap() ?: mutableMapOf()
 
     val elements = root.childNodes.asSequence()
             .mapNotNull(::parseElement)
