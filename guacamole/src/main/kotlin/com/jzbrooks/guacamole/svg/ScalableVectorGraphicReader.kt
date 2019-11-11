@@ -10,7 +10,7 @@ import org.w3c.dom.Node
 import org.w3c.dom.Text
 
 fun parse(root: Node): ScalableVectorGraphic {
-    val rootMetadata = root.attributes?.toMutableMap() ?: mutableMapOf()
+    val rootMetadata = root.attributes.toMutableMap()
 
     val elements = root.childNodes.asSequence()
             .mapNotNull(::parseElement)
