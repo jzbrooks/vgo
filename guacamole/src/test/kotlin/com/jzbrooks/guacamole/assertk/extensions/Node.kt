@@ -19,3 +19,13 @@ fun <T> Assert<Node>.hasName(other: T) = given { actual ->
 
     fail(other, actual)
 }
+
+/**
+ * Asserts the node names in the list appear in the same order as the parameters
+ */
+fun Assert<List<Node>>.hasNames(vararg names: String) = given { actual ->
+    for ((i, name) in names.withIndex()) {
+        if (actual[i].nodeName != name)
+            fail(names, actual)
+    }
+}

@@ -45,11 +45,6 @@ class ScalableVectorGraphicWriter(override val options: Set<Writer.Option> = emp
                     }
                 }
             }
-            is ClipPath -> {
-                document.createElement("clipPath").apply {
-                    setAttribute("d", element.commands.joinToString(separator = ""))
-                }
-            }
             is Extra -> {
                 document.createElement(element.name).also {
                     for (child in element.elements) {

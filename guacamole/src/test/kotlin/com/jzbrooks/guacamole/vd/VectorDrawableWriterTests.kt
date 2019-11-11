@@ -5,13 +5,14 @@ import assertk.assertions.endsWith
 import assertk.assertions.isEqualTo
 import assertk.assertions.startsWith
 import com.jzbrooks.guacamole.assertk.extensions.hasName
+import com.jzbrooks.guacamole.assertk.extensions.hasNames
 import com.jzbrooks.guacamole.assertk.extensions.hasValue
-import com.jzbrooks.guacamole.core.graphic.ClipPath
 import com.jzbrooks.guacamole.core.graphic.Extra
 import com.jzbrooks.guacamole.core.graphic.Group
 import com.jzbrooks.guacamole.core.graphic.Path
 import com.jzbrooks.guacamole.core.graphic.command.CommandString
 import com.jzbrooks.guacamole.util.xml.toList
+import com.jzbrooks.guacamole.vd.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -90,10 +91,7 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val firstGenNodes = output.firstChild.childNodes.toList()
 
-            assertThat(firstGenNodes[0]).hasName("path")
-            assertThat(firstGenNodes[1]).hasName("bicycle")
-            assertThat(firstGenNodes[2]).hasName("clip-path")
-            assertThat(firstGenNodes[3]).hasName("path")
+            assertThat(firstGenNodes).hasNames("path", "bicycle", "clip-path", "path")
         }
     }
 

@@ -3,10 +3,8 @@ package com.jzbrooks.guacamole.core.optimization
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.jzbrooks.guacamole.core.graphic.*
+import com.jzbrooks.guacamole.core.graphic.command.*
 import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
-import com.jzbrooks.guacamole.core.graphic.command.LineTo
-import com.jzbrooks.guacamole.core.graphic.command.MoveTo
-import com.jzbrooks.guacamole.core.graphic.command.ShortcutCubicBezierCurve
 import com.jzbrooks.guacamole.core.util.math.Point
 import org.junit.Test
 
@@ -171,8 +169,8 @@ class MergePathsTests {
         val paths = listOf(
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
-                ClipPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))))),
-                ClipPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))),
+                PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))))),
+                PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
         )
@@ -190,10 +188,10 @@ class MergePathsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                 )),
-                ClipPath(listOf(
+                PseudoPath(listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
-                )),
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))
+                ),
                 Path(listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
@@ -206,8 +204,8 @@ class MergePathsTests {
         val paths = listOf(
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
-                ClipPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))))),
-                ClipPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))),
+                PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))))),
+                PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))), mutableMapOf("android:fillColor" to "#FF0011FF")),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
         )
@@ -225,12 +223,14 @@ class MergePathsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                 )),
-                ClipPath(listOf(
+                PseudoPath(listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
-                )),
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))
+                ),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))), mutableMapOf("android:fillColor" to "#FF0011FF")),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
         ))
     }
+
+    data class PseudoPath(override var commands: List<Command>, override val attributes: MutableMap<String, String> = mutableMapOf()) : PathElement
 }
