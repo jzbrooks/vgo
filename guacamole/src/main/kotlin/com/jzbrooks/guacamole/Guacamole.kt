@@ -10,7 +10,7 @@ import java.util.jar.Manifest
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.system.exitProcess
 
-class App {
+class Guacamole {
     private var printStats = false
 
     fun run(args: Array<String>): Int {
@@ -146,6 +146,6 @@ Options:
         """
 
         @JvmStatic
-        fun main(args: Array<String>): Unit = exitProcess(App().run(args))
+        fun main(args: Array<String>): Unit = exitProcess(Guacamole().run(args))
     }
 }

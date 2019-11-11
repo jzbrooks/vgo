@@ -28,7 +28,7 @@ tasks {
     withType<Jar> {
         destinationDir = file("$buildDir/libs/debug")
         manifest {
-            attributes["Main-Class"] = "com.jzbrooks.guacamole.App"
+            attributes["Main-Class"] = "com.jzbrooks.guacamole.Guacamole"
             attributes["Bundle-Version"] = "0.1.0"
         }
 

@@ -59,7 +59,7 @@ class CommandLineInterfaceTests {
     fun testLongHelpFlag() {
         val arguments = arrayOf("--help")
 
-        val exitCode = App().run(arguments)
+        val exitCode = Guacamole().run(arguments)
 
         assertThat(exitCode).isEqualTo(0)
         val output = systemOutput.toString()
@@ -71,7 +71,7 @@ class CommandLineInterfaceTests {
     fun testShortHelpFlag() {
         val arguments = arrayOf("-h")
 
-        val exitCode = App().run(arguments)
+        val exitCode = Guacamole().run(arguments)
 
         assertThat(exitCode).isEqualTo(0)
         val output = systemOutput.toString()
@@ -82,7 +82,7 @@ class CommandLineInterfaceTests {
     @Test
     fun testLongStatsFlag() {
         val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/stats-test.xml", "--stats")
-        val exitCode = App().run(arguments)
+        val exitCode = Guacamole().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         assertThat(systemOutput.toString()).contains("Percent saved:")
     }
@@ -90,7 +90,7 @@ class CommandLineInterfaceTests {
     @Test
     fun testShortStatsFlag() {
         val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/stats-test.xml", "-s")
-        val exitCode = App().run(arguments)
+        val exitCode = Guacamole().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         assertThat(systemOutput.toString()).contains("Percent saved:")
     }
@@ -98,7 +98,7 @@ class CommandLineInterfaceTests {
     @Test
     fun testIndentOption() {
         val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/indent-test.xml", "--indent", "4")
-        val exitCode = App().run(arguments)
+        val exitCode = Guacamole().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         val output = File("build/integrationTest/indent-test.xml").readText()
         assertThat(output).contains("    <path")

@@ -9,6 +9,6 @@
 -dontskipnonpubliclibraryclasses
 -mergeinterfacesaggressively
 
--keep class com.jzbrooks.guacamole.App {
+-keep class com.jzbrooks.guacamole.Guacamole {
   public static void main(java.lang.String[]);
 }

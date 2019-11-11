@@ -16,7 +16,7 @@ abstract class BaselineTest(private val unoptimizedAsset: Path, private val base
         val outputFilePath = "build/integrationTest/${this::class.java.simpleName}/testOptimizationFinishes.$inputExtension"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
-        val exitCode = App().run(arguments)
+        val exitCode = Guacamole().run(arguments)
 
         assertThat(exitCode).isEqualTo(0)
     }
@@ -26,7 +26,7 @@ abstract class BaselineTest(private val unoptimizedAsset: Path, private val base
         val outputFilePath = "build/integrationTest/${this::class.java.simpleName}/testOptimizationIsCompact.$inputExtension"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
-        App().run(arguments)
+        Guacamole().run(arguments)
 
         val content = File(outputFilePath).readText()
         val baselineContent = baselineAsset.toFile().readText()
@@ -38,7 +38,7 @@ abstract class BaselineTest(private val unoptimizedAsset: Path, private val base
         val outputFilePath = "build/integrationTest/${this::class.java.simpleName}/testOptimizedAssetIsNotLargerThanBaseline.$inputExtension"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
-        App().run(arguments)
+        Guacamole().run(arguments)
 
         val optimizedAssetSize = File(outputFilePath).length()
         val baselineAssetSize = baselineAsset.toFile().length()
