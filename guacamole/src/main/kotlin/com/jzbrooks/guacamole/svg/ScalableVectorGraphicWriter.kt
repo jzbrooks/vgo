@@ -2,6 +2,7 @@ package com.jzbrooks.guacamole.svg
 
 import com.jzbrooks.guacamole.core.Writer
 import com.jzbrooks.guacamole.core.graphic.*
+import com.jzbrooks.guacamole.svg.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
 import javax.xml.parsers.DocumentBuilderFactory
@@ -40,6 +41,13 @@ class ScalableVectorGraphicWriter(override val options: Set<Writer.Option> = emp
             }
             is Group -> {
                 document.createElement("g").also {
+                    for (child in element.elements) {
+                        write(it, child, document)
+                    }
+                }
+            }
+            is ClipPath -> {
+                document.createElement("clipPath").also {
                     for (child in element.elements) {
                         write(it, child, document)
                     }

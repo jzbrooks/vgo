@@ -3,6 +3,7 @@ package com.jzbrooks.guacamole.svg
 import com.jzbrooks.guacamole.core.graphic.*
 import com.jzbrooks.guacamole.core.graphic.command.Command
 import com.jzbrooks.guacamole.core.graphic.command.CommandString
+import com.jzbrooks.guacamole.svg.graphic.ClipPath
 import com.jzbrooks.guacamole.util.xml.asSequence
 import com.jzbrooks.guacamole.util.xml.toMutableMap
 import org.w3c.dom.Node
@@ -21,7 +22,8 @@ fun parse(root: Node): ScalableVectorGraphic {
 private fun parseElement(node: Node): Element? {
     return if (node !is Text) {
         when (node.nodeName) {
-            "g" -> parseGroup(node)
+            "g" -> parseContainerElement(node, ::Group)
+            "clipPath" -> parseContainerElement(node, ::ClipPath)
             "path" -> parsePathElement(node, ::Path)
             else -> parseExtraElement(node)
         }
@@ -30,13 +32,13 @@ private fun parseElement(node: Node): Element? {
     }
 }
 
-private fun parseGroup(groupNode: Node): Group {
-    val groupChildElements = groupNode.childNodes.asSequence()
+private fun <T : ContainerElement> parseContainerElement(containerElementNode: Node, generator: (List<Element>, MutableMap<String, String>) -> T): T {
+    val childElements = containerElementNode.childNodes.asSequence()
             .mapNotNull(::parseElement)
             .toList()
-    val groupMetadata = groupNode.attributes.toMutableMap()
+    val attributes = containerElementNode.attributes.toMutableMap()
 
-    return Group(groupChildElements, groupMetadata)
+    return generator(childElements, attributes)
 }
 
 private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Command>, MutableMap<String, String>) -> T): T {
