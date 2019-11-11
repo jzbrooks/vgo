@@ -91,6 +91,8 @@ class Guacamole {
 
     private fun handleFile(input: File, output: File, options: Set<Writer.Option>) {
         input.inputStream().use { inputStream ->
+            val sizeBefore = inputStream.channel.size()
+
             val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
                 documentElement.normalize()
             }
@@ -122,7 +124,6 @@ class Guacamole {
                 }
 
                 if (printStats) {
-                    val sizeBefore = inputStream.channel.size()
                     val sizeAfter = outputStream.channel.size()
                     val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
                     println("Size before: $sizeBefore")

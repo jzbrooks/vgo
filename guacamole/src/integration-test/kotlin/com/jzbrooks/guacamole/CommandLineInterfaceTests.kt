@@ -2,6 +2,7 @@ package com.jzbrooks.guacamole
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.matches
 import org.junit.After
@@ -11,6 +12,7 @@ import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
+import java.nio.file.Path
 
 class CommandLineInterfaceTests {
     private val avocadoExampleRelativePath = "src/integration-test/resources/avocado_example.xml"
@@ -93,6 +95,19 @@ class CommandLineInterfaceTests {
         val exitCode = Guacamole().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         assertThat(systemOutput.toString()).contains("Percent saved:")
+    }
+
+    @Test
+    fun testOverwritingInputFileReportsNonZeroSizeChange() {
+        val overwritePath = Path.of("build/integrationTest/stat-overwrite-test.xml")
+        File(avocadoExampleRelativePath).copyTo(overwritePath.toFile(), overwrite = true)
+
+        val arguments = arrayOf(overwritePath.toString(), "-s")
+        val exitCode = Guacamole().run(arguments)
+
+        assertThat(exitCode).isEqualTo(0)
+        assertThat(systemOutput.toString()).contains("Percent saved:")
+        assertThat(systemOutput.toString()).doesNotContain("Percent saved: 0.0")
     }
 
     @Test
