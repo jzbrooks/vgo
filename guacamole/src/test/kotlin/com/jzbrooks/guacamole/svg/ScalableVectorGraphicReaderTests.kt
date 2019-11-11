@@ -15,31 +15,31 @@ import com.jzbrooks.guacamole.core.graphic.command.*
 import com.jzbrooks.guacamole.core.util.math.Point
 import org.junit.Before
 import org.junit.Test
-import org.w3c.dom.Document
+import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
 class ScalableVectorGraphicReaderTests {
-    private lateinit var document: Document
+    private lateinit var node: Node
 
     @Before
     fun setup() {
         javaClass.getResourceAsStream("/simple_heart.svg").use { input ->
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
-            document.documentElement.normalize()
+            val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
+            document.normalize()
+            node = document.firstChild
         }
     }
-
     @Test
     fun testParseDimensions() {
-        val graphic: Graphic = parse(document)
+        val graphic: Graphic = parse(node)
 
         assertThat(graphic.attributes["viewBox"]).isEqualTo("0 0 100 100")
     }
 
     @Test
     fun testParseMetadataDoesNotContainPathData() {
-        val graphic: Graphic = parse(document)
+        val graphic: Graphic = parse(node)
 
         val path = graphic.elements.first() as Path
 
@@ -48,7 +48,7 @@ class ScalableVectorGraphicReaderTests {
 
     @Test
     fun testParseMetadata() {
-        val graphic: Graphic = parse(document)
+        val graphic: Graphic = parse(node)
 
         val path = graphic.elements.first() as Path
 
@@ -57,7 +57,7 @@ class ScalableVectorGraphicReaderTests {
 
     @Test
     fun testParsePaths() {
-        val graphic: Graphic = parse(document)
+        val graphic: Graphic = parse(node)
 
         val path = graphic.elements.first() as Path
 
@@ -72,12 +72,11 @@ class ScalableVectorGraphicReaderTests {
                 )
         )
         assertThat(graphic.elements).hasSize(1)
-
     }
 
     @Test
     fun testStoreIdForPath() {
-        val graphic: Graphic = parse(document)
+        val graphic: Graphic = parse(node)
 
         val path = graphic.elements.first() as Path
 
@@ -93,7 +92,7 @@ class ScalableVectorGraphicReaderTests {
             }
         }
 
-        val graphic: Graphic = parse(commentDocument)
+        val graphic: Graphic = parse(commentDocument.firstChild)
 
         val unknown = graphic.elements.first() as Extra
 
@@ -109,7 +108,7 @@ class ScalableVectorGraphicReaderTests {
             }
         }
 
-        val graphic: Graphic = parse(unknownElementDocument)
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
         val unknown = graphic.elements.first() as Extra
 
@@ -125,7 +124,7 @@ class ScalableVectorGraphicReaderTests {
             }
         }
 
-        val graphic: Graphic = parse(unknownElementDocument)
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
         val unknown = graphic.elements.first() as Extra
 
@@ -147,11 +146,11 @@ class ScalableVectorGraphicReaderTests {
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use { input ->
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
-                documentElement.normalize()
+                normalize()
             }
         }
 
-        val graphic: Graphic = parse(unknownElementDocument)
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
         val unknown = graphic.elements.first() as Extra
 

@@ -18,24 +18,26 @@ import com.jzbrooks.guacamole.core.graphic.command.MoveTo
 import com.jzbrooks.guacamole.core.util.math.Point
 import org.junit.Before
 import org.w3c.dom.Document
+import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.test.Test
 
 class VectorDrawableReaderTests {
-    private lateinit var document: Document
+    private lateinit var node: Node
 
     @Before
     fun setup() {
         javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use { input ->
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
-            document.documentElement.normalize()
+            val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
+            document.normalize()
+            node = document.firstChild
         }
     }
 
     @Test
     fun testParseDimensions() {
-        val graphic: Graphic = parse(document)
+        val graphic: Graphic = parse(node)
 
         assertThat(graphic.attributes["android:width"]).isEqualTo("24dp")
         assertThat(graphic.attributes["android:height"]).isEqualTo("24dp")
@@ -43,7 +45,7 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testParseMetadataDoesNotContainPathData() {
-            val graphic: Graphic = parse(document)
+            val graphic: Graphic = parse(node)
 
             val path = graphic.elements.first() as Path
 
@@ -52,7 +54,7 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testParseMetadata() {
-            val graphic: Graphic = parse(document)
+            val graphic: Graphic = parse(node)
 
             val path = graphic.elements.first() as Path
 
@@ -61,7 +63,7 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testParsePaths() {
-            val graphic: Graphic = parse(document)
+            val graphic: Graphic = parse(node)
 
             val path = graphic.elements.first() as Path
             assertThat(path.commands).isEqualTo(
@@ -78,7 +80,7 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testStoreNameForPath() {
-            val graphic: Graphic = parse(document)
+            val graphic: Graphic = parse(node)
 
             val path = graphic.elements.first() as Path
 
@@ -94,7 +96,7 @@ class VectorDrawableReaderTests {
             }
         }
 
-        val graphic: Graphic = parse(commentDocument)
+        val graphic: Graphic = parse(commentDocument.firstChild)
 
         val unknown = graphic.elements.first() as Extra
 
@@ -110,7 +112,7 @@ class VectorDrawableReaderTests {
             }
         }
 
-        val graphic: Graphic = parse(unknownElementDocument)
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
         val unknown = graphic.elements.first() as Extra
 
@@ -126,7 +128,7 @@ class VectorDrawableReaderTests {
             }
         }
 
-        val graphic: Graphic = parse(unknownElementDocument)
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
         val unknown = graphic.elements.first() as Extra
 
@@ -152,7 +154,7 @@ class VectorDrawableReaderTests {
             }
         }
 
-        val graphic: Graphic = parse(unknownElementDocument)
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
         val unknown = graphic.elements.first() as Extra
 
