@@ -10,7 +10,7 @@ interface Matrix3 {
             override fun get(row: Int, column: Int) = if (row == column) 1f else 0f
 
             override fun times(other: Matrix3): Matrix3 {
-                val data = Array(3) { Array(3) { 0f } }
+                val data = Array(3) { FloatArray(3) }
 
                 for (i in 0..2) {
                     for (j in 0..2) {
@@ -23,7 +23,7 @@ interface Matrix3 {
 
             override fun times(other: Vector3): Vector3 = other.copy()
         }
-        fun from(data: Array<Array<Float>>): Matrix3 = ArrayMatrix3(data)
+        fun from(data: Array<FloatArray>): Matrix3 = ArrayMatrix3(data)
     }
 }
 
@@ -31,15 +31,15 @@ interface MutableMatrix3 : Matrix3 {
     operator fun set(row: Int, column: Int, value: Float)
     companion object {
         fun identity(): MutableMatrix3 = ArrayMatrix3(arrayOf(
-                arrayOf(1f, 0f, 0f),
-                arrayOf(1f, 1f, 0f),
-                arrayOf(1f, 0f, 1f)
+                floatArrayOf(1f, 0f, 0f),
+                floatArrayOf(1f, 1f, 0f),
+                floatArrayOf(1f, 0f, 1f)
         ))
-        fun from(data: Array<Array<Float>>): MutableMatrix3 = ArrayMatrix3(data)
+        fun from(data: Array<FloatArray>): MutableMatrix3 = ArrayMatrix3(data)
     }
 }
 
-private class ArrayMatrix3(private val data: Array<Array<Float>>) : MutableMatrix3 {
+private class ArrayMatrix3(private val data: Array<FloatArray>) : MutableMatrix3 {
 
     override fun equals(other: Any?): Boolean {
         if (other !is Matrix3) return false
@@ -53,17 +53,7 @@ private class ArrayMatrix3(private val data: Array<Array<Float>>) : MutableMatri
         return true
     }
 
-    override fun hashCode(): Int {
-        var hash = 11
-
-        for (row in data) {
-            for (column in row) {
-                hash += column.hashCode()
-            }
-        }
-
-        return hash
-    }
+    override fun hashCode(): Int = floatArrayOf(*data[0], *data[1], *data[2]).contentHashCode()
 
     override operator fun get(row: Int, column: Int): Float {
         return data[row][column]
@@ -74,7 +64,7 @@ private class ArrayMatrix3(private val data: Array<Array<Float>>) : MutableMatri
     }
 
     override operator fun times(other: Matrix3): Matrix3 {
-        val data = Array(3) { Array(3) { 0f }}
+        val data = Array(3) { FloatArray(3) }
 
         data[0][0] = this[0, 0] * other[0, 0] + this[0, 1] * other[1, 0] + this[0, 2] * other[2, 0]
         data[0][1] = this[0, 0] * other[0, 1] + this[0, 1] * other[1, 1] + this[0, 2] * other[2, 1]

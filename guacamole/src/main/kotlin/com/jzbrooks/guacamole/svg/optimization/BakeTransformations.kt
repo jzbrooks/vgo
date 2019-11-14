@@ -136,10 +136,10 @@ class BakeTransformations : Optimization {
             // [a, c, e]
             // [b, d, f]
             // [0, 0, 1]
-            val firstRow = arrayOf(values[0], values[2], values[4])
-            val secondRow = arrayOf(values[1], values[3], values[5])
+            val firstRow = floatArrayOf(values[0], values[2], values[4])
+            val secondRow = floatArrayOf(values[1], values[3], values[5])
 
-            Matrix3.from(arrayOf(firstRow, secondRow, arrayOf(0f, 0f, 1f)))
+            Matrix3.from(arrayOf(firstRow, secondRow, floatArrayOf(0f, 0f, 1f)))
         } else {
             Matrix3.IDENTITY
         }

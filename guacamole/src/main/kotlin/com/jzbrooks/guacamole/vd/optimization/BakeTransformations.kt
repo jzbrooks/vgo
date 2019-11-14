@@ -151,35 +151,35 @@ class BakeTransformations : Optimization {
         val rotation = group.attributes["android:rotation"]?.toFloat()
 
         val scale = Matrix3.from(arrayOf(
-                arrayOf(scaleX ?: 1f, 0f, 0f),
-                arrayOf(0f, scaleY ?: 1f, 0f),
-                arrayOf(0f, 0f, 1f)
+                floatArrayOf(scaleX ?: 1f, 0f, 0f),
+                floatArrayOf(0f, scaleY ?: 1f, 0f),
+                floatArrayOf(0f, 0f, 1f)
         ))
 
         val translation = Matrix3.from(arrayOf(
-                arrayOf(1f, 0f, translationX ?: 0f),
-                arrayOf(0f, 1f, translationY ?: 0f),
-                arrayOf(0f, 0f, 1f)
+                floatArrayOf(1f, 0f, translationX ?: 0f),
+                floatArrayOf(0f, 1f, translationY ?: 0f),
+                floatArrayOf(0f, 0f, 1f)
         ))
 
         val pivot = Matrix3.from(arrayOf(
-                arrayOf(1f, 0f, pivotX ?: 0f),
-                arrayOf(0f, 1f, pivotY ?: 0f),
-                arrayOf(0f, 0f, 1f)
+                floatArrayOf(1f, 0f, pivotX ?: 0f),
+                floatArrayOf(0f, 1f, pivotY ?: 0f),
+                floatArrayOf(0f, 0f, 1f)
         ))
 
         val antiPivot = Matrix3.from(arrayOf(
-                arrayOf(1f, 0f, (pivotX ?: 0f) * -1),
-                arrayOf(0f, 1f, (pivotY ?: 0f) * -1),
-                arrayOf(0f, 0f, 1f)
+                floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1),
+                floatArrayOf(0f, 1f, (pivotY ?: 0f) * -1),
+                floatArrayOf(0f, 0f, 1f)
         ))
 
         val rotate = rotation?.let {
             val radians = it * PI.toFloat() / 180f
             Matrix3.from(arrayOf(
-                    arrayOf(cos(radians), -sin(radians), 0f),
-                    arrayOf(sin(radians), cos(radians), 0f),
-                    arrayOf(0f, 0f, 1f)
+                    floatArrayOf(cos(radians), -sin(radians), 0f),
+                    floatArrayOf(sin(radians), cos(radians), 0f),
+                    floatArrayOf(0f, 0f, 1f)
             ))
         } ?: Matrix3.IDENTITY
 
