@@ -1,8 +1,5 @@
 package com.jzbrooks.guacamole.core.optimization
 
-import com.jzbrooks.guacamole.core.graphic.ContainerElement
-import com.jzbrooks.guacamole.core.graphic.Element
-import com.jzbrooks.guacamole.core.graphic.Graphic
 import com.jzbrooks.guacamole.core.graphic.PathElement
 import com.jzbrooks.guacamole.core.graphic.command.*
 
@@ -10,21 +7,10 @@ import com.jzbrooks.guacamole.core.graphic.command.*
  * Enables more resolution in the the other command
  * related optimizations like [CommandVariant] and [RemoveRedundantCommands]
  */
-class BreakoutImplicitCommands : Optimization {
-    override fun optimize(graphic: Graphic) {
-        topDownOptimize(graphic)
-    }
-
-    private fun topDownOptimize(element: Element): Element {
-        return when (element) {
-            is PathElement -> process(element)
-            is ContainerElement -> element.apply { elements = element.elements.map(::topDownOptimize) }
-            else -> element
-        }
-    }
-
-    private fun process(pathElement: PathElement): PathElement {
+class BreakoutImplicitCommands : TopDownOptimization, PathElementVisitor {
+    override fun visit(pathElement: PathElement) {
         val commands = mutableListOf<Command>()
+
         for (current in pathElement.commands) {
             if (current is ParameterizedCommand<*> && current.parameters.size > 1) {
                 val splitCommands = divideParameters(current)
@@ -34,7 +20,7 @@ class BreakoutImplicitCommands : Optimization {
             }
         }
 
-        return pathElement.apply { this.commands = commands }
+        pathElement.commands = commands
     }
 
     private fun divideParameters(first: ParameterizedCommand<*>) : List<Command> {

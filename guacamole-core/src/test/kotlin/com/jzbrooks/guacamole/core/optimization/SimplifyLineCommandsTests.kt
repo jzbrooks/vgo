@@ -21,12 +21,7 @@ class SimplifyLineCommandsTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        SimplifyLineCommands(0f).optimize(graphic)
+        SimplifyLineCommands(0f).visit(path)
 
         assertThat(path.commands.filterIsInstance<LineTo>()).hasSize(0)
         assertThat(path.commands.filterIsInstance<VerticalLineTo>()).hasSize(1)
@@ -42,12 +37,7 @@ class SimplifyLineCommandsTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        SimplifyLineCommands(0f).optimize(graphic)
+        SimplifyLineCommands(0f).visit(path)
 
         assertThat(path.commands.filterIsInstance<LineTo>()).hasSize(0)
         assertThat(path.commands.filterIsInstance<HorizontalLineTo>()).hasSize(1)
@@ -63,12 +53,7 @@ class SimplifyLineCommandsTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        SimplifyLineCommands(0.0001f).optimize(graphic)
+        SimplifyLineCommands(0.0001f).visit(path)
 
         assertThat(path.commands.filterIsInstance<LineTo>()).hasSize(0)
         assertThat(path.commands.filterIsInstance<VerticalLineTo>()).hasSize(1)
@@ -84,12 +69,7 @@ class SimplifyLineCommandsTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        SimplifyLineCommands(0.0001f).optimize(graphic)
+        SimplifyLineCommands(0.0001f).visit(path)
 
         assertThat(path.commands.filterIsInstance<LineTo>()).hasSize(0)
         assertThat(path.commands.filterIsInstance<HorizontalLineTo>()).hasSize(1)
@@ -105,12 +85,7 @@ class SimplifyLineCommandsTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        SimplifyLineCommands(0f).optimize(graphic)
+        SimplifyLineCommands(0f).visit(path)
 
         assertThat(path.commands.filterIsInstance<LineTo>()).hasSize(1)
         assertThat(path.commands.filterIsInstance<VerticalLineTo>()).hasSize(0)

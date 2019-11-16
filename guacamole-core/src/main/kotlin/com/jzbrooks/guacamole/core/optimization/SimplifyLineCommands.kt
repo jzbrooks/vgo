@@ -1,22 +1,11 @@
 package com.jzbrooks.guacamole.core.optimization
 
-import com.jzbrooks.guacamole.core.graphic.ContainerElement
-import com.jzbrooks.guacamole.core.graphic.Element
-import com.jzbrooks.guacamole.core.graphic.Graphic
 import com.jzbrooks.guacamole.core.graphic.PathElement
 import com.jzbrooks.guacamole.core.graphic.command.*
 
-class SimplifyLineCommands(private val tolerance: Float) : Optimization {
-    override fun optimize(graphic: Graphic) {
-        topDownOptimize(graphic)
-    }
-
-    private fun topDownOptimize(element: Element): Element {
-        return when (element) {
-            is PathElement -> element.apply { commands = element.commands.map(::process) }
-            is ContainerElement -> element.apply { elements = element.elements.map(::topDownOptimize) }
-            else -> element
-        }
+class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization, PathElementVisitor {
+    override fun visit(pathElement: PathElement) {
+        pathElement.commands = pathElement.commands.map(::process)
     }
 
     private fun process(command: Command): Command {

@@ -33,12 +33,7 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        CommandVariant().optimize(graphic)
+        CommandVariant().visit(path)
 
         // M100,1 L103,6 L106,7 93,10 C109,8 113,12 120,10 H101 V-8 H103 S113,39 105,-6 Q112,-10 109, -3 T100,0 A4,4,93,1,1,109,15 Z
         // M100,1 l3,5 l3,1 -13,3 c16,-2 20,2 27,0 H101 V-8 h2 s10,47 2,2 q7,-4 4,3 t-9,3 a4,3,93,1,1,9,15 Z
@@ -58,12 +53,7 @@ class CommandVariantTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        CommandVariant().optimize(graphic)
+        CommandVariant().visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(1)
     }
@@ -80,12 +70,7 @@ class CommandVariantTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        CommandVariant().optimize(graphic)
+        CommandVariant().visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(3)
     }
@@ -113,12 +98,7 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        CommandVariant().optimize(graphic)
+        CommandVariant().visit(path)
 
         // M100,1 L103,6 L106,7 93,10 C109,8 113,12 120,10 M110,8 H101 V-8 Z H103 S113,39 105,-6 Q112,-10 109,-3 T100,0 A4,3,93,1,1,109,15 Z
         // M100,1l3,5l3,1 -10,4c16,-2 20,2 27,0M103,8h-9V-8Zh-7s10,31 2,-14q7,-4 4,3t-9,3a4,3,93,1,1,9,15Z
@@ -139,12 +119,7 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        CommandVariant().optimize(graphic)
+        CommandVariant().visit(path)
 
         // M100,1 101,1 L103,6 L106,7 93,10 Z
         // M100,1 101,1 l2,5 l3,1 -13,3 Z
@@ -166,12 +141,7 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        CommandVariant().optimize(graphic)
+        CommandVariant().visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(2)
         assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)

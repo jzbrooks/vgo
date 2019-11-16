@@ -24,12 +24,7 @@ class RemoveRedundantCommandsTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        RemoveRedundantCommands().optimize(graphic)
+        RemoveRedundantCommands().visit(path)
 
         assertThat(path.commands.filterIsInstance<LineTo>()).hasSize(1)
         assertThat(path.commands).hasSize(3)
@@ -46,12 +41,7 @@ class RemoveRedundantCommandsTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        RemoveRedundantCommands().optimize(graphic)
+        RemoveRedundantCommands().visit(path)
 
         assertThat(path.commands).hasSize(4)
     }

@@ -2,27 +2,16 @@ package com.jzbrooks.guacamole.vd.optimization
 
 import com.jzbrooks.guacamole.core.graphic.*
 import com.jzbrooks.guacamole.core.graphic.command.*
+import com.jzbrooks.guacamole.core.optimization.GroupVisitor
 import com.jzbrooks.guacamole.core.optimization.Optimization
+import com.jzbrooks.guacamole.core.optimization.TopDownOptimization
 import com.jzbrooks.guacamole.core.util.math.Matrix3
 import com.jzbrooks.guacamole.core.util.math.Vector3
 import kotlin.math.*
 
-class BakeTransformations : Optimization {
-    override fun optimize(graphic: Graphic) {
-        topDownVisit(graphic)
-    }
-
-    private fun topDownVisit(element: Element): Element {
-        return when (element) {
-            is ContainerElement -> {
-                if (element is Group) {
-                    bakeIntoGroup(element)
-                }
-
-                element.apply { elements = elements.map(::topDownVisit) }
-            }
-            else -> element
-        }
+class BakeTransformations : TopDownOptimization, GroupVisitor {
+    override fun visit(group: Group) {
+        bakeIntoGroup(group)
     }
 
     private fun bakeIntoGroup(group: Group) {

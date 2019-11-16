@@ -23,12 +23,7 @@ class BreakoutImplicitCommandsTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        BreakoutImplicitCommands().optimize(graphic)
+        BreakoutImplicitCommands().visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().none { it.parameters.size > 1 }).isTrue()
         assertThat(path.commands.filterIsInstance<LineTo>()).hasSize(3)
@@ -48,12 +43,7 @@ class BreakoutImplicitCommandsTests {
                 )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        BreakoutImplicitCommands().optimize(graphic)
+        BreakoutImplicitCommands().visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().none { it.parameters.size > 1 }).isTrue()
         assertThat(path.commands.filterIsInstance<LineTo>()).hasSize(3)
@@ -77,12 +67,7 @@ class BreakoutImplicitCommandsTests {
         )
         val sizeBefore = path.commands.size
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(path)
-            override var attributes = mutableMapOf<String, String>()
-        }
-
-        BreakoutImplicitCommands().optimize(graphic)
+        BreakoutImplicitCommands().visit(path)
 
         assertThat(path.commands).hasSize(sizeBefore)
     }

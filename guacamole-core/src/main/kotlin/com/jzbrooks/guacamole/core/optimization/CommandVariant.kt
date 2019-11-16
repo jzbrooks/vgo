@@ -10,7 +10,7 @@ import com.jzbrooks.guacamole.core.util.math.Point
 import java.util.*
 
 // todo: handle precision better. Converted commands can be longer because they have more decimal places.
-class CommandVariant : Optimization {
+class CommandVariant : TopDownOptimization, PathElementVisitor {
     private val subPathStart = Stack<Point>()
 
     // Updated once per process call when computing
@@ -19,25 +19,13 @@ class CommandVariant : Optimization {
     // of their absolute or relative nature.
     private lateinit var currentPoint: Point
 
-    override fun optimize(graphic: Graphic) {
-        topDownVisit(graphic)
-    }
-
-    private fun topDownVisit(element: Element): Element {
-        return when (element) {
-            is PathElement -> visit(element)
-            is ContainerElement -> element.apply { elements = elements.map(::topDownVisit) }
-            else -> element
-        }
-    }
-
-    private fun visit(element: PathElement): PathElement {
+    override fun visit(pathElement: PathElement) {
         subPathStart.clear()
 
-        val initialMoveTo = element.commands.first() as MoveTo
+        val initialMoveTo = pathElement.commands.first() as MoveTo
         currentPoint = initialMoveTo.parameters.last().copy()
 
-        element.commands = listOf(initialMoveTo) + element.commands.asSequence().drop(1).map { command ->
+        pathElement.commands = listOf(initialMoveTo) + pathElement.commands.asSequence().drop(1).map { command ->
             when (command) {
                 is MoveTo -> process(command)
                 is LineTo -> process(command)
@@ -52,8 +40,6 @@ class CommandVariant : Optimization {
                 else -> throw IllegalStateException("Unsupported command encountered: $command")
             }
         }
-
-        return element
     }
 
     private fun process(command: MoveTo): MoveTo {
