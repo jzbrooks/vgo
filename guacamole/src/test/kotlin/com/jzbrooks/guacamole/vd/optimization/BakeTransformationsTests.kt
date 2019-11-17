@@ -3,8 +3,6 @@ package com.jzbrooks.guacamole.vd.optimization
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import com.jzbrooks.guacamole.assertk.extensions.doesNotContainKey
-import com.jzbrooks.guacamole.core.graphic.Element
-import com.jzbrooks.guacamole.core.graphic.Graphic
 import com.jzbrooks.guacamole.core.graphic.Group
 import com.jzbrooks.guacamole.core.graphic.Path
 import com.jzbrooks.guacamole.core.graphic.command.CommandVariant

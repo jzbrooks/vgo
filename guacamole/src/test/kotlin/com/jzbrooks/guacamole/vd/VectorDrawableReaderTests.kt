@@ -17,7 +17,6 @@ import com.jzbrooks.guacamole.core.graphic.command.LineTo
 import com.jzbrooks.guacamole.core.graphic.command.MoveTo
 import com.jzbrooks.guacamole.core.util.math.Point
 import org.junit.Before
-import org.w3c.dom.Document
 import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import javax.xml.parsers.DocumentBuilderFactory

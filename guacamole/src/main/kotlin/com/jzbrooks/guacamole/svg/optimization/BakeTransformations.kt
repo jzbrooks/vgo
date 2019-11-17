@@ -1,13 +1,12 @@
 package com.jzbrooks.guacamole.svg.optimization
 
-import com.jzbrooks.guacamole.core.graphic.*
+import com.jzbrooks.guacamole.core.graphic.Group
+import com.jzbrooks.guacamole.core.graphic.PathElement
 import com.jzbrooks.guacamole.core.graphic.command.*
 import com.jzbrooks.guacamole.core.optimization.GroupVisitor
-import com.jzbrooks.guacamole.core.optimization.Optimization
 import com.jzbrooks.guacamole.core.optimization.TopDownOptimization
 import com.jzbrooks.guacamole.core.util.math.Matrix3
 import com.jzbrooks.guacamole.core.util.math.Vector3
-import kotlin.math.*
 
 class BakeTransformations : TopDownOptimization, GroupVisitor {
     override fun visit(group: Group) {

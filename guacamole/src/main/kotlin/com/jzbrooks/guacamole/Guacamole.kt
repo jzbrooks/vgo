@@ -8,7 +8,6 @@ import com.jzbrooks.guacamole.vd.VectorDrawable
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
 import org.w3c.dom.Document
 import java.io.File
-import java.lang.UnsupportedOperationException
 import java.util.jar.Manifest
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.system.exitProcess
