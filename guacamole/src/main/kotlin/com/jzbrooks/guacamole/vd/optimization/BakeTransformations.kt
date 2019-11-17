@@ -3,7 +3,6 @@ package com.jzbrooks.guacamole.vd.optimization
 import com.jzbrooks.guacamole.core.graphic.*
 import com.jzbrooks.guacamole.core.graphic.command.*
 import com.jzbrooks.guacamole.core.optimization.GroupVisitor
-import com.jzbrooks.guacamole.core.optimization.Optimization
 import com.jzbrooks.guacamole.core.optimization.TopDownOptimization
 import com.jzbrooks.guacamole.core.util.math.Matrix3
 import com.jzbrooks.guacamole.core.util.math.Vector3
@@ -157,7 +156,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                 floatArrayOf(0f, 0f, 1f)
         ))
 
-        val antiPivot = Matrix3.from(arrayOf(
+        val pivotInverse = Matrix3.from(arrayOf(
                 floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1),
                 floatArrayOf(0f, 1f, (pivotY ?: 0f) * -1),
                 floatArrayOf(0f, 0f, 1f)
@@ -172,7 +171,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
             ))
         } ?: Matrix3.IDENTITY
 
-        return listOf(pivot, translation, rotate, scale, antiPivot).reduce(Matrix3::times)
+        return listOf(pivot, translation, rotate, scale, pivotInverse).reduce(Matrix3::times)
     }
 
     companion object {
