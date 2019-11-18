@@ -26,13 +26,15 @@ dependencies {
 
 tasks {
     withType<Jar> {
-        destinationDir = file("$buildDir/libs/debug")
+        destinationDirectory.set(file("$buildDir/libs/debug"))
+
         manifest {
             attributes["Main-Class"] = "com.jzbrooks.guacamole.Guacamole"
             attributes["Bundle-Version"] = "0.1.0"
         }
 
-        from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
+        dependsOn(configurations.runtimeClasspath)
+        from(configurations.runtimeClasspath.get().filter { it.isFile }.map(::zipTree))
     }
 
     val optimize by registering {
