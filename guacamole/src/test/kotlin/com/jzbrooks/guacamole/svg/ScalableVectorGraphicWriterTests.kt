@@ -10,11 +10,11 @@ import com.jzbrooks.guacamole.core.graphic.Group
 import com.jzbrooks.guacamole.core.graphic.Path
 import com.jzbrooks.guacamole.core.graphic.command.CommandString
 import com.jzbrooks.guacamole.util.xml.toList
+import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import javax.xml.parsers.DocumentBuilderFactory
-import kotlin.test.Test
 
 class ScalableVectorGraphicWriterTests {
     @Test

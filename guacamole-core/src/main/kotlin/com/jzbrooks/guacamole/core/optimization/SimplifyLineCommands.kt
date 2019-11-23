@@ -1,7 +1,10 @@
 package com.jzbrooks.guacamole.core.optimization
 
 import com.jzbrooks.guacamole.core.graphic.PathElement
-import com.jzbrooks.guacamole.core.graphic.command.*
+import com.jzbrooks.guacamole.core.graphic.command.Command
+import com.jzbrooks.guacamole.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.guacamole.core.graphic.command.LineTo
+import com.jzbrooks.guacamole.core.graphic.command.VerticalLineTo
 
 class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization, PathElementVisitor {
     override fun visit(pathElement: PathElement) {

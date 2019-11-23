@@ -3,7 +3,7 @@ package com.jzbrooks.guacamole
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isLessThanOrEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import java.io.File
 import java.nio.file.Path
 

@@ -1,11 +1,9 @@
 package com.jzbrooks.guacamole.core.graphic.command
 
 import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
-import assertk.assertions.prop
+import assertk.assertions.*
 import com.jzbrooks.guacamole.core.util.math.Point
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 
 class ParserTests {
     private val moveToSingle = MoveTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 1f)))
@@ -245,10 +243,12 @@ class ParserTests {
                 .isEqualTo(Point(200f, 5f))
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun testInvalidCommandParsing() {
-        val pathCommandString = "G 3 2"
+        val commandString = CommandString("G 3 2")
 
-        CommandString(pathCommandString).toCommandList()
+        assertThat {
+            commandString.toCommandList()
+        }.isFailure().hasClass(IllegalStateException::class)
     }
 }

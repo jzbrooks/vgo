@@ -13,8 +13,8 @@ import com.jzbrooks.guacamole.core.graphic.Graphic
 import com.jzbrooks.guacamole.core.graphic.Path
 import com.jzbrooks.guacamole.core.graphic.command.*
 import com.jzbrooks.guacamole.core.util.math.Point
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import javax.xml.parsers.DocumentBuilderFactory
@@ -22,7 +22,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 class ScalableVectorGraphicReaderTests {
     private lateinit var node: Node
 
-    @Before
+    @BeforeEach
     fun setup() {
         javaClass.getResourceAsStream("/simple_heart.svg").use { input ->
             val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)

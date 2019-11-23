@@ -16,16 +16,16 @@ import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.graphic.command.LineTo
 import com.jzbrooks.guacamole.core.graphic.command.MoveTo
 import com.jzbrooks.guacamole.core.util.math.Point
-import org.junit.Before
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import javax.xml.parsers.DocumentBuilderFactory
-import kotlin.test.Test
 
 class VectorDrawableReaderTests {
     private lateinit var node: Node
 
-    @Before
+    @BeforeEach
     fun setup() {
         javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use { input ->
             val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)

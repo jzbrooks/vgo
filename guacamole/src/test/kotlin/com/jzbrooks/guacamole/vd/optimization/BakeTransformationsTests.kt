@@ -9,7 +9,7 @@ import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.graphic.command.LineTo
 import com.jzbrooks.guacamole.core.graphic.command.MoveTo
 import com.jzbrooks.guacamole.core.util.math.Point
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class BakeTransformationsTests {
     @Test

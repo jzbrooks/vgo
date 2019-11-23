@@ -1,8 +1,5 @@
 package com.jzbrooks.guacamole.core.optimization
 
-import com.jzbrooks.guacamole.core.graphic.ContainerElement
-import com.jzbrooks.guacamole.core.graphic.Element
-import com.jzbrooks.guacamole.core.graphic.Graphic
 import com.jzbrooks.guacamole.core.graphic.PathElement
 import com.jzbrooks.guacamole.core.graphic.command.*
 import com.jzbrooks.guacamole.core.graphic.command.CommandVariant

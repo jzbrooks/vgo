@@ -2,7 +2,7 @@ package com.jzbrooks.guacamole.core.util.math
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class Matrix3Tests {
     @Test

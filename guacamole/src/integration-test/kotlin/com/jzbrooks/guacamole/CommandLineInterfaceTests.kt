@@ -5,10 +5,10 @@ import assertk.assertions.contains
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.matches
-import org.junit.After
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
@@ -18,13 +18,13 @@ class CommandLineInterfaceTests {
     private val avocadoExampleRelativePath = "src/integration-test/resources/avocado_example.xml"
     private lateinit var systemOutput: ByteArrayOutputStream
 
-    @Before
+    @BeforeEach
     fun redirect() {
         systemOutput = ByteArrayOutputStream()
         System.setOut(PrintStream(systemOutput))
     }
 
-    @After
+    @AfterEach
     fun cleanup() {
         systemOutput.close()
     }
@@ -120,7 +120,7 @@ class CommandLineInterfaceTests {
     }
 
     companion object {
-        @BeforeClass
+        @BeforeAll
         fun createTempDir() {
             File("build/integrationTest").apply {
                 mkdir()

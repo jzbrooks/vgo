@@ -2,15 +2,13 @@ package com.jzbrooks.guacamole.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.hasSize
-import com.jzbrooks.guacamole.core.graphic.Element
-import com.jzbrooks.guacamole.core.graphic.Graphic
 import com.jzbrooks.guacamole.core.graphic.Path
 import com.jzbrooks.guacamole.core.graphic.command.ClosePath
+import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.graphic.command.LineTo
 import com.jzbrooks.guacamole.core.graphic.command.MoveTo
-import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.util.math.Point
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class RemoveRedundantCommandsTests {
     @Test

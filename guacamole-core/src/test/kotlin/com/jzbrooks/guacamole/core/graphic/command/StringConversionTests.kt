@@ -3,7 +3,7 @@ package com.jzbrooks.guacamole.core.graphic.command
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.jzbrooks.guacamole.core.util.math.Point
-import kotlin.test.Test
+import org.junit.jupiter.api.Test
 
 class StringConversionTests {
     @Test

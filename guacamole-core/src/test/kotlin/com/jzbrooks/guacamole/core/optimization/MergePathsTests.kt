@@ -6,7 +6,7 @@ import com.jzbrooks.guacamole.core.graphic.*
 import com.jzbrooks.guacamole.core.graphic.command.*
 import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.util.math.Point
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class MergePathsTests {
 
