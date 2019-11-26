@@ -3,9 +3,12 @@ package com.jzbrooks.guacamole
 import com.jzbrooks.guacamole.core.Writer
 import com.jzbrooks.guacamole.svg.ScalableVectorGraphic
 import com.jzbrooks.guacamole.svg.ScalableVectorGraphicWriter
+import com.jzbrooks.guacamole.svg.SvgOptimizationRegistry
 import com.jzbrooks.guacamole.util.xml.asSequence
 import com.jzbrooks.guacamole.vd.VectorDrawable
+import com.jzbrooks.guacamole.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.guacamole.vd.VectorDrawableWriter
+import com.jzbrooks.guacamole.vd.toSvg
 import org.w3c.dom.Document
 import java.io.File
 import java.util.jar.Manifest
@@ -14,6 +17,7 @@ import kotlin.system.exitProcess
 
 class Guacamole {
     private var printStats = false
+    private var outputFormat: String? = null
 
     fun run(args: Array<String>): Int {
         val argReader = ArgReader(args.toMutableList())
@@ -50,6 +54,8 @@ class Guacamole {
             }
             outputPaths.toList()
         }
+
+        outputFormat = argReader.readOption("format")
 
         var inputs = argReader.readArguments()
         if (inputs.none()) {
@@ -100,7 +106,7 @@ class Guacamole {
             }
 
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
-            val graphic = when {
+            var graphic = when {
                 rootNodes.any { it.nodeName == "svg" } -> com.jzbrooks.guacamole.svg.parse(rootNodes.first())
                 rootNodes.any { it.nodeName == "vector" } -> com.jzbrooks.guacamole.vd.parse(rootNodes.first())
                 else -> throw UnsupportedOperationException(
@@ -109,9 +115,13 @@ class Guacamole {
                 )
             }
 
+            if (graphic is VectorDrawable && outputFormat == "svg") {
+                graphic = graphic.toSvg()
+            }
+
             val optimizationRegistry = when (graphic) {
-                is VectorDrawable -> com.jzbrooks.guacamole.vd.OptimizationRegistry()
-                is ScalableVectorGraphic -> com.jzbrooks.guacamole.svg.OptimizationRegistry()
+                is VectorDrawable -> VectorDrawableOptimizationRegistry()
+                is ScalableVectorGraphic -> SvgOptimizationRegistry()
                 else -> null
             }
 
@@ -149,7 +159,8 @@ Options:
   -o --output     file or directory, if not provided the input will be overwritten
   -s --stats      print statistics on processed files to standard out
   -v --version    print the version number
-  --indent=value  write files with value columns of indentation 
+  --indent value  write files with value columns of indentation
+  --format value  output format (svg, vd, etc)
         """
 
         @JvmStatic

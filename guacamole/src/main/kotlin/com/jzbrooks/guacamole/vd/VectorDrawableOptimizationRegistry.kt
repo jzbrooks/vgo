@@ -1,10 +1,10 @@
-package com.jzbrooks.guacamole.svg
+package com.jzbrooks.guacamole.vd
 
 import com.jzbrooks.guacamole.core.optimization.*
 import com.jzbrooks.guacamole.core.optimization.OptimizationRegistry
-import com.jzbrooks.guacamole.svg.optimization.BakeTransformations
+import com.jzbrooks.guacamole.vd.optimization.BakeTransformations
 
-class OptimizationRegistry : OptimizationRegistry(topDownOptimizations, emptyList(), wholeGraphicOptimizations) {
+class VectorDrawableOptimizationRegistry : OptimizationRegistry(topDownOptimizations, emptyList(), wholeGraphicOptimizations) {
 
     companion object {
         private val topDownOptimizations: List<TopDownOptimization> = listOf(
