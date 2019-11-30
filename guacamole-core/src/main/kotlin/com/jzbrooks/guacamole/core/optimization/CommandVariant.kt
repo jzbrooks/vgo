@@ -40,6 +40,8 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
     }
 
     private fun process(command: MoveTo): MoveTo {
+        subPathStart.push(currentPoint.copy())
+
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
                     variant = CommandVariant.ABSOLUTE,

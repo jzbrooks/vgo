@@ -2,6 +2,7 @@ package com.jzbrooks.guacamole.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
 import assertk.assertions.isGreaterThan
 import com.jzbrooks.guacamole.core.graphic.Path
 import com.jzbrooks.guacamole.core.graphic.command.*
@@ -98,9 +99,7 @@ class CommandVariantTests {
 
         CommandVariant().visit(path)
 
-        // M100,1 L103,6 L106,7 93,10 C109,8 113,12 120,10 M110,8 H101 V-8 Z H103 S113,39 105,-6 Q112,-10 109,-3 T100,0 A4,3,93,1,1,109,15 Z
-        // M100,1l3,5l3,1 -10,4c16,-2 20,2 27,0M103,8h-9V-8Zh-7s10,31 2,-14q7,-4 4,3t-9,3a4,3,93,1,1,9,15Z
-        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(9)
+        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(8)
         assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)
     }
 
@@ -143,5 +142,26 @@ class CommandVariantTests {
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(2)
         assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)
+    }
+
+    @Test
+    fun testSubpathConversion() {
+        val path = Path(
+                listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(15f, 5f))),
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
+                        ClosePath(),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(17f, 7f))),
+                        ClosePath()
+                )
+        )
+
+        CommandVariant().visit(path)
+
+        val lastLineTo = path.commands.filterIsInstance<LineTo>().last()
+        assertThat(lastLineTo.variant).isEqualTo(CommandVariant.RELATIVE)
+        assertThat(lastLineTo.parameters.last()).isEqualTo(Point(2f, 2f))
     }
 }
