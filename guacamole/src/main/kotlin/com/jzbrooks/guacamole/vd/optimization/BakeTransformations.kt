@@ -67,125 +67,232 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
             when (command) {
                 is MoveTo -> {
                     command.apply {
-                        parameters = parameters.map { parameter ->
-                            transform(variant, parameter, currentPoint, transform)
-                        }
-
-                        currentPoint = if (variant == CommandVariant.RELATIVE) {
-                            currentPoint + parameters.last()
+                        val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
+                            currentPoint + parameters.reduce(Point::plus)
                         } else {
                             parameters.last()
                         }
 
+                        parameters = parameters.map { parameter ->
+                            val point = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter
+                            } else {
+                                parameter
+                            }
+
+                            (transform * Vector3(point)).toPoint()
+                        }
+                        variant = CommandVariant.ABSOLUTE
+
+                        currentPoint = newCurrentPoint
                         subPathStart.push(currentPoint)
                     }
                 }
                 is LineTo -> {
                     command.apply {
-                        parameters = parameters.map { parameter ->
-                            transform(variant, parameter, currentPoint, transform)
-                        }
-
-                        currentPoint = if (variant == CommandVariant.RELATIVE) {
-                            currentPoint + parameters.last()
+                        val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
+                            currentPoint + parameters.reduce(Point::plus)
                         } else {
                             parameters.last()
                         }
+
+                        parameters = parameters.map { parameter ->
+                            val point = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter
+                            } else {
+                                parameter
+                            }
+
+                            (transform * Vector3(point)).toPoint()
+                        }
+                        variant = CommandVariant.ABSOLUTE
+
+                        currentPoint = newCurrentPoint
                     }
                 }
                 is HorizontalLineTo -> {
-                    command.apply {
-                        parameters = parameters.map { x ->
-                            transform(variant, Point(x, 0f), currentPoint, transform).x
-                        }
-
-                        currentPoint.x = if (variant == CommandVariant.RELATIVE) {
-                            currentPoint.x + parameters.last()
+                    command.run {
+                        val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
+                            currentPoint.x + parameters.reduce(Float::plus)
                         } else {
                             parameters.last()
                         }
+
+                        val newParameters = parameters.map { parameter ->
+                            val x = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint.x + parameter
+                            } else {
+                                parameter
+                            }
+                            val point = Point(x, currentPoint.y)
+
+                            (transform * Vector3(point)).toPoint()
+                        }
+
+                        currentPoint.x = newCurrentPoint
+                        LineTo(CommandVariant.ABSOLUTE, newParameters)
                     }
                 }
                 is VerticalLineTo -> {
-                    command.apply {
-                        parameters = parameters.map { y ->
-                            transform(variant, Point(0f, y), currentPoint, transform).y
-                        }
-
-                        currentPoint.y = if (variant == CommandVariant.RELATIVE) {
-                            currentPoint.y + parameters.last()
+                    command.run {
+                        val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
+                            currentPoint.y + parameters.reduce(Float::plus)
                         } else {
                             parameters.last()
                         }
+
+                        val newParameters = parameters.map { parameter ->
+                            val y = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint.y + parameter
+                            } else {
+                                parameter
+                            }
+                            val point = Point(currentPoint.x, y)
+
+                            (transform * Vector3(point)).toPoint()
+                        }
+
+                        currentPoint.y = newCurrentPoint
+
+                        LineTo(CommandVariant.ABSOLUTE, newParameters)
                     }
                 }
                 is QuadraticBezierCurve -> {
                     command.apply {
-                        parameters.forEach {
-                            it.control = transform(variant, it.control, currentPoint, transform)
-                            it.end = transform(variant, it.end, currentPoint, transform)
+                        val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
+                            currentPoint + parameters.map { it.end }.reduce(Point::plus)
+                        } else {
+                            parameters.map { it.end }.last()
                         }
 
-                        currentPoint = if (variant == CommandVariant.RELATIVE) {
-                            currentPoint + parameters.last().end
-                        } else {
-                            parameters.last().end
+                        parameters.forEach { parameter ->
+                            val control = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter.control
+                            } else {
+                                parameter.control
+                            }
+
+                            val end = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter.end
+                            } else {
+                                parameter.end
+                            }
+
+                            parameter.control = (transform * Vector3(control)).toPoint()
+                            parameter.end = (transform * Vector3(end)).toPoint()
                         }
+                        variant = CommandVariant.ABSOLUTE
+
+                        currentPoint = newCurrentPoint
                     }
                 }
                 is ShortcutQuadraticBezierCurve -> {
                     command.apply {
-                        parameters = parameters.map { parameter ->
-                            transform(variant, parameter, currentPoint, transform)
-                        }
-
-                        currentPoint = if (variant == CommandVariant.RELATIVE) {
-                            currentPoint + parameters.last()
+                        val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
+                            currentPoint + parameters.reduce(Point::plus)
                         } else {
                             parameters.last()
                         }
+
+                        parameters = parameters.map { parameter ->
+                            val point = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter
+                            } else {
+                                parameter
+                            }
+
+                            (transform * Vector3(point)).toPoint()
+                        }
+                        variant = CommandVariant.ABSOLUTE
+
+                        currentPoint = newCurrentPoint
                     }
                 }
                 is CubicBezierCurve -> {
                     command.apply {
-                        parameters.forEach {
-                            it.startControl = transform(variant, it.startControl, currentPoint, transform)
-                            it.endControl = transform(variant, it.endControl, currentPoint, transform)
-                            it.end = transform(variant, it.end, currentPoint, transform)
+                        val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
+                            currentPoint + parameters.map { it.end }.reduce(Point::plus)
+                        } else {
+                            parameters.map { it.end }.last()
                         }
 
-                        currentPoint = if (variant == CommandVariant.RELATIVE) {
-                            currentPoint + parameters.last().end
-                        } else {
-                            parameters.last().end
+                        parameters.forEach { parameter ->
+                            val startControl = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter.startControl
+                            } else {
+                                parameter.startControl
+                            }
+
+                            val endControl = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter.endControl
+                            } else {
+                                parameter.endControl
+                            }
+
+                            val end = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter.end
+                            } else {
+                                parameter.end
+                            }
+
+                            parameter.startControl = (transform * Vector3(startControl)).toPoint()
+                            parameter.endControl = (transform * Vector3(endControl)).toPoint()
+                            parameter.end = (transform * Vector3(end)).toPoint()
                         }
+                        variant = CommandVariant.ABSOLUTE
+
+                        currentPoint = newCurrentPoint
                     }
                 }
                 is ShortcutCubicBezierCurve -> {
                     command.apply {
-                        parameters.forEach {
-                            it.endControl = transform(variant, it.endControl, currentPoint, transform)
-                            it.end = transform(variant, it.end, currentPoint, transform)
+                        val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
+                            currentPoint + parameters.map { it.end }.reduce(Point::plus)
+                        } else {
+                            parameters.map { it.end }.last()
                         }
 
-                        currentPoint = if (variant == CommandVariant.RELATIVE) {
-                            currentPoint + parameters.last().end
-                        } else {
-                            parameters.last().end
+                        parameters.forEach { parameter ->
+                            val endControl = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter.endControl
+                            } else {
+                                parameter.endControl
+                            }
+
+                            val end = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter.end
+                            } else {
+                                parameter.end
+                            }
+
+                            parameter.endControl = (transform * Vector3(endControl)).toPoint()
+                            parameter.end = (transform * Vector3(end)).toPoint()
                         }
+                        variant = CommandVariant.ABSOLUTE
+
+                        currentPoint = newCurrentPoint
                     }
                 }
                 is EllipticalArcCurve -> {
                     command.apply {
-                        parameters.forEach {
-                            it.end = transform(variant, it.end, currentPoint, transform)
+                        val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
+                            currentPoint + parameters.map { it.end }.reduce(Point::plus)
+                        } else {
+                            parameters.map { it.end }.last()
                         }
 
-                        currentPoint = if (variant == CommandVariant.RELATIVE) {
-                            currentPoint + parameters.last().end
-                        } else {
-                            parameters.last().end
+                        parameters.forEach { parameter ->
+                            val end = if (variant == CommandVariant.RELATIVE) {
+                                currentPoint + parameter.end
+                            } else {
+                                parameter.end
+                            }
+
+                            parameter.end = (transform * Vector3(end)).toPoint()
                         }
+                        variant = CommandVariant.ABSOLUTE
+
+                        currentPoint = newCurrentPoint
                     }
                 }
                 is ClosePath -> {
@@ -198,27 +305,6 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                 else -> throw IllegalStateException("Unexpected command: $command")
             }
         }
-    }
-
-    private fun transform(
-            variant: CommandVariant,
-            point: Point,
-            currentPoint: Point,
-            transform: Matrix3
-    ): Point {
-        val vector = if (variant == CommandVariant.RELATIVE) {
-            Vector3(currentPoint + point)
-        } else {
-            Vector3(point)
-        }
-
-        var result = (transform * vector).toPoint()
-
-        if (variant == CommandVariant.RELATIVE) {
-            result -= (transform * Vector3(currentPoint)).toPoint()
-        }
-
-        return result
     }
 
     private fun computeTransformationMatrix(group: Group): Matrix3 {

@@ -9,6 +9,8 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+private val hexWithAlpha = Regex("#[aAbBcCdDeEfF\\d]{8}")
+
 fun VectorDrawable.toSvg(): ScalableVectorGraphic {
     val graphic = traverse(this) as ContainerElement
     return ScalableVectorGraphic(graphic.elements, convertTopLevelAttributes(attributes))
@@ -59,6 +61,11 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
 
     for ((key, value) in attributes) {
 
+        var newValue = value
+        if (hexWithAlpha.matches(value)) {
+            newValue = '#' + value.substring(3)
+        }
+
         val svgKey = when (key) {
             "android:name" -> "id"
             "android:fillColor" -> "fill"
@@ -77,7 +84,7 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
             else -> key
         }
 
-        svgPathElementAttributes[svgKey] = value
+        svgPathElementAttributes[svgKey] = newValue
     }
 
     // We've mangled the map at this point...
