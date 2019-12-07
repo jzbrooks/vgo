@@ -9,7 +9,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-private val hexWithAlpha = Regex("#[aAbBcCdDeEfF\\d]{8}")
+private val hexWithAlpha = Regex("#[a-fA-F\\d]{8}")
 
 fun VectorDrawable.toSvg(): ScalableVectorGraphic {
     val graphic = traverse(this) as ContainerElement

@@ -7,7 +7,7 @@ import com.jzbrooks.guacamole.core.graphic.command.CommandString
 import com.jzbrooks.guacamole.vd.graphic.ClipPath
 import org.junit.jupiter.api.Test
 
-class ScalableVectorGraphicConverterTests {
+class SvgConverterTests {
     @Test
     fun testRootElementAttributesAreConverted() {
         val attributes = mutableMapOf(
@@ -55,7 +55,30 @@ class ScalableVectorGraphicConverterTests {
 
         assertThat(graphic.elements.first().attributes).isEqualTo(mapOf(
                 "id" to "strike_thru_path",
-                "fill" to "#FFFF00FF",
+                "fill" to "#FF00FF",
+                "stroke-width" to "10"
+        ))
+    }
+
+    @Test
+    fun testHexColorsWithAlphaAreConverted() {
+        val attributes = mutableMapOf(
+                "android:name" to "strike_thru_path",
+                "android:fillColor" to "#FFFF00FF",
+                "android:strokeWidth" to "10"
+        )
+        val pathElementGraphic = VectorDrawable(
+                listOf(
+                        Path(CommandString("M 2 4.27 L 3.27 3 L 3.27 3 L 2 4.27 Z").toCommandList(), attributes)
+                ),
+                mutableMapOf()
+        )
+
+        val graphic = pathElementGraphic.toSvg()
+
+        assertThat(graphic.elements.first().attributes).isEqualTo(mapOf(
+                "id" to "strike_thru_path",
+                "fill" to "#FF00FF",
                 "stroke-width" to "10"
         ))
     }
