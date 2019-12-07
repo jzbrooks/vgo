@@ -45,4 +45,17 @@ abstract class BaselineTest(private val unoptimizedAsset: Path, private val base
 
         assertThat(optimizedAssetSize).isLessThanOrEqualTo(baselineAssetSize)
     }
+
+    @Test
+    fun testOptimizedAssetIsNotLargerThanOriginal() {
+        val outputFilePath = "build/integrationTest/${this::class.java.simpleName}/testOptimizedAssetIsNotLargerThanBaseline.$inputExtension"
+        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
+
+        Guacamole().run(arguments)
+
+        val optimizedAssetSize = File(outputFilePath).length()
+        val unoptimizedAssetSize = unoptimizedAsset.toFile().length()
+
+        assertThat(optimizedAssetSize).isLessThanOrEqualTo(unoptimizedAssetSize)
+    }
 }
