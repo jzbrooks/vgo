@@ -2,6 +2,7 @@ package com.jzbrooks.guacamole.vd
 
 import com.jzbrooks.guacamole.core.Writer
 import com.jzbrooks.guacamole.core.graphic.*
+import com.jzbrooks.guacamole.core.graphic.command.CommandPrinter
 import com.jzbrooks.guacamole.vd.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
@@ -12,6 +13,8 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()) : Writer {
+
+    private val commandPrinter = CommandPrinter(3)
 
     override fun write(graphic: Graphic, stream: OutputStream) {
         require(graphic is VectorDrawable)
@@ -36,7 +39,8 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         val node = when (element) {
             is Path -> {
                 document.createElement("path").apply {
-                    setAttribute("android:pathData", element.commands.joinToString(separator = ""))
+                    val data = element.commands.joinToString(separator = "", transform = commandPrinter::print)
+                    setAttribute("android:pathData", data)
                 }
             }
             is Group -> {
@@ -48,7 +52,8 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
             }
             is ClipPath -> {
                 document.createElement("clip-path").apply {
-                    setAttribute("android:pathData", element.commands.joinToString(separator = ""))
+                    val data = element.commands.joinToString(separator = "", transform = commandPrinter::print)
+                    setAttribute("android:pathData", data)
                 }
             }
             is Extra -> {

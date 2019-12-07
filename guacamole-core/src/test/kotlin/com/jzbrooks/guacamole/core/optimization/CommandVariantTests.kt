@@ -37,7 +37,6 @@ class CommandVariantTests {
         // M100,1 L103,6 L106,7 93,10 C109,8 113,12 120,10 H101 V-8 H103 S113,39 105,-6 Q112,-10 109, -3 T100,0 A4,4,93,1,1,109,15 Z
         // M100,1 l3,5 l3,1 -13,3 c16,-2 20,2 27,0 H101 V-8 h2 s10,47 2,2 q7,-4 4,3 t-9,3 a4,3,93,1,1,9,15 Z
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(8)
-        assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)
     }
 
     @Test
@@ -100,7 +99,6 @@ class CommandVariantTests {
         CommandVariant().visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(8)
-        assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)
     }
 
     @Test
@@ -122,7 +120,6 @@ class CommandVariantTests {
         // M100,1 101,1 l2,5 l3,1 -13,3 Z
         // todo: the case of implicit commands in the initial moveto could be handled better
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(2)
-        assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)
     }
 
     @Test
@@ -141,7 +138,6 @@ class CommandVariantTests {
         CommandVariant().visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(2)
-        assertThat(copy.commands.joinToString("").length).isGreaterThan(path.commands.joinToString("").length)
     }
 
     @Test
