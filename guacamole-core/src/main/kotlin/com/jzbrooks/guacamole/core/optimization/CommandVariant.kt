@@ -6,8 +6,7 @@ import com.jzbrooks.guacamole.core.graphic.command.CommandVariant
 import com.jzbrooks.guacamole.core.util.math.Point
 import java.util.*
 
-// todo: handle precision better. Converted commands can be longer because they have more decimal places.
-class CommandVariant : TopDownOptimization, PathElementVisitor {
+class CommandVariant(private val commandPrinter: CommandPrinter) : TopDownOptimization, PathElementVisitor {
     private val subPathStart = Stack<Point>()
 
     // Updated once per process call when computing
@@ -58,7 +57,7 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
             )
         }
 
-        return if (convertedCommand.toString().length < command.toString().length) {
+        return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
         } else {
             command
@@ -82,7 +81,7 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
             )
         }
 
-        return if (convertedCommand.toString().length < command.toString().length) {
+        return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
         } else {
             command
@@ -106,7 +105,7 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
             )
         }
 
-        return if (convertedCommand.toString().length < command.toString().length) {
+        return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
         } else {
             command
@@ -134,7 +133,7 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
             )
         }
 
-        return if (convertedCommand.toString().length < command.toString().length) {
+        return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
         } else {
             command
@@ -170,7 +169,7 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
             )
         }
 
-        return if (convertedCommand.toString().length < command.toString().length) {
+        return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
         } else {
             command
@@ -204,7 +203,7 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
             )
         }
 
-        return if (convertedCommand.toString().length < command.toString().length) {
+        return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
         } else {
             command
@@ -238,7 +237,7 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
             )
         }
 
-        return if (convertedCommand.toString().length < command.toString().length) {
+        return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
         } else {
             command
@@ -264,7 +263,7 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
             )
         }
 
-        return if (convertedCommand.toString().length < command.toString().length) {
+        return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
         } else {
             command
@@ -292,7 +291,7 @@ class CommandVariant : TopDownOptimization, PathElementVisitor {
             )
         }
 
-        return if (convertedCommand.toString().length < command.toString().length) {
+        return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
         } else {
             command

@@ -11,6 +11,8 @@ import com.jzbrooks.guacamole.core.util.math.Point
 import org.junit.jupiter.api.Test
 
 class CommandVariantTests {
+    private val commandPrinter = CommandPrinter(3)
+
     @Test
     fun testConvertOnlyAbsoluteCommands() {
         val path = Path(
@@ -32,7 +34,7 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        CommandVariant().visit(path)
+        CommandVariant(commandPrinter).visit(path)
 
         // M100,1 L103,6 L106,7 93,10 C109,8 113,12 120,10 H101 V-8 H103 S113,39 105,-6 Q112,-10 109, -3 T100,0 A4,4,93,1,1,109,15 Z
         // M100,1 l3,5 l3,1 -13,3 c16,-2 20,2 27,0 H101 V-8 h2 s10,47 2,2 q7,-4 4,3 t-9,3 a4,3,93,1,1,9,15 Z
@@ -51,7 +53,7 @@ class CommandVariantTests {
                 )
         )
 
-        CommandVariant().visit(path)
+        CommandVariant(commandPrinter).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(1)
     }
@@ -68,7 +70,7 @@ class CommandVariantTests {
                 )
         )
 
-        CommandVariant().visit(path)
+        CommandVariant(commandPrinter).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(3)
     }
@@ -96,7 +98,7 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        CommandVariant().visit(path)
+        CommandVariant(commandPrinter).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(8)
     }
@@ -114,7 +116,7 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        CommandVariant().visit(path)
+        CommandVariant(commandPrinter).visit(path)
 
         // M100,1 101,1 L103,6 L106,7 93,10 Z
         // M100,1 101,1 l2,5 l3,1 -13,3 Z
@@ -135,7 +137,7 @@ class CommandVariantTests {
 
         val copy = path.copy()
 
-        CommandVariant().visit(path)
+        CommandVariant(commandPrinter).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(2)
     }
@@ -154,7 +156,7 @@ class CommandVariantTests {
                 )
         )
 
-        CommandVariant().visit(path)
+        CommandVariant(commandPrinter).visit(path)
 
         val lastLineTo = path.commands.filterIsInstance<LineTo>().last()
         assertThat(lastLineTo.variant).isEqualTo(CommandVariant.RELATIVE)
