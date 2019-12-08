@@ -1,10 +1,7 @@
 package com.jzbrooks.guacamole
 
 import assertk.assertThat
-import assertk.assertions.contains
-import assertk.assertions.doesNotContain
-import assertk.assertions.isEqualTo
-import assertk.assertions.matches
+import assertk.assertions.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -117,6 +114,15 @@ class CommandLineInterfaceTests {
         assertThat(exitCode).isEqualTo(0)
         val output = File("build/integrationTest/indent-test.xml").readText()
         assertThat(output).contains("    <path")
+    }
+
+    @Test
+    fun testFormatOption() {
+        val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/format-test.svg", "--format", "svg")
+        val exitCode = Guacamole().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        val output = File("build/integrationTest/format-test.svg").readText()
+        assertThat(output).startsWith("<svg")
     }
 
     companion object {
