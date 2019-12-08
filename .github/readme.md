@@ -14,7 +14,8 @@ Options:
   -o --output     file or directory, if not provided the input will be overwritten
   -s --stats      print statistics on processed files to standard out
   -v --version    print the version number
-  --indent [value]  write files with value columns of indentation  
+  --indent [value]  write files with value columns of indentation
+  --format value  output format (svg, vd (coming soon), etc)  
 ```
 
 ## Examples
