@@ -21,6 +21,7 @@ dependencies {
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.20")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.5.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.5.2")
 }
 
 tasks {
