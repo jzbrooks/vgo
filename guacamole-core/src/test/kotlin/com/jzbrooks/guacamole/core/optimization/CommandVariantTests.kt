@@ -32,8 +32,6 @@ class CommandVariantTests {
                 )
         )
 
-        val copy = path.copy()
-
         CommandVariant(commandPrinter).visit(path)
 
         // M100,1 L103,6 L106,7 93,10 C109,8 113,12 120,10 H101 V-8 H103 S113,39 105,-6 Q112,-10 109, -3 T100,0 A4,4,93,1,1,109,15 Z
@@ -96,8 +94,6 @@ class CommandVariantTests {
                 )
         )
 
-        val copy = path.copy()
-
         CommandVariant(commandPrinter).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(8)
@@ -113,8 +109,6 @@ class CommandVariantTests {
                         ClosePath()
                 )
         )
-
-        val copy = path.copy()
 
         CommandVariant(commandPrinter).visit(path)
 
@@ -134,8 +128,6 @@ class CommandVariantTests {
                         ClosePath()
                 )
         )
-
-        val copy = path.copy()
 
         CommandVariant(commandPrinter).visit(path)
 
