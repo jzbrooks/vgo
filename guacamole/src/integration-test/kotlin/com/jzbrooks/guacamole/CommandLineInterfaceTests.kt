@@ -39,7 +39,7 @@ class CommandLineInterfaceTests {
                 .start()
 
         assertThat(process.waitFor()).isEqualTo(0)
-        assertThat(standardOutput.readText()).matches(Regex("\\d+.\\d+.\\d+\n"))
+        assertThat(standardOutput.readText()).matches(Regex("\\d+.\\d+.\\d+\r?\n"))
     }
 
     @Test
@@ -51,7 +51,7 @@ class CommandLineInterfaceTests {
                 .start()
 
         assertThat(process.waitFor()).isEqualTo(0)
-        assertThat(standardOutput.readText()).matches(Regex("\\d+.\\d+.\\d+\n"))
+        assertThat(standardOutput.readText()).matches(Regex("\\d+.\\d+.\\d+\r?\n"))
     }
 
     @Test
