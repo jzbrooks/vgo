@@ -4,6 +4,7 @@ import com.jzbrooks.guacamole.core.Writer
 import com.jzbrooks.guacamole.svg.ScalableVectorGraphic
 import com.jzbrooks.guacamole.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.guacamole.svg.SvgOptimizationRegistry
+import com.jzbrooks.guacamole.svg.toVectorDrawable
 import com.jzbrooks.guacamole.util.xml.asSequence
 import com.jzbrooks.guacamole.vd.VectorDrawable
 import com.jzbrooks.guacamole.vd.VectorDrawableOptimizationRegistry
@@ -117,6 +118,10 @@ class Guacamole {
 
             if (graphic is VectorDrawable && outputFormat == "svg") {
                 graphic = graphic.toSvg()
+            }
+
+            if (graphic is ScalableVectorGraphic && outputFormat == "vd") {
+                graphic = graphic.toVectorDrawable()
             }
 
             val optimizationRegistry = when (graphic) {

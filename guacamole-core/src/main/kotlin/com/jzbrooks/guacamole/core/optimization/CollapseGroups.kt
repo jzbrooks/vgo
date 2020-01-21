@@ -1,11 +1,22 @@
 package com.jzbrooks.guacamole.core.optimization
 
-import com.jzbrooks.guacamole.core.graphic.ContainerElement
-import com.jzbrooks.guacamole.core.graphic.Element
-import com.jzbrooks.guacamole.core.graphic.Graphic
-import com.jzbrooks.guacamole.core.graphic.Group
+import com.jzbrooks.guacamole.core.graphic.*
 
 class CollapseGroups : Optimization {
+
+    // Groups play a serious role in clip paths for
+    // Android Vector Drawables. Perhaps this should
+    // eventually be a target-specific optimization
+    private val Group.isMergeable: Boolean
+        get() {
+            // todo(jzb): We should probably be more specific about clip paths here
+            val firstClipPath = elements.indexOfFirst { it !is Path }
+            val lastPath = elements.indexOfLast { it is Path }
+            val hasValidClipPath = firstClipPath != -1 && firstClipPath < lastPath
+
+            return !hasValidClipPath && elements.isNotEmpty() && attributes.isEmpty()
+        }
+
     override fun optimize(graphic: Graphic) {
         bottomUpVisit(graphic)
     }
@@ -16,7 +27,7 @@ class CollapseGroups : Optimization {
         val newElements = mutableListOf<Element>()
         for (child in element.elements) {
             val parent = bottomUpVisit(child)
-            if (parent is Group && parent.elements.isNotEmpty() && parent.attributes.isEmpty()) {
+            if (parent is Group && parent.isMergeable) {
                 newElements.addAll(parent.elements)
             } else {
                 newElements.add(parent)

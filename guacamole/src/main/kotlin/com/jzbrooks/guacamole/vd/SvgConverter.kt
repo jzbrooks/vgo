@@ -106,7 +106,7 @@ private fun convertContainerElementAttributes(attributes: MutableMap<String, Str
         svgPathElementAttributes[svgKey] = value
     }
 
-    val transform = computeTransformationMatrix(attributes.filterKeys(transformationPropertyNames::contains))
+    val transform = computeTransformationMatrix(attributes)
     if (transform != Matrix3.IDENTITY) {
         val matrixStringBuilder = StringBuilder("matrix(").apply {
             append(transform[0,0])
