@@ -88,9 +88,21 @@ class Guacamole {
             } else if (input.isDirectory && (output.isDirectory || !output.exists())) {
                 input.listFiles { file -> !file.isHidden }?.forEach { handleFile(it, File(output, it.name), writerOptions) }
             } else {
-                System.err.println("Input and output must be either files or directories.")
-                System.err.println("Input is a " + if (input.isFile) "file" else "directory")
-                System.err.println("Output is a " + if (output.isFile) "file" else "directory")
+                System.err.println("""
+                    Input and output must be either files or directories.
+                    Input is a ${if (input.isFile) "file" else "directory"}
+                        path: ${input.absolutePath}
+                        exists: ${input.exists()}
+                        isWritable: ${input.canWrite()}
+                    Output is a ${if (output.isFile) "file" else "directory"}
+                        path: ${output.absolutePath}
+                        exists: ${input.exists()}
+                        isWritable: ${input.canWrite()}
+                        
+                    Storage: ${output.usableSpace} / ${output.totalSpace} is usable.
+                """.trimIndent()
+                )
+
                 return 1
             }
         }
