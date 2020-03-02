@@ -78,7 +78,8 @@ class BaselineTests {
                 Path.of("src/integration-test/resources/simple_heart.xml") to Path.of("src/integration-test/resources/baseline/simple_heart_optimized.xml"),
                 Path.of("src/integration-test/resources/visibility_strike.xml") to Path.of("src/integration-test/resources/baseline/visibility_strike_optimized.xml"),
                 Path.of("src/integration-test/resources/simple_heart.svg") to Path.of("src/integration-test/resources/baseline/simple_heart_optimized.svg"),
-                Path.of("src/integration-test/resources/guacamole.svg") to Path.of("src/integration-test/resources/baseline/guacamole_optimized.svg")
+                Path.of("src/integration-test/resources/guacamole.svg") to Path.of("src/integration-test/resources/baseline/guacamole_optimized.svg"),
+                Path.of("src/integration-test/resources/dribbble_ball_mark.svg") to Path.of("src/integration-test/resources/baseline/dribbble_ball_mark_optimized.svg")
         )
 
         @JvmStatic

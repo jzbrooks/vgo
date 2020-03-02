@@ -7,7 +7,7 @@ import com.jzbrooks.guacamole.core.util.math.Point
 import java.util.*
 
 class CommandVariant(private val commandPrinter: CommandPrinter) : TopDownOptimization, PathElementVisitor {
-    private val subPathStart = Stack<Point>()
+    private val pathStart = Stack<Point>()
 
     // Updated once per process call when computing
     // the other variant of the command. This works
@@ -16,12 +16,10 @@ class CommandVariant(private val commandPrinter: CommandPrinter) : TopDownOptimi
     private lateinit var currentPoint: Point
 
     override fun visit(pathElement: PathElement) {
-        subPathStart.clear()
+        pathStart.clear()
+        currentPoint = Point(0f, 0f)
 
-        val initialMoveTo = pathElement.commands.first() as MoveTo
-        currentPoint = initialMoveTo.parameters.last().copy()
-
-        pathElement.commands = listOf(initialMoveTo) + pathElement.commands.asSequence().drop(1).map { command ->
+        pathElement.commands = pathElement.commands.asSequence().map { command ->
             when (command) {
                 is MoveTo -> process(command)
                 is LineTo -> process(command)
@@ -35,12 +33,10 @@ class CommandVariant(private val commandPrinter: CommandPrinter) : TopDownOptimi
                 is ClosePath -> process(command)
                 else -> throw IllegalStateException("Unsupported command encountered: $command")
             }
-        }
+        }.toList()
     }
 
     private fun process(command: MoveTo): MoveTo {
-        subPathStart.push(currentPoint.copy())
-
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
                     variant = CommandVariant.ABSOLUTE,
@@ -56,6 +52,8 @@ class CommandVariant(private val commandPrinter: CommandPrinter) : TopDownOptimi
                     }.also { currentPoint += it.last() }
             )
         }
+
+        pathStart.push(currentPoint.copy())
 
         return if (commandPrinter.print(convertedCommand).length < commandPrinter.print(command).length) {
             convertedCommand
@@ -299,10 +297,8 @@ class CommandVariant(private val commandPrinter: CommandPrinter) : TopDownOptimi
     }
 
     private fun process(command: ClosePath): ClosePath {
-        if (subPathStart.isNotEmpty()) {
-            currentPoint = subPathStart.pop()
-        }
-
+        // If there is a close path, there should be a corresponding path start entry on the stack
+        currentPoint = pathStart.pop()
         return command
     }
 }

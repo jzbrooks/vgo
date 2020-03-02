@@ -96,7 +96,7 @@ class CommandVariantTests {
 
         CommandVariant(commandPrinter).visit(path)
 
-        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(8)
+        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(9)
     }
 
     @Test
@@ -135,7 +135,7 @@ class CommandVariantTests {
     }
 
     @Test
-    fun testSubpathConversion() {
+    fun testNestedSubpathConversion() {
         val path = Path(
                 listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
@@ -143,7 +143,7 @@ class CommandVariantTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
                         ClosePath(),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(17f, 7f))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(107f, 7f))),
                         ClosePath()
                 )
         )
@@ -152,6 +152,28 @@ class CommandVariantTests {
 
         val lastLineTo = path.commands.filterIsInstance<LineTo>().last()
         assertThat(lastLineTo.variant).isEqualTo(CommandVariant.RELATIVE)
-        assertThat(lastLineTo.parameters.last()).isEqualTo(Point(2f, 2f))
+        assertThat(lastLineTo.parameters.last()).isEqualTo(Point(7f, 6f))
     }
+
+    @Test
+    fun testSequentialSubpathConversion() {
+        val path = Path(
+                listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(15f, 5f))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
+                        ClosePath(),
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(17f, 21f))),
+                        ClosePath()
+                )
+        )
+
+        CommandVariant(commandPrinter).visit(path)
+
+        val lastLineTo = path.commands.filterIsInstance<LineTo>().last()
+        assertThat(lastLineTo.variant).isEqualTo(CommandVariant.RELATIVE)
+        assertThat(lastLineTo.parameters.last()).isEqualTo(Point(7f, 6f))
+    }
+
 }
