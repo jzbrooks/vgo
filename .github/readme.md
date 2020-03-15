@@ -1,13 +1,13 @@
-## Guacamole
+## vgo
 
-Guacamole is a tool (similar to [avocado](https://github.com/alexjlockwood/avocado) and [svgo](https://github.com/svg/svgo)) for optimizing vector artwork files that helps ensure your vector artwork is represented compactly without compromising quality.
+vgo is a tool for optimizing vector artwork files that helps ensure your vector artwork is represented compactly without compromising quality.
 
-[![Build Status](https://github.com/jzbrooks/guacamole/workflows/build/badge.svg)](https://github.com/jzbrooks/guacamole/actions?workflow=build)
+[![Build Status](https://github.com/jzbrooks/vgo/workflows/build/badge.svg)](https://github.com/jzbrooks/vgo/actions?workflow=build)
 
 ## Command Line Interface
 
 ```
-> guacamole [options] [file/directory]
+> vgo [options] [file/directory]
 
 Options:
   -h --help       print this message
@@ -22,16 +22,16 @@ Options:
 
 ```
 # Optimize files specified from standard in
-> find ./**/ic_*.xml | guacamole
+> find ./**/ic_*.xml | vgo
 
 # Optimize vector.xml and overwrite its contents
-> guacamole vector.xml
+> vgo vector.xml
 
 # Optimize vector.xml and write the result into new_vector.xml
-> guacamole vector.xml -o new_vector.xml
+> vgo vector.xml -o new_vector.xml
 
 # Optimize multiple input sources write results to the
-> guacamole vector.xml -o new_vector.xml ./assets -o ./new_assets
+> vgo vector.xml -o new_vector.xml ./assets -o ./new_assets
 ```
 
 ## Build instructions

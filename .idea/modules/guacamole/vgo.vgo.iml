@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="ExternalSystem" externalSystem="GRADLE" externalSystemModuleGroup="vgo" externalSystemModuleVersion="unspecified" linkedProjectId=":vgo" linkedProjectPath="$MODULE_DIR$/../../../vgo" rootProjectPath="$MODULE_DIR$/../../.." />
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../../vgo">
+      <excludeFolder url="file://$MODULE_DIR$/../../../guacamole/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../vgo/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../vgo/build" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

@@ -7,4 +7,4 @@
  * in the user manual at https://docs.gradle.org/5.6/userguide/multi_project_builds.html
  */
 
-include("guacamole", "guacamole-core")
+include("vgo", "vgo-core")

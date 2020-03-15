@@ -2,15 +2,14 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/guacamole.iml" filepath="$PROJECT_DIR$/guacamole.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.test.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole-core/guacamole.guacamole-core.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.integrationTest.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.integrationTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.main.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.test.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole/guacamole.guacamole.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/projects.guacamole.iml" filepath="$PROJECT_DIR$/.idea/modules/projects.guacamole.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vgo.iml" filepath="$PROJECT_DIR$/.idea/modules/vgo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/guacamole/vgo.vgo.iml" filepath="$PROJECT_DIR$/.idea/modules/guacamole/vgo.vgo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vgo-core/vgo.vgo-core.iml" filepath="$PROJECT_DIR$/.idea/modules/vgo-core/vgo.vgo-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vgo-core/vgo.vgo-core.main.iml" filepath="$PROJECT_DIR$/.idea/modules/vgo-core/vgo.vgo-core.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vgo-core/vgo.vgo-core.test.iml" filepath="$PROJECT_DIR$/.idea/modules/vgo-core/vgo.vgo-core.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vgo/vgo.vgo.integrationTest.iml" filepath="$PROJECT_DIR$/.idea/modules/vgo/vgo.vgo.integrationTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vgo/vgo.vgo.main.iml" filepath="$PROJECT_DIR$/.idea/modules/vgo/vgo.vgo.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vgo/vgo.vgo.test.iml" filepath="$PROJECT_DIR$/.idea/modules/vgo/vgo.vgo.test.iml" />
     </modules>
   </component>
 </project>

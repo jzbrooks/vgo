@@ -1,5 +1,5 @@
--injars       guacamole/build/libs/debug/guacamole.jar
--outjars      guacamole/build/libs/guacamole.jar
+-injars       vgo/build/libs/debug/vgo.jar
+-outjars      vgo/build/libs/vgo.jar
 -libraryjars  <java.home>/jmods
 
 -dontobfuscate
@@ -9,6 +9,6 @@
 -dontskipnonpubliclibraryclasses
 -mergeinterfacesaggressively
 
--keep class com.jzbrooks.guacamole.Guacamole {
+-keep class com.jzbrooks.vgo.Application {
   public static void main(java.lang.String[]);
 }

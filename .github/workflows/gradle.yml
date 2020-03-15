@@ -15,25 +15,25 @@ jobs:
         java-version: 13
     - name: build
       run: ./gradlew build
-    - name: archive guacamole test results
+    - name: archive vgo test results
       uses: actions/upload-artifact@v1
       with:
-        name: guacamole_test_results
-        path: guacamole/build/reports/tests/test/
-    - name: archive guacamole core test results
+        name: vgo_test_results
+        path: vgo/build/reports/tests/test/
+    - name: archive vgo core test results
       uses: actions/upload-artifact@v1
       with:
-        name: guacamole_core_test_results
-        path: guacamole-core/build/reports/tests/test/
+        name: vgo_core_test_results
+        path: vgo-core/build/reports/tests/test/
     - name: archive integration test results
       uses: actions/upload-artifact@v1
       with:
         name: integration_test_results
-        path: guacamole/build/reports/tests/integrationTest
+        path: vgo/build/reports/tests/integrationTest
     - name: optimize
       run: ./gradlew optimize
-    - name: archive guacamole
+    - name: archive vgo
       uses: actions/upload-artifact@v1
       with:
-        name: guacamole.jar
-        path: guacamole/build/libs/guacamole.jar
+        name: vgo.jar
+        path: vgo/build/libs/vgo.jar
