@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.willowtreeapps.assertk:assertk-jvm:0.22">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.willowtreeapps.assertk/assertk-jvm/0.22/fbd2dad91770d2772b1588a4da6b3e7437018108/assertk-jvm-0.22.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.willowtreeapps.assertk/assertk-jvm/0.22/f0a9ce5a177d371fecaf08d1bd14c26a668c83cb/assertk-jvm-0.22-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
