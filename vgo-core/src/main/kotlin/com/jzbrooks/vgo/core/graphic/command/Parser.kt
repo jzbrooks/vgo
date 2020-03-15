@@ -148,7 +148,5 @@ inline class CommandString(val data: String) {
     companion object {
         private val commandRegex = Regex("(?=[MmLlHhVvCcSsQqTtAaZz])\\s*")
         private val number = Regex("[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?")
-        private val separator = Regex("[,\\s]")
-        private val points = Regex("${number.pattern}${separator.pattern}${number.pattern}")
     }
 }
