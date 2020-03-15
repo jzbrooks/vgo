@@ -21,4 +21,10 @@ allprojects {
             freeCompilerArgs = listOf("-Xinline-classes")
         }
     }
+
+    tasks.withType<Test> {
+        addTestOutputListener { desc, result -> 
+            println("${desc.name}: ${result.message}")
+        }
+    }
 }
