@@ -2,7 +2,6 @@ package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.graphic.*
-import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.svg.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
@@ -14,7 +13,7 @@ import javax.xml.transform.stream.StreamResult
 
 class ScalableVectorGraphicWriter(override val options: Set<Writer.Option> = emptySet()) : Writer {
 
-    private val commandPrinter = CommandPrinter(3)
+    private val commandPrinter = ScalableVectorGraphicCommandPrinter(3)
 
     override fun write(graphic: Graphic, stream: OutputStream) {
         require(graphic is ScalableVectorGraphic)

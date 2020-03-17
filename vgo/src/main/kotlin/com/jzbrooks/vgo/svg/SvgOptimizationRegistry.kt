@@ -1,6 +1,5 @@
 package com.jzbrooks.vgo.svg
 
-import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.core.optimization.*
 import com.jzbrooks.vgo.core.optimization.OptimizationRegistry
 import com.jzbrooks.vgo.svg.optimization.BakeTransformations
@@ -11,7 +10,7 @@ class SvgOptimizationRegistry : OptimizationRegistry(topDownOptimizations, empty
         private val topDownOptimizations: List<TopDownOptimization> = listOf(
                 BakeTransformations(),
                 BreakoutImplicitCommands(),
-                CommandVariant(CommandPrinter(3)),
+                CommandVariant(ScalableVectorGraphicCommandPrinter(3)),
                 RemoveRedundantCommands(),
                 SimplifyLineCommands(0.00001f)
         )

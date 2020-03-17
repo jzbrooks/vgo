@@ -10,7 +10,12 @@ import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
 class CommandVariantTests {
-    private val commandPrinter = CommandPrinter(3)
+    // This is okay because this optimization only ever compares
+    // two commands of the same type, which should have similar
+    // string representations by default
+    private val commandPrinter = object : CommandPrinter {
+        override fun print(command: Command) = command.toString()
+    }
 
     @Test
     fun testConvertOnlyAbsoluteCommands() {
@@ -174,5 +179,4 @@ class CommandVariantTests {
         assertThat(lastLineTo.variant).isEqualTo(CommandVariant.RELATIVE)
         assertThat(lastLineTo.parameters.last()).isEqualTo(Point(7f, 6f))
     }
-
 }
