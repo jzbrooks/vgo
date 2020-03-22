@@ -40,7 +40,8 @@
     <output url="file://$MODULE_DIR$/../../../vgo/build/classes/java/integrationTest" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../vgo/src/integration-test">
-      <sourceFolder url="file://$MODULE_DIR$/../../../vgo/src/integration-test/kotlin" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../vgo/src/integration-test/kotlin" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../vgo/src/integration-test/resources" type="java-test-resource" />
     </content>
     <content url="file://$MODULE_DIR$/../../../vgo/src/integrationTest" />
     <orderEntry type="inheritedJdk" />
