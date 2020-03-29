@@ -1,7 +1,6 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.optimization.*
-import com.jzbrooks.vgo.core.optimization.OptimizationRegistry
 import com.jzbrooks.vgo.vd.optimization.BakeTransformations
 
 class VectorDrawableOptimizationRegistry : OptimizationRegistry(topDownOptimizations, emptyList(), wholeGraphicOptimizations) {
@@ -12,7 +11,8 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(topDownOptimizat
                 BreakoutImplicitCommands(),
                 CommandVariant(VectorDrawableCommandPrinter(3)),
                 RemoveRedundantCommands(),
-                SimplifyLineCommands(0.00001f)
+                SimplifyLineCommands(0.00001f),
+                RemoveRedundantCommands()
         )
 
         private val wholeGraphicOptimizations = listOf(
