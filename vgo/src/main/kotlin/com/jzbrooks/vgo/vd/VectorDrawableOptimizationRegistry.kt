@@ -9,9 +9,11 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(topDownOptimizat
         private val topDownOptimizations: List<TopDownOptimization> = listOf(
                 BakeTransformations(),
                 BreakoutImplicitCommands(),
+                CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(0.00001f),
+                UseShorthand(),
                 RemoveRedundantCommands(),
-                CommandVariant(VectorDrawableCommandPrinter(3))
+                CommandVariant(CommandVariant.Mode.Compact(VectorDrawableCommandPrinter(3)))
         )
 
         private val wholeGraphicOptimizations = listOf(

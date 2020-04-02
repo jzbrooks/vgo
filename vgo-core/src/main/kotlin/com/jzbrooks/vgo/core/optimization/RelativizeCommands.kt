@@ -6,7 +6,7 @@ import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.util.math.Point
 import java.util.*
 
-class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementVisitor {
+class RelativizeCommands : TopDownOptimization, PathElementVisitor {
     private val pathStart = Stack<Point>()
 
     // Updated once per process call when computing
@@ -55,7 +55,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
 
         pathStart.push(currentPoint.copy())
 
-        return choose(convertedCommand, command)
+        return if (convertedCommand.variant == CommandVariant.RELATIVE) convertedCommand else command
     }
 
     private fun process(command: LineTo): LineTo {
@@ -75,7 +75,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
             )
         }
 
-        return choose(convertedCommand, command)
+        return if (convertedCommand.variant == CommandVariant.RELATIVE) convertedCommand else command
     }
 
     private fun process(command: HorizontalLineTo): HorizontalLineTo {
@@ -95,7 +95,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
             )
         }
 
-        return choose(convertedCommand, command)
+        return if (convertedCommand.variant == CommandVariant.RELATIVE) convertedCommand else command
     }
 
     private fun process(command: VerticalLineTo): VerticalLineTo {
@@ -119,39 +119,39 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
             )
         }
 
-        return choose(convertedCommand, command)
+        return if (convertedCommand.variant == CommandVariant.RELATIVE) convertedCommand else command
     }
 
     private fun process(command: CubicBezierCurve): CubicBezierCurve {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
-                variant = CommandVariant.ABSOLUTE,
-                parameters = command.parameters.map {
-                    it.copy(
-                            startControl = it.startControl + currentPoint,
-                            endControl = it.endControl + currentPoint,
-                            end = it.end + currentPoint
-                    )
-                }.also {
-                    currentPoint = it.last().end.copy()
-                }
+                    variant = CommandVariant.ABSOLUTE,
+                    parameters = command.parameters.map {
+                        it.copy(
+                                startControl = it.startControl + currentPoint,
+                                endControl = it.endControl + currentPoint,
+                                end = it.end + currentPoint
+                        )
+                    }.also {
+                        currentPoint = it.last().end.copy()
+                    }
             )
         } else {
             command.copy(
-                variant = CommandVariant.RELATIVE,
-                parameters = command.parameters.map {
-                    it.copy(
-                            startControl = it.startControl - currentPoint,
-                            endControl = it.endControl - currentPoint,
-                            end = it.end - currentPoint
-                    )
-                }.also {
-                    currentPoint += it.last().end
-                }
+                    variant = CommandVariant.RELATIVE,
+                    parameters = command.parameters.map {
+                        it.copy(
+                                startControl = it.startControl - currentPoint,
+                                endControl = it.endControl - currentPoint,
+                                end = it.end - currentPoint
+                        )
+                    }.also {
+                        currentPoint += it.last().end
+                    }
             )
         }
 
-        return choose(convertedCommand, command)
+        return if (convertedCommand.variant == CommandVariant.RELATIVE) convertedCommand else command
     }
 
     private fun process(command: ShortcutCubicBezierCurve): ShortcutCubicBezierCurve {
@@ -181,7 +181,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
             )
         }
 
-        return choose(convertedCommand, command)
+        return if (convertedCommand.variant == CommandVariant.RELATIVE) convertedCommand else command
     }
 
     private fun process(command: QuadraticBezierCurve): QuadraticBezierCurve {
@@ -211,7 +211,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
             )
         }
 
-        return choose(convertedCommand, command)
+        return if (convertedCommand.variant == CommandVariant.RELATIVE) convertedCommand else command
     }
 
     private fun process(command: ShortcutQuadraticBezierCurve): ShortcutQuadraticBezierCurve {
@@ -233,7 +233,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
             )
         }
 
-        return choose(convertedCommand, command)
+        return if (convertedCommand.variant == CommandVariant.RELATIVE) convertedCommand else command
     }
 
     private fun process(command: EllipticalArcCurve): EllipticalArcCurve {
@@ -257,42 +257,12 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
             )
         }
 
-        return choose(convertedCommand, command)
+        return if (convertedCommand.variant == CommandVariant.RELATIVE) convertedCommand else command
     }
 
     private fun process(command: ClosePath): ClosePath {
         // If there is a close path, there should be a corresponding path start entry on the stack
         currentPoint = pathStart.pop()
         return command
-    }
-
-    private fun <T : ParameterizedCommand<*>> choose(convertedCommand: T, command: T): T {
-        return when (mode) {
-            is Mode.Absolute -> {
-                if (convertedCommand.variant == CommandVariant.ABSOLUTE)
-                    convertedCommand
-                else
-                    command
-            }
-            is Mode.Relative -> {
-                if (convertedCommand.variant == CommandVariant.RELATIVE)
-                    convertedCommand
-                else
-                    command
-            }
-            is Mode.Compact -> {
-                return if (mode.printer.print(convertedCommand).length < mode.printer.print(command).length) {
-                    convertedCommand
-                } else {
-                    command
-                }
-            }
-        }
-    }
-
-    sealed class Mode {
-        object Absolute : Mode()
-        object Relative : Mode()
-        data class Compact(val printer: CommandPrinter) : Mode()
     }
 }

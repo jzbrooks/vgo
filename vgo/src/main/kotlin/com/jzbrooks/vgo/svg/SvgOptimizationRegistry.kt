@@ -10,7 +10,7 @@ class SvgOptimizationRegistry : OptimizationRegistry(topDownOptimizations, empty
         private val topDownOptimizations: List<TopDownOptimization> = listOf(
                 BakeTransformations(),
                 BreakoutImplicitCommands(),
-                CommandVariant(ScalableVectorGraphicCommandPrinter(3)),
+                CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3))),
                 RemoveRedundantCommands(),
                 SimplifyLineCommands(0.00001f)
         )
