@@ -11,7 +11,7 @@ class RemoveRedundantCommands : TopDownOptimization, PathElementVisitor {
 
         if (commandCount > 0) {
             val commands = mutableListOf<Command>((pathElement.commands.first() as MoveTo).copy())
-            loop@ for (current in pathElement.commands.slice(1 until commandCount)) {
+            loop@ for (current in pathElement.commands.drop(1)) {
                 assert((current as? ParameterizedCommand<*>)?.variant != CommandVariant.ABSOLUTE)
 
                 when (current) {

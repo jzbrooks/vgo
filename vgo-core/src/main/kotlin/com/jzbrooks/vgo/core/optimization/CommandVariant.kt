@@ -19,7 +19,19 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
         pathStart.clear()
         currentPoint = Point(0f, 0f)
 
-        pathElement.commands = pathElement.commands.asSequence().map { command ->
+        val firstMoveTo = pathElement.commands.take(1).map {
+            val moveTo = it as MoveTo
+            // The first M/m is always treated as absolute.
+            // This is accomplished by initializing the current point
+            // to the origin and adding the next current point values.
+            // Absolute values are relative to the origin, so += means
+            // the same thing here.
+            currentPoint += moveTo.parameters.last()
+            pathStart.push(currentPoint.copy())
+            moveTo
+        }
+
+        val commands = pathElement.commands.drop(1).map { command ->
             when (command) {
                 is MoveTo -> process(command)
                 is LineTo -> process(command)
@@ -33,7 +45,9 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
                 is ClosePath -> process(command)
                 else -> throw IllegalStateException("Unsupported command encountered: $command")
             }
-        }.toList()
+        }
+
+        pathElement.commands = firstMoveTo + commands
     }
 
     private fun process(command: MoveTo): MoveTo {

@@ -14,8 +14,8 @@ class SvgOptimizationRegistry : OptimizationRegistry(topDownOptimizations, empty
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(0.00001f),
                 SimplifyBezierCurveCommands(),
-                RemoveRedundantCommands(),
-                CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3)))
+                RemoveRedundantCommands()
+                // CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3)))
         )
 
         private val wholeGraphicOptimizations = listOf(
