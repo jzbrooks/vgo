@@ -1,9 +1,7 @@
 package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.optimization.*
-import com.jzbrooks.vgo.core.optimization.OptimizationRegistry
 import com.jzbrooks.vgo.svg.optimization.BakeTransformations
-import com.jzbrooks.vgo.vd.VectorDrawableCommandPrinter
 
 class SvgOptimizationRegistry : OptimizationRegistry(topDownOptimizations, emptyList(), wholeGraphicOptimizations) {
 
@@ -14,8 +12,8 @@ class SvgOptimizationRegistry : OptimizationRegistry(topDownOptimizations, empty
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(0.00001f),
                 SimplifyBezierCurveCommands(),
-                RemoveRedundantCommands()
-                // CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3)))
+                RemoveRedundantCommands(),
+                CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3)))
         )
 
         private val wholeGraphicOptimizations = listOf(
