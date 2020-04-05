@@ -1,17 +1,34 @@
 package com.jzbrooks.vgo.core.optimization
 
 import com.jzbrooks.vgo.core.graphic.PathElement
-import com.jzbrooks.vgo.core.graphic.command.Command
-import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
-import com.jzbrooks.vgo.core.graphic.command.LineTo
-import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import kotlin.math.sign
 
 class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization, PathElementVisitor {
+    lateinit var commands: MutableList<Command>
     override fun visit(pathElement: PathElement) {
-        pathElement.commands = pathElement.commands.map(::process)
+        commands = mutableListOf()
+
+        if (pathElement.commands.isNotEmpty()) {
+            commands.add((pathElement.commands.first() as MoveTo).copy())
+            for (command in pathElement.commands.drop(1)) {
+
+                assert((command as? ParameterizedCommand<*>)?.variant != CommandVariant.ABSOLUTE)
+                assert((command as? HorizontalLineTo)?.parameters?.size ?: 0 < 2)
+                assert((command as? VerticalLineTo)?.parameters?.size ?: 0 < 2)
+
+                val processedCommand = process(command)
+                if (processedCommand != null) {
+                    commands.add(processedCommand)
+                }
+            }
+        }
+
+        pathElement.commands = commands
     }
 
-    private fun process(command: Command): Command {
+    private fun process(command: Command): Command? {
         return when (command) {
             is LineTo -> {
                 val firstParameter = command.parameters.first()
@@ -22,7 +39,26 @@ class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization, 
                     else -> command
                 }
             }
-            // todo: convert straight curves and arcs
+            is HorizontalLineTo -> {
+                val lastAdded = commands.last()
+                when {
+                    lastAdded is HorizontalLineTo && lastAdded.parameters.last().sign == command.parameters.last().sign -> {
+                        lastAdded.parameters = listOf(lastAdded.parameters.last() + command.parameters.last())
+                        null
+                    }
+                    else -> command
+                }
+            }
+            is VerticalLineTo -> {
+                val lastAdded = commands.last()
+                when {
+                    lastAdded is VerticalLineTo && lastAdded.parameters.last().sign == command.parameters.last().sign -> {
+                        lastAdded.parameters = listOf(lastAdded.parameters.last() + command.parameters.last())
+                        null
+                    }
+                    else -> command
+                }
+            }
             else -> command
         }
     }
