@@ -11,7 +11,7 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(topDownOptimizat
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(0.00001f),
-                SimplifyBezierCurveCommands(),
+                SimplifyBezierCurveCommands(0.00001f),
                 RemoveRedundantCommands(),
                 CommandVariant(CommandVariant.Mode.Compact(VectorDrawableCommandPrinter(3)))
         )

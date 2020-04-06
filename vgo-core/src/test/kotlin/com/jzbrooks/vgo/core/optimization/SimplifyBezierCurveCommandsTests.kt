@@ -23,7 +23,7 @@ class SimplifyBezierCurveCommandsTests {
                 )
         )
 
-        SimplifyBezierCurveCommands().visit(path)
+        SimplifyBezierCurveCommands(0.00001f).visit(path)
 
         assertThat(path.commands.last()::class).isEqualTo(ShortcutCubicBezierCurve::class)
     }
@@ -42,7 +42,7 @@ class SimplifyBezierCurveCommandsTests {
                 )
         )
 
-        SimplifyBezierCurveCommands().visit(path)
+        SimplifyBezierCurveCommands(0.00001f).visit(path)
 
         assertThat(path.commands.last()::class).isEqualTo(ShortcutCubicBezierCurve::class)
     }
@@ -58,7 +58,7 @@ class SimplifyBezierCurveCommandsTests {
                 )
         )
 
-        SimplifyBezierCurveCommands().visit(path)
+        SimplifyBezierCurveCommands(0.00001f).visit(path)
 
         assertThat(path.commands.last()::class).isEqualTo(ShortcutCubicBezierCurve::class)
     }
@@ -77,7 +77,7 @@ class SimplifyBezierCurveCommandsTests {
                 )
         )
 
-        SimplifyBezierCurveCommands().visit(path)
+        SimplifyBezierCurveCommands(0.00001f).visit(path)
 
         assertThat(path.commands.last()::class).isEqualTo(ShortcutQuadraticBezierCurve::class)
     }
@@ -87,6 +87,9 @@ class SimplifyBezierCurveCommandsTests {
         val path = Path(
                 listOf(
                         MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 200f))),
+                        QuadraticBezierCurve(CommandVariant.RELATIVE, listOf(
+                                QuadraticBezierCurve.Parameter(Point(-300f, 100f), Point(150f, 50f)))
+                        ),
                         ShortcutQuadraticBezierCurve(CommandVariant.RELATIVE, listOf(
                                 Point(250f, 200f))
                         ),
@@ -96,8 +99,44 @@ class SimplifyBezierCurveCommandsTests {
                 )
         )
 
-        SimplifyBezierCurveCommands().visit(path)
+        SimplifyBezierCurveCommands(0.00001f).visit(path)
 
         assertThat(path.commands.last()::class).isEqualTo(ShortcutQuadraticBezierCurve::class)
+    }
+
+    @Test
+    fun testStraightCubicBezierCurveIsConvertedToLineTo() {
+        val path = Path(
+                listOf(
+                        MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 200f))),
+                        CubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                                CubicBezierCurve.Parameter(Point(20f, 20f), Point(20f, 20f), Point(20f, 20f)))
+                        )
+                )
+        )
+
+        SimplifyBezierCurveCommands(0.00001f).visit(path)
+
+        assertThat(path.commands.last()::class).isEqualTo(LineTo::class)
+    }
+
+    @Test
+    fun testShortcutCubicIsExpandedIfPreviousIsStraightened() {
+        val path = Path(
+                listOf(
+                        MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 200f))),
+                        CubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                                CubicBezierCurve.Parameter(Point(20f, 20f), Point(20f, 20f), Point(20f, 20f)))
+                        ),
+                        ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                                ShortcutCubicBezierCurve.Parameter(Point(450f, 100f), Point(250f, 200f)))
+                        )
+                )
+        )
+
+        SimplifyBezierCurveCommands(0.00001f).visit(path)
+
+        assertThat(path.commands.last()::class).isEqualTo(CubicBezierCurve::class)
+        assertThat((path.commands.last() as CubicBezierCurve).parameters.last().startControl).isEqualTo(Point.zero)
     }
 }

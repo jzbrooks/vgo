@@ -11,7 +11,7 @@ class SvgOptimizationRegistry : OptimizationRegistry(topDownOptimizations, empty
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(0.00001f),
-                SimplifyBezierCurveCommands(),
+                SimplifyBezierCurveCommands(0.00001f),
                 RemoveRedundantCommands(),
                 CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3)))
         )
