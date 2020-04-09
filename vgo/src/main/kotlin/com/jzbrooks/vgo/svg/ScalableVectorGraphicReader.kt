@@ -6,6 +6,7 @@ import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.svg.graphic.ClipPath
 import com.jzbrooks.vgo.util.xml.asSequence
 import com.jzbrooks.vgo.util.xml.toMutableMap
+import org.w3c.dom.Comment
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 
@@ -20,7 +21,7 @@ fun parse(root: Node): ScalableVectorGraphic {
 }
 
 private fun parseElement(node: Node): Element? {
-    return if (node !is Text) {
+    return if (node !is Text && node !is Comment) {
         when (node.nodeName) {
             "g" -> parseContainerElement(node, ::Group)
             "clipPath" -> parseContainerElement(node, ::ClipPath)

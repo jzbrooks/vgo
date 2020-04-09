@@ -88,7 +88,7 @@ class VectorDrawableReaderTests {
     }
 
     @Test
-    fun testParseComment() {
+    fun testIgnoreComment() {
         val commentDocument = ByteArrayInputStream("<vector><!-- test comment --></vector>".toByteArray()).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
                 documentElement.normalize()
@@ -97,10 +97,7 @@ class VectorDrawableReaderTests {
 
         val graphic: Graphic = parse(commentDocument.firstChild)
 
-        val unknown = graphic.elements.first() as Extra
-
-        assertThat(unknown.name).isEqualTo(" test comment ")
-        assertThat(unknown.elements).isEmpty()
+        assertThat(graphic.elements).isEmpty()
     }
 
     @Test

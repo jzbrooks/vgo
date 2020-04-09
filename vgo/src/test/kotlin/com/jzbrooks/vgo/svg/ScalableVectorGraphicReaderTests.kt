@@ -85,7 +85,7 @@ class ScalableVectorGraphicReaderTests {
     }
 
     @Test
-    fun testParseComment() {
+    fun testIgnoreComment() {
         val commentDocument = ByteArrayInputStream("<svg><!-- test comment --></svg>".toByteArray()).use { input ->
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
                 documentElement.normalize()
@@ -94,10 +94,7 @@ class ScalableVectorGraphicReaderTests {
 
         val graphic: Graphic = parse(commentDocument.firstChild)
 
-        val unknown = graphic.elements.first() as Extra
-
-        assertThat(unknown.name).isEqualTo(" test comment ")
-        assertThat(unknown.elements).isEmpty()
+        assertThat(graphic.elements).isEmpty()
     }
 
     @Test

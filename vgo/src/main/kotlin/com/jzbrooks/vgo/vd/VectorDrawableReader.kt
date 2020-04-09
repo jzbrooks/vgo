@@ -6,6 +6,7 @@ import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.util.xml.asSequence
 import com.jzbrooks.vgo.util.xml.toMutableMap
 import com.jzbrooks.vgo.vd.graphic.ClipPath
+import org.w3c.dom.Comment
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 
@@ -20,7 +21,7 @@ fun parse(root: Node): VectorDrawable {
 }
 
 private fun parseElement(node: Node): Element? {
-    return if (node !is Text) {
+    return if (node !is Text && node !is Comment) {
         when (node.nodeName) {
             "group" -> parseGroup(node)
             "path" -> parsePathElement(node, ::Path)
