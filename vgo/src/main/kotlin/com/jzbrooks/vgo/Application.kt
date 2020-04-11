@@ -86,7 +86,12 @@ class Application {
             if (input.isFile && (output.isFile || !output.exists())) {
                 handleFile(input, output, writerOptions)
             } else if (input.isDirectory && (output.isDirectory || !output.exists())) {
-                input.listFiles { file -> !file.isHidden }?.forEach { handleFile(it, File(output, it.name), writerOptions) }
+                input.listFiles { file -> !file.isHidden }?.forEach { file ->
+                    if (printStats) {
+                        println("\n${file.path}")
+                    }
+                    handleFile(file, File(output, file.name), writerOptions)
+                }
             } else {
                 System.err.println("""
                     Input and output must be either files or directories.
@@ -120,12 +125,10 @@ class Application {
 
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
             var graphic = when {
-                rootNodes.any { it.nodeName == "svg" } -> com.jzbrooks.vgo.svg.parse(rootNodes.first())
-                rootNodes.any { it.nodeName == "vector" } -> com.jzbrooks.vgo.vd.parse(rootNodes.first())
-                else -> throw UnsupportedOperationException(
-                        """No supported formats were found in the document.
-                           |roots:${rootNodes.map { it.nodeName }}""".trimMargin()
-                )
+                rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> com.jzbrooks.vgo.svg.parse(rootNodes.first())
+                rootNodes.any { it.nodeName == "vector" || input.extension == "xml"} -> com.jzbrooks.vgo.vd.parse(rootNodes.first())
+                else -> throw IllegalStateException("""No supported formats were found in the document.
+                           |roots:${rootNodes.joinToString { it.nodeName }}""".trimMargin())
             }
 
             if (graphic is VectorDrawable && outputFormat == "svg") {
@@ -151,7 +154,8 @@ class Application {
                 if (graphic is VectorDrawable) {
                     val writer = VectorDrawableWriter(options)
                     writer.write(graphic, outputStream)
-                } else {
+                }
+                if (graphic is ScalableVectorGraphic){
                     val writer = ScalableVectorGraphicWriter(options)
                     writer.write(graphic, outputStream)
                 }
@@ -159,8 +163,8 @@ class Application {
                 if (printStats) {
                     val sizeAfter = outputStream.channel.size()
                     val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
-                    println("Size before: $sizeBefore")
-                    println("Size after: $sizeAfter")
+                    println("Size before: ${sizeBefore}B")
+                    println("Size after: ${sizeAfter}B")
                     println("Percent saved: $percentSaved")
                 }
             }
