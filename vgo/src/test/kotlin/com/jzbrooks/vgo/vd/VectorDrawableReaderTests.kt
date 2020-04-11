@@ -1,10 +1,7 @@
 package com.jzbrooks.vgo.vd
 
 import assertk.assertThat
-import assertk.assertions.containsExactly
-import assertk.assertions.hasSize
-import assertk.assertions.isEmpty
-import assertk.assertions.isEqualTo
+import assertk.assertions.*
 import com.jzbrooks.vgo.assertk.extensions.containsKey
 import com.jzbrooks.vgo.assertk.extensions.containsKeys
 import com.jzbrooks.vgo.assertk.extensions.doesNotContainKey
@@ -156,5 +153,27 @@ class VectorDrawableReaderTests {
 
         assertThat(unknown.name).isEqualTo("bicycle")
         assertThat(unknown.elements).containsExactly(expectedChild)
+    }
+
+    @Test
+    fun testPathDataSpecifiedWithResourceIsUntouched() {
+        val vectorText = """
+            |<vector>
+            |  <path android:pathData="@string/path_data" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
+
+        val path = graphic.elements.first() as Path
+
+        assertThat(path.commands).isEmpty()
+        assertThat(path.attributes).contains("android:pathData", "@string/path_data")
     }
 }

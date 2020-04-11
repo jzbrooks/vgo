@@ -47,8 +47,15 @@ private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Comm
             .associate { attribute -> attribute.nodeName to attribute.nodeValue }
             .toMutableMap()
 
-    val data = CommandString(node.attributes.getNamedItem("android:pathData").textContent)
-    return generator(data.toCommandList(), metadata)
+    val pathDataString = node.attributes.getNamedItem("android:pathData").textContent
+
+    return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
+        metadata["android:pathData"] = pathDataString
+        generator(emptyList(), metadata)
+    } else {
+        val data = CommandString(pathDataString)
+        generator(data.toCommandList(), metadata)
+    }
 }
 
 private fun parseExtraElement(node: Node): Extra {
