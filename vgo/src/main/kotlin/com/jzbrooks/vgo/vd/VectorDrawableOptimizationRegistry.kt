@@ -7,7 +7,6 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(topDownOptimizat
 
     companion object {
         private val topDownOptimizations: List<TopDownOptimization> = listOf(
-                BakeTransformations(),
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(0.00001f),
@@ -17,6 +16,7 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(topDownOptimizat
         )
 
         private val wholeGraphicOptimizations = listOf(
+                BakeTransformations(),
                 CollapseGroups(),
                 MergePaths(),
                 RemoveEmptyGroups()

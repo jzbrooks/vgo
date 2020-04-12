@@ -1,9 +1,9 @@
 package com.jzbrooks.vgo.vd.optimization
 
-import com.jzbrooks.vgo.core.graphic.Group
-import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.optimization.GroupVisitor
+import com.jzbrooks.vgo.core.optimization.Optimization
 import com.jzbrooks.vgo.core.optimization.TopDownOptimization
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
@@ -13,9 +13,23 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BakeTransformations : TopDownOptimization, GroupVisitor {
-    override fun visit(group: Group) {
-        bakeIntoGroup(group)
+class BakeTransformations : Optimization {
+
+    override fun optimize(graphic: Graphic) {
+        graphic.elements = graphic.elements.map(::topDownTraverse)
+    }
+
+    private fun topDownTraverse(element: Element): Element {
+        return when {
+            element is Group && element.attributes.values.none { it.startsWith("@") } -> {
+                bakeIntoGroup(element)
+                element.apply { elements.map(::topDownTraverse) }
+            }
+            element is ContainerElement -> {
+                element.apply { elements.map(::topDownTraverse) }
+            }
+            else -> element
+        }
     }
 
     private fun bakeIntoGroup(group: Group) {
@@ -24,6 +38,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
         if (groupTransforms.isNotEmpty()) {
             val groupTransform = computeTransformationMatrix(group)
 
+            val children = mutableListOf<Element>()
             for(child in group.elements) {
                 if (child is Group) {
                     val childTransformations = child.attributes.keys intersect transformationPropertyNames
@@ -35,18 +50,37 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                     }
 
                     for (transformKey in shared) {
-                        val childValue = child.attributes.getValue(transformKey).toFloat()
                         val groupValue = group.attributes.getValue(transformKey).toFloat()
+                        val childValue = child.attributes.getValue(transformKey).toFloatOrNull()
+
+                        // If the child has a resource-specified value, then
+                        // merging isn't possible. Wrap the child in a new group with the
+                        // current group transform value and proceed to bake siblings in
+                        // case this child had other path element siblings.
+                        if (childValue == null) {
+                            val transforms = child.attributes.filterKeys{childTransformations.contains(it)}
+                            for ((transform) in transforms) {
+                                child.attributes.remove(transform)
+                            }
+
+                            children.add(Group(listOf(child), transforms.toMutableMap()))
+                            continue
+                        }
+
                         child.attributes[transformKey] = when {
                             transformKey.startsWith("android:scale") -> (childValue * groupValue).toString()
                             transformKey == "android:rotation" -> ((childValue + groupValue) % 360).toString()
                             else -> (childValue + groupValue).toString()
                         }
+                        children.add(child)
                     }
                 } else if (child is PathElement) {
                     applyTransform(child, groupTransform)
+                    children.add(child)
                 }
             }
+
+            group.elements = children
 
             for (transformAttribute in groupTransforms) {
                 group.attributes.remove(transformAttribute)
@@ -55,6 +89,8 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
     }
 
     private fun applyTransform(element: PathElement, transform: Matrix3) {
+        if (element.commands.isEmpty()) return
+
         val subPathStart = Stack<Point>()
 
         val initialMoveTo = element.commands.first() as MoveTo
