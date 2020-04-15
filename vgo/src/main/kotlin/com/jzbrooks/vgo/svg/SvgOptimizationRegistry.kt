@@ -3,7 +3,7 @@ package com.jzbrooks.vgo.svg
 import com.jzbrooks.vgo.core.optimization.*
 import com.jzbrooks.vgo.svg.optimization.BakeTransformations
 
-class SvgOptimizationRegistry : OptimizationRegistry(topDownOptimizations, emptyList(), wholeGraphicOptimizations) {
+class SvgOptimizationRegistry : OptimizationRegistry(emptyList(), topDownOptimizations, emptyList(), wholeGraphicOptimizations) {
 
     companion object {
         private val topDownOptimizations: List<TopDownOptimization> = listOf(

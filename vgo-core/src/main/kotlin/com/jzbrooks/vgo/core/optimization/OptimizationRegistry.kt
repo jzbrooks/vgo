@@ -3,15 +3,23 @@ package com.jzbrooks.vgo.core.optimization
 import com.jzbrooks.vgo.core.graphic.*
 
 abstract class OptimizationRegistry(
+        private val prePass: List<Optimization>,
         private val topDownOptimizations: List<TopDownOptimization>,
         private val bottomUpOptimization: List<BottomUpOptimization>,
-        private val wholeGraphicOptimizations: List<Optimization>
+        private val postPass: List<Optimization>
 ) {
 
     fun apply(graphic: Graphic) {
+        for (optimization in prePass) {
+            optimization.optimize(graphic)
+        }
+
         topDownTraversal(graphic)
         bottomUpTraversal(graphic)
-        wholeGraphicTraversal(graphic)
+
+        for (optimization in postPass) {
+            optimization.optimize(graphic)
+        }
     }
 
     private fun topDownTraversal(element: Element): Element {
@@ -40,11 +48,5 @@ abstract class OptimizationRegistry(
         }
 
         return element
-    }
-
-    private fun wholeGraphicTraversal(graphic: Graphic) {
-        for (optimization in wholeGraphicOptimizations) {
-            optimization.optimize(graphic)
-        }
     }
 }
