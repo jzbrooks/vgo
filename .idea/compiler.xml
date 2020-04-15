@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="13">
       <module name="guacamole.guacamole-core.main" target="13" />
       <module name="guacamole.guacamole-core.test" target="13" />
       <module name="guacamole.guacamole.integrationTest" target="13" />
       <module name="guacamole.guacamole.main" target="13" />
       <module name="guacamole.guacamole.test" target="13" />
-      <module name="vgo.vgo-core.main" target="13" />
-      <module name="vgo.vgo-core.test" target="13" />
-      <module name="vgo.vgo.integrationTest" target="13" />
-      <module name="vgo.vgo.main" target="13" />
-      <module name="vgo.vgo.test" target="13" />
     </bytecodeTargetLevel>
   </component>
 </project>
