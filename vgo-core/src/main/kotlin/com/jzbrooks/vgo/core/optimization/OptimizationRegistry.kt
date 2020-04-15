@@ -5,7 +5,7 @@ import com.jzbrooks.vgo.core.graphic.*
 abstract class OptimizationRegistry(
         private val prePass: List<Optimization>,
         private val topDownOptimizations: List<TopDownOptimization>,
-        private val bottomUpOptimization: List<BottomUpOptimization>,
+        private val bottomUpOptimizations: List<BottomUpOptimization>,
         private val postPass: List<Optimization>
 ) {
 
@@ -14,8 +14,13 @@ abstract class OptimizationRegistry(
             optimization.optimize(graphic)
         }
 
-        topDownTraversal(graphic)
-        bottomUpTraversal(graphic)
+        if (topDownOptimizations.isNotEmpty()) {
+            graphic.elements = graphic.elements.map(::topDownTraversal)
+        }
+
+        if (bottomUpOptimizations.isNotEmpty()) {
+            graphic.elements = graphic.elements.map(::bottomUpTraversal)
+        }
 
         for (optimization in postPass) {
             optimization.optimize(graphic)
@@ -31,15 +36,15 @@ abstract class OptimizationRegistry(
             }
         }
 
-        return if (element is ContainerElement) element.apply { elements.map(::topDownTraversal) } else element
+        return if (element is ContainerElement) element.apply { elements = elements.map(::topDownTraversal) } else element
     }
 
     private fun bottomUpTraversal(element: Element): Element {
         if (element is ContainerElement) {
-            element.apply { elements.map(::topDownTraversal) }
+            element.apply { elements = elements.map(::bottomUpTraversal) }
         }
 
-        for (optimization in bottomUpOptimization) {
+        for (optimization in bottomUpOptimizations) {
             when {
                 element is PathElement && optimization is PathElementVisitor -> optimization.visit(element)
                 element is Group && optimization is GroupVisitor -> optimization.visit(element)
