@@ -9,11 +9,7 @@ class CollapseGroups : Optimization {
     // eventually be a target-specific optimization
     private val Group.isMergeable: Boolean
         get() {
-            // todo(jzb): We should probably be more specific about clip paths here
-            val firstClipPath = elements.indexOfFirst { it !is Path }
-            val lastPath = elements.indexOfLast { it is Path }
-            val hasValidClipPath = firstClipPath != -1 && firstClipPath < lastPath
-
+            val hasValidClipPath = elements.any { it is PathElement && it !is Path }
             return !hasValidClipPath && elements.isNotEmpty() && attributes.isEmpty()
         }
 
