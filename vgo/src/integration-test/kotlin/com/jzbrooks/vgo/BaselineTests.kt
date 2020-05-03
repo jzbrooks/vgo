@@ -79,10 +79,12 @@ class BaselineTests {
                 Path.of("src/integration-test/resources/visibility_strike.xml") to Path.of("src/integration-test/resources/baseline/visibility_strike_optimized.xml"),
                 Path.of("src/integration-test/resources/dribbble_ball_mark.xml") to Path.of("src/integration-test/resources/baseline/dribbble_ball_mark_optimized.xml"),
                 Path.of("src/integration-test/resources/nasa.xml") to Path.of("src/integration-test/resources/baseline/nasa_optimized.xml"),
+                Path.of("src/integration-test/resources/tiger.xml") to Path.of("src/integration-test/resources/baseline/tiger_optimized.xml"),
                 Path.of("src/integration-test/resources/simple_heart.svg") to Path.of("src/integration-test/resources/baseline/simple_heart_optimized.svg"),
                 Path.of("src/integration-test/resources/guacamole.svg") to Path.of("src/integration-test/resources/baseline/guacamole_optimized.svg"),
                 Path.of("src/integration-test/resources/dribbble_ball_mark.svg") to Path.of("src/integration-test/resources/baseline/dribbble_ball_mark_optimized.svg"),
-                Path.of("src/integration-test/resources/nasa.svg") to Path.of("src/integration-test/resources/baseline/nasa_optimized.svg")
+                Path.of("src/integration-test/resources/nasa.svg") to Path.of("src/integration-test/resources/baseline/nasa_optimized.svg"),
+                Path.of("src/integration-test/resources/tiger.svg") to Path.of("src/integration-test/resources/baseline/tiger_optimized.svg")
         )
 
         @JvmStatic
