@@ -7,7 +7,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
+import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.streams.asSequence
 
 class BaselineTests {
 
@@ -72,20 +74,27 @@ class BaselineTests {
     }
 
     companion object {
-        private val assets = listOf(
-                Path.of("src/integration-test/resources/avocado_example.xml") to Path.of("src/integration-test/resources/baseline/avocado_example_optimized.xml"),
-                Path.of("src/integration-test/resources/charging_battery.xml") to Path.of("src/integration-test/resources/baseline/charging_battery_optimized.xml"),
-                Path.of("src/integration-test/resources/simple_heart.xml") to Path.of("src/integration-test/resources/baseline/simple_heart_optimized.xml"),
-                Path.of("src/integration-test/resources/visibility_strike.xml") to Path.of("src/integration-test/resources/baseline/visibility_strike_optimized.xml"),
-                Path.of("src/integration-test/resources/dribbble_ball_mark.xml") to Path.of("src/integration-test/resources/baseline/dribbble_ball_mark_optimized.xml"),
-                Path.of("src/integration-test/resources/nasa.xml") to Path.of("src/integration-test/resources/baseline/nasa_optimized.xml"),
-                Path.of("src/integration-test/resources/tiger.xml") to Path.of("src/integration-test/resources/baseline/tiger_optimized.xml"),
-                Path.of("src/integration-test/resources/simple_heart.svg") to Path.of("src/integration-test/resources/baseline/simple_heart_optimized.svg"),
-                Path.of("src/integration-test/resources/guacamole.svg") to Path.of("src/integration-test/resources/baseline/guacamole_optimized.svg"),
-                Path.of("src/integration-test/resources/dribbble_ball_mark.svg") to Path.of("src/integration-test/resources/baseline/dribbble_ball_mark_optimized.svg"),
-                Path.of("src/integration-test/resources/nasa.svg") to Path.of("src/integration-test/resources/baseline/nasa_optimized.svg"),
-                Path.of("src/integration-test/resources/tiger.svg") to Path.of("src/integration-test/resources/baseline/tiger_optimized.svg")
-        )
+
+        private val assets: List<Pair<Path, Path>>
+
+        init {
+            // Loads the files based on the convention that optimized files
+            // live in src/integration-test/resources/baseline and are suffixed
+            // with _optimized
+            assets = try {
+                Files.list(Path.of("src/integration-test/resources"))
+                        .asSequence()
+                        .filterNot { Files.isDirectory(it) }
+                        .map { unoptimizedFile ->
+                            val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
+                            val optimizedDirectory = unoptimizedFile.parent.resolve("baseline")
+                            unoptimizedFile to optimizedDirectory.resolve("${fileName}_optimized.$fileExtension")
+                        }.toList()
+            } catch (e: Throwable) {
+                System.err.println(e)
+                throw e
+            }
+        }
 
         @JvmStatic
         private fun provideUnoptimizedAssets(): List<Arguments> {
