@@ -5,6 +5,6 @@ import com.jzbrooks.vgo.core.util.math.Point
 data class ShortcutCubicBezierCurve(
         override var variant: CommandVariant,
         override var parameters: List<Parameter>
-) : ParameterizedCommand<ShortcutCubicBezierCurve.Parameter> {
-    data class Parameter(var endControl: Point, var end: Point)
+) : CubicCurve<ShortcutCubicBezierCurve.Parameter> {
+    data class Parameter(var endControl: Point, override var end: Point) : EndPoint
 }
