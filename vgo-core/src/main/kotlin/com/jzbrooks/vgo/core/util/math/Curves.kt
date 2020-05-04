@@ -18,8 +18,8 @@ fun CubicBezierCurve.fitCircle(tolerance: Float = 0.01f): Circle? {
     val m1 = mid * 0.5f
     val m2 = (mid + end) * 0.5f
 
-    val firstDiagonal = Line(m1, Point(m1.x + m1.y, m1.y - m1.x))
-    val secondDiagonal = Line(m2, Point(m2.x + (m2.y - mid.y), m2.y - (m2.x - mid.x)))
+    val firstDiagonal = LineSegment(m1, Point(m1.x + m1.y, m1.y - m1.x))
+    val secondDiagonal = LineSegment(m2, Point(m2.x + (m2.y - mid.y), m2.y - (m2.x - mid.x)))
     val center = firstDiagonal.intersection(secondDiagonal) ?: return null
     val radius = Point.zero.distanceTo(center)
 
@@ -49,8 +49,8 @@ fun ShortcutCubicBezierCurve.fitCircle(tolerance: Float = 0.01f): Circle? {
     val m1 = mid * 0.5f
     val m2 = (mid + end) * 0.5f
 
-    val firstDiagonal = Line(m1, Point(m1.x + m1.y, m1.y - m1.x))
-    val secondDiagonal = Line(m2, Point(m2.x + (m2.y - mid.y), m2.y - (m2.x - mid.x)))
+    val firstDiagonal = LineSegment(m1, Point(m1.x + m1.y, m1.y - m1.x))
+    val secondDiagonal = LineSegment(m2, Point(m2.x + (m2.y - mid.y), m2.y - (m2.x - mid.x)))
     val center = firstDiagonal.intersection(secondDiagonal) ?: return null
     val radius = Point.zero.distanceTo(center)
 
@@ -117,8 +117,8 @@ fun CubicBezierCurve.isConvex(): Boolean {
 
     val (startControl, endControl, end) = parameters[0]
 
-    val firstDiagonal = Line(Point.zero, endControl)
-    val secondDiagonal = Line(startControl, end)
+    val firstDiagonal = LineSegment(Point.zero, endControl)
+    val secondDiagonal = LineSegment(startControl, end)
 
     val intersection = secondDiagonal.intersection(firstDiagonal)
 
@@ -139,8 +139,8 @@ fun ShortcutCubicBezierCurve.isConvex(): Boolean {
 
     val (control, end) = parameters[0]
 
-    val firstDiagonal = Line(Point.zero, control)
-    val secondDiagonal = Line(Point.zero, end)
+    val firstDiagonal = LineSegment(Point.zero, control)
+    val secondDiagonal = LineSegment(Point.zero, end)
 
     val intersection = firstDiagonal.intersection(secondDiagonal)
 

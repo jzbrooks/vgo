@@ -6,7 +6,7 @@ import assertk.assertions.isNull
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
-class LineTests {
+class LineSegmentTests {
 
     @MethodSource
     @ParameterizedTest
@@ -20,7 +20,7 @@ class LineTests {
 
     @MethodSource
     @ParameterizedTest
-    fun testParallelLinesReturnsNull(pair: Pair<Line, Line>) {
+    fun testParallelLinesReturnsNull(pair: Pair<LineSegment, LineSegment>) {
         val (first, second) = pair
 
         val actual = first.intersection(second)
@@ -28,19 +28,19 @@ class LineTests {
         assertThat(actual).isNull()
     }
 
-    data class Intersection(val first: Line, val second: Line, val result: Point?)
+    data class Intersection(val first: LineSegment, val second: LineSegment, val result: Point?)
     companion object {
         @JvmStatic
         fun testIntersections(): List<Intersection> {
             return listOf(
                     Intersection(
-                            Line(Point(0f, 10f), Point(0f, -10f)),
-                            Line(Point(-1f, 0f), Point(1f, 0f)),
+                            LineSegment(Point(0f, 10f), Point(0f, -10f)),
+                            LineSegment(Point(-1f, 0f), Point(1f, 0f)),
                             Point.zero
                     ),
                     Intersection(
-                            Line(Point(1f, 1f), Point(4f, 4f)),
-                            Line(Point(1f, 8f), Point(2f, 4f)),
+                            LineSegment(Point(1f, 1f), Point(4f, 4f)),
+                            LineSegment(Point(1f, 8f), Point(2f, 4f)),
                             Point(2.4f, 2.4f)
                     )
 
@@ -48,9 +48,9 @@ class LineTests {
         }
 
         @JvmStatic
-        fun testParallelLinesReturnsNull(): List<Pair<Line, Line>> {
+        fun testParallelLinesReturnsNull(): List<Pair<LineSegment, LineSegment>> {
             return listOf(
-                    Line(Point(0f, 3f), Point(0f, 3f)) to Line(Point(1f, 3f), Point(1f, 3f))
+                    LineSegment(Point(0f, 3f), Point(0f, 3f)) to LineSegment(Point(1f, 3f), Point(1f, 3f))
             )
         }
     }
