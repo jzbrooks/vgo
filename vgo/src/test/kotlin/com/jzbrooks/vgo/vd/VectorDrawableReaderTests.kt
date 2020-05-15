@@ -68,7 +68,7 @@ class VectorDrawableReaderTests {
                             LineTo(CommandVariant.ABSOLUTE, listOf(Point(3.27f, 3f))),
                             LineTo(CommandVariant.ABSOLUTE, listOf(Point(3.27f, 3f))),
                             LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 4.27f))),
-                            ClosePath()
+                            ClosePath
                     )
             )
             assertThat(graphic.elements).hasSize(3)
@@ -139,7 +139,7 @@ class VectorDrawableReaderTests {
             |</vector>
             |""".trimMargin().toByteArray()
 
-        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f,0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath()))
+        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f,0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath))
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {

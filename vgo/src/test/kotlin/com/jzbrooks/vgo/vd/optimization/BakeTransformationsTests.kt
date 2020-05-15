@@ -136,7 +136,7 @@ class BakeTransformationsTests {
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                                 LineTo(CommandVariant.RELATIVE, listOf(Point(4f, 4f))),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
-                                ClosePath()
+                                ClosePath
                         ))
                 ),
                 mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
@@ -153,7 +153,7 @@ class BakeTransformationsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(24f, 24f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(28f, 28f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(18f, 18f))),
-                        ClosePath()
+                        ClosePath
                 )
     }
 
@@ -193,7 +193,7 @@ class BakeTransformationsTests {
                                 HorizontalLineTo(CommandVariant.RELATIVE, listOf(4f)),
                                 VerticalLineTo(CommandVariant.RELATIVE, listOf(4f)),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 14f))),
-                                ClosePath()
+                                ClosePath
                         ))
                 ),
                 mutableMapOf("android:pivotX" to "10", "android:pivotY" to "10", "android:rotation" to "15")

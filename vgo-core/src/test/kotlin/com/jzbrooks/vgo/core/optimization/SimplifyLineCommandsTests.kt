@@ -16,7 +16,7 @@ class SimplifyLineCommandsTests {
                 listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 6f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -32,7 +32,7 @@ class SimplifyLineCommandsTests {
                 listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(6f, 0f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -48,7 +48,7 @@ class SimplifyLineCommandsTests {
                 listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(0.0000000000001f, 6f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -64,7 +64,7 @@ class SimplifyLineCommandsTests {
                 listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(6f, 0.0000000000001f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -80,7 +80,7 @@ class SimplifyLineCommandsTests {
                 listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 6f), Point(10f, 0f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -98,7 +98,7 @@ class SimplifyLineCommandsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         HorizontalLineTo(CommandVariant.RELATIVE, listOf(12f)),
                         HorizontalLineTo(CommandVariant.RELATIVE, listOf(15f)),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -115,7 +115,7 @@ class SimplifyLineCommandsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         HorizontalLineTo(CommandVariant.RELATIVE, listOf(12f)),
                         HorizontalLineTo(CommandVariant.RELATIVE, listOf(-15f)),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -133,7 +133,7 @@ class SimplifyLineCommandsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         VerticalLineTo(CommandVariant.RELATIVE, listOf(5f)),
                         VerticalLineTo(CommandVariant.RELATIVE, listOf(15f)),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -150,7 +150,7 @@ class SimplifyLineCommandsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         VerticalLineTo(CommandVariant.RELATIVE, listOf(12f)),
                         VerticalLineTo(CommandVariant.RELATIVE, listOf(-5f)),
-                        ClosePath()
+                        ClosePath
                 )
         )
 

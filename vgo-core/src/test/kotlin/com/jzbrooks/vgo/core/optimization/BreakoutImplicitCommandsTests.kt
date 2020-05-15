@@ -17,7 +17,7 @@ class BreakoutImplicitCommandsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(103f, 6f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f), Point(93f, 10f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -37,7 +37,7 @@ class BreakoutImplicitCommandsTests {
                                 Point(106f, 7f),
                                 Point(93f, 10f))
                         ),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -60,7 +60,7 @@ class BreakoutImplicitCommandsTests {
                         QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(112f, -10f), Point(109f, -3f)))),
                         ShortcutQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                         EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
-                        ClosePath()
+                        ClosePath
                 )
         )
         val sizeBefore = path.commands.size

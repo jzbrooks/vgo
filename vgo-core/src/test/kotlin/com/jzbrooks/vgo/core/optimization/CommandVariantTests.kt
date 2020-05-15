@@ -33,7 +33,7 @@ class CommandVariantTests {
                         QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(112f, -10f), Point(109f, -3f)))),
                         ShortcutQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                         EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -87,13 +87,13 @@ class CommandVariantTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(110f, 8f))),
                         HorizontalLineTo(CommandVariant.ABSOLUTE, listOf(101f)),
                         VerticalLineTo(CommandVariant.ABSOLUTE, listOf(-8f)),
-                        ClosePath(),
+                        ClosePath,
                         HorizontalLineTo(CommandVariant.ABSOLUTE, listOf(103f)),
                         ShortcutCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(ShortcutCubicBezierCurve.Parameter(Point(113f, 39f), Point(105f, -6f)))),
                         QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(112f, -10f), Point(109f, -3f)))),
                         ShortcutQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                         EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -109,7 +109,7 @@ class CommandVariantTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f), Point(101f, 1f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(103f, 6f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f), Point(93f, 10f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -128,7 +128,7 @@ class CommandVariantTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(CubicBezierCurve.Parameter(Point(105f, 8f), Point(115f, 10f), Point(100f, 10f)))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -145,9 +145,9 @@ class CommandVariantTests {
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(15f, 5f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
-                        ClosePath(),
+                        ClosePath,
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(107f, 7f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -165,10 +165,10 @@ class CommandVariantTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(15f, 5f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
-                        ClosePath(),
+                        ClosePath,
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(17f, 21f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 

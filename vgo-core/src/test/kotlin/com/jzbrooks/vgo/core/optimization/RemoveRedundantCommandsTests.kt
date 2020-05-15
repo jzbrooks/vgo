@@ -18,7 +18,7 @@ class RemoveRedundantCommandsTests {
                         MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 0f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(103f, 6f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 
@@ -35,7 +35,7 @@ class RemoveRedundantCommandsTests {
                         MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 1f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(103f, 6f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(106f, 7f), Point(93f, 10f))),
-                        ClosePath()
+                        ClosePath
                 )
         )
 

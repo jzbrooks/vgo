@@ -97,7 +97,7 @@ class VectorDrawableCommandPrinterTests {
 
     @Test
     fun testPrintClosePath() {
-        val result = VectorDrawableCommandPrinter(3).print(ClosePath())
+        val result = VectorDrawableCommandPrinter(3).print(ClosePath)
         assertThat(result).isEqualTo("Z")
     }
 

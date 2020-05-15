@@ -68,7 +68,7 @@ class ScalableVectorGraphicReaderTests {
                         EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(20f, 20f, 0f, EllipticalArcCurve.ArcFlag.SMALL, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(90f, 30f)))),
                         QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(90f, 60f), Point(50f, 90f)))),
                         QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(10f, 60f), Point(10f, 30f)))),
-                        ClosePath()
+                        ClosePath
                 )
         )
         assertThat(graphic.elements).hasSize(1)
@@ -139,7 +139,7 @@ class ScalableVectorGraphicReaderTests {
             |</svg>
             |""".trimMargin().toByteArray()
 
-        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f,0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath()))
+        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f,0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath))
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use { input ->
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
