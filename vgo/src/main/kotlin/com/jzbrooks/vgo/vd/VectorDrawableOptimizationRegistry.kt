@@ -13,9 +13,9 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(prePass, topDown
         private val topDownOptimizations: List<TopDownOptimization> = listOf(
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
-                SimplifyLineCommands(0.00001f),
+                SimplifyLineCommands(1e-3f),
                 ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)),
-                SimplifyBezierCurveCommands(0.00001f),
+                SimplifyBezierCurveCommands(1e-3f),
                 RemoveRedundantCommands(),
                 CommandVariant(CommandVariant.Mode.Compact(VectorDrawableCommandPrinter(3)))
         )
