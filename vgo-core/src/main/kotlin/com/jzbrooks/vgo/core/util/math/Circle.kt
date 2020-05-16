@@ -1,3 +1,3 @@
 package com.jzbrooks.vgo.core.util.math
 
-data class Circle(val center: Point, val radius: Float)
+data class Circle(var center: Point, val radius: Float)

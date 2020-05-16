@@ -25,28 +25,28 @@ class CurvesTests {
 
     @Test
     fun `Ensure non-relative interpolation throws`() {
-        assertThrows<IllegalStateException> {
+        assertThrows<AssertionError> {
             nonRelativeCurve.interpolate(0.2f)
         }
     }
 
     @Test
     fun `Ensure multiple curve parameter interpolation throws`() {
-        assertThrows<IllegalStateException> {
+        assertThrows<AssertionError> {
             multiParameterCurve.interpolate(0.2f)
         }
     }
 
     @Test
     fun `Ensure non-relative throws`() {
-        assertThrows<IllegalStateException> {
+        assertThrows<AssertionError> {
             nonRelativeCurve.isConvex()
         }
     }
 
     @Test
     fun `Ensure multiple curve parameters throws`() {
-        assertThrows<IllegalStateException> {
+        assertThrows<AssertionError> {
             multiParameterCurve.isConvex()
         }
     }
@@ -57,7 +57,7 @@ class CurvesTests {
                 ShortcutCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f))
         ))
 
-        assertThrows<IllegalStateException> {
+        assertThrows<AssertionError> {
             nonRelativeCurve.isConvex()
         }
     }
@@ -69,7 +69,7 @@ class CurvesTests {
                 ShortcutCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f))
         ))
 
-        assertThrows<IllegalStateException> {
+        assertThrows<AssertionError> {
             mutliParameterCurve.isConvex()
         }
     }

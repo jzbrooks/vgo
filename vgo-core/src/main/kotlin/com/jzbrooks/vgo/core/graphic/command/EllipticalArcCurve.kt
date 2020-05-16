@@ -7,7 +7,7 @@ data class EllipticalArcCurve(
         override var parameters: List<Parameter>
 ) : ParameterizedCommand<EllipticalArcCurve.Parameter> {
 
-    data class Parameter(var radiusX: Float, var radiusY: Float, var angle: Float, var arc: ArcFlag, var sweep: SweepFlag, var end: Point)
+    data class Parameter(var radiusX: Float, var radiusY: Float, var angle: Float, var arc: ArcFlag, var sweep: SweepFlag, override var end: Point) : EndPoint
 
     enum class ArcFlag {
         SMALL,
