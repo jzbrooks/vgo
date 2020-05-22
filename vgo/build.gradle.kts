@@ -61,5 +61,21 @@ tasks {
         dependsOn(getByName("jar"))
     }
 
+    val updateBaselineOptimizations by registering(Copy::class) {
+        from("$buildDir/integrationTest/") {
+            include("*testOptimizationFinishes.xml")
+            include("*testOptimizationFinishes.svg")
+        }
+        into("src/integration-test/resources/baseline/")
+        rename { original ->
+            val originalAssetName = original.let {
+                val i = it.lastIndexOf('_')
+                it.substring(0 until i)
+            }
+            val fileExtension = original.split('.').last()
+            "${originalAssetName}_optimized.$fileExtension"
+        }
+    }
+
     getByName("check").dependsOn(integrationTest)
 }
