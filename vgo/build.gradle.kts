@@ -42,16 +42,13 @@ tasks {
         from(configurations.runtimeClasspath.get().filter { it.isFile }.map(::zipTree))
     }
 
-    val optimize by registering {
+    val optimize by registering(JavaExec::class) {
         description = "Runs proguard on the jar application."
         group = "build"
 
-        doLast {
-            exec {
-                workingDir(rootDir)
-                commandLine("java", "-jar", "$rootDir/tools/proguard.jar", "@$rootDir/optimize.pro")
-            }
-        }
+        classpath = files("$rootDir/tools/proguard.jar")
+        args = listOf("@$rootDir/optimize.pro")
+
         dependsOn(getByName("jar"))
     }
 
