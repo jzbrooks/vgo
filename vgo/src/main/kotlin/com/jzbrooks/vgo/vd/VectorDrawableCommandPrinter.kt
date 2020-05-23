@@ -35,15 +35,18 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             CommandVariant.RELATIVE -> 'm'
         }
 
-        val builder = StringBuilder()
-        for ((index, parameter) in moveTo.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != moveTo.parameters.size - 1) {
-                builder.append(" ")
+        return buildString {
+            append(command)
+            append(print(moveTo.parameters.first()))
+
+            for (parameter in moveTo.parameters.drop(1)) {
+                if (parameter.x >= 0) {
+                    append(' ')
+                }
+
+                append(print(parameter))
             }
         }
-
-        return "$command$builder"
     }
 
     private fun print(lineTo: LineTo): String {
@@ -52,15 +55,18 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             CommandVariant.RELATIVE -> 'l'
         }
 
-        val builder = StringBuilder()
-        for ((index, parameter) in lineTo.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != lineTo.parameters.size - 1) {
-                builder.append(" ")
+        return buildString {
+            append(command)
+            append(print(lineTo.parameters.first()))
+
+            for (parameter in lineTo.parameters.drop(1)) {
+                if (parameter.x >= 0) {
+                    append(' ')
+                }
+
+                append(print(parameter))
             }
         }
-
-        return "$command$builder"
     }
 
     private fun print(verticalLineTo: VerticalLineTo): String {
@@ -69,15 +75,18 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             CommandVariant.RELATIVE -> 'v'
         }
 
-        val builder = StringBuilder()
-        for ((index, parameter) in verticalLineTo.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != verticalLineTo.parameters.size - 1) {
-                builder.append(" ")
+        return buildString {
+            append(command)
+            append(print(verticalLineTo.parameters.first()))
+
+            for (parameter in verticalLineTo.parameters.drop(1)) {
+                if (parameter >= 0) {
+                    append(' ')
+                }
+
+                append(print(parameter))
             }
         }
-
-        return "$command$builder"
     }
 
     private fun print(horizontalLineTo: HorizontalLineTo): String {
@@ -86,15 +95,18 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             CommandVariant.RELATIVE -> 'h'
         }
 
-        val builder = StringBuilder()
-        for ((index, parameter) in horizontalLineTo.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != horizontalLineTo.parameters.size - 1) {
-                builder.append(" ")
+        return buildString {
+            append(command)
+            append(print(horizontalLineTo.parameters.first()))
+
+            for (parameter in horizontalLineTo.parameters.drop(1)) {
+                if (parameter >= 0) {
+                    append(' ')
+                }
+
+                append(print(parameter))
             }
         }
-
-        return "$command$builder"
     }
 
     private fun print(cubicBezierCurve: CubicBezierCurve): String {
@@ -103,15 +115,18 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             CommandVariant.RELATIVE -> 'c'
         }
 
-        val builder = StringBuilder()
-        for ((index, parameter) in cubicBezierCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != cubicBezierCurve.parameters.size - 1) {
-                builder.append(" ")
+        return buildString {
+            append(command)
+            append(print(cubicBezierCurve.parameters.first()))
+
+            for (parameter in cubicBezierCurve.parameters.drop(1)) {
+                if (parameter.startControl.x >= 0) {
+                    append(' ')
+                }
+
+                append(print(parameter))
             }
         }
-
-        return "$command$builder"
     }
 
     private fun print(shortcutCubicBezierCurve: ShortcutCubicBezierCurve): String {
@@ -120,15 +135,18 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             CommandVariant.RELATIVE -> 's'
         }
 
-        val builder = StringBuilder()
-        for ((index, parameter) in shortcutCubicBezierCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != shortcutCubicBezierCurve.parameters.size - 1) {
-                builder.append(" ")
+        return buildString {
+            append(command)
+            append(print(shortcutCubicBezierCurve.parameters.first()))
+
+            for (parameter in shortcutCubicBezierCurve.parameters.drop(1)) {
+                if (parameter.endControl.x >= 0) {
+                    append(' ')
+                }
+
+                append(print(parameter))
             }
         }
-
-        return "$command$builder"
     }
 
     private fun print(quadraticBezierCurve: QuadraticBezierCurve): String {
@@ -137,15 +155,18 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             CommandVariant.RELATIVE -> 'q'
         }
 
-        val builder = StringBuilder()
-        for ((index, parameter) in quadraticBezierCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != quadraticBezierCurve.parameters.size - 1) {
-                builder.append(" ")
+        return buildString {
+            append(command)
+            append(print(quadraticBezierCurve.parameters.first()))
+
+            for (parameter in quadraticBezierCurve.parameters.drop(1)) {
+                if (parameter.control.x >= 0) {
+                    append(' ')
+                }
+
+                append(print(parameter))
             }
         }
-
-        return "$command$builder"
     }
 
     private fun print(shortcutQuadraticBezierCurve: ShortcutQuadraticBezierCurve): String {
@@ -154,15 +175,18 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             CommandVariant.RELATIVE -> 't'
         }
 
-        val builder = StringBuilder()
-        for ((index, parameter) in shortcutQuadraticBezierCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != shortcutQuadraticBezierCurve.parameters.size - 1) {
-                builder.append(" ")
+        return buildString {
+            append(command)
+            append(print(shortcutQuadraticBezierCurve.parameters.first()))
+
+            for (parameter in shortcutQuadraticBezierCurve.parameters.drop(1)) {
+                if (parameter.x >= 0) {
+                    append(' ')
+                }
+
+                append(print(parameter))
             }
         }
-
-        return "$command$builder"
     }
 
     private fun print(ellipticalArcCurve: EllipticalArcCurve): String {
@@ -171,98 +195,84 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             CommandVariant.RELATIVE -> 'a'
         }
 
-        val builder = StringBuilder()
-        for ((index, parameter) in ellipticalArcCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != ellipticalArcCurve.parameters.size - 1) {
-                builder.append(" ")
+        return buildString {
+            append(command)
+            append(print(ellipticalArcCurve.parameters.first()))
+
+            for (parameter in ellipticalArcCurve.parameters.drop(1)) {
+                if (parameter.radiusX >= 0) {
+                    append(' ')
+                }
+
+                append(print(parameter))
             }
         }
-
-        return "$command$builder"
     }
 
     private fun print(float: Float): String {
         val rounded = (float * floatPrecisionScaleFactor).roundToInt() / floatPrecisionScaleFactor
         val roundedInt = rounded.toInt()
 
-        return when {
-            abs(rounded.rem(1f)) < epsilon -> roundedInt.toString()
-            roundedInt == 0 -> {
-                if (rounded < 0) {
-                    "-${rounded.toFloat().toString().trim('-', '0')}"
-                } else {
-                    rounded.toFloat().toString().trim('0')
-                }
-            }
-            else -> rounded.toFloat().toString()
+        return if (abs(rounded.rem(1f)) < epsilon) {
+            roundedInt.toString()
+        } else {
+            rounded.toFloat().toString()
         }
     }
 
-    private fun print(point: Point): String {
-        val builder = StringBuilder(print(point.x))
-
-        when {
-            (abs(point.y) > epsilon && point.y < 1 && point.y > epsilon && point.x != 0f) -> {
-                builder.append(print(point.y))
-            }
-            (abs(point.y) > epsilon && point.y > -1 && point.y < epsilon && point.x != 0f) -> {
-                val y = print(point.y).trimStart('-', '0')
-                builder.append('-')
-                builder.append(y)
-            }
-            else -> {
-                builder.append(',')
-                builder.append(print(point.y))
-            }
-        }
-
-        return builder.toString()
+    private fun print(point: Point) = buildString {
+        append(print(point.x))
+        append(',')
+        append(print(point.y))
     }
 
     private fun print(parameter: CubicBezierCurve.Parameter): String {
         return parameter.run {
-            val builder = StringBuilder(print(startControl))
-            if (endControl.x >= 0) builder.append(' ')
-            builder.append(print(endControl))
-            if (end.x >= 0) builder.append(' ')
-            builder.append(print(end))
-            builder.toString()
+            buildString {
+                append(print(startControl))
+                if (endControl.x >= 0) append(' ')
+                append(print(endControl))
+                if (end.x >= 0) append(' ')
+                append(print(end))
+            }
         }
     }
 
     private fun print(parameter: ShortcutCubicBezierCurve.Parameter): String {
         return parameter.run {
-            val builder = StringBuilder(print(endControl))
-            if (end.x >= 0) builder.append(' ')
-            builder.append(print(end))
-            builder.toString()
+            buildString {
+                append(print(endControl))
+                if (end.x >= 0) append(' ')
+                append(print(end))
+            }
         }
     }
 
     private fun print(parameter: QuadraticBezierCurve.Parameter): String {
         return parameter.run {
-            val builder = StringBuilder(print(control))
-            if (end.x >= 0) builder.append(' ')
-            builder.append(print(end))
-            builder.toString()
+            buildString {
+                append(print(control))
+                if (end.x >= 0) append(' ')
+                append(print(end))
+            }
         }
     }
 
     private fun print(parameter: EllipticalArcCurve.Parameter): String {
         return parameter.run {
-            val builder = StringBuilder(print(radiusX))
-            if (radiusY >= 0) builder.append(',')
-            builder.append(print(radiusY))
-            if (angle >= 0) builder.append(',')
-            builder.append(print(angle))
-            builder.append(',')
-            builder.append(arc.ordinal)
-            builder.append(',')
-            builder.append(sweep.ordinal)
-            builder.append(',')
-            builder.append(print(end))
-            builder.toString()
+            buildString {
+                append(print(radiusX))
+                if (radiusY >= 0) append(',')
+                append(print(radiusY))
+                if (angle >= 0) append(',')
+                append(print(angle))
+                append(',')
+                append(arc.ordinal)
+                append(',')
+                append(sweep.ordinal)
+                append(',')
+                append(print(end))
+            }
         }
     }
 }

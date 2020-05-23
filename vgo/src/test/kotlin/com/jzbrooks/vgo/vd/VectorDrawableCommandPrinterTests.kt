@@ -105,7 +105,7 @@ class VectorDrawableCommandPrinterTests {
     fun testPrintRoundedCoordinates() {
         val command = MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0.03494f, 0.012415f)))
         val result = VectorDrawableCommandPrinter(3).print(command)
-        assertThat(result).isEqualTo("M.035.012")
+        assertThat(result).isEqualTo("M0.035,0.012")
     }
 
     @Test
