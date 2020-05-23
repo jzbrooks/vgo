@@ -137,8 +137,12 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
 
     private fun convertSingleArcs(commands: List<Command>): List<Command> {
         val newCommands = mutableListOf<Command>()
+        var fixedUpCurve: CubicBezierCurve? = null
 
-        for (command in commands) {
+        for (i in commands.indices) {
+            val command = fixedUpCurve ?: commands[i]
+            fixedUpCurve = null
+
             if (command is CubicBezierCurve) {
                 assert(command.parameters.size == 1)
 
@@ -163,8 +167,16 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                             )
                     ))
 
-                    if (printer.print(arc).length < printer.print(command).length) {
-                        newCommands.add(arc)
+                    val next = commands.getOrNull(i + 1)
+                    val arcOutput = if (next is ShortcutCubicBezierCurve) {
+                        listOf(arc, next.toCubicBezierCurve(command))
+                    } else {
+                        listOf(arc)
+                    }
+
+                    if (arcOutput.joinToString(separator = "", transform = printer::print).length < printer.print(command).length) {
+                        newCommands.addAll(arcOutput)
+                        fixedUpCurve = arcOutput.last() as? CubicBezierCurve
                     } else {
                         newCommands.add(command)
                     }
