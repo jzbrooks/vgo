@@ -36,7 +36,7 @@ class LineSegmentTests {
                     Intersection(
                             LineSegment(Point(0f, 10f), Point(0f, -10f)),
                             LineSegment(Point(-1f, 0f), Point(1f, 0f)),
-                            Point.zero
+                            Point.ZERO
                     ),
                     Intersection(
                             LineSegment(Point(1f, 1f), Point(4f, 4f)),

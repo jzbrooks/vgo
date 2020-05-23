@@ -58,7 +58,7 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                         continue@loop
                     }
                     if (lastAdded !is ShortcutCubicBezierCurve && lastAdded !is CubicBezierCurve &&
-                            currentFinalParameter.startControl == Point.zero) {
+                            currentFinalParameter.startControl == Point.ZERO) {
                         commands.add(ShortcutCubicBezierCurve(current.variant, current.parameters.map {
                             ShortcutCubicBezierCurve.Parameter(it.endControl, it.end)
                         }))

@@ -98,14 +98,14 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
                     variant = CommandVariant.ABSOLUTE,
                     parameters = command.parameters.map { x ->
                         (x + currentPoint.x)
-                    }.also { currentPoint.x = it.last() }
+                    }.also { currentPoint = currentPoint.copy(x = it.last()) }
             )
         } else {
             command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters = command.parameters.map { x ->
                         (x - currentPoint.x)
-                    }.also { currentPoint.x += it.last() }
+                    }.also { currentPoint = currentPoint.copy(x = currentPoint.x + it.last()) }
             )
         }
 
@@ -118,18 +118,14 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
                     variant = CommandVariant.ABSOLUTE,
                     parameters = command.parameters.map { y ->
                         (y + currentPoint.y)
-                    }.also {
-                        currentPoint.y = it.last()
-                    }
+                    }.also { currentPoint = currentPoint.copy(y = it.last()) }
             )
         } else {
             command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters = command.parameters.map { y ->
                         (y - currentPoint.y)
-                    }.also {
-                        currentPoint.y += it.last()
-                    }
+                    }.also { currentPoint = currentPoint.copy(y = currentPoint.y + it.last()) }
             )
         }
 

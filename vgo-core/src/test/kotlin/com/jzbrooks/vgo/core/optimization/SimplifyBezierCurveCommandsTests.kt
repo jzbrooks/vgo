@@ -137,6 +137,6 @@ class SimplifyBezierCurveCommandsTests {
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
         assertThat(path.commands.last()::class).isEqualTo(CubicBezierCurve::class)
-        assertThat((path.commands.last() as CubicBezierCurve).parameters.last().startControl).isEqualTo(Point.zero)
+        assertThat((path.commands.last() as CubicBezierCurve).parameters.last().startControl).isEqualTo(Point.ZERO)
     }
 }

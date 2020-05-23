@@ -2,7 +2,7 @@ package com.jzbrooks.vgo.core.util.math
 
 import kotlin.math.hypot
 
-data class Point(var x: Float, var y: Float) {
+data class Point(val x: Float, val y: Float) {
     operator fun plus(other: Point): Point {
         return Point(x + other.x, y + other.y)
     }
@@ -24,6 +24,6 @@ data class Point(var x: Float, var y: Float) {
     }
 
     companion object {
-        val zero = Point(0f, 0f)
+        val ZERO = Point(0f, 0f)
     }
 }

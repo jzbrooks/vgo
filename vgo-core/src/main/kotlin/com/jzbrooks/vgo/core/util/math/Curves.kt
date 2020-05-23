@@ -26,7 +26,7 @@ fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
     val firstDiagonal = LineSegment(m1, Point(m1.x + m1.y, m1.y - m1.x))
     val secondDiagonal = LineSegment(m2, Point(m2.x + (m2.y - mid.y), m2.y - (m2.x - mid.x)))
     val center = firstDiagonal.intersection(secondDiagonal) ?: return null
-    val radius = Point.zero.distanceTo(center)
+    val radius = Point.ZERO.distanceTo(center)
 
     // Do we need to parameterize this?
     @Suppress("NAME_SHADOWING")
@@ -50,7 +50,7 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
 
     val (startControl, endControl, end) = when (this) {
         is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-        is ShortcutCubicBezierCurve -> Triple(Point.zero, parameters[0].endControl, parameters[0].end)
+        is ShortcutCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
         else -> throw IllegalStateException("Control points must be provided for interpolation.")
     }
 
@@ -75,11 +75,11 @@ fun CubicCurve<*>.isConvex(tolerance: Float = 1e-2f): Boolean {
 
     val (startControl, endControl, end) = when (this) {
         is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-        is ShortcutCubicBezierCurve -> Triple(Point.zero, parameters[0].endControl, parameters[0].end)
+        is ShortcutCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
         else -> throw IllegalStateException("Control points must be provided for interpolation.")
     }
 
-    val firstDiagonal = LineSegment(Point.zero, endControl)
+    val firstDiagonal = LineSegment(Point.ZERO, endControl)
     val secondDiagonal = LineSegment(startControl, end)
 
     val intersection = secondDiagonal.intersection(firstDiagonal, tolerance)

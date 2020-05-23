@@ -165,7 +165,7 @@ class BakeTransformations : Optimization {
                             (transform * Vector3(point)).toPoint()
                         }
 
-                        currentPoint.x = newCurrentPoint
+                        currentPoint = currentPoint.copy(x = newCurrentPoint)
                         LineTo(CommandVariant.ABSOLUTE, newParameters)
                     }
                 }
@@ -188,8 +188,7 @@ class BakeTransformations : Optimization {
                             (transform * Vector3(point)).toPoint()
                         }
 
-                        currentPoint.y = newCurrentPoint
-
+                        currentPoint = currentPoint.copy(y = newCurrentPoint)
                         LineTo(CommandVariant.ABSOLUTE, newParameters)
                     }
                 }
