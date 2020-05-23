@@ -14,10 +14,14 @@ import org.w3c.dom.Document
 import java.io.File
 import java.util.jar.Manifest
 import javax.xml.parsers.DocumentBuilderFactory
+import kotlin.math.max
+import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
 class Application {
     private var printStats = false
+    private var totalBytesBefore = 0.0
+    private var totalBytesAfter = 0.0
     private var outputFormat: String? = null
 
     fun run(args: Array<String>): Int {
@@ -92,6 +96,16 @@ class Application {
                     }
                     handleFile(file, File(output, file.name), writerOptions)
                 }
+                if (printStats) {
+                    val message = "| Total bytes saved: ${(totalBytesBefore - totalBytesAfter).roundToInt()} |"
+                    val border = "-".repeat(message.length)
+                    println("""
+                        
+                        $border
+                        $message
+                        $border
+                    """.trimIndent())
+                }
             } else {
                 System.err.println("""
                     Input and output must be either files or directories.
@@ -163,6 +177,8 @@ class Application {
                 if (printStats) {
                     val sizeAfter = outputStream.channel.size()
                     val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
+                    totalBytesBefore += sizeBefore
+                    totalBytesAfter += sizeAfter
                     println("Size before: ${sizeBefore}B")
                     println("Size after: ${sizeAfter}B")
                     println("Percent saved: $percentSaved")
