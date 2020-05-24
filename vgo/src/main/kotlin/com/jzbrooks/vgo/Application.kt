@@ -140,9 +140,8 @@ class Application {
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
             var graphic = when {
                 rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> com.jzbrooks.vgo.svg.parse(rootNodes.first())
-                rootNodes.any { it.nodeName == "vector" || input.extension == "xml"} -> com.jzbrooks.vgo.vd.parse(rootNodes.first())
-                else -> throw IllegalStateException("""No supported formats were found in the document.
-                           |roots:${rootNodes.joinToString { it.nodeName }}""".trimMargin())
+                rootNodes.any { it.nodeName == "vector" && input.extension == "xml"} -> com.jzbrooks.vgo.vd.parse(rootNodes.first())
+                else -> null
             }
 
             if (graphic is VectorDrawable && outputFormat == "svg") {
@@ -159,7 +158,9 @@ class Application {
                 else -> null
             }
 
-            optimizationRegistry?.apply(graphic)
+            if (graphic != null) {
+                optimizationRegistry?.apply(graphic)
+            }
 
             if (!output.parentFile.exists()) output.parentFile.mkdirs()
             if (!output.exists()) output.createNewFile()
@@ -169,9 +170,14 @@ class Application {
                     val writer = VectorDrawableWriter(options)
                     writer.write(graphic, outputStream)
                 }
+
                 if (graphic is ScalableVectorGraphic){
                     val writer = ScalableVectorGraphicWriter(options)
                     writer.write(graphic, outputStream)
+                }
+
+                if (graphic == null && input != output) {
+                    inputStream.copyTo(outputStream)
                 }
 
                 if (printStats) {
