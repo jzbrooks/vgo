@@ -2,10 +2,10 @@ package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.svg.graphic.ClipPath
-import com.jzbrooks.vgo.vd.graphic.ClipPath as AndroidClipPath
 import com.jzbrooks.vgo.vd.VectorDrawable
 import kotlin.math.atan
 import kotlin.math.hypot
+import com.jzbrooks.vgo.vd.graphic.ClipPath as AndroidClipPath
 
 private val namedColorValues = mapOf(
         "black" to "#000000",

@@ -6,9 +6,9 @@ import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
-import com.jzbrooks.vgo.core.optimization.CommandVariant as CommandVariantOpt
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
+import com.jzbrooks.vgo.core.optimization.CommandVariant as CommandVariantOpt
 
 class CommandVariantTests {
     // This is okay because this optimization only ever compares

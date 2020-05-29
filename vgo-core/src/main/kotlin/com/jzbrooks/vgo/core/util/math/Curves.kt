@@ -1,6 +1,9 @@
 package com.jzbrooks.vgo.core.util.math
 
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.CubicCurve
+import com.jzbrooks.vgo.core.graphic.command.ShortcutCubicBezierCurve
 import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.hypot

@@ -2,7 +2,6 @@ package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point
-import java.lang.IllegalArgumentException
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt

@@ -1,7 +1,7 @@
 package com.jzbrooks.vgo.vd.optimization
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve

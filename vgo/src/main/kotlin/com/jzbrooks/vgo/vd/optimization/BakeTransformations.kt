@@ -2,9 +2,7 @@ package com.jzbrooks.vgo.vd.optimization
 
 import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.core.graphic.command.*
-import com.jzbrooks.vgo.core.optimization.GroupVisitor
 import com.jzbrooks.vgo.core.optimization.Optimization
-import com.jzbrooks.vgo.core.optimization.TopDownOptimization
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.Vector3

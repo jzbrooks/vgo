@@ -8,12 +8,7 @@ import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
-import com.jzbrooks.vgo.core.graphic.command.ClosePath
-import com.jzbrooks.vgo.core.graphic.command.CommandVariant
-import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
-import com.jzbrooks.vgo.core.graphic.command.LineTo
-import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
-import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 

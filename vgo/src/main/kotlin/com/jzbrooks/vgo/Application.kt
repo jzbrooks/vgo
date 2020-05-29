@@ -14,7 +14,6 @@ import org.w3c.dom.Document
 import java.io.File
 import java.util.jar.Manifest
 import javax.xml.parsers.DocumentBuilderFactory
-import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
