@@ -17,7 +17,8 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(prePass, topDown
                 ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)),
                 SimplifyBezierCurveCommands(1e-3f),
                 RemoveRedundantCommands(),
-                CommandVariant(CommandVariant.Mode.Compact(VectorDrawableCommandPrinter(3)))
+                CommandVariant(CommandVariant.Mode.Compact(VectorDrawableCommandPrinter(3))),
+                Polycommands()
         )
 
         private val postPass = listOf(
