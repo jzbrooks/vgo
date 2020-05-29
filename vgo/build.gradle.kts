@@ -62,6 +62,9 @@ tasks {
     }
 
     val updateBaselineOptimizations by registering(Copy::class) {
+        description = "Updates baseline assets with the latest integration test outputs."
+        group = "Build Setup"
+
         from("$buildDir/integrationTest/") {
             include("*testOptimizationFinishes.xml")
             include("*testOptimizationFinishes.svg")
