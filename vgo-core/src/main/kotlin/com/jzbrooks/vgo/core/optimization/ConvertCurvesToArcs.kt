@@ -68,7 +68,7 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
 
                     val previous = computeAbsoluteCoordinates(commands.take(i))
 
-                    while (nextCommand is CubicCurve<*> && nextCommand.isConvex(1e-2f) && nextCommand.liesOnCircle(relativeCircle, 1e-2f)) {
+                    while (nextCommand is CubicCurve<*> && nextCommand.isConvex() && nextCommand.liesOnCircle(relativeCircle)) {
                         val originalNext = nextCommand
                         if (nextCommand is ShortcutCubicBezierCurve) {
                             nextCommand = nextCommand.toCubicBezierCurve(currentCommand as CubicCurve<*>)
