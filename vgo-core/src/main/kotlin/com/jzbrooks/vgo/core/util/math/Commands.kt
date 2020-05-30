@@ -9,13 +9,13 @@ import java.util.*
  * @param commands: The complete list of **relative** commands for a given path. The initial moveto can be absolute.
  * @param commandIndex: The index of a specific command to compute absolute coordinates from relative
  */
-fun computeAbsoluteCoordinates(commands: List<Command>, commandIndex: Int = commands.size - 1): Point {
+fun computeAbsoluteCoordinates(commands: List<Command>): Point {
     assert(commands.drop(1).filterIsInstance<ParameterizedCommand<*>>().all { it.variant == CommandVariant.RELATIVE })
 
     val pathStart = Stack<Point>()
     var currentPoint = Point(0f, 0f)
 
-    for (i in 0..commandIndex) {
+    for (i in commands.indices) {
         val command = commands[i]
         val newCurrentPoint = when (command) {
             is MoveTo -> command.parameters[0]

@@ -8,8 +8,9 @@ import com.jzbrooks.vgo.core.util.math.*
 class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimization, PathElementVisitor {
 
     override fun visit(pathElement: PathElement) {
-        val newCommands = convertSingleArcs(pathElement.commands)
-        pathElement.commands = newCommands
+        val multiCurvePass = collapseMultipleCurves(pathElement.commands)
+        val singleCurvePass = convertSingleArcs(multiCurvePass)
+        pathElement.commands = singleCurvePass
     }
 
     private fun collapseMultipleCurves(commands: List<Command>): List<Command> {
@@ -64,15 +65,18 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
 
                     var j = i + 1
                     var nextCommand = commands.getOrNull(j)
-                    val previous = computeAbsoluteCoordinates(newCommands)
 
-                    while (nextCommand is CubicCurve<*> && nextCommand.isConvex() && nextCommand.liesOnCircle(relativeCircle)) {
+                    val previous = computeAbsoluteCoordinates(commands.take(i))
+
+                    while (nextCommand is CubicCurve<*> && nextCommand.isConvex(1e-2f) && nextCommand.liesOnCircle(relativeCircle, 1e-2f)) {
                         val originalNext = nextCommand
                         if (nextCommand is ShortcutCubicBezierCurve) {
                             nextCommand = nextCommand.toCubicBezierCurve(currentCommand as CubicCurve<*>)
                         }
 
                         check(nextCommand is CubicBezierCurve)
+
+                        val next = computeAbsoluteCoordinates(commands.take(j + 1))
 
                         angle += nextCommand.findArcAngle(relativeCircle)
 
@@ -84,8 +88,6 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                         if (angle > Math.PI) arc.parameters[0].arc = EllipticalArcCurve.ArcFlag.LARGE
 
                         pendingCurves.add(originalNext)
-
-                        val next = computeAbsoluteCoordinates(commands, j + 1)
 
                         if (2 * Math.PI - angle > 1e-3) {
                             arc.parameters[0].end = next - previous
@@ -104,7 +106,6 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                         }
 
                         relativeCircle.center -= nextCommand.parameters[0].end
-
                         nextCommand = commands.getOrNull(++j)
                     }
 
@@ -118,7 +119,9 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                         alternativeOutput.add(nextCommand.toCubicBezierCurve(pendingCurves.last()))
                     }
 
-                    if (pendingCurves.joinToString(separator = "", transform = printer::print).length > alternativeOutput.joinToString(separator = "", transform = printer::print).length) {
+                    val originalSize = pendingCurves.joinToString(separator = "", transform = printer::print).length
+                    val alternativeSize = alternativeOutput.joinToString(separator = "", transform = printer::print).length
+                    if (alternativeSize < originalSize) {
                         newCommands.addAll(alternativeOutput)
                         if (alternativeOutput.last() is CubicBezierCurve) replacedCommands += 1
                     } else {
@@ -174,7 +177,9 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                         listOf(arc)
                     }
 
-                    if (arcOutput.joinToString(separator = "", transform = printer::print).length < printer.print(command).length) {
+                    val originalSize = printer.print(command).length
+                    val alternativeSize = arcOutput.joinToString(separator = "", transform = printer::print).length
+                    if (alternativeSize < originalSize) {
                         newCommands.addAll(arcOutput)
                         fixedUpCurve = arcOutput.last() as? CubicBezierCurve
                     } else {

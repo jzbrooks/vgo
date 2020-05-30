@@ -50,7 +50,7 @@ class CommandsTest {
                 ClosePath
         )
 
-        val absoluteCoordinates = computeAbsoluteCoordinates(commands, 5)
+        val absoluteCoordinates = computeAbsoluteCoordinates(commands.take(6))
 
         assertThat(absoluteCoordinates).isEqualTo(Point(12f, 8f))
     }

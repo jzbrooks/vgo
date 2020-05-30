@@ -9,7 +9,7 @@ import kotlin.math.acos
 import kotlin.math.hypot
 import kotlin.math.min
 
-private const val ARC_THRESHOLD = 2.5f
+private const val ARC_THRESHOLD = 2f
 private const val ARC_TOLERANCE = 0.5f
 
 /**
@@ -33,9 +33,9 @@ fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
 
     // Do we need to parameterize this?
     @Suppress("NAME_SHADOWING")
-    val tolerance = min(ARC_THRESHOLD * tolerance, ARC_TOLERANCE * radius / 100f)
+    val tolerance = ARC_THRESHOLD * tolerance
 
-    val withinTolerance = radius < 1e15 && floatArrayOf(1/4f, 3/4f).all {
+    val withinTolerance = radius < 1e10 && floatArrayOf(1/4f, 3/4f).all {
         val curveValue = interpolate(it)
         abs(curveValue.distanceTo(center) - radius) <= tolerance
     }
@@ -72,7 +72,7 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
  * Requires that the curve only has a single parameter
  * Requires that the curve use relative coordinates
 */
-fun CubicCurve<*>.isConvex(tolerance: Float = 1e-2f): Boolean {
+fun CubicCurve<*>.isConvex(tolerance: Float = 1e-3f): Boolean {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
@@ -115,7 +115,7 @@ fun ShortcutCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicB
     })
 }
 
-fun CubicCurve<*>.liesOnCircle(circle: Circle, tolerance: Float = 0.01f): Boolean {
+fun CubicCurve<*>.liesOnCircle(circle: Circle, tolerance: Float = 1e-3f): Boolean {
     @Suppress("NAME_SHADOWING")
     val tolerance = min(ARC_THRESHOLD * tolerance, ARC_TOLERANCE * circle.radius / 100)
 
@@ -125,7 +125,7 @@ fun CubicCurve<*>.liesOnCircle(circle: Circle, tolerance: Float = 0.01f): Boolea
 }
 
 fun CubicBezierCurve.findArcAngle(circle: Circle): Float {
-    val center = circle.center * -1f
+    val center = circle.center
     val edge = parameters[0].end
 
     val innerProduct = center.x * edge.x + center.y * edge.y
