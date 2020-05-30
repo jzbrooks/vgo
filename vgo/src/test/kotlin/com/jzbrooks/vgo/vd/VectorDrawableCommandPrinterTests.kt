@@ -50,8 +50,8 @@ class VectorDrawableCommandPrinterTests {
 
     @Test
     fun testPrintShortcutCubicBezierCurve() {
-        val command = ShortcutCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(
-                ShortcutCubicBezierCurve.Parameter(
+        val command = SmoothCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(
+                SmoothCubicBezierCurve.Parameter(
                         Point(1.03424f, 2.0f),
                         Point(1.3924f, 1.0f)
                 )
@@ -74,7 +74,7 @@ class VectorDrawableCommandPrinterTests {
 
     @Test
     fun testPrintShortcutQuadraticBezierCurve() {
-        val command = ShortcutQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(1.03424f, 2.0f)))
+        val command = SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(1.03424f, 2.0f)))
         val result = VectorDrawableCommandPrinter(3).print(command)
         assertThat(result).isEqualTo("T1.034,2")
     }

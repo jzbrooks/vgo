@@ -173,7 +173,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                         currentPoint = newCurrentPoint
                     }
                 }
-                is ShortcutQuadraticBezierCurve -> {
+                is SmoothQuadraticBezierCurve -> {
                     command.apply {
                         val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
                             currentPoint + parameters.reduce(Point::plus)
@@ -231,7 +231,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                         currentPoint = newCurrentPoint
                     }
                 }
-                is ShortcutCubicBezierCurve -> {
+                is SmoothCubicBezierCurve -> {
                     command.apply {
                         val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
                             currentPoint + parameters.map { it.end }.reduce(Point::plus)

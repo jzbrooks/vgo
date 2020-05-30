@@ -7,7 +7,7 @@ import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.ShortcutCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
@@ -53,8 +53,8 @@ class CurvesTests {
 
     @Test
     fun `Ensure non-relative shortcut throws`() {
-        val nonRelativeCurve = ShortcutCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(
-                ShortcutCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f))
+        val nonRelativeCurve = SmoothCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(
+                SmoothCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f))
         ))
 
         assertThrows<AssertionError> {
@@ -64,9 +64,9 @@ class CurvesTests {
 
     @Test
     fun `Ensure multiple shortcut curve parameters throws`() {
-        val mutliParameterCurve = ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
-                ShortcutCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f)),
-                ShortcutCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f))
+        val mutliParameterCurve = SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                SmoothCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f)),
+                SmoothCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f))
         ))
 
         assertThrows<AssertionError> {
@@ -83,7 +83,7 @@ class CurvesTests {
 
     @MethodSource
     @ParameterizedTest
-    fun `Shortcut curve does not fit to circle`(curve: ShortcutCubicBezierCurve) {
+    fun `Shortcut curve does not fit to circle`(curve: SmoothCubicBezierCurve) {
         val circle = curve.fitCircle(0.01f)
         assertThat(circle).isNull()
     }
@@ -116,21 +116,21 @@ class CurvesTests {
 
     @MethodSource
     @ParameterizedTest
-    fun `Convex shortcut curves are convex`(curve: ShortcutCubicBezierCurve) {
+    fun `Convex shortcut curves are convex`(curve: SmoothCubicBezierCurve) {
         assertThat(curve.isConvex()).isTrue()
     }
 
     @MethodSource
     @ParameterizedTest
-    fun `Concave shortcut curves are not convex`(curve: ShortcutCubicBezierCurve) {
+    fun `Concave shortcut curves are not convex`(curve: SmoothCubicBezierCurve) {
         assertThat(curve.isConvex()).isFalse()
     }
 
     data class FitCircle(val curve: CubicBezierCurve, val expectedCircle: Circle)
-    data class ShortcutFitCircle(val curve: ShortcutCubicBezierCurve, val expectedCircle: Circle?)
+    data class ShortcutFitCircle(val curve: SmoothCubicBezierCurve, val expectedCircle: Circle?)
 
     data class ParameterizedCurve(val curve: CubicBezierCurve, val t: Float, val expected: Point)
-    data class ShortcutParameterizedCurve(val curve: ShortcutCubicBezierCurve, val t: Float, val expected: Point)
+    data class ShortcutParameterizedCurve(val curve: SmoothCubicBezierCurve, val t: Float, val expected: Point)
 
     companion object {
         @JvmStatic
@@ -146,10 +146,10 @@ class CurvesTests {
         }
 
         @JvmStatic
-        fun `Shortcut curve does not fit to circle`(): List<ShortcutCubicBezierCurve> {
+        fun `Shortcut curve does not fit to circle`(): List<SmoothCubicBezierCurve> {
             return listOf(
-                    ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
-                            ShortcutCubicBezierCurve.Parameter(Point(5f, 2.239f), Point(5f, 5f))
+                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                            SmoothCubicBezierCurve.Parameter(Point(5f, 2.239f), Point(5f, 5f))
                     ))
             )
         }
@@ -171,8 +171,8 @@ class CurvesTests {
         fun `Point along a shortcut curve is computed correctly`(): List<ShortcutParameterizedCurve> {
             return listOf(
                     ShortcutParameterizedCurve(
-                            ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
-                                    ShortcutCubicBezierCurve.Parameter(Point(-5.1f, 14f), Point(12.4f, 11.1f))
+                            SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                                    SmoothCubicBezierCurve.Parameter(Point(-5.1f, 14f), Point(12.4f, 11.1f))
                             )),
                             0.54f,
                             Point(-0.099726915f, 7.381562f)
@@ -205,25 +205,25 @@ class CurvesTests {
         }
 
         @JvmStatic
-        fun `Convex shortcut curves are convex`(): List<ShortcutCubicBezierCurve> {
+        fun `Convex shortcut curves are convex`(): List<SmoothCubicBezierCurve> {
             return listOf(
-                    ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
-                            ShortcutCubicBezierCurve.Parameter(Point(5f, 2.25f), Point(5f, 5f))
+                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                            SmoothCubicBezierCurve.Parameter(Point(5f, 2.25f), Point(5f, 5f))
                     )),
-                    ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
-                            ShortcutCubicBezierCurve.Parameter(Point(1.5f, 0.5f), Point(3.5f, 2f))
+                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                            SmoothCubicBezierCurve.Parameter(Point(1.5f, 0.5f), Point(3.5f, 2f))
                     )),
-                    ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
-                            ShortcutCubicBezierCurve.Parameter(Point(109f, 8f), Point(113f, 12f))
+                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                            SmoothCubicBezierCurve.Parameter(Point(109f, 8f), Point(113f, 12f))
                     ))
             )
         }
 
         @JvmStatic
-        fun `Concave shortcut curves are not convex`(): List<ShortcutCubicBezierCurve> {
+        fun `Concave shortcut curves are not convex`(): List<SmoothCubicBezierCurve> {
             return listOf(
-                    ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
-                            ShortcutCubicBezierCurve.Parameter(Point(2.5f, 0f), Point(-5f, 2.25f))
+                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                            SmoothCubicBezierCurve.Parameter(Point(2.5f, 0f), Point(-5f, 2.25f))
                     ))
             )
         }

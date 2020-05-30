@@ -62,7 +62,7 @@ inline class CommandString(val data: String) {
                                     .map(::mapPoint)
                                     .toList()
 
-                            ShortcutQuadraticBezierCurve(variant, parameters)
+                            SmoothQuadraticBezierCurve(variant, parameters)
                         }
                         command.startsWith('C', true) -> {
                             val parameters = number.findAll(command)
@@ -82,7 +82,7 @@ inline class CommandString(val data: String) {
                                     .map(::mapShortcutCubicBezierCurveParameter)
                                     .toList()
 
-                            ShortcutCubicBezierCurve(variant, parameters)
+                            SmoothCubicBezierCurve(variant, parameters)
                         }
                         command.startsWith('A', true) -> {
                             val parameters = number.findAll(command)
@@ -119,11 +119,11 @@ inline class CommandString(val data: String) {
         return CubicBezierCurve.Parameter(startControl, endControl, end)
     }
 
-    private fun mapShortcutCubicBezierCurveParameter(components: List<Float>): ShortcutCubicBezierCurve.Parameter {
+    private fun mapShortcutCubicBezierCurveParameter(components: List<Float>): SmoothCubicBezierCurve.Parameter {
         val endControl = Point(components[0], components[1])
         val end = Point(components[2], components[3])
 
-        return ShortcutCubicBezierCurve.Parameter(endControl, end)
+        return SmoothCubicBezierCurve.Parameter(endControl, end)
     }
 
     private fun mapEllipticalArcCurveParameter(components: List<Float>): EllipticalArcCurve.Parameter {

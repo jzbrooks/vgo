@@ -56,9 +56,9 @@ class BreakoutImplicitCommandsTests {
                         HorizontalLineTo(CommandVariant.ABSOLUTE, listOf(101f)),
                         VerticalLineTo(CommandVariant.ABSOLUTE, listOf(-8f)),
                         HorizontalLineTo(CommandVariant.ABSOLUTE, listOf(103f)),
-                        ShortcutCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(ShortcutCubicBezierCurve.Parameter(Point(113f, 39f), Point(105f, -6f)))),
+                        SmoothCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(SmoothCubicBezierCurve.Parameter(Point(113f, 39f), Point(105f, -6f)))),
                         QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(112f, -10f), Point(109f, -3f)))),
-                        ShortcutQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
+                        SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                         EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
                         ClosePath
                 )

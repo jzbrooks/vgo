@@ -25,7 +25,7 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(ShortcutCubicBezierCurve::class)
+        assertThat(path.commands.last()::class).isEqualTo(SmoothCubicBezierCurve::class)
     }
 
     @Test
@@ -33,8 +33,8 @@ class SimplifyBezierCurveCommandsTests {
         val path = Path(
                 listOf(
                         MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 200f))),
-                        ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
-                                ShortcutCubicBezierCurve.Parameter(Point(450f, 100f), Point(250f, 200f)))
+                        SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                                SmoothCubicBezierCurve.Parameter(Point(450f, 100f), Point(250f, 200f)))
                         ),
                         CubicBezierCurve(CommandVariant.RELATIVE, listOf(
                                 CubicBezierCurve.Parameter(Point(-200f, 100f), Point(400f, 300f), Point(250f, 200f)))
@@ -44,7 +44,7 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(ShortcutCubicBezierCurve::class)
+        assertThat(path.commands.last()::class).isEqualTo(SmoothCubicBezierCurve::class)
     }
 
     @Test
@@ -60,7 +60,7 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(ShortcutCubicBezierCurve::class)
+        assertThat(path.commands.last()::class).isEqualTo(SmoothCubicBezierCurve::class)
     }
 
     @Test
@@ -79,7 +79,7 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(ShortcutQuadraticBezierCurve::class)
+        assertThat(path.commands.last()::class).isEqualTo(SmoothQuadraticBezierCurve::class)
     }
 
     @Test
@@ -90,7 +90,7 @@ class SimplifyBezierCurveCommandsTests {
                         QuadraticBezierCurve(CommandVariant.RELATIVE, listOf(
                                 QuadraticBezierCurve.Parameter(Point(-300f, 100f), Point(150f, 50f)))
                         ),
-                        ShortcutQuadraticBezierCurve(CommandVariant.RELATIVE, listOf(
+                        SmoothQuadraticBezierCurve(CommandVariant.RELATIVE, listOf(
                                 Point(250f, 200f))
                         ),
                         QuadraticBezierCurve(CommandVariant.RELATIVE, listOf(
@@ -101,7 +101,7 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(ShortcutQuadraticBezierCurve::class)
+        assertThat(path.commands.last()::class).isEqualTo(SmoothQuadraticBezierCurve::class)
     }
 
     @Test
@@ -128,8 +128,8 @@ class SimplifyBezierCurveCommandsTests {
                         CubicBezierCurve(CommandVariant.RELATIVE, listOf(
                                 CubicBezierCurve.Parameter(Point(20f, 20f), Point(20f, 20f), Point(20f, 20f)))
                         ),
-                        ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(
-                                ShortcutCubicBezierCurve.Parameter(Point(450f, 100f), Point(250f, 200f)))
+                        SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                                SmoothCubicBezierCurve.Parameter(Point(450f, 100f), Point(250f, 200f)))
                         )
                 )
         )

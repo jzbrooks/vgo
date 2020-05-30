@@ -29,7 +29,7 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
             val previousCommand = commands.getOrNull(i - 1)
             val originalCommand = commands[i]
             val currentCommand = originalCommand.let { command ->
-                if (command is ShortcutCubicBezierCurve && previousCommand is CubicCurve<*>) {
+                if (command is SmoothCubicBezierCurve && previousCommand is CubicCurve<*>) {
                     command.toCubicBezierCurve(previousCommand)
                 } else {
                     command
@@ -73,7 +73,7 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
 
                     while (nextCommand is CubicCurve<*> && nextCommand.isConvex() && nextCommand.liesOnCircle(relativeCircle)) {
                         val originalNext = nextCommand
-                        if (nextCommand is ShortcutCubicBezierCurve) {
+                        if (nextCommand is SmoothCubicBezierCurve) {
                             nextCommand = nextCommand.toCubicBezierCurve(currentCommand as CubicCurve<*>)
                         }
 
@@ -118,7 +118,7 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                     // If the next curve is a shorthand, it must be converted
                     // to longhand if it the previous curve is replaced with an
                     // elliptical arc.
-                    if (nextCommand is ShortcutCubicBezierCurve) {
+                    if (nextCommand is SmoothCubicBezierCurve) {
                         alternativeOutput.add(nextCommand.toCubicBezierCurve(pendingCurves.last()))
                     }
 
@@ -174,7 +174,7 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                     ))
 
                     val next = commands.getOrNull(i + 1)
-                    val arcOutput = if (next is ShortcutCubicBezierCurve) {
+                    val arcOutput = if (next is SmoothCubicBezierCurve) {
                         listOf(arc, next.toCubicBezierCurve(command))
                     } else {
                         listOf(arc)

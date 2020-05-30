@@ -43,9 +43,9 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
                 is HorizontalLineTo -> process(command)
                 is VerticalLineTo -> process(command)
                 is CubicBezierCurve -> process(command)
-                is ShortcutCubicBezierCurve -> process(command)
+                is SmoothCubicBezierCurve -> process(command)
                 is QuadraticBezierCurve -> process(command)
-                is ShortcutQuadraticBezierCurve -> process(command)
+                is SmoothQuadraticBezierCurve -> process(command)
                 is EllipticalArcCurve -> process(command)
                 is ClosePath -> process(command)
                 else -> throw IllegalStateException("Unsupported command encountered: $command")
@@ -169,7 +169,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
         return choose(convertedCommand, command)
     }
 
-    private fun process(command: ShortcutCubicBezierCurve): ShortcutCubicBezierCurve {
+    private fun process(command: SmoothCubicBezierCurve): SmoothCubicBezierCurve {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
                     variant = CommandVariant.ABSOLUTE,
@@ -229,7 +229,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
         return choose(convertedCommand, command)
     }
 
-    private fun process(command: ShortcutQuadraticBezierCurve): ShortcutQuadraticBezierCurve {
+    private fun process(command: SmoothQuadraticBezierCurve): SmoothQuadraticBezierCurve {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
                     variant = CommandVariant.ABSOLUTE,

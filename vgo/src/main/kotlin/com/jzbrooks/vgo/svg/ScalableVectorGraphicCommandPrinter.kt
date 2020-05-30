@@ -19,9 +19,9 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int): Comma
             is VerticalLineTo -> print(command)
             is HorizontalLineTo -> print(command)
             is CubicBezierCurve -> print(command)
-            is ShortcutCubicBezierCurve -> print(command)
+            is SmoothCubicBezierCurve -> print(command)
             is QuadraticBezierCurve -> print(command)
-            is ShortcutQuadraticBezierCurve -> print(command)
+            is SmoothQuadraticBezierCurve -> print(command)
             is EllipticalArcCurve -> print(command)
             is ClosePath -> "Z"
             else -> throw IllegalArgumentException("An unexpected command type was encountered: $command")
@@ -108,15 +108,15 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int): Comma
         return builder.toString()
     }
 
-    private fun print(shortcutCubicBezierCurve: ShortcutCubicBezierCurve): String {
-        val builder = StringBuilder(when (shortcutCubicBezierCurve.variant) {
+    private fun print(smoothCubicBezierCurve: SmoothCubicBezierCurve): String {
+        val builder = StringBuilder(when (smoothCubicBezierCurve.variant) {
             CommandVariant.ABSOLUTE -> "S"
             CommandVariant.RELATIVE -> "s"
         })
 
-        for ((index, parameter) in shortcutCubicBezierCurve.parameters.withIndex()) {
+        for ((index, parameter) in smoothCubicBezierCurve.parameters.withIndex()) {
             builder.append(print(parameter))
-            if (index != shortcutCubicBezierCurve.parameters.size - 1) {
+            if (index != smoothCubicBezierCurve.parameters.size - 1) {
                 builder.append(" ")
             }
         }
@@ -142,15 +142,15 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int): Comma
         return builder.toString()
     }
 
-    private fun print(shortcutQuadraticBezierCurve: ShortcutQuadraticBezierCurve): String {
-        val builder = StringBuilder(when (shortcutQuadraticBezierCurve.variant) {
+    private fun print(smoothQuadraticBezierCurve: SmoothQuadraticBezierCurve): String {
+        val builder = StringBuilder(when (smoothQuadraticBezierCurve.variant) {
             CommandVariant.ABSOLUTE -> "T"
             CommandVariant.RELATIVE -> "t"
         })
 
-        for ((index, parameter) in shortcutQuadraticBezierCurve.parameters.withIndex()) {
+        for ((index, parameter) in smoothQuadraticBezierCurve.parameters.withIndex()) {
             builder.append(print(parameter))
-            if (index != shortcutQuadraticBezierCurve.parameters.size - 1) {
+            if (index != smoothQuadraticBezierCurve.parameters.size - 1) {
                 builder.append(" ")
             }
         }
@@ -223,7 +223,7 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int): Comma
         }
     }
 
-    private fun print(parameter: ShortcutCubicBezierCurve.Parameter): String {
+    private fun print(parameter: SmoothCubicBezierCurve.Parameter): String {
         return parameter.run {
             val builder = StringBuilder(print(endControl))
             if (end.x >= 0) builder.append(' ')

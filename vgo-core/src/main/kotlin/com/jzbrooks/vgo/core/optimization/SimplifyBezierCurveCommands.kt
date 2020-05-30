@@ -37,7 +37,7 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                         commands.add(LineTo(current.variant, listOf(currentFinalParameter.end)))
 
                         val next = existingCommands.getOrNull(index + 1)
-                        if (next is ShortcutCubicBezierCurve) {
+                        if (next is SmoothCubicBezierCurve) {
                             commands.add(CubicBezierCurve(next.variant, next.parameters.map {
                                 CubicBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.endControl, it.endControl, it.end)
                             }))
@@ -48,34 +48,34 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                     }
                     if (lastAdded is CubicBezierCurve &&
                             currentFinalParameter.startControl == (lastAdded.parameters.last().run { end - endControl })) {
-                        commands.add(ShortcutCubicBezierCurve(current.variant, current.parameters.map {
-                            ShortcutCubicBezierCurve.Parameter(it.endControl, it.end)
+                        commands.add(SmoothCubicBezierCurve(current.variant, current.parameters.map {
+                            SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
                         }))
                         continue@loop
                     }
-                    if (lastAdded is ShortcutCubicBezierCurve &&
+                    if (lastAdded is SmoothCubicBezierCurve &&
                             currentFinalParameter.startControl == (lastAdded.parameters.last().run { end - endControl })) {
-                        commands.add(ShortcutCubicBezierCurve(current.variant, current.parameters.map {
-                            ShortcutCubicBezierCurve.Parameter(it.endControl, it.end)
+                        commands.add(SmoothCubicBezierCurve(current.variant, current.parameters.map {
+                            SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
                         }))
                         continue@loop
                     }
-                    if (lastAdded !is ShortcutCubicBezierCurve && lastAdded !is CubicBezierCurve &&
+                    if (lastAdded !is SmoothCubicBezierCurve && lastAdded !is CubicBezierCurve &&
                             currentFinalParameter.startControl == Point.ZERO) {
-                        commands.add(ShortcutCubicBezierCurve(current.variant, current.parameters.map {
-                            ShortcutCubicBezierCurve.Parameter(it.endControl, it.end)
+                        commands.add(SmoothCubicBezierCurve(current.variant, current.parameters.map {
+                            SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
                         }))
                         continue@loop
                     }
                 }
 
-                if (current is ShortcutCubicBezierCurve && current.isStraightLine()) {
+                if (current is SmoothCubicBezierCurve && current.isStraightLine()) {
                     val currentFinalParameter = current.parameters.last()
 
                     commands.add(LineTo(current.variant, listOf(currentFinalParameter.end)))
 
                     val next = existingCommands.getOrNull(index + 1)
-                    if (next is ShortcutCubicBezierCurve) {
+                    if (next is SmoothCubicBezierCurve) {
                         commands.add(CubicBezierCurve(next.variant, next.parameters.map {
                             CubicBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.endControl, it.endControl, it.end)
                         }))
@@ -91,7 +91,7 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                         commands.add(LineTo(current.variant, listOf(currentFinalParameter.end)))
 
                         val next = existingCommands.getOrNull(index + 1)
-                        if (next is ShortcutQuadraticBezierCurve) {
+                        if (next is SmoothQuadraticBezierCurve) {
                             commands.add(QuadraticBezierCurve(next.variant, next.parameters.map {
                                 QuadraticBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.control, it)
                             }))
@@ -103,24 +103,24 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
 
                     if (lastAdded is QuadraticBezierCurve &&
                             currentFinalParameter.control == (lastAdded.parameters.last().run { end - control })) {
-                        commands.add(ShortcutQuadraticBezierCurve(current.variant, current.parameters.map {
+                        commands.add(SmoothQuadraticBezierCurve(current.variant, current.parameters.map {
                             it.end
                         }))
                         continue@loop
                     }
 
-                    if (lastAdded is ShortcutQuadraticBezierCurve &&
+                    if (lastAdded is SmoothQuadraticBezierCurve &&
                             currentFinalParameter.end == lastAdded.parameters.last()) {
-                        commands.add(ShortcutQuadraticBezierCurve(current.variant, current.parameters.map {
+                        commands.add(SmoothQuadraticBezierCurve(current.variant, current.parameters.map {
                             it.end
                         }))
                         continue@loop
                     }
                 }
 
-                if (current is ShortcutQuadraticBezierCurve &&
+                if (current is SmoothQuadraticBezierCurve &&
                         lastAdded !is QuadraticBezierCurve &&
-                        lastAdded !is ShortcutQuadraticBezierCurve) {
+                        lastAdded !is SmoothQuadraticBezierCurve) {
                     val currentFinalParameter = current.parameters.last()
                     commands.add(LineTo(current.variant, listOf(currentFinalParameter)))
                     continue@loop
@@ -153,7 +153,7 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
         return true
     }
 
-    private fun ShortcutCubicBezierCurve.isStraightLine(): Boolean {
+    private fun SmoothCubicBezierCurve.isStraightLine(): Boolean {
         val lastParameter = parameters.last().end
         val a = -lastParameter.y.toDouble()
         val b = lastParameter.x.toDouble()

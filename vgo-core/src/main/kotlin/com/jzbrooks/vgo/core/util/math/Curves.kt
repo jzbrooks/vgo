@@ -3,7 +3,7 @@ package com.jzbrooks.vgo.core.util.math
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.CubicCurve
-import com.jzbrooks.vgo.core.graphic.command.ShortcutCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.hypot
@@ -53,7 +53,7 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
 
     val (startControl, endControl, end) = when (this) {
         is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-        is ShortcutCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
+        is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
         else -> throw IllegalStateException("Control points must be provided for interpolation.")
     }
 
@@ -78,7 +78,7 @@ fun CubicCurve<*>.isConvex(tolerance: Float = 1e-3f): Boolean {
 
     val (startControl, endControl, end) = when (this) {
         is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-        is ShortcutCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
+        is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
         else -> throw IllegalStateException("Control points must be provided for interpolation.")
     }
 
@@ -98,7 +98,7 @@ fun CubicCurve<*>.isConvex(tolerance: Float = 1e-3f): Boolean {
  * Requires that the curve only has a single parameter
  * Requires that the curve use relative coordinates
  */
-fun ShortcutCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBezierCurve {
+fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBezierCurve {
     assert(variant == CommandVariant.RELATIVE)
     assert(previous.variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
@@ -106,7 +106,7 @@ fun ShortcutCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicB
 
     val (prevEndControl, prevEnd) = when (val previousParam = previous.parameters[0]) {
         is CubicBezierCurve.Parameter -> previousParam.endControl to previousParam.end
-        is ShortcutCubicBezierCurve.Parameter -> previousParam.endControl to previousParam.end
+        is SmoothCubicBezierCurve.Parameter -> previousParam.endControl to previousParam.end
         else -> throw IllegalStateException("A destructuring of control points is required for ${previous::class.simpleName}.")
     }
 

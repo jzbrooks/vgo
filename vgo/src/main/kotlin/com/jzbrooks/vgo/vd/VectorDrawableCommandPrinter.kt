@@ -19,9 +19,9 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
             is VerticalLineTo -> print(command)
             is HorizontalLineTo -> print(command)
             is CubicBezierCurve -> print(command)
-            is ShortcutCubicBezierCurve -> print(command)
+            is SmoothCubicBezierCurve -> print(command)
             is QuadraticBezierCurve -> print(command)
-            is ShortcutQuadraticBezierCurve -> print(command)
+            is SmoothQuadraticBezierCurve -> print(command)
             is EllipticalArcCurve -> print(command)
             is ClosePath -> "Z"
             else -> throw IllegalArgumentException("An unexpected command type was encountered: $command")
@@ -128,17 +128,17 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
         }
     }
 
-    private fun print(shortcutCubicBezierCurve: ShortcutCubicBezierCurve): String {
-        val command = when (shortcutCubicBezierCurve.variant) {
+    private fun print(smoothCubicBezierCurve: SmoothCubicBezierCurve): String {
+        val command = when (smoothCubicBezierCurve.variant) {
             CommandVariant.ABSOLUTE -> 'S'
             CommandVariant.RELATIVE -> 's'
         }
 
         return buildString {
             append(command)
-            append(print(shortcutCubicBezierCurve.parameters.first()))
+            append(print(smoothCubicBezierCurve.parameters.first()))
 
-            for (parameter in shortcutCubicBezierCurve.parameters.drop(1)) {
+            for (parameter in smoothCubicBezierCurve.parameters.drop(1)) {
                 if (parameter.endControl.x >= 0) {
                     append(' ')
                 }
@@ -168,17 +168,17 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
         }
     }
 
-    private fun print(shortcutQuadraticBezierCurve: ShortcutQuadraticBezierCurve): String {
-        val command = when (shortcutQuadraticBezierCurve.variant) {
+    private fun print(smoothQuadraticBezierCurve: SmoothQuadraticBezierCurve): String {
+        val command = when (smoothQuadraticBezierCurve.variant) {
             CommandVariant.ABSOLUTE -> 'T'
             CommandVariant.RELATIVE -> 't'
         }
 
         return buildString {
             append(command)
-            append(print(shortcutQuadraticBezierCurve.parameters.first()))
+            append(print(smoothQuadraticBezierCurve.parameters.first()))
 
-            for (parameter in shortcutQuadraticBezierCurve.parameters.drop(1)) {
+            for (parameter in smoothQuadraticBezierCurve.parameters.drop(1)) {
                 if (parameter.x >= 0) {
                     append(' ')
                 }
@@ -237,7 +237,7 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
         }
     }
 
-    private fun print(parameter: ShortcutCubicBezierCurve.Parameter): String {
+    private fun print(parameter: SmoothCubicBezierCurve.Parameter): String {
         return parameter.run {
             buildString {
                 append(print(endControl))

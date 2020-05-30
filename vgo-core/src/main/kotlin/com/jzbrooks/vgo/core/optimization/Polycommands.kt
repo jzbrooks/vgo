@@ -43,7 +43,7 @@ class Polycommands : TopDownOptimization, PathElementVisitor {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
-                        lastAdded is ShortcutCubicBezierCurve && current is ShortcutCubicBezierCurve -> {
+                        lastAdded is SmoothCubicBezierCurve && current is SmoothCubicBezierCurve -> {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
@@ -51,7 +51,7 @@ class Polycommands : TopDownOptimization, PathElementVisitor {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
-                        lastAdded is ShortcutQuadraticBezierCurve && current is ShortcutQuadraticBezierCurve -> {
+                        lastAdded is SmoothQuadraticBezierCurve && current is SmoothQuadraticBezierCurve -> {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }

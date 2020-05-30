@@ -23,9 +23,9 @@ fun computeAbsoluteCoordinates(commands: List<Command>): Point {
             is HorizontalLineTo -> Point(command.parameters[0], 0f)
             is VerticalLineTo -> Point(0f, command.parameters[0])
             is CubicBezierCurve -> command.parameters[0].end
-            is ShortcutCubicBezierCurve -> command.parameters[0].end
+            is SmoothCubicBezierCurve -> command.parameters[0].end
             is QuadraticBezierCurve -> command.parameters[0].end
-            is ShortcutQuadraticBezierCurve -> command.parameters[0]
+            is SmoothQuadraticBezierCurve -> command.parameters[0]
             is EllipticalArcCurve -> command.parameters[0].end
             is ClosePath -> pathStart.pop()
             else -> throw IllegalStateException("Unsupported command encountered: $command")

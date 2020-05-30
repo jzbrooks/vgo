@@ -43,7 +43,7 @@ class MergePathsTests {
                 Path(
                         listOf(
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                                ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                                SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                         )
                 ),
@@ -68,7 +68,7 @@ class MergePathsTests {
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                                ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                                SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                         )),
                         Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mutableMapOf("android:strokeWidth" to "1")),
@@ -88,7 +88,7 @@ class MergePathsTests {
                 Path(
                         listOf(
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                                ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                                SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                         )
                 ),
@@ -110,7 +110,7 @@ class MergePathsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                        ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                        SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                 )),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mutableMapOf("android:strokeWidth" to "1")),
@@ -129,7 +129,7 @@ class MergePathsTests {
                 Path(
                         listOf(
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                                ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                                SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                         )
                 ),
@@ -152,7 +152,7 @@ class MergePathsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                        ShortcutCubicBezierCurve(CommandVariant.RELATIVE, listOf(ShortcutCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                        SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                 )),
                 Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), mutableMapOf("android:strokeWidth" to "1")),

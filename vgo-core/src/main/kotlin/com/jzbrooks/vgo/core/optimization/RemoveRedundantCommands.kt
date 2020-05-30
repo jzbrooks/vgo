@@ -22,9 +22,9 @@ class RemoveRedundantCommands : TopDownOptimization, PathElementVisitor {
                     is VerticalLineTo -> if (current.parameters.all { it == 0.0f }) { continue@loop }
                     is HorizontalLineTo -> if (current.parameters.all { it == 0.0f }) { continue@loop }
                     is CubicBezierCurve -> if (current.parameters.all { it == CubicBezierCurve.Parameter(Point(0f, 0f), Point(0f, 0f), Point(0f, 0f)) }) { continue@loop }
-                    is ShortcutCubicBezierCurve -> if (current.parameters.all { it == ShortcutCubicBezierCurve.Parameter(Point(0f, 0f), Point(0f, 0f)) }) { continue@loop }
+                    is SmoothCubicBezierCurve -> if (current.parameters.all { it == SmoothCubicBezierCurve.Parameter(Point(0f, 0f), Point(0f, 0f)) }) { continue@loop }
                     is QuadraticBezierCurve -> if (current.parameters.all { it == QuadraticBezierCurve.Parameter(Point(0f, 0f), Point(0f, 0f)) }) { continue@loop }
-                    is ShortcutQuadraticBezierCurve -> if (current.parameters.all { it == Point.ZERO }) { continue@loop }
+                    is SmoothQuadraticBezierCurve -> if (current.parameters.all { it == Point.ZERO }) { continue@loop }
                 }
 
                 commands.add(current)
