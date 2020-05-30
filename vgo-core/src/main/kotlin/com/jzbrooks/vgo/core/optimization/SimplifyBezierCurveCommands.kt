@@ -7,6 +7,9 @@ import com.jzbrooks.vgo.core.util.math.Point
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+/**
+ * Convert curves into shorter commands where possible
+ */
 class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimization, PathElementVisitor {
     private var skipAnother = false
 

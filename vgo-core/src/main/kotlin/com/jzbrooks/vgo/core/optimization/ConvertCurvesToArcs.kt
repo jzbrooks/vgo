@@ -5,6 +5,9 @@ import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.util.math.*
 
+/**
+ * Converts cubic bezier curves to arcs, when they are shorter.
+ */
 class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimization, PathElementVisitor {
 
     override fun visit(pathElement: PathElement) {

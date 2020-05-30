@@ -5,6 +5,9 @@ import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import kotlin.math.sign
 
+/**
+ * Convert lines into shorter commands where possible
+ */
 class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization, PathElementVisitor {
     lateinit var commands: MutableList<Command>
     override fun visit(pathElement: PathElement) {

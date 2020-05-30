@@ -2,6 +2,9 @@ package com.jzbrooks.vgo.core.optimization
 
 import com.jzbrooks.vgo.core.graphic.*
 
+/**
+ * Collapse unnecessary nested groups into a single group
+ */
 class CollapseGroups : Optimization {
 
     // Groups play a serious role in clip paths for

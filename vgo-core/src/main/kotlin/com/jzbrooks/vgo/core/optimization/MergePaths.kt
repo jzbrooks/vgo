@@ -6,6 +6,9 @@ import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.PathElement
 import java.util.*
 
+/**
+ * Merges multiple paths into a single path where possible
+ */
 class MergePaths : Optimization {
     override fun optimize(graphic: Graphic) {
         topDownVisit(graphic)

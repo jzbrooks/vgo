@@ -3,6 +3,9 @@ package com.jzbrooks.vgo.core.optimization
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 
+/**
+ * Remove unnecessary groups
+ */
 class RemoveEmptyGroups : Optimization {
     override fun optimize(graphic: Graphic) {
         graphic.elements = graphic.elements.asSequence()

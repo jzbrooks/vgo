@@ -11,6 +11,10 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * Apply transformations to paths command coordinates in a group
+ * and remove the transformations from the group
+ */
 class BakeTransformations : Optimization {
 
     override fun optimize(graphic: Graphic) {

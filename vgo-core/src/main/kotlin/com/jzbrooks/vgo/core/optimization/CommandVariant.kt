@@ -6,6 +6,11 @@ import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.util.math.Point
 import java.util.*
 
+/**
+ * Converts commands to use relative, absolute,
+ * or the shortest representation of coordinates
+ * @param mode determines the operating mode of the command
+ */
 class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementVisitor {
     private val pathStart = Stack<Point>()
 

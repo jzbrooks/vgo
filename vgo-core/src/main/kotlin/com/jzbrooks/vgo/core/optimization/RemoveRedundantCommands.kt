@@ -5,6 +5,9 @@ import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.util.math.Point
 
+/**
+ * Elide commands that don't contribute to the overall graphic
+ */
 class RemoveRedundantCommands : TopDownOptimization, PathElementVisitor {
     override fun visit(pathElement: PathElement) {
         val commandCount = pathElement.commands.size

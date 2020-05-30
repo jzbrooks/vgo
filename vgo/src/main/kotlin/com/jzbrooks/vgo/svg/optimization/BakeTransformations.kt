@@ -10,6 +10,10 @@ import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.Vector3
 import java.util.*
 
+/**
+ * Apply transformations to paths command coordinates in a group
+ * and remove the transformations from the group
+ */
 class BakeTransformations : TopDownOptimization, GroupVisitor {
     override fun visit(group: Group) {
         bakeIntoGroup(group)
