@@ -35,7 +35,7 @@ fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
     @Suppress("NAME_SHADOWING")
     val tolerance = ARC_THRESHOLD * tolerance
 
-    val withinTolerance = radius < 1e10 && floatArrayOf(1/4f, 3/4f).all {
+    val withinTolerance = radius < 1e7 && floatArrayOf(0.25f, 0.75f).all {
         val curveValue = interpolate(it)
         abs(curveValue.distanceTo(center) - radius) <= tolerance
     }
