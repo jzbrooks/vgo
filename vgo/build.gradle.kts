@@ -35,7 +35,7 @@ tasks {
 
         manifest {
             attributes["Main-Class"] = "com.jzbrooks.vgo.Application"
-            attributes["Bundle-Version"] = "0.1.0"
+            attributes["Bundle-Version"] = "1.0.0"
         }
 
         dependsOn(configurations.runtimeClasspath)
