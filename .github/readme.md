@@ -4,6 +4,15 @@ vgo is a tool for optimizing vector artwork files that helps ensure your vector 
 
 [![Build Status](https://github.com/jzbrooks/vgo/workflows/build/badge.svg)](https://github.com/jzbrooks/vgo/actions?workflow=build)
 
+## Installation
+
+Download the jar from the releases page. Create an executable script `vgo` and place it on your path.
+
+```
+#!/bin/sh
+java -jar <PATH_TO_JAR> "$@"
+```
+
 ## Command Line Interface
 
 ```
