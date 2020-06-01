@@ -24,7 +24,7 @@ Options:
   -s --stats      print statistics on processed files to standard out
   -v --version    print the version number
   --indent [value]  write files with value columns of indentation
-  --format [value]  output format (svg, vd (coming soon), etc)  
+  --format [value]  output format (svg, vd, etc) - ALPHA
 ```
 
 ## Examples
