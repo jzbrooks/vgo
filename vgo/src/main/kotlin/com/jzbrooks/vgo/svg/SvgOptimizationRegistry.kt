@@ -18,8 +18,8 @@ class SvgOptimizationRegistry : OptimizationRegistry(emptyList(), topDownOptimiz
 
         private val wholeGraphicOptimizations = listOf(
                 CollapseGroups(),
-                MergePaths(),
-                RemoveEmptyGroups()
+                RemoveEmptyGroups(),
+                MergePaths()
         )
     }
 }

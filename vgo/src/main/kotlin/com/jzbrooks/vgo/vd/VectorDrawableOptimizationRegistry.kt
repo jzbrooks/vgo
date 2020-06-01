@@ -23,8 +23,8 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(prePass, topDown
 
         private val postPass = listOf(
                 CollapseGroups(),
-                MergePaths(),
-                RemoveEmptyGroups()
+                RemoveEmptyGroups(),
+                MergePaths()
         )
     }
 }
