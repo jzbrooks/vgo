@@ -11,9 +11,11 @@ class SvgOptimizationRegistry : OptimizationRegistry(emptyList(), topDownOptimiz
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(1e-3f),
+                ConvertCurvesToArcs(ScalableVectorGraphicCommandPrinter(3)),
                 SimplifyBezierCurveCommands(1e-3f),
                 RemoveRedundantCommands(),
-                CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3)))
+                CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3))),
+                Polycommands()
         )
 
         private val wholeGraphicOptimizations = listOf(
