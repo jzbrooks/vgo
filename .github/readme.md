@@ -6,7 +6,13 @@ vgo is a tool for optimizing vector artwork files that helps ensure your vector 
 
 ## Installation
 
-Download the jar from the releases page. Create an executable script `vgo` and place it on your path.
+Download the jar from the releases page. 
+
+Run it quickly by creating an alias or by creating and placing an executable script `vgo` on your path.
+
+```
+alias vgo="java -jar <PATH_TO_JAR>"
+```
 
 ```
 #!/bin/sh
