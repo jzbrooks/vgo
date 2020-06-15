@@ -34,9 +34,9 @@ jobs:
         name: integration_test_results
         path: vgo/build/reports/tests/integrationTest
     - name: optimize
-      run: ./gradlew optimize
+      run: ./gradlew postOptimize
     - name: archive vgo
       uses: actions/upload-artifact@v1
       with:
-        name: vgo.jar
-        path: vgo/build/libs/vgo.jar
+        name: vgo
+        path: vgo/build/distributions/vgo-1.0.0.zip

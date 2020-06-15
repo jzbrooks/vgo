@@ -1,7 +1,16 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
+val MAIN_CLASS = "com.jzbrooks.vgo.Application"
+val VERSION = "1.0.0"
+
 plugins {
     id("org.jetbrains.kotlin.jvm")
+    application
+}
+
+application {
+    mainClass.set(MAIN_CLASS)
+    version = VERSION
 }
 
 sourceSets {
@@ -31,15 +40,16 @@ tasks {
     }
 
     withType<Jar> {
-        destinationDirectory.set(file("$buildDir/libs/debug"))
-
         manifest {
-            attributes["Main-Class"] = "com.jzbrooks.vgo.Application"
-            attributes["Bundle-Version"] = "1.0.0"
+            attributes["Bundle-Version"] = VERSION
         }
+    }
 
-        dependsOn(configurations.runtimeClasspath)
-        from(configurations.runtimeClasspath.get().filter { it.isFile }.map(::zipTree))
+    val prepareForOptimization by registering(Copy::class) {
+        from("$buildDir/distributions/vgo-$VERSION.zip")
+        into("$buildDir/distributions")
+        rename { "vgo.zip" }
+        dependsOn("assembleDist")
     }
 
     val optimize by registering(JavaExec::class) {
@@ -49,7 +59,14 @@ tasks {
         classpath = files("$rootDir/tools/proguard.jar")
         args = listOf("@$rootDir/optimize.pro")
 
-        dependsOn(getByName("jar"))
+        dependsOn("prepareForOptimization")
+    }
+
+    val postOptimize by registering(Copy::class) {
+        from("$buildDir/distributions/vgo-release.zip")
+        into("$buildDir/distributions")
+        rename { "vgo-$VERSION.zip" }
+        dependsOn("optimize")
     }
 
     val integrationTest by registering(Test::class) {
