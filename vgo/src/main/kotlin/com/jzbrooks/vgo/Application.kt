@@ -12,7 +12,7 @@ import com.jzbrooks.vgo.vd.VectorDrawableWriter
 import com.jzbrooks.vgo.vd.toSvg
 import org.w3c.dom.Document
 import java.io.File
-import java.util.jar.Manifest
+import com.jzbrooks.BuildConstants
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
@@ -32,13 +32,7 @@ class Application {
         }
 
         if (argReader.readFlag("version|v")) {
-            val resources = this.javaClass.classLoader.getResources("META-INF/MANIFEST.MF")
-            while (resources.hasMoreElements()) {
-                val resource = resources.nextElement()
-                val manifest = Manifest(resource?.openStream())
-                manifest.mainAttributes.getValue("Bundle-Version")?.let(::println)
-            }
-
+            println(BuildConstants.VERSION)
             return 0
         }
 

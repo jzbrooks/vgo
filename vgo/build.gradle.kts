@@ -1,12 +1,25 @@
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-
-val MAIN_CLASS = "com.jzbrooks.vgo.Application"
-val VERSION = "1.0.0"
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import java.io.FileInputStream
+import java.io.PrintWriter
+import java.util.Properties
+import java.nio.file.Paths
+import java.nio.file.Files
 
 plugins {
-    id("org.jetbrains.kotlin.jvm")
     application
+    id("org.jetbrains.kotlin.jvm")
 }
+
+val buildProperties = run {
+    val properties = Properties()
+    FileInputStream("$projectDir/build.properties").use(properties::load)
+    properties
+}
+
+
+val MAIN_CLASS = "com.jzbrooks.vgo.Application"
+val VERSION = buildProperties["version"].toString()
 
 application {
     mainClass.set(MAIN_CLASS)
@@ -14,6 +27,12 @@ application {
 }
 
 sourceSets {
+    main {
+        withConvention(KotlinSourceSet::class) {
+            kotlin.srcDir("src/generated/kotlin")
+        }
+    }
+
     create("integrationTest") {
         withConvention(KotlinSourceSet::class) {
             kotlin.srcDir("src/integration-test/kotlin")
@@ -39,9 +58,35 @@ tasks {
         useJUnitPlatform()
     }
 
-    withType<Jar> {
-        manifest {
-            attributes["Bundle-Version"] = VERSION
+    withType<KotlinCompile<*>> {
+        dependsOn("generateConstants")
+    }
+
+    val generateConstants by registering {
+        doLast {
+            val generatedDirectory = Paths.get("$projectDir/src/generated/kotlin/com/jzbrooks")
+            Files.createDirectories(generatedDirectory)
+            val generatedFile = generatedDirectory.resolve("BuildConstants.kt")
+            PrintWriter(generatedFile.toFile()).use { output ->
+                val buildConstantsClass = buildString {
+                    appendln("""
+                           |package com.jzbrooks
+                           |                           
+                           |object BuildConstants {
+                           """.trimMargin())
+
+                    for (property in buildProperties) {
+                        append("    const val ")
+                        append(property.key.toString().toUpperCase())
+                        append(" = \"")
+                        append(property.value)
+                        appendln('"')
+                    }
+
+                    appendln("}")
+                }
+                output.write(buildConstantsClass)
+            }
         }
     }
 
@@ -62,7 +107,7 @@ tasks {
         dependsOn("prepareForOptimization")
     }
 
-    val postOptimize by registering(Copy::class) {
+    val assembleOptimizedDist by registering(Copy::class) {
         from("$buildDir/distributions/vgo-release.zip")
         into("$buildDir/distributions")
         rename { "vgo-$VERSION.zip" }
@@ -74,8 +119,7 @@ tasks {
         group = "verification"
         testClassesDirs = sourceSets["integrationTest"].output.classesDirs
         classpath = sourceSets["integrationTest"].runtimeClasspath
-        mustRunAfter(getByName("test"))
-        dependsOn(getByName("jar"))
+        mustRunAfter("test")
     }
 
     val updateBaselineOptimizations by registering(Copy::class) {

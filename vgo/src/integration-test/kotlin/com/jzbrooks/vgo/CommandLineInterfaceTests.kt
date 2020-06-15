@@ -26,32 +26,24 @@ class CommandLineInterfaceTests {
         systemOutput.close()
     }
 
-    // The version is baked into the jar manifest. It would be nice to be able to
-    // remove the dependency on the jar task for the tests and to not lose the test
-    // which would make running the tests with a plain junit runner easier
-
     @Test
     fun testLongVersionFlag() {
         val arguments = arrayOf("--version")
-        val standardOutput = File("build/integrationTest/version.tmp").apply { deleteOnExit() }
-        val process = ProcessBuilder("java", "-jar", "build/libs/debug/vgo.jar", *arguments)
-                .redirectOutput(standardOutput)
-                .start()
 
-        assertThat(process.waitFor()).isEqualTo(0)
-        assertThat(standardOutput.readText()).matches(Regex("\\d+.\\d+.\\d+\r?\n"))
+        val exitCode = Application().run(arguments)
+
+        assertThat(exitCode).isEqualTo(0)
+        assertThat(systemOutput.toString()).matches(Regex("\\d+.\\d+.\\d+\r?\n"))
     }
 
     @Test
     fun testShortVersionFlag() {
         val arguments = arrayOf("-v")
-        val standardOutput = File("build/integrationTest/version.tmp").apply { deleteOnExit() }
-        val process = ProcessBuilder("java", "-jar", "build/libs/debug/vgo.jar", *arguments)
-                .redirectOutput(standardOutput)
-                .start()
 
-        assertThat(process.waitFor()).isEqualTo(0)
-        assertThat(standardOutput.readText()).matches(Regex("\\d+.\\d+.\\d+\r?\n"))
+        val exitCode = Application().run(arguments)
+
+        assertThat(exitCode).isEqualTo(0)
+        assertThat(systemOutput.toString()).matches(Regex("\\d+.\\d+.\\d+\r?\n"))
     }
 
     @Test
