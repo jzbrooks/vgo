@@ -4,12 +4,16 @@ import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.roundToInt
+import java.text.DecimalFormat
+import kotlin.math.*
 
 class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int): CommandPrinter {
-    private val epsilon = 0.1.pow(decimalDigits.toDouble())
+    private val formatter = DecimalFormat().apply {
+        maximumFractionDigits = decimalDigits
+        isDecimalSeparatorAlwaysShown = false
+        roundingMode = RoundingMode.HALF_UP
+        minimumIntegerDigits = 0
+    }
 
     override fun print(command: Command): String {
         return when(command) {
@@ -173,89 +177,65 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int): Comma
         return builder.toString()
     }
 
-    private fun print(float: Float): String {
-        val decimal = BigDecimal(float.toDouble())
-                .setScale(decimalDigits, RoundingMode.HALF_UP)
+    private fun print(float: Float) = formatter.format(float)
 
-        val rounded = decimal.toFloat()
-        val roundedInt = rounded.toInt()
+    private fun print(point: Point) = buildString {
+        append(print(point.x))
 
-        return when {
-            abs(rounded.rem(1)) < epsilon -> roundedInt.toString()
-            roundedInt == 0 -> {
-                if (rounded < 0) {
-                    "-${rounded.toString().trim('-', '0')}"
-                } else {
-                    rounded.toString().trim('0')
-                }
-            }
-            else -> rounded.toString()
+        if (point.y.sign < 0f) {
+            append(print(point.y))
+        } else {
+            append(',')
+            append(print(point.y))
         }
-    }
-
-    private fun print(point: Point): String {
-        val builder = StringBuilder(print(point.x))
-
-        when {
-            (point.y < 1 && point.y > 0 && point.x != 0f) -> {
-                builder.append(print(point.y).trimStart('0'))
-            }
-            (point.y > -1 && point.y < 0 && point.x != 0f) -> {
-                val y = print(point.y).trimStart('-', '0')
-                builder.append('-')
-                builder.append(y)
-            }
-            else -> {
-                builder.append(',')
-                builder.append(print(point.y))
-            }
-        }
-
-        return builder.toString()
     }
 
     private fun print(parameter: CubicBezierCurve.Parameter): String {
         return parameter.run {
-            val builder = StringBuilder(print(startControl))
-            if (endControl.x >= 0) builder.append(' ')
-            builder.append(print(endControl))
-            if (end.x >= 0) builder.append(' ')
-            builder.append(print(end))
-            builder.toString()
+            buildString {
+                append(print(startControl))
+                if (endControl.x.sign >= 0) append(' ')
+                append(print(endControl))
+                if (end.x.sign >= 0) append(' ')
+                append(print(end))
+            }
         }
     }
 
     private fun print(parameter: SmoothCubicBezierCurve.Parameter): String {
         return parameter.run {
-            val builder = StringBuilder(print(endControl))
-            if (end.x >= 0) builder.append(' ')
-            builder.append(print(end))
-            builder.toString()
+            buildString {
+                append(print(endControl))
+                if (end.x.sign >= 0) append(' ')
+                append(print(end))
+            }
         }
     }
 
     private fun print(parameter: QuadraticBezierCurve.Parameter): String {
         return parameter.run {
-            val builder = StringBuilder(print(control))
-            if (end.x >= 0) builder.append(' ')
-            builder.append(print(end))
-            builder.toString()
+            buildString{
+                append(print(control))
+                if (end.x.sign >= 0) append(' ')
+                append(print(end))
+            }
         }
     }
 
     private fun print(parameter: EllipticalArcCurve.Parameter): String {
         return parameter.run {
-            val builder = StringBuilder(print(radiusX))
-            if (radiusY >= 0) builder.append(',')
-            builder.append(print(radiusY))
-            if (angle >= 0) builder.append(',')
-            builder.append(print(angle))
-            builder.append(',')
-            builder.append(arc.ordinal)
-            builder.append(sweep.ordinal)
-            if (end.x >= 0) builder.append(',')
-            builder.append(print(end))
-            builder.toString()
+            buildString {
+                append(print(radiusX))
+                if (radiusY.sign >= 0) append(',')
+                append(print(radiusY))
+                if (angle.sign >= 0) append(',')
+                append(print(angle))
+                append(',')
+                append(arc.ordinal)
+                append(sweep.ordinal)
+                if (end.x.sign >= 0) append(',')
+                append(print(end))
+            }
         }
     }
 }
