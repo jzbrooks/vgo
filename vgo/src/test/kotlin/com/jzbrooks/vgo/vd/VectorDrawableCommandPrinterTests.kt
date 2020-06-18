@@ -112,7 +112,7 @@ class VectorDrawableCommandPrinterTests {
     fun testPrintCoordinatesNearEpsilonAsIntegers() {
         val command = MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0.00094f, 0.00015f)))
         val result = VectorDrawableCommandPrinter(3).print(command)
-        assertThat(result).isEqualTo("M0,0")
+        assertThat(result).isEqualTo("M0.001,0")
     }
 
     @Test

@@ -2,6 +2,8 @@ package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -209,13 +211,16 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
     }
 
     private fun print(float: Float): String {
-        val rounded = (float * floatPrecisionScaleFactor).roundToInt() / floatPrecisionScaleFactor
-        val roundedInt = rounded.toInt()
+        val decimal = BigDecimal(float.toDouble())
+                .setScale(decimalDigits, RoundingMode.HALF_UP)
+
+        val rounded = decimal.toFloat()
+        val roundedInt = decimal.toInt()
 
         return if (abs(rounded.rem(1f)) < epsilon) {
             roundedInt.toString()
         } else {
-            rounded.toFloat().toString()
+            rounded.toString()
         }
     }
 

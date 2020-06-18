@@ -2,15 +2,14 @@ package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
 class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int): CommandPrinter {
     private val epsilon = 0.1.pow(decimalDigits.toDouble())
-    private val floatPrecisionScaleFactor by lazy {
-        10.0.pow(decimalDigits.toDouble())
-    }
 
     override fun print(command: Command): String {
         return when(command) {
@@ -175,19 +174,22 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int): Comma
     }
 
     private fun print(float: Float): String {
-        val rounded = (float * floatPrecisionScaleFactor).roundToInt() / floatPrecisionScaleFactor
+        val decimal = BigDecimal(float.toDouble())
+                .setScale(decimalDigits, RoundingMode.HALF_UP)
+
+        val rounded = decimal.toFloat()
         val roundedInt = rounded.toInt()
 
         return when {
-            abs(rounded.rem(1f)) < epsilon -> roundedInt.toString()
+            abs(rounded.rem(1)) < epsilon -> roundedInt.toString()
             roundedInt == 0 -> {
                 if (rounded < 0) {
-                    "-${rounded.toFloat().toString().trim('-', '0')}"
+                    "-${rounded.toString().trim('-', '0')}"
                 } else {
-                    rounded.toFloat().toString().trim('0')
+                    rounded.toString().trim('0')
                 }
             }
-            else -> rounded.toFloat().toString()
+            else -> rounded.toString()
         }
     }
 
