@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
+import assertk.assertions.containsNone
 import assertk.assertions.hasSize
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
@@ -42,5 +43,22 @@ class RemoveRedundantCommandsTests {
         RemoveRedundantCommands().visit(path)
 
         assertThat(path.commands).hasSize(4)
+    }
+
+    @Test
+    fun testRedundantClosePathsAreRemoved() {
+        val path = Path(
+                listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                        LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f))),
+                        LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 1f))),
+                        LineTo(CommandVariant.RELATIVE, listOf(Point(-3f, -2f))),
+                        ClosePath
+                )
+        )
+
+        RemoveRedundantCommands().visit(path)
+
+        assertThat(path.commands).containsNone(ClosePath)
     }
 }

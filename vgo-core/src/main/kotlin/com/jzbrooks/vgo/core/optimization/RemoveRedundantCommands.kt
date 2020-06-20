@@ -4,6 +4,7 @@ import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.util.math.Point
+import com.jzbrooks.vgo.core.util.math.computeAbsoluteCoordinates
 import kotlin.math.abs
 
 /**
@@ -14,7 +15,9 @@ class RemoveRedundantCommands : TopDownOptimization, PathElementVisitor {
         val commandCount = pathElement.commands.size
 
         if (commandCount > 0) {
-            val commands = mutableListOf<Command>((pathElement.commands.first() as MoveTo).copy())
+            val firstCommand = pathElement.commands.first() as MoveTo
+
+            val commands = mutableListOf<Command>(firstCommand)
             loop@ for (current in pathElement.commands.drop(1)) {
                 assert((current as? ParameterizedCommand<*>)?.variant != CommandVariant.ABSOLUTE)
 
@@ -30,6 +33,17 @@ class RemoveRedundantCommands : TopDownOptimization, PathElementVisitor {
                 }
 
                 commands.add(current)
+            }
+
+            if (pathElement.commands.last() is ClosePath) {
+                val commandsWithoutFinalClosePath = commands.dropLast(1)
+                val current = computeAbsoluteCoordinates(commandsWithoutFinalClosePath)
+                val firstCurrentPoint = firstCommand.parameters.last()
+
+                if (current == firstCurrentPoint) {
+                    pathElement.commands = commandsWithoutFinalClosePath
+                    return
+                }
             }
 
             pathElement.commands = commands
