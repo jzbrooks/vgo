@@ -42,7 +42,7 @@ Options:
 
 This project uses the Gradle build system.
 
-To build the application: `/.gradlew jar`
+To run the application: `/.gradlew run --args="[arguments]"`
 
 To run the tests: `./gradlew check`
 
