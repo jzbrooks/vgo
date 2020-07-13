@@ -6,7 +6,7 @@ vgo is a tool for optimizing vector artwork files that helps ensure your vector 
 
 ## Installation
 
-Download the distrobution from the releases page. Unzip it. Add the `bin` folder to your path.
+Download the distribution from the releases page. Unzip it. Add the `bin` folder to your path.
 
 ## Command Line Interface
 
