@@ -99,6 +99,9 @@ class Application {
                         $border
                     """.trimIndent())
                 }
+            } else if (!input.exists()){
+                System.err.println("${input.path} does not exist.")
+                return 65
             } else {
                 System.err.println("""
                     Input and output must be either files or directories.
@@ -155,7 +158,7 @@ class Application {
                 optimizationRegistry?.apply(graphic)
             }
 
-            if (!output.parentFile.exists()) output.parentFile.mkdirs()
+            if (output.parentFile?.exists() == false) output.parentFile.mkdirs()
             if (!output.exists()) output.createNewFile()
 
             output.outputStream().use { outputStream ->
