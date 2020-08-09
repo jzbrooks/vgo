@@ -42,6 +42,7 @@ class ConvertCurvesToArcsTest {
         )
     }
 
+    @Test
     fun `Sharp corners disqualify curves from arc collapse`() {
         // This data is taken from the first the first commands
         // in visibility_strike.xml. It presented tolerance challenges

@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo
 
+import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
@@ -12,7 +13,6 @@ import com.jzbrooks.vgo.vd.VectorDrawableWriter
 import com.jzbrooks.vgo.vd.toSvg
 import org.w3c.dom.Document
 import java.io.File
-import com.jzbrooks.BuildConstants
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess

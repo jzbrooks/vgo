@@ -317,7 +317,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
 
     companion object {
         private val transformationPropertyNames = setOf("transform")
-        private val number = Regex("[-+]?(?:\\d*\\.\\d+|\\d+\\.?)([eE][-+]?\\d+)?")
-        private val transformValueRegex = Regex("matrix\\(((?:(?:${number.pattern})(?:,\\s?)?){6})\\)")
+        private val number = Regex("""[-+]?(?:\d*\.\d+|\d+\.?)([eE][-+]?\d+)?""")
+        private val transformValueRegex = Regex("""matrix\(((?:(?:${number.pattern})(?:,\s?)?){6})\)""")
     }
 }

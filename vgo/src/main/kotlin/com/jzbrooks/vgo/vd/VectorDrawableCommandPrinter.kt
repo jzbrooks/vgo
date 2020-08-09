@@ -2,12 +2,8 @@ package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point
-import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.roundToInt
 
 class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrinter {
     private val formatter = DecimalFormat().apply {

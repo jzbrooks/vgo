@@ -7,8 +7,7 @@ import java.util.*
  * Computes absolute coordinates for a given command in the sequence.
  * By default, the absolute coordinate of the last command is returned.
  * @param commands: The complete list of **relative** commands for a given path. The initial moveto can be absolute.
- * @param commandIndex: The index of a specific command to compute absolute coordinates from relative
- */
+  */
 fun computeAbsoluteCoordinates(commands: List<Command>): Point {
     assert(commands.drop(1).filterIsInstance<ParameterizedCommand<*>>().all { it.variant == CommandVariant.RELATIVE })
 

@@ -1,10 +1,10 @@
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.FileInputStream
 import java.io.PrintWriter
-import java.util.Properties
-import java.nio.file.Paths
 import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.*
 
 plugins {
     application
