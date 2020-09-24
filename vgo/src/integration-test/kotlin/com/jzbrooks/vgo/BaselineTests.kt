@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.streams.asSequence
 
 class BaselineTests {
@@ -82,7 +83,7 @@ class BaselineTests {
             // live in src/integration-test/resources/baseline and are suffixed
             // with _optimized
             assets = try {
-                Files.list(Path.of("src/integration-test/resources"))
+                Files.list(Paths.get("src/integration-test/resources"))
                         .asSequence()
                         .filterNot { Files.isDirectory(it) }
                         .map { unoptimizedFile ->

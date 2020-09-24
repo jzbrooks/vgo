@@ -101,8 +101,15 @@ tasks {
         description = "Runs proguard on the jar application."
         group = "build"
 
-        classpath = files("$rootDir/tools/proguard.jar")
-        args = listOf("@$rootDir/optimize.pro")
+        classpath = files("$rootDir/tools/r8.jar")
+        args = listOf(
+                "--release",
+                "--classfile",
+                "--lib", System.getenv("JAVA_HOME"),
+                "--output", "$buildDir/libs/vgo.jar",
+                "--pg-conf", "$rootDir/optimize.pro",
+                "$buildDir/libs/debug/vgo.jar"
+        )
 
         dependsOn(getByName("jar"))
     }

@@ -12,10 +12,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up JDK 14
+    - name: Set up JDK 8
+      id: setup-jdk
       uses: actions/setup-java@v1
       with:
-        java-version: 14
+        java-version: 8
     - name: build
       run: ./gradlew build
     - name: archive vgo test results

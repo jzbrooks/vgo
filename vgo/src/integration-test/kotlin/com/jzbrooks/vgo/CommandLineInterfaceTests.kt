@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
-import java.nio.file.Path
+import java.nio.file.Paths
 
 class CommandLineInterfaceTests {
     private val avocadoExampleRelativePath = "src/integration-test/resources/avocado_example.xml"
@@ -88,7 +88,7 @@ class CommandLineInterfaceTests {
 
     @Test
     fun testOverwritingInputFileReportsNonZeroSizeChange() {
-        val overwritePath = Path.of("build/integrationTest/stat-overwrite-test.xml")
+        val overwritePath = Paths.get("build/integrationTest/stat-overwrite-test.xml")
         File(avocadoExampleRelativePath).copyTo(overwritePath.toFile(), overwrite = true)
 
         val arguments = arrayOf(overwritePath.toString(), "-s")
