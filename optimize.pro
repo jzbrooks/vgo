@@ -1,5 +1,5 @@
--injars         vgo/build/distributions/vgo.zip
--outjars        vgo/build/distributions/vgo-release.zip
+-injars         vgo/build/libs/debug/vgo.jar
+-outjars        vgo/build/libs/vgo.jar
 -libraryjars    <java.home>/jmods
 
 -dontobfuscate

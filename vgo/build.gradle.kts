@@ -7,7 +7,6 @@ import java.nio.file.Paths
 import java.util.*
 
 plugins {
-    application
     id("org.jetbrains.kotlin.jvm")
 }
 
@@ -20,11 +19,6 @@ val buildProperties = run {
 
 val MAIN_CLASS = "com.jzbrooks.vgo.Application"
 val VERSION = buildProperties["version"].toString()
-
-application {
-    mainClass.set(MAIN_CLASS)
-    version = VERSION
-}
 
 sourceSets {
     main {
@@ -90,11 +84,17 @@ tasks {
         }
     }
 
-    val prepareForOptimization by registering(Copy::class) {
-        from("$buildDir/distributions/vgo-$VERSION.zip")
-        into("$buildDir/distributions")
-        rename { "vgo.zip" }
-        dependsOn("assembleDist")
+
+    withType<Jar> {
+        destinationDirectory.set(file("$buildDir/libs/debug"))
+
+        manifest {
+            attributes["Main-Class"] = MAIN_CLASS
+            attributes["Bundle-Version"] = VERSION
+        }
+
+        dependsOn(configurations.runtimeClasspath)
+        from(configurations.runtimeClasspath.get().filter { it.isFile }.map(::zipTree))
     }
 
     val optimize by registering(JavaExec::class) {
@@ -104,14 +104,7 @@ tasks {
         classpath = files("$rootDir/tools/proguard.jar")
         args = listOf("@$rootDir/optimize.pro")
 
-        dependsOn("prepareForOptimization")
-    }
-
-    val assembleOptimizedDist by registering(Copy::class) {
-        from("$buildDir/distributions/vgo-release.zip")
-        into("$buildDir/distributions")
-        rename { "vgo-$VERSION.zip" }
-        dependsOn("optimize")
+        dependsOn(getByName("jar"))
     }
 
     val integrationTest by registering(Test::class) {
