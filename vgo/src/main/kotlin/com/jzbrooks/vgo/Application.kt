@@ -69,7 +69,7 @@ class Application {
             inputs = standardInPaths
         }
 
-        val inputOutputPair = if (outputs.isNotEmpty()) {
+        val inputOutputMap = if (outputs.isNotEmpty()) {
             inputs.zip(outputs) { a, b ->
                 Pair(File(a), File(b))
             }
@@ -77,34 +77,26 @@ class Application {
             inputs.zip(inputs) { a, b ->
                 Pair(File(a), File(b))
             }
-        }
+        }.toMap()
 
-        for ((input, output) in inputOutputPair) {
-            if (input.isFile && (output.isFile || !output.exists())) {
-                handleFile(input, output, writerOptions)
-            } else if (input.isDirectory && (output.isDirectory || !output.exists())) {
-                input.listFiles { file -> !file.isHidden }?.forEach { file ->
-                    if (printStats) {
-                        println("\n${file.path}")
-                    }
-                    handleFile(file, File(output, file.name), writerOptions)
+        return handleFiles(inputOutputMap, writerOptions)
+    }
+
+    private fun handleFiles(inputOutputMap: Map<File, File>, writerOptions: Set<Writer.Option>): Int {
+        for (entry in inputOutputMap) {
+            val (input, output) = entry
+
+            when {
+                entry.isFile -> handleFile(input, output, writerOptions)
+                entry.isDirectory -> handleDirectory(input, output, writerOptions)
+                !entry.inputExists -> {
+                    System.err.println("${input.path} does not exist.")
+                    return 65
                 }
-                if (printStats) {
-                    val message = "| Total bytes saved: ${(totalBytesBefore - totalBytesAfter).roundToInt()} |"
-                    val border = "-".repeat(message.length)
-                    println("""
-                        
-                        $border
-                        $message
-                        $border
-                    """.trimIndent())
-                }
-            } else if (!input.exists()){
-                System.err.println("${input.path} does not exist.")
-                return 65
-            } else {
-                System.err.println("""
-                    Input and output must be either files or directories.
+                else -> {
+                    System.err.println("""
+                    A given input and output pair (grouped positionally)
+                    must be either files or directories.
                     Input is a ${if (input.isFile) "file" else "directory"}
                         path: ${input.absolutePath}
                         exists: ${input.exists()}
@@ -113,12 +105,13 @@ class Application {
                         path: ${output.absolutePath}
                         exists: ${input.exists()}
                         isWritable: ${input.canWrite()}
-                        
-                    Storage: ${output.usableSpace} / ${output.totalSpace} is usable.
-                """.trimIndent()
-                )
 
-                return 65
+                    Storage: ${output.usableSpace} / ${output.totalSpace} is usable.
+                    """.trimIndent()
+                    )
+
+                    return 65
+                }
             }
         }
 
@@ -181,13 +174,62 @@ class Application {
                     val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
                     totalBytesBefore += sizeBefore
                     totalBytesAfter += sizeAfter
-                    println("Size before: ${sizeBefore}B")
-                    println("Size after: ${sizeAfter}B")
+                    println("Size before: " + formatByteDescription(sizeBefore))
+                    println("Size after: " + formatByteDescription(sizeAfter))
                     println("Percent saved: $percentSaved")
                 }
             }
         }
     }
+
+    private fun handleDirectory(input: File, output: File, options: Set<Writer.Option>) {
+        assert(input.isDirectory)
+        assert(output.isDirectory || !output.exists())
+
+        input.listFiles { file -> !file.isHidden }?.forEach { file ->
+            if (printStats) {
+                println("\n${file.path}")
+            }
+            handleFile(file, File(output, file.name), options)
+        }
+        if (printStats) {
+            val message = "| Total bytes saved: ${(totalBytesBefore - totalBytesAfter).roundToInt()} |"
+            val border = "-".repeat(message.length)
+            println("""
+                        
+                        $border
+                        $message
+                        $border
+                    """.trimIndent())
+        }
+    }
+
+    private fun formatByteDescription(bytes: Long): String {
+        return when {
+            bytes >= 1024 * 1024 * 1024 -> {
+                val gigabytes = bytes / (1024.0 * 1024.0 * 1024.0)
+                "%.2f GiB".format(gigabytes)
+            }
+            bytes >= 1024 * 1024 -> {
+                val megabytes = bytes / (1024.0 * 1024.0)
+                "%.2f MiB".format(megabytes)
+            }
+            bytes >= 1024 -> {
+                val kilobytes = bytes / 1024.0
+                "%.2f KiB".format(kilobytes)
+            }
+            else -> "$bytes B"
+        }
+    }
+
+    private val Map.Entry<File, File>.inputExists
+        get() = key.exists()
+
+    private val Map.Entry<File, File>.isFile
+        get() = key.isFile && (value.isFile || !value.exists())
+
+    private val Map.Entry<File, File>.isDirectory
+        get() = key.isDirectory && (value.isDirectory || !value.exists())
 
     companion object {
         private const val HELP_MESSAGE = """
