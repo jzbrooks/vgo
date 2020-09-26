@@ -16,10 +16,6 @@ val buildProperties = run {
     properties
 }
 
-
-val MAIN_CLASS = "com.jzbrooks.vgo.Application"
-val VERSION = buildProperties["version"].toString()
-
 sourceSets {
     main {
         withConvention(KotlinSourceSet::class) {
@@ -89,8 +85,8 @@ tasks {
         destinationDirectory.set(file("$buildDir/libs/debug"))
 
         manifest {
-            attributes["Main-Class"] = MAIN_CLASS
-            attributes["Bundle-Version"] = VERSION
+            attributes["Main-Class"] = "com.jzbrooks.vgo.Application"
+            attributes["Bundle-Version"] = buildProperties["version"].toString()
         }
 
         dependsOn(configurations.runtimeClasspath)
