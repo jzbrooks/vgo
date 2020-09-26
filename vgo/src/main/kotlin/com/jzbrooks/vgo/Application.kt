@@ -56,7 +56,7 @@ class Application {
         outputFormat = argReader.readOption("format")
 
         var inputs = argReader.readArguments()
-        if (inputs.none()) {
+        if (inputs.isEmpty()) {
             require(outputs.isEmpty())
 
             var path = readLine()
@@ -87,8 +87,8 @@ class Application {
             val (input, output) = entry
 
             when {
-                entry.isFile -> handleFile(input, output, writerOptions)
-                entry.isDirectory -> handleDirectory(input, output, writerOptions)
+                entry.isFilePair -> handleFile(input, output, writerOptions)
+                entry.isDirectoryPair -> handleDirectory(input, output, writerOptions)
                 !entry.inputExists -> {
                     System.err.println("${input.path} does not exist.")
                     return 65
@@ -225,10 +225,10 @@ class Application {
     private val Map.Entry<File, File>.inputExists
         get() = key.exists()
 
-    private val Map.Entry<File, File>.isFile
+    private val Map.Entry<File, File>.isFilePair
         get() = key.isFile && (value.isFile || !value.exists())
 
-    private val Map.Entry<File, File>.isDirectory
+    private val Map.Entry<File, File>.isDirectoryPair
         get() = key.isDirectory && (value.isDirectory || !value.exists())
 
     companion object {
