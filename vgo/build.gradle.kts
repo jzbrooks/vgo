@@ -97,11 +97,15 @@ tasks {
         description = "Runs proguard on the jar application."
         group = "build"
 
+        val javaHome = System.getenv("JAVA_HOME") ?: javaInstalls
+                .installationForCurrentVirtualMachine.get()
+                .installationDirectory.toString()
+
         classpath = files("$rootDir/tools/r8.jar")
         args = listOf(
                 "--release",
                 "--classfile",
-                "--lib", System.getenv("JAVA_HOME"),
+                "--lib", javaHome,
                 "--output", "$buildDir/libs/vgo.jar",
                 "--pg-conf", "$rootDir/optimize.pro",
                 "$buildDir/libs/debug/vgo.jar"
