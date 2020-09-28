@@ -120,7 +120,11 @@ tasks {
 
     val binaryFile = file("$buildDir/libs/vgo")
     val binary by registering {
+        description = "Prepends shell script in the jar to improve CLI"
+        group = "build"
+
         dependsOn(optimize)
+
         inputs.file(optimizedJar)
         outputs.file(binaryFile)
 

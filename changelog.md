@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## 1.2.0
+_09.28.2020_
+
+* Improvement: Resort to distribution via a fat jar. Requires managing fewer files and results in a smaller installation since R8 can operate on classes from dependencies as well.
+* Improvement: Use R8 for optimization. R8 produces a slightly smaller jar and in some cases faster code as well.
+
 ## 1.1.1
 _07.13.2020_
 

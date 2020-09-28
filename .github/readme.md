@@ -6,7 +6,7 @@ vgo is a tool for optimizing vector artwork files that helps ensure your vector 
 
 ## Installation
 
-Download the distribution from the releases page. Unzip it. Add the `bin` folder to your path.
+Download the distribution from the releases page and ensure it has execute permission. On macOS & Linux run `chmod +x vgo`.
 
 ## Command Line Interface
 
@@ -21,6 +21,8 @@ Options:
   --indent [value]  write files with value columns of indentation
   --format [value]  output format (svg, vd, etc) - ALPHA
 ```
+
+> `java -jar vgo` for Windows
 
 ## Examples
 
@@ -42,7 +44,7 @@ Options:
 
 This project uses the Gradle build system.
 
-To run the application: `/.gradlew run --args="[arguments]"`
+To build the binary: `/.gradlew binary`
 
 To run the tests: `./gradlew check`
 
