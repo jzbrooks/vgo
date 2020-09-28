@@ -4,7 +4,7 @@ import java.io.FileInputStream
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.*
+import java.util.Properties
 
 plugins {
     id("org.jetbrains.kotlin.jvm")
@@ -93,9 +93,13 @@ tasks {
         from(configurations.runtimeClasspath.get().filter { it.isFile }.map(::zipTree))
     }
 
+    val optimizedJar = file("$buildDir/libs/vgo.jar")
     val optimize by registering(JavaExec::class) {
         description = "Runs proguard on the jar application."
         group = "build"
+
+        inputs.file("$buildDir/libs/debug/vgo.jar")
+        outputs.file(optimizedJar)
 
         val javaHome = System.getenv("JAVA_HOME") ?: javaInstalls
                 .installationForCurrentVirtualMachine.get()
@@ -112,6 +116,21 @@ tasks {
         )
 
         dependsOn(getByName("jar"))
+    }
+
+    val binaryFile = file("$buildDir/libs/vgo")
+    val binary by registering {
+        dependsOn(optimize)
+        inputs.file(optimizedJar)
+        outputs.file(binaryFile)
+
+        doLast {
+            binaryFile.parentFile.mkdirs()
+            binaryFile.delete()
+            binaryFile.appendText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
+            optimizedJar.inputStream().use { binaryFile.appendBytes(it.readBytes()) }
+            binaryFile.setExecutable(true, false)
+        }
     }
 
     val integrationTest by registering(Test::class) {
