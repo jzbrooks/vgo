@@ -1,6 +1,8 @@
 package com.jzbrooks.vgo.vd.optimization
 
 import assertk.assertThat
+import assertk.assertions.hasSize
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -71,5 +73,51 @@ class ConvertCurvesToArcsTest {
         ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)).visit(path)
 
         assertThat(path).isEqualTo(before)
+    }
+
+    @Test
+    fun `Multiple curves on a circle are converted to arcs`() {
+        // m45.4,27.726
+        // c-2.499,0-4.525-2.026-4.525-4.526
+        // c0-2.499,2.026-4.525,4.525-4.525
+        // c2.5,0,4.526,2.026,4.526,4.525
+        // c0,2.5-2.026,4.526-4.526,4.526
+        // z
+        val path = Path(listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(45.4f, 27.726f))),
+                CubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                        CubicBezierCurve.Parameter(
+                                Point(-2.499f, 0f),
+                                Point(-4.525f, -2.026f),
+                                Point(-4.525f, -4.526f)
+                        )
+                )),
+                CubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                        CubicBezierCurve.Parameter(
+                                Point(0f, -2.499f),
+                                Point(2.026f, -4.525f),
+                                Point(4.525f, -4.525f)
+                        )
+                )),
+                CubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                        CubicBezierCurve.Parameter(
+                                Point(2.5f, 0f),
+                                Point(4.526f, 2.026f),
+                                Point(4.526f, 4.525f)
+                        )
+                )),
+                CubicBezierCurve(CommandVariant.RELATIVE, listOf(
+                        CubicBezierCurve.Parameter(
+                                Point(0f, 2.5f),
+                                Point(-2.026f, 4.526f),
+                                Point(-4.526f, 4.526f)
+                        )
+                ))
+        ))
+
+        ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)).visit(path)
+
+        assertThat(path.commands.filterIsInstance<EllipticalArcCurve>()).hasSize(2)
+        assertThat(path.commands.filterIsInstance<CubicBezierCurve>()).isEmpty()
     }
 }
