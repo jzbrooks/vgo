@@ -94,6 +94,7 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
 
                         if (2 * Math.PI - angle > 1e-3) {
                             arc.parameters[0].end = next - previous
+                            break
                         } else {
                             arc.parameters[0].end = (relativeCircle.center - nextCommand.parameters[0].end) * 2f
                             alternativeOutput.add(EllipticalArcCurve(CommandVariant.RELATIVE, listOf(
