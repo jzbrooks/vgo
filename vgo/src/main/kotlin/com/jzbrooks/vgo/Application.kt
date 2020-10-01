@@ -14,6 +14,7 @@ import com.jzbrooks.vgo.vd.toSvg
 import org.w3c.dom.Document
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
@@ -118,7 +119,7 @@ class Application {
         return 0
     }
 
-    private fun handleFile(input: File, output: File, options: Set<Writer.Option>) {
+    private fun handleFile(input: File, output: File, options: Set<Writer.Option>, printFileName: Boolean = false) {
         input.inputStream().use { inputStream ->
             val sizeBefore = inputStream.channel.size()
 
@@ -174,9 +175,13 @@ class Application {
                     val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
                     totalBytesBefore += sizeBefore
                     totalBytesAfter += sizeAfter
-                    println("Size before: " + formatByteDescription(sizeBefore))
-                    println("Size after: " + formatByteDescription(sizeAfter))
-                    println("Percent saved: $percentSaved")
+
+                    if (percentSaved.absoluteValue > 1e-3) {
+                        if (printFileName) println("\n${input.path}")
+                        println("Size before: " + formatByteDescription(sizeBefore))
+                        println("Size after: " + formatByteDescription(sizeAfter))
+                        println("Percent saved: $percentSaved")
+                    }
                 }
             }
         }
@@ -187,10 +192,7 @@ class Application {
         assert(output.isDirectory || !output.exists())
 
         input.listFiles { file -> !file.isHidden }?.forEach { file ->
-            if (printStats) {
-                println("\n${file.path}")
-            }
-            handleFile(file, File(output, file.name), options)
+            handleFile(file, File(output, file.name), options, true)
         }
         if (printStats) {
             val message = "| Total bytes saved: ${(totalBytesBefore - totalBytesAfter).roundToInt()} |"
