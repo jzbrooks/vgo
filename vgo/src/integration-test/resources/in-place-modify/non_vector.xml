@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:drawable="@drawable/ic_foo"
+            android:gravity="center" />
+
+    <item
+            android:id="@+id/ic_bar"
+            android:left="1dp" android:bottom="1dp" android:right="1dp" android:top="1dp">
+        <shape android:shape="oval">
+            <solid android:color="#FF00FF"/>
+            <size android:width="10dp" android:height="10dp"/>
+            <stroke android:color="@color/white" android:width="1dp"/>
+        </shape>
+    </item>
+
+</layer-list>

@@ -130,7 +130,7 @@ class Application {
             var graphic = when {
                 rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> com.jzbrooks.vgo.svg.parse(rootNodes.first())
                 rootNodes.any { it.nodeName == "vector" && input.extension == "xml"} -> com.jzbrooks.vgo.vd.parse(rootNodes.first())
-                else -> null
+                else -> if (input == output) return else null
             }
 
             if (graphic is VectorDrawable && outputFormat == "svg") {
