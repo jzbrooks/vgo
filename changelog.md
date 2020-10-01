@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+## 1.2.1
+_10.01.2020_
+
+* Fixed: Some images with curves that lie on a circle omit any representation of that circle in the output
+* Fixed: Modifying files in-place sometimes results in destroying non-vector files.
+
 ## 1.2.0
 _09.28.2020_
 
