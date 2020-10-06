@@ -82,15 +82,30 @@ tasks {
 
 
     withType<Jar> {
-        destinationDirectory.set(file("$buildDir/libs/debug"))
+        dependsOn(configurations.runtimeClasspath)
 
         manifest {
             attributes["Main-Class"] = "com.jzbrooks.vgo.Application"
             attributes["Bundle-Version"] = buildProperties["version"].toString()
         }
 
-        dependsOn(configurations.runtimeClasspath)
-        from(configurations.runtimeClasspath.get().filter { it.isFile }.map(::zipTree))
+        val sourceClasses = sourceSets.main.get().output.classesDirs
+        inputs.files(sourceClasses)
+        destinationDirectory.set(file("$buildDir/libs/debug"))
+
+        doFirst {
+            from(files(sourceClasses))
+            from(configurations.runtimeClasspath.get().asFileTree.files.map(::zipTree))
+
+            exclude(
+                    "**/*.kotlin_metadata",
+                    "**/*.kotlin_module",
+                    "**/*.kotlin_builtins",
+                    "**/module-info.class",
+                    "META-INF/maven/**",
+                    "META-INF/*.version"
+            )
+        }
     }
 
     val optimizedJar = file("$buildDir/libs/vgo.jar")
