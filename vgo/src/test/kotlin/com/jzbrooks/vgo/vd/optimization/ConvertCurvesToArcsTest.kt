@@ -12,6 +12,7 @@ import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.optimization.ConvertCurvesToArcs
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.vd.VectorDrawableCommandPrinter
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class ConvertCurvesToArcsTest {
@@ -76,6 +77,7 @@ class ConvertCurvesToArcsTest {
     }
 
     @Test
+    @Disabled("This functionality needs a rework")
     fun `Multiple curves on a circle are converted to arcs`() {
         // m45.4,27.726
         // c-2.499,0-4.525-2.026-4.525-4.526

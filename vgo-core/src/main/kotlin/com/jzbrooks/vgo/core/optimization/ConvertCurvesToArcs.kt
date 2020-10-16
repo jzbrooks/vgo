@@ -11,8 +11,9 @@ import com.jzbrooks.vgo.core.util.math.*
 class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimization, PathElementVisitor {
 
     override fun visit(pathElement: PathElement) {
-        val multiCurvePass = collapseMultipleCurves(pathElement.commands)
-        val singleCurvePass = convertSingleArcs(multiCurvePass)
+        // todo: reimplement multiple curve passes
+        // val multiCurvePass = collapseMultipleCurves(pathElement.commands)
+        val singleCurvePass = convertSingleArcs(pathElement.commands)
         pathElement.commands = singleCurvePass
     }
 
