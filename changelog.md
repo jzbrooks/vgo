@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+## 1.2.2
+_10.20.2020_
+
+* Improvement: Show filenames with statistics with multiple file inputs and `--stats`
+* Improvement: Remove Kotlin metadata from the output jar
+* Fixed: Temporarily removed an optimization that distorted some images
+
 ## 1.2.1
 _10.01.2020_
 
