@@ -20,6 +20,7 @@ import kotlin.system.exitProcess
 
 class Application {
     private var printStats = false
+    private var printFileNames = false
     private var totalBytesBefore = 0.0
     private var totalBytesAfter = 0.0
     private var outputFormat: String? = null
@@ -80,6 +81,10 @@ class Application {
             }
         }.toMap()
 
+        val files = inputOutputMap.count { (input, _) -> input.isFile }
+        val containsDirectory = inputOutputMap.any { (input, _) -> input.isDirectory }
+        printFileNames = printStats && (files > 1 || containsDirectory)
+
         return handleFiles(inputOutputMap, writerOptions)
     }
 
@@ -119,7 +124,7 @@ class Application {
         return 0
     }
 
-    private fun handleFile(input: File, output: File, options: Set<Writer.Option>, printFileName: Boolean = false) {
+    private fun handleFile(input: File, output: File, options: Set<Writer.Option>) {
         input.inputStream().use { inputStream ->
             val sizeBefore = inputStream.channel.size()
 
@@ -177,7 +182,7 @@ class Application {
                     totalBytesAfter += sizeAfter
 
                     if (percentSaved.absoluteValue > 1e-3) {
-                        if (printFileName) println("\n${input.path}")
+                        if (printFileNames) println("\n${input.path}")
                         println("Size before: " + formatByteDescription(sizeBefore))
                         println("Size after: " + formatByteDescription(sizeAfter))
                         println("Percent saved: $percentSaved")
@@ -192,7 +197,7 @@ class Application {
         assert(output.isDirectory || !output.exists())
 
         input.listFiles { file -> !file.isHidden }?.forEach { file ->
-            handleFile(file, File(output, file.name), options, true)
+            handleFile(file, File(output, file.name), options)
         }
         if (printStats) {
             val message = "| Total bytes saved: ${(totalBytesBefore - totalBytesAfter).roundToInt()} |"

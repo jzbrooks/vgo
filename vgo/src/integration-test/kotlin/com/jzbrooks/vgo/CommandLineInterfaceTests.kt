@@ -13,6 +13,7 @@ import java.nio.file.Paths
 
 class CommandLineInterfaceTests {
     private val avocadoExampleRelativePath = "src/integration-test/resources/avocado_example.xml"
+    private val heartExampleRelativePath = "src/integration-test/resources/simple_heart.xml"
     private lateinit var systemOutput: ByteArrayOutputStream
 
     @BeforeEach
@@ -76,6 +77,53 @@ class CommandLineInterfaceTests {
         val exitCode = Application().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         assertThat(systemOutput.toString()).contains("Percent saved:")
+    }
+
+    @Test
+    fun `unmodified files are omitted from statistics`() {
+        val input = "src/integration-test/resources/baseline/simple_heart_optimized.xml"
+        val arguments = arrayOf(
+                input,
+                "-o",
+                "build/integrationTest/unmodified-stats-omitted.xml",
+                "--stats"
+        )
+        val exitCode = Application().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        val report = systemOutput.toString()
+        assertThat(report).doesNotContain(input)
+    }
+
+    @Test
+    fun `directory inputs include a filename with statistics`() {
+        val arguments = arrayOf(
+                "src/integration-test/resources/in-place-modify",
+                "-o",
+                "build/integrationTest/multi-stats-test-directory",
+                "--stats"
+        )
+        val exitCode = Application().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        val report = systemOutput.toString()
+        assertThat(report).contains("src/integration-test/resources/in-place-modify/avocado_example.xml")
+    }
+
+    @Test
+    fun `multiple file inputs include a filename with statistics`() {
+        val arguments = arrayOf(
+                avocadoExampleRelativePath,
+                "-o",
+                "build/integrationTest/multi-stats-test-one.xml",
+                heartExampleRelativePath,
+                "-o",
+                "build/integrationTest/multi-stats-test-two.xml",
+                "--stats"
+        )
+        val exitCode = Application().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        val report = systemOutput.toString()
+        assertThat(report).contains(avocadoExampleRelativePath)
+        assertThat(report).contains(heartExampleRelativePath)
     }
 
     @Test
