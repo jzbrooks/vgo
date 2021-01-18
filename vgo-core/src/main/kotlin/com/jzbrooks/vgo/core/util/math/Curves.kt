@@ -111,7 +111,7 @@ fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBez
     }
 
     return CubicBezierCurve(variant, parameters.map { (endControl, end) ->
-        CubicBezierCurve.Parameter(prevEndControl - prevEnd, endControl, end)
+        CubicBezierCurve.Parameter( prevEnd - prevEndControl, endControl, end)
     })
 }
 

@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 1.3.0
+
+* Added: Collapse multiple Bézier curves into elliptical arcs when possible
+* Improvement: Target JVM 11
+
 ## 1.2.2
 _10.20.2020_
 

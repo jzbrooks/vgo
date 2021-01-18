@@ -77,7 +77,6 @@ class ConvertCurvesToArcsTest {
     }
 
     @Test
-    @Disabled("This functionality needs a rework")
     fun `Multiple curves on a circle are converted to arcs`() {
         // m45.4,27.726
         // c-2.499,0-4.525-2.026-4.525-4.526

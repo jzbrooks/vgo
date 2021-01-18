@@ -11,9 +11,8 @@ import com.jzbrooks.vgo.core.util.math.*
 class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimization, PathElementVisitor {
 
     override fun visit(pathElement: PathElement) {
-        // todo: reimplement multiple curve passes
-        // val multiCurvePass = collapseMultipleCurves(pathElement.commands)
-        val singleCurvePass = convertSingleArcs(pathElement.commands)
+        val multiCurvePass = collapseMultipleCurves(pathElement.commands)
+        val singleCurvePass = convertSingleArcs(multiCurvePass)
         pathElement.commands = singleCurvePass
     }
 
@@ -62,7 +61,7 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                     ))
 
                     val pendingCurves = mutableListOf(originalCommand as CubicCurve<*>)
-                    val alternativeOutput = mutableListOf<Command>(arc)
+                    val ellipticalArcs = mutableListOf<Command>(arc)
 
                     val relativeCircle = circle.copy(center = circle.center - currentCommand.parameters[0].end)
                     var angle = currentCommand.findArcAngle(circle)
@@ -73,32 +72,31 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                     val previous = computeAbsoluteCoordinates(commands.take(i))
 
                     while (nextCommand is CubicCurve<*> && nextCommand.isConvex() && nextCommand.liesOnCircle(relativeCircle)) {
-                        val originalNext = nextCommand
-                        if (nextCommand is SmoothCubicBezierCurve) {
-                            nextCommand = nextCommand.toCubicBezierCurve(currentCommand as CubicCurve<*>)
+                        val normalizedNext = if (nextCommand is SmoothCubicBezierCurve) {
+                            nextCommand.toCubicBezierCurve(pendingCurves.last())
+                        } else {
+                            nextCommand
                         }
 
-                        check(nextCommand is CubicBezierCurve)
+                        check(normalizedNext is CubicBezierCurve)
+
+                        pendingCurves.add(nextCommand)
 
                         val next = computeAbsoluteCoordinates(commands.take(j + 1))
 
-                        angle += nextCommand.findArcAngle(relativeCircle)
+                        angle += normalizedNext.findArcAngle(relativeCircle)
 
                         if (angle - 2 * Math.PI > 1e-3) {
-                            replacedCommands += 1
                             break
                         }
 
                         if (angle > Math.PI) arc.parameters[0].arc = EllipticalArcCurve.ArcFlag.LARGE
 
-                        pendingCurves.add(originalNext)
-
                         if (2 * Math.PI - angle > 1e-3) {
                             arc.parameters[0].end = next - previous
-                            break
                         } else {
-                            arc.parameters[0].end = (relativeCircle.center - nextCommand.parameters[0].end) * 2f
-                            alternativeOutput.add(EllipticalArcCurve(CommandVariant.RELATIVE, listOf(
+                            arc.parameters[0].end = (relativeCircle.center - normalizedNext.parameters[0].end) * 2f
+                            ellipticalArcs.add(EllipticalArcCurve(CommandVariant.RELATIVE, listOf(
                                     EllipticalArcCurve.Parameter(
                                             radius,
                                             radius,
@@ -108,29 +106,33 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter): TopDownOptimizat
                                             next - (previous + arc.parameters[0].end)
                                     )
                             )))
+                            break
                         }
 
-                        relativeCircle.center -= nextCommand.parameters[0].end
+                        relativeCircle.center += normalizedNext.parameters[0].end
                         nextCommand = commands.getOrNull(++j)
                     }
-
-                    // Skip curves that have already been considered on the next iteration
-                    replacedCommands += pendingCurves.size - 1
 
                     // If the next curve is a shorthand, it must be converted
                     // to longhand if it the previous curve is replaced with an
                     // elliptical arc.
                     if (nextCommand is SmoothCubicBezierCurve) {
-                        alternativeOutput.add(nextCommand.toCubicBezierCurve(pendingCurves.last()))
+                        ellipticalArcs.add(nextCommand.toCubicBezierCurve(pendingCurves.last()))
+                        pendingCurves.add(nextCommand)
                     }
 
                     val originalSize = pendingCurves.joinToString(separator = "", transform = printer::print).length
-                    val alternativeSize = alternativeOutput.joinToString(separator = "", transform = printer::print).length
+                    val alternativeSize = ellipticalArcs.joinToString(separator = "", transform = printer::print).length
                     if (alternativeSize < originalSize) {
-                        newCommands.addAll(alternativeOutput)
-                        if (alternativeOutput.last() is CubicBezierCurve) replacedCommands += 1
+                        newCommands.addAll(ellipticalArcs)
+
+                        // Skip curves that have already been considered on the next iteration
+                        replacedCommands = j - i - 1
+
+                        if (ellipticalArcs.last() is CubicBezierCurve) replacedCommands += 1
                     } else {
                         newCommands.addAll(pendingCurves)
+                        replacedCommands = pendingCurves.size - 1
                     }
                 } else {
                     newCommands.add(originalCommand)
