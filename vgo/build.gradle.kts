@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.targets.js.npm.fromSrcPackageJson
 import java.io.FileInputStream
 import java.io.PrintWriter
 import java.nio.file.Files
@@ -53,17 +54,23 @@ tasks {
     }
 
     val generateConstants by registering {
+        inputs.properties(buildProperties.mapKeys { it.toString() }.mapValues { it.toString() })
+        outputs.files("$projectDir/src/generated/kotlin/com/jzbrooks/BuildConstants.kt")
+
         doLast {
             val generatedDirectory = Paths.get("$projectDir/src/generated/kotlin/com/jzbrooks")
             Files.createDirectories(generatedDirectory)
             val generatedFile = generatedDirectory.resolve("BuildConstants.kt")
+
             PrintWriter(generatedFile.toFile()).use { output ->
                 val buildConstantsClass = buildString {
-                    appendln("""
-                           |package com.jzbrooks
-                           |                           
-                           |object BuildConstants {
-                           """.trimMargin())
+                    appendln(
+                        """
+                               |package com.jzbrooks
+                               |                           
+                               |object BuildConstants {
+                               """.trimMargin()
+                    )
 
                     for (property in buildProperties) {
                         append("    const val ")

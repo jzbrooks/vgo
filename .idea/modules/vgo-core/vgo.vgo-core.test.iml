@@ -2,7 +2,7 @@
 <module external.linked.project.id=":vgo-core:test" external.linked.project.path="$MODULE_DIR$/../../../vgo-core" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="vgo" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
-      <configuration version="3" platform="JVM 1.8" allPlatforms="JVM [1.8]" useProjectSettings="false">
+      <configuration version="3" platform="JVM 11" allPlatforms="JVM [11]" useProjectSettings="false">
         <compilerSettings>
           <option name="additionalArguments" value="-Xallow-no-source-files -Xuse-ir -Xinline-classes" />
         </compilerSettings>
@@ -12,7 +12,7 @@
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
           <option name="moduleName" value="vgo-core" />
-          <option name="jvmTarget" value="1.8" />
+          <option name="jvmTarget" value="11" />
           <option name="friendPaths">
             <array>
               <option value="$MODULE_DIR$/../../../vgo-core/build/classes/java/main" />
