@@ -3,13 +3,18 @@
 vgo is a tool for optimizing vector artwork files that helps ensure your vector artwork is represented compactly without compromising quality.
 
 [![Build Status](https://github.com/jzbrooks/vgo/workflows/build/badge.svg)](https://github.com/jzbrooks/vgo/actions?workflow=build)
+[![Maven Central: vgo](https://img.shields.io/maven-central/v/com.jzbrooks/vgo?label=vgo)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo)
+[![Maven Central: vgo-core](https://img.shields.io/maven-central/v/com.jzbrooks/vgo-core?label=vgo-core)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo-core)
+[![Maven Central: vgo-plugin](https://img.shields.io/maven-central/v/com.jzbrooks/vgo-plugin?label=vgo-plugin)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo-plugin)
 
 ## Installation
 
 Download the distribution from the releases page and ensure it has execute permission. On macOS & Linux run `chmod +x vgo`.
 
 ## Gradle Plugin
-Add the plugin to your buildscript classpath.
+The plugin adds the `shrinkVectorArtwork` task to your project.
+
+To incorporate the plugin in your build, add it to your buildscript classpath.
 ```
 buildscript {
     repositories {
