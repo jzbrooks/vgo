@@ -15,7 +15,7 @@ Download the distribution from the releases page and ensure it has execute permi
 The plugin adds the `shrinkVectorArtwork` task to your project.
 
 To incorporate the plugin in your build, add it to your buildscript classpath.
-```
+```groovy
 buildscript {
     repositories {
         mavenCentral()
@@ -28,11 +28,12 @@ buildscript {
 ```
 
 Then, in the relevant project, add the plugin.
-```
+```groovy
 plugins {
     id 'com.jzbrooks.vgo'
 }
 
+// Default configuration shown
 vgo {
     inputs = fileTree(projectDir) {
         include '**/res/drawable*/*.xml'
@@ -43,6 +44,8 @@ vgo {
     indent = 0
 }
 ```
+
+> For Android projects a non-zero indent is better for readability and provides no apk size impact after AAPT processing.
 
 ## Command Line Interface
 
