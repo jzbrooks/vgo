@@ -1,18 +1,33 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import io.codearte.gradle.nexus.NexusStagingExtension
+import java.util.Properties
+import java.io.FileInputStream
 
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
 
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.21")
+        classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0")
     }
 }
 
 allprojects {
+    val buildProperties = run {
+        val properties = Properties()
+        FileInputStream("$rootDir/build.properties").use(properties::load)
+        properties
+    }
+
+    group = "com.jzbrooks"
+    version = buildProperties["version"]?.toString() ?: ""
+
     repositories {
-        jcenter()
+        mavenLocal()
+        mavenCentral()
     }
 
     tasks.withType<KotlinCompile> {
@@ -24,6 +39,8 @@ allprojects {
     }
 
     tasks.withType<Test> {
+        useJUnitPlatform()
+
         addTestListener(object : TestListener {
             override fun afterSuite(suite: TestDescriptor, result: TestResult) {
                 if (suite.parent == null) {
@@ -43,4 +60,18 @@ allprojects {
             override fun beforeSuite(suite: TestDescriptor?) {}
         })
     }
+}
+
+ext["signing.keyId"] = System.getenv("SIGNING_KEY_ID")
+ext["signing.password"] = System.getenv("SIGNING_PASSWORD")
+ext["signing.secretKeyRingFile"] = System.getenv("SIGNING_KEY_FILE_PATH")
+
+apply(plugin = "io.codearte.nexus-staging")
+configure<NexusStagingExtension> {
+    packageGroup = "com.jzbrooks"
+    stagingProfileId = System.getenv("SONATYPE_PROFILE_ID")
+    numberOfRetries = 60
+    delayBetweenRetriesInMillis = 30_000
+    username = System.getenv("OSSRH_USERNAME")
+    password = System.getenv("OSSRH_PASSWORD")
 }

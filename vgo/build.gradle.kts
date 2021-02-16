@@ -1,20 +1,12 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.jetbrains.kotlin.gradle.targets.js.npm.fromSrcPackageJson
-import java.io.FileInputStream
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.Properties
 
 plugins {
     id("org.jetbrains.kotlin.jvm")
-}
-
-val buildProperties = run {
-    val properties = Properties()
-    FileInputStream("$projectDir/build.properties").use(properties::load)
-    properties
+    id("maven-publish")
+    id("signing")
 }
 
 sourceSets {
@@ -23,20 +15,10 @@ sourceSets {
             kotlin.srcDir("src/generated/kotlin")
         }
     }
-
-    create("integrationTest") {
-        withConvention(KotlinSourceSet::class) {
-            kotlin.srcDir("src/integration-test/kotlin")
-            resources.srcDir("src/integration-test/resources")
-            compileClasspath += sourceSets["main"].output + configurations["testRuntimeClasspath"]
-            runtimeClasspath += output + compileClasspath + sourceSets["test"].runtimeClasspath
-        }
-    }
 }
 
 dependencies {
     implementation(project(":vgo-core"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.22")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
@@ -45,55 +27,16 @@ dependencies {
 }
 
 tasks {
-    withType<Test> {
-        useJUnitPlatform()
-    }
-
-    withType<KotlinCompile<*>> {
+    compileKotlin {
         dependsOn("generateConstants")
     }
 
-    val generateConstants by registering {
-        inputs.properties(buildProperties.mapKeys { it.toString() }.mapValues { it.toString() })
-        outputs.files("$projectDir/src/generated/kotlin/com/jzbrooks/BuildConstants.kt")
-
-        doLast {
-            val generatedDirectory = Paths.get("$projectDir/src/generated/kotlin/com/jzbrooks")
-            Files.createDirectories(generatedDirectory)
-            val generatedFile = generatedDirectory.resolve("BuildConstants.kt")
-
-            PrintWriter(generatedFile.toFile()).use { output ->
-                val buildConstantsClass = buildString {
-                    appendln(
-                        """
-                               |package com.jzbrooks
-                               |                           
-                               |object BuildConstants {
-                               """.trimMargin()
-                    )
-
-                    for (property in buildProperties) {
-                        append("    const val ")
-                        append(property.key.toString().toUpperCase())
-                        append(" = \"")
-                        append(property.value)
-                        appendln('"')
-                    }
-
-                    appendln("}")
-                }
-                output.write(buildConstantsClass)
-            }
-        }
-    }
-
-
-    withType<Jar> {
+    jar {
         dependsOn(configurations.runtimeClasspath)
 
         manifest {
             attributes["Main-Class"] = "com.jzbrooks.vgo.Application"
-            attributes["Bundle-Version"] = buildProperties["version"].toString()
+            attributes["Bundle-Version"] = project.version
         }
 
         val sourceClasses = sourceSets.main.get().output.classesDirs
@@ -115,12 +58,44 @@ tasks {
         }
     }
 
+    val generateConstants by registering {
+        outputs.files("$projectDir/src/generated/kotlin/com/jzbrooks/BuildConstants.kt")
+
+        doLast {
+            val generatedDirectory = Paths.get("$projectDir/src/generated/kotlin/com/jzbrooks")
+            Files.createDirectories(generatedDirectory)
+            val generatedFile = generatedDirectory.resolve("BuildConstants.kt")
+
+            PrintWriter(generatedFile.toFile()).use { output ->
+                val buildConstantsClass = buildString {
+                    appendln(
+                        """
+                               |package com.jzbrooks
+                               |                           
+                               |object BuildConstants {
+                               """.trimMargin()
+                    )
+
+
+                    append("    const val ")
+                    append("VERSION")
+                    append(" = \"")
+                    append(project.version)
+                    appendln('"')
+
+                    appendln("}")
+                }
+                output.write(buildConstantsClass)
+            }
+        }
+    }
+
     val optimizedJar = file("$buildDir/libs/vgo.jar")
     val optimize by registering(JavaExec::class) {
         description = "Runs proguard on the jar application."
         group = "build"
 
-        inputs.file("$buildDir/libs/debug/vgo.jar")
+        inputs.file("$buildDir/libs/debug/vgo-$version.jar")
         outputs.file(optimizedJar)
 
         val javaHome = System.getenv("JAVA_HOME") ?: javaInstalls
@@ -134,7 +109,7 @@ tasks {
                 "--lib", javaHome,
                 "--output", "$buildDir/libs/vgo.jar",
                 "--pg-conf", "$rootDir/optimize.pro",
-                "$buildDir/libs/debug/vgo.jar"
+                "$buildDir/libs/debug/vgo-$version.jar"
         )
 
         dependsOn(getByName("jar"))
@@ -159,23 +134,15 @@ tasks {
         }
     }
 
-    val integrationTest by registering(Test::class) {
-        description = "Runs the integration tests."
-        group = "verification"
-        testClassesDirs = sourceSets["integrationTest"].output.classesDirs
-        classpath = sourceSets["integrationTest"].runtimeClasspath
-        mustRunAfter("test")
-    }
-
     val updateBaselineOptimizations by registering(Copy::class) {
         description = "Updates baseline assets with the latest integration test outputs."
         group = "Build Setup"
 
-        from("$buildDir/integrationTest/") {
+        from("$buildDir/test/") {
             include("*testOptimizationFinishes.xml")
             include("*testOptimizationFinishes.svg")
         }
-        into("src/integration-test/resources/baseline/")
+        into("src/test/resources/baseline/")
         rename { original ->
             val originalAssetName = original.let {
                 val i = it.lastIndexOf('_')
@@ -186,5 +153,68 @@ tasks {
         }
     }
 
-    getByName("check").dependsOn(integrationTest)
+    val sourcesJar by creating(Jar::class) {
+        archiveClassifier.set("sources")
+        from(sourceSets["main"].allSource)
+    }
+
+    val javadocJar by creating(Jar::class) {
+        archiveClassifier.set("javadoc")
+        from(this@tasks["javadoc"])
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            artifactId = "vgo"
+
+            artifact(tasks["sourcesJar"])
+            artifact(tasks["javadocJar"])
+            from(components["kotlin"])
+
+            @Suppress("UnstableApiUsage")
+            pom {
+                name.set("vgo")
+                description.set("vgo is a tool for optimizing vector artwork files that helps ensure your vector artwork is represented compactly without compromising quality.")
+                url.set("https://github.com/jzbrooks/vgo/")
+
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://github.com/jzbrooks/vgo/blob/master/LICENSE")
+                    }
+                }
+
+                developers {
+                    developer {
+                        id.set("jzbrooks")
+                        name.set("Justin Brooks")
+                        email.set("justin@jzbrooks.com")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:git:github.com/jzbrooks/vgo.git")
+                    developerConnection.set("scm:git:ssh://github.com/jzbrooks/vgo.git")
+                    url.set("https://github.com/jzbrooks/vgo/tree/master")
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "sonatype"
+            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = System.getenv("OSSRH_USERNAME")
+                password = System.getenv("OSSRH_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications)
 }

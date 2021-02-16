@@ -2,15 +2,12 @@ package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
-import com.jzbrooks.vgo.svg.ScalableVectorGraphic
-import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
-import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
-import com.jzbrooks.vgo.svg.toVectorDrawable
-import com.jzbrooks.vgo.util.xml.asSequence
-import com.jzbrooks.vgo.vd.VectorDrawable
-import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
-import com.jzbrooks.vgo.vd.VectorDrawableWriter
-import com.jzbrooks.vgo.vd.toSvg
+import com.jzbrooks.vgo.core.svg.*
+import com.jzbrooks.vgo.core.util.xml.asSequence
+import com.jzbrooks.vgo.core.vd.VectorDrawable
+import com.jzbrooks.vgo.core.vd.VectorDrawableOptimizationRegistry
+import com.jzbrooks.vgo.core.vd.VectorDrawableWriter
+import com.jzbrooks.vgo.core.vd.toSvg
 import org.w3c.dom.Document
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
@@ -134,8 +131,10 @@ class Application {
 
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
             var graphic = when {
-                rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> com.jzbrooks.vgo.svg.parse(rootNodes.first())
-                rootNodes.any { it.nodeName == "vector" && input.extension == "xml"} -> com.jzbrooks.vgo.vd.parse(rootNodes.first())
+                rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> parse(rootNodes.first())
+                rootNodes.any { it.nodeName == "vector" && input.extension == "xml"} -> com.jzbrooks.vgo.core.vd.parse(
+                    rootNodes.first()
+                )
                 else -> if (input == output) return else null
             }
 

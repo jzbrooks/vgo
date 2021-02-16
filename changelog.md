@@ -1,7 +1,15 @@
 Change Log
 ==========
 
+## 1.4.0
+_02.15.2021_
+
+* Added: Gradle plugin
+* Improved: Reworked the gradle modules to better be published as a library (vgo-core) and thin application wrapper (vgo).
+* Added: Sonatype publishing
+
 ## 1.3.0
+_01.18.2021_
 
 * Added: Collapse multiple Bézier curves into elliptical arcs when possible
 * Improvement: Target JVM 11
