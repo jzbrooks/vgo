@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":vgo-core:test" external.linked.project.path="$MODULE_DIR$/../../../vgo-core" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="vgo" external.system.module.type="sourceSet" external.system.module.version="unspecified" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":vgo-core:test" external.linked.project.path="$MODULE_DIR$/../../../vgo-core" external.root.project.path="$MODULE_DIR$/../../.." external.system.id="GRADLE" external.system.module.group="com.jzbrooks" external.system.module.type="sourceSet" external.system.module.version="1.4.0" type="JAVA_MODULE" version="4">
   <component name="ExternalSystem" linkedProjectPath="$MODULE_DIR$/../../.." rootProjectPath="$MODULE_DIR$/../../.." />
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
@@ -18,7 +18,7 @@
             <array>
               <option value="$MODULE_DIR$/../../../vgo-core/build/classes/java/main" />
               <option value="$MODULE_DIR$/../../../vgo-core/build/classes/kotlin/main" />
-              <option value="$MODULE_DIR$/../../../vgo-core/build/libs/vgo-core.jar" />
+              <option value="$MODULE_DIR$/../../../vgo-core/build/libs/vgo-core-1.4.0.jar" />
             </array>
           </option>
           <option name="languageVersion" value="1.4" />

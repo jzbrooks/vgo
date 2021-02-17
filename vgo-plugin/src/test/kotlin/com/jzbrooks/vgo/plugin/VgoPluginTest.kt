@@ -2,8 +2,12 @@ package com.jzbrooks.vgo.plugin
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isTrue
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.getByName
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -14,10 +18,10 @@ class VgoPluginTest {
     fun pluginAddsTaskToProject() {
         val project: Project = ProjectBuilder.builder().build()
         project.pluginManager.apply("com.jzbrooks.vgo")
-        project.tasks.getByName("shrinkVectorArtwork")
+        val task = project.tasks.getByName("shrinkVectorArtwork")
+        assertThat(task).isInstanceOf(ShrinkVectorArtwork::class)
     }
 
-    @Disabled("Needs a custom task first (to get the output out of the task)")
     @Test
     fun testConfiguration() {
         val project: Project = ProjectBuilder.builder()
@@ -30,8 +34,10 @@ class VgoPluginTest {
         project.configure<VgoPluginExtension> {
             inputs = project.fileTree(input)
         }
-        val task = project.tasks.getByName("shrinkVectorArtwork")
 
-//        assertThat(task.args).containsExactly(input.absolutePath, "--stats")
+        val task = project.tasks.getByName<ShrinkVectorArtwork>("shrinkVectorArtwork")
+
+        assertThat(task.files).containsExactly(input.absolutePath)
+        assertThat(task.showStatistics).isTrue()
     }
 }
