@@ -16,14 +16,8 @@ buildscript {
 }
 
 allprojects {
-    val buildProperties = run {
-        val properties = Properties()
-        FileInputStream("$rootDir/build.properties").use(properties::load)
-        properties
-    }
-
     group = "com.jzbrooks"
-    version = buildProperties["version"]?.toString() ?: ""
+    version = properties["vgo_version"]?.toString() ?: ""
 
     repositories {
         mavenLocal()

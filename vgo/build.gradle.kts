@@ -76,12 +76,17 @@ tasks {
                                """.trimMargin()
                     )
 
+                    val vgoProperties = project.properties
+                        .filter { it.key.startsWith("vgo_") }
+                        .mapKeys { it.key.removePrefix("vgo_") }
 
-                    append("    const val ")
-                    append("VERSION")
-                    append(" = \"")
-                    append(project.version)
-                    appendln('"')
+                    for (property in vgoProperties) {
+                        append("    const val ")
+                        append(property.key.toUpperCase())
+                        append(" = \"")
+                        append(property.value)
+                        appendln('"')
+                    }
 
                     appendln("}")
                 }

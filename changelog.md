@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 1.4.1
+_02.16.2021_
+
+* Added: A new type for the `shrinkVectorArtwork` task
+
 ## 1.4.0
 _02.15.2021_
 
