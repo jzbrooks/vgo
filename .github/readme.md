@@ -22,7 +22,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "com.jzbrooks:vgo-plugin:1.4.0"
+        classpath "com.jzbrooks:vgo-plugin:1.4.1"
     }
 }
 ```
