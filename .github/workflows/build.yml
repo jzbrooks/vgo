@@ -5,6 +5,8 @@ env:
 
 on:
   push:
+    paths-ignore:
+      - '**.md'
     branches:
       - master
 
