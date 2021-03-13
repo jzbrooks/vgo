@@ -10,6 +10,7 @@ vgo is a tool for optimizing vector artwork files that helps ensure your vector 
 ## Installation
 
 Download the distribution from the releases page and ensure it has execute permission. On macOS & Linux run `chmod +x vgo`.
+vgo requires Java 11.
 
 ## Gradle Plugin
 The plugin adds the `shrinkVectorArtwork` task to your project.
