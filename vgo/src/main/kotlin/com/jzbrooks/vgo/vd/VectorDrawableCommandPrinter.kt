@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.vd
+package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point

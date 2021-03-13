@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.vd
+package com.jzbrooks.vgo.vd
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo

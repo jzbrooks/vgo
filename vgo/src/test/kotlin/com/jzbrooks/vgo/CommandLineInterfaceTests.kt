@@ -12,8 +12,8 @@ import java.io.PrintStream
 import java.nio.file.Paths
 
 class CommandLineInterfaceTests {
-    private val avocadoExampleRelativePath = "src/test/resources/avocado_example.xml"
-    private val heartExampleRelativePath = "src/test/resources/simple_heart.xml"
+    private val avocadoExampleRelativePath = Paths.get("src/test/resources/avocado_example.xml").toString()
+    private val heartExampleRelativePath = Paths.get("src/test/resources/simple_heart.xml").toString()
     private lateinit var systemOutput: ByteArrayOutputStream
 
     @BeforeEach
@@ -105,7 +105,7 @@ class CommandLineInterfaceTests {
         val exitCode = Application().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         val report = systemOutput.toString()
-        assertThat(report).contains("src/test/resources/in-place-modify/avocado_example.xml")
+        assertThat(report).contains(Paths.get("src/test/resources/in-place-modify/avocado_example.xml").toString())
     }
 
     @Test

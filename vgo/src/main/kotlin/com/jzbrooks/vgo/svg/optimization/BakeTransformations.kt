@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.svg.optimization
+package com.jzbrooks.vgo.svg.optimization
 
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.PathElement

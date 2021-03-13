@@ -1,11 +1,11 @@
-package com.jzbrooks.vgo.core.vd.optimization
+package com.jzbrooks.vgo.vd.optimization
 
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.core.optimization.ContainerElementVisitor
 import com.jzbrooks.vgo.core.optimization.PathElementVisitor
 import com.jzbrooks.vgo.core.optimization.TopDownOptimization
-import com.jzbrooks.vgo.core.vd.VectorDrawable
+import com.jzbrooks.vgo.vd.VectorDrawable
 
 class RemoveRedundantAttributes : TopDownOptimization, ContainerElementVisitor, PathElementVisitor {
     override fun visit(containerElement: ContainerElement) {

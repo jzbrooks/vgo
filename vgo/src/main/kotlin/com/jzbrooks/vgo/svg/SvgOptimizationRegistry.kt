@@ -1,7 +1,7 @@
-package com.jzbrooks.vgo.core.svg
+package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.optimization.*
-import com.jzbrooks.vgo.core.svg.optimization.BakeTransformations
+import com.jzbrooks.vgo.svg.optimization.BakeTransformations
 
 class SvgOptimizationRegistry : OptimizationRegistry(emptyList(), topDownOptimizations, emptyList(), wholeGraphicOptimizations) {
 

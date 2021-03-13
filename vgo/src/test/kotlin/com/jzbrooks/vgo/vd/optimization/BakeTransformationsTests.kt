@@ -1,15 +1,15 @@
-package com.jzbrooks.vgo.core.vd.optimization
+package com.jzbrooks.vgo.vd.optimization
 
 import assertk.assertThat
 import assertk.assertions.*
-import com.jzbrooks.vgo.core.assertk.extensions.containsKey
-import com.jzbrooks.vgo.core.assertk.extensions.doesNotContainKey
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point
+import com.jzbrooks.vgo.util.assertk.containsKey
+import com.jzbrooks.vgo.util.assertk.doesNotContainKey
 import org.junit.jupiter.api.Test
 
 class BakeTransformationsTests {

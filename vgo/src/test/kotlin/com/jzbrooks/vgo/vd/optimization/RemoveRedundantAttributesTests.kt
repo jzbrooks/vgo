@@ -1,9 +1,9 @@
-package com.jzbrooks.vgo.core.vd.optimization
+package com.jzbrooks.vgo.vd.optimization
 
 import assertk.assertThat
 import assertk.assertions.isEmpty
 import com.jzbrooks.vgo.core.graphic.Path
-import com.jzbrooks.vgo.core.vd.VectorDrawable
+import com.jzbrooks.vgo.vd.VectorDrawable
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource

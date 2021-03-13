@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.vd.optimization
+package com.jzbrooks.vgo.vd.optimization
 
 import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.core.graphic.command.*

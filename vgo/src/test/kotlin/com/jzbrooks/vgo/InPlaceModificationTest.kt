@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
+import java.nio.file.Paths
 
 class InPlaceModificationTest {
 
@@ -56,7 +57,7 @@ class InPlaceModificationTest {
         Application().run(arguments)
 
         assertThat(systemOutput.toString())
-                .contains("src/test/resources/in-place-modify/avocado_example.xml")
+                .contains(Paths.get("src/test/resources/in-place-modify/avocado_example.xml").toString())
     }
 
     @Test

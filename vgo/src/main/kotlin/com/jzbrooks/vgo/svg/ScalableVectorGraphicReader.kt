@@ -1,9 +1,9 @@
-package com.jzbrooks.vgo.core.svg
+package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandString
-import com.jzbrooks.vgo.core.svg.graphic.ClipPath
+import com.jzbrooks.vgo.svg.graphic.ClipPath
 import com.jzbrooks.vgo.core.util.xml.asSequence
 import com.jzbrooks.vgo.core.util.xml.toMutableMap
 import org.w3c.dom.Comment

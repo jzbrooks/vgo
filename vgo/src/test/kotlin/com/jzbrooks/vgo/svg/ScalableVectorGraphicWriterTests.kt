@@ -1,15 +1,15 @@
-package com.jzbrooks.vgo.core.svg
+package com.jzbrooks.vgo.svg
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.jzbrooks.vgo.core.assertk.extensions.hasName
-import com.jzbrooks.vgo.core.assertk.extensions.hasNames
-import com.jzbrooks.vgo.core.assertk.extensions.hasValue
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.xml.toList
+import com.jzbrooks.vgo.util.assertk.hasName
+import com.jzbrooks.vgo.util.assertk.hasNames
+import com.jzbrooks.vgo.util.assertk.hasValue
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream

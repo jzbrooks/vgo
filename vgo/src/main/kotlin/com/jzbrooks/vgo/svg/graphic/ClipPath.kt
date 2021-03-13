@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.svg.graphic
+package com.jzbrooks.vgo.svg.graphic
 
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element

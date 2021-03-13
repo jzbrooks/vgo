@@ -1,13 +1,13 @@
-package com.jzbrooks.vgo.core.svg
+package com.jzbrooks.vgo.svg
 
 import assertk.assertThat
 import assertk.assertions.*
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
-import com.jzbrooks.vgo.core.svg.graphic.ClipPath
+import com.jzbrooks.vgo.svg.graphic.ClipPath
 import org.junit.jupiter.api.Test
-import com.jzbrooks.vgo.core.vd.graphic.ClipPath as AndroidClipPath
+import com.jzbrooks.vgo.vd.graphic.ClipPath as AndroidClipPath
 
 class VectorDrawableConverterTests {
     @Test

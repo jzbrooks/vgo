@@ -1,7 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import io.codearte.gradle.nexus.NexusStagingExtension
-import java.util.Properties
-import java.io.FileInputStream
 
 buildscript {
     repositories {

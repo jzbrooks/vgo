@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.vd.optimization
+package com.jzbrooks.vgo.vd.optimization
 
 import assertk.assertThat
 import assertk.assertions.hasSize
@@ -11,7 +11,7 @@ import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.optimization.ConvertCurvesToArcs
 import com.jzbrooks.vgo.core.util.math.Point
-import com.jzbrooks.vgo.core.vd.VectorDrawableCommandPrinter
+import com.jzbrooks.vgo.vd.VectorDrawableCommandPrinter
 import org.junit.jupiter.api.Test
 
 class ConvertCurvesToArcsTest {

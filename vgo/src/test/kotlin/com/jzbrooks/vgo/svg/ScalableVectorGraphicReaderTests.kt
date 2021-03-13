@@ -1,18 +1,18 @@
-package com.jzbrooks.vgo.core.svg
+package com.jzbrooks.vgo.svg
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import com.jzbrooks.vgo.core.assertk.extensions.containsKey
-import com.jzbrooks.vgo.core.assertk.extensions.containsKeys
-import com.jzbrooks.vgo.core.assertk.extensions.doesNotContainKey
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point
+import com.jzbrooks.vgo.util.assertk.containsKey
+import com.jzbrooks.vgo.util.assertk.containsKeys
+import com.jzbrooks.vgo.util.assertk.doesNotContainKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Node

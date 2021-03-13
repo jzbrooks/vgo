@@ -1,8 +1,8 @@
-package com.jzbrooks.vgo.core.svg
+package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.graphic.*
-import com.jzbrooks.vgo.core.svg.graphic.ClipPath
+import com.jzbrooks.vgo.svg.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
 import javax.xml.parsers.DocumentBuilderFactory

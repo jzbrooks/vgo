@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.vd.graphic
+package com.jzbrooks.vgo.vd.graphic
 
 import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.core.graphic.command.Command

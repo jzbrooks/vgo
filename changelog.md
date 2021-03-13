@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## Unpublished (2.0.0)
+
+* Removed non IR related code from the core library
+* Fixed tests on Windows
+
 ## 1.4.1
 _02.16.2021_
 

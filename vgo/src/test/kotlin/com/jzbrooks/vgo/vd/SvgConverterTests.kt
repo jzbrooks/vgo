@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.vd
+package com.jzbrooks.vgo.vd
 
 import assertk.assertThat
 import assertk.assertions.contains
@@ -9,7 +9,7 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
-import com.jzbrooks.vgo.core.vd.graphic.ClipPath
+import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.junit.jupiter.api.Test
 
 class SvgConverterTests {

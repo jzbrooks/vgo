@@ -1,7 +1,7 @@
-package com.jzbrooks.vgo.core.vd
+package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.optimization.*
-import com.jzbrooks.vgo.core.vd.optimization.BakeTransformations
+import com.jzbrooks.vgo.vd.optimization.BakeTransformations
 
 class VectorDrawableOptimizationRegistry : OptimizationRegistry(prePass, topDownOptimizations, emptyList(), postPass) {
 

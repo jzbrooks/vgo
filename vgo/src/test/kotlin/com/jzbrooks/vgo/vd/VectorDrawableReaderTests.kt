@@ -1,10 +1,7 @@
-package com.jzbrooks.vgo.core.vd
+package com.jzbrooks.vgo.vd
 
 import assertk.assertThat
 import assertk.assertions.*
-import com.jzbrooks.vgo.core.assertk.extensions.containsKey
-import com.jzbrooks.vgo.core.assertk.extensions.containsKeys
-import com.jzbrooks.vgo.core.assertk.extensions.doesNotContainKey
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Path
@@ -13,10 +10,14 @@ import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.math.Point
+import com.jzbrooks.vgo.util.assertk.containsKey
+import com.jzbrooks.vgo.util.assertk.containsKeys
+import com.jzbrooks.vgo.util.assertk.doesNotContainKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
+import java.nio.file.Paths
 import javax.xml.parsers.DocumentBuilderFactory
 
 class VectorDrawableReaderTests {
@@ -24,7 +25,7 @@ class VectorDrawableReaderTests {
 
     @BeforeEach
     fun setup() {
-        javaClass.getResourceAsStream("/vd_visibilitystrike.xml").use { input ->
+        javaClass.getResourceAsStream("/visibility_strike.xml").use { input ->
             val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
             document.normalize()
             node = document.firstChild

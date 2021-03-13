@@ -1,11 +1,11 @@
-package com.jzbrooks.vgo.core.vd
+package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.xml.asSequence
 import com.jzbrooks.vgo.core.util.xml.toMutableMap
-import com.jzbrooks.vgo.core.vd.graphic.ClipPath
+import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.w3c.dom.Comment
 import org.w3c.dom.Node
 import org.w3c.dom.Text

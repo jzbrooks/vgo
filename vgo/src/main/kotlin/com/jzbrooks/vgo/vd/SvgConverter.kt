@@ -1,9 +1,9 @@
-package com.jzbrooks.vgo.core.vd
+package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.core.util.math.Matrix3
-import com.jzbrooks.vgo.core.svg.ScalableVectorGraphic
-import com.jzbrooks.vgo.core.vd.graphic.ClipPath
+import com.jzbrooks.vgo.svg.ScalableVectorGraphic
+import com.jzbrooks.vgo.vd.graphic.ClipPath
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
