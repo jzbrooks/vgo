@@ -2,6 +2,8 @@
 
 vgo is a tool for optimizing vector artwork files that helps ensure your vector artwork is represented compactly without compromising quality.
 
+vgo is built on vgo-core, a library and intermediate representation for vector graphics.
+
 [![Build Status](https://github.com/jzbrooks/vgo/workflows/build/badge.svg)](https://github.com/jzbrooks/vgo/actions?workflow=build)
 [![Maven Central: vgo](https://img.shields.io/maven-central/v/com.jzbrooks/vgo?label=vgo)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo)
 [![Maven Central: vgo-core](https://img.shields.io/maven-central/v/com.jzbrooks/vgo-core?label=vgo-core)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo-core)
@@ -10,6 +12,7 @@ vgo is a tool for optimizing vector artwork files that helps ensure your vector 
 ## Installation
 
 Download the distribution from the releases page and ensure it has execute permission. On macOS & Linux run `chmod +x vgo`.
+
 vgo requires Java 11.
 
 ## Gradle Plugin
