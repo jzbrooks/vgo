@@ -1,68 +1,122 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.graphic.*
-import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.xml.asSequence
+import com.jzbrooks.vgo.core.util.xml.removeOrNull
 import com.jzbrooks.vgo.core.util.xml.toMutableMap
 import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.w3c.dom.Comment
+import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 
+private val HEX_WITH_ALPHA = Regex("#[a-fA-F\\d]{8}")
+
 fun parse(root: Node): VectorDrawable {
-    val rootMetadata = root.attributes.toMutableMap()
+    val rootMetadata = root.attributes.toGraphicAttributes()
 
     val elements = root.childNodes.asSequence()
-            .mapNotNull(::parseElement)
-            .toList()
+        .mapNotNull(::parseElement)
+        .toList()
 
     return VectorDrawable(elements, rootMetadata)
 }
 
 private fun parseElement(node: Node): Element? {
-    return if (node !is Text && node !is Comment) {
-        when (node.nodeName) {
-            "group" -> parseGroup(node)
-            "path" -> parsePathElement(node, ::Path)
-            "clip-path" -> parsePathElement(node, ::ClipPath)
-            else -> parseExtraElement(node)
-        }
-    } else {
-        null
+    if (node is Text || node is Comment) return null
+
+    return when (node.nodeName) {
+        "group" -> parseGroup(node)
+        "path" -> parsePath(node)
+        "clip-path" -> parseClipPath(node)
+        else -> parseExtraElement(node)
     }
 }
 
 private fun parseGroup(groupNode: Node): Group {
     val groupChildElements = groupNode.childNodes.asSequence()
-            .mapNotNull(::parseElement)
-            .toList()
-    val groupMetadata = groupNode.attributes.toMutableMap()
+        .mapNotNull(::parseElement)
+        .toList()
+    val groupMetadata = groupNode.attributes.toGroupAttributes()
     return Group(groupChildElements, groupMetadata)
 }
 
-private fun <T : PathElement> parsePathElement(node: Node, generator: (List<Command>, MutableMap<String, String>) -> T): T {
-    val metadata = node.attributes.asSequence()
-            .filter { attribute -> attribute.nodeName != "android:pathData" }
-            .associate { attribute -> attribute.nodeName to attribute.nodeValue }
-            .toMutableMap()
-
-    val pathDataString = node.attributes.getNamedItem("android:pathData").textContent
+private fun parsePath(node: Node): Path {
+    val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
 
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
-        metadata["android:pathData"] = pathDataString
-        generator(emptyList(), metadata)
+        Path(emptyList(), node.attributes.toPathAttributes())
     } else {
+        node.attributes.removeNamedItem("android:pathData")
+
         val data = CommandString(pathDataString)
-        generator(data.toCommandList(), metadata)
+        Path(data.toCommandList(), node.attributes.toPathAttributes())
     }
+}
+
+private fun parseClipPath(node: Node): ClipPath {
+    val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
+
+    return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
+        ClipPath(emptyList(), node.attributes.toClipPathAttributes())
+    } else {
+        node.attributes.removeNamedItem("android:pathData")
+
+        val data = CommandString(pathDataString)
+        ClipPath(data.toCommandList(), node.attributes.toClipPathAttributes())
+    }
+}
+
+private fun parseGroupElement(node: Node): Group {
+    val attributes = node.attributes.toGroupAttributes()
+
+    val childElements = node.childNodes.asSequence()
+        .mapNotNull(::parseElement)
+        .toList()
+
+    return Group(childElements, attributes)
+}
+
+private fun parsePathElement(node: Node): Path {
+    val attributes = node.attributes.toPathAttributes()
+
+    val data = CommandString(node.attributes.removeNamedItem("android:pathData").textContent)
+
+    return Path(data.toCommandList(), attributes)
 }
 
 private fun parseExtraElement(node: Node): Extra {
     val containedElements = node.childNodes.asSequence()
-            .mapNotNull(::parseElement)
-            .toList()
-    val attributes = node.attributes?.toMutableMap() ?: mutableMapOf()
+        .mapNotNull(::parseElement)
+        .toList()
 
-    return Extra(node.nodeValue ?: node.nodeName, containedElements, attributes)
+    return Extra(node.nodeValue ?: node.nodeName, containedElements, node.attributes.toExtraAttributes())
 }
+
+private fun NamedNodeMap.toGraphicAttributes() = VectorDrawable.Attributes(
+    removeOrNull("id")?.nodeValue,
+    toMutableMap(),
+)
+
+private fun NamedNodeMap.toPathAttributes(): Path.Attributes {
+    return Path.Attributes(
+        removeOrNull("id")?.nodeValue,
+        toMutableMap(),
+    )
+}
+
+private fun NamedNodeMap.toClipPathAttributes() = ClipPath.Attributes(
+    removeOrNull("id")?.nodeValue,
+    toMutableMap(),
+)
+
+private fun NamedNodeMap.toGroupAttributes() = Group.Attributes(
+    removeOrNull("id")?.nodeValue,
+    toMutableMap(),
+)
+
+private fun NamedNodeMap.toExtraAttributes() = Extra.Attributes(
+    removeOrNull("id")?.nodeValue,
+    toMutableMap(),
+)
