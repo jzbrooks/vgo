@@ -82,8 +82,7 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes.foreign).containsKey("android:name")
-        assertThat(path.attributes.foreign["android:name"]).isEqualTo("strike_thru_path")
+        assertThat(path.attributes.name).isEqualTo("strike_thru_path")
     }
 
     @Test

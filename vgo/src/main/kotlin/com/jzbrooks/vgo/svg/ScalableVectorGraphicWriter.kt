@@ -24,7 +24,7 @@ class ScalableVectorGraphicWriter(override val options: Set<Writer.Option> = emp
         val root = document.createElement("svg")
         val elementName = graphic.attributes.name
         if (elementName != null) {
-            root.setAttribute("android:name", elementName)
+            root.setAttribute("id", elementName)
         }
         for (item in graphic.attributes.foreign) {
             root.setAttribute(item.key, item.value)
@@ -73,7 +73,7 @@ class ScalableVectorGraphicWriter(override val options: Set<Writer.Option> = emp
         if (node != null) {
             val elementName = element.attributes.name
             if (elementName != null) {
-                node.setAttribute("android:name", elementName)
+                node.setAttribute("id", elementName)
             }
             for (item in element.attributes.foreign) {
                 node.setAttribute(item.key, item.value)

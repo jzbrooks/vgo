@@ -250,8 +250,7 @@ class MergePathsTests {
         ))
     }
 
-    data class PseudoPath(override var commands: List<Command>, override val attributes: Attributes = object : Attributes {
-        override val name: String? = null
-        override val foreign: MutableMap<String, String> = mutableMapOf()
-    }) : PathElement
+    data class PseudoPath(override var commands: List<Command>, override val attributes: Attributes = Attributes(null, mutableMapOf())) : PathElement {
+        data class Attributes(override val name: String?, override val foreign: MutableMap<String, String>) : com.jzbrooks.vgo.core.graphic.Attributes
+    }
 }
