@@ -187,7 +187,7 @@ private fun traverse(element: Element): Element {
 private fun process(containerElement: ContainerElement): Element {
     val clipPaths = containerElement.elements
             .filterIsInstance<ClipPath>()
-            .associateBy { it.attributes.foreign.getValue("id") }
+            .associateBy { it.attributes.name }
 
     val newElements = mutableListOf<Element>()
     for (element in containerElement.elements.filter { it !is ClipPath }) {
@@ -215,6 +215,7 @@ private fun process(containerElement: ContainerElement): Element {
     }
 
     val newAttributes = convertContainerElementAttributes(containerElement.attributes.foreign.toMutableMap())
+    containerElement.attributes.foreign.clear()
     containerElement.attributes.foreign.putAll(newAttributes)
 
     return containerElement.apply { elements = newElements.map(::traverse) }
@@ -238,9 +239,9 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
 }
 
 private fun convertContainerElementAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
-    val vdContainerElements = mutableMapOf<String, String>()
+    val vdContainerElements: MutableMap<String, String> = mapAttributes(attributes)
 
-    attributes.remove("transform")?.let { matrix ->
+    vdContainerElements.remove("transform")?.let { matrix ->
         val entries = matrix.removePrefix("matrix(")
                 .trimEnd(')')
                 .split(',')
@@ -276,8 +277,6 @@ private fun convertContainerElementAttributes(attributes: MutableMap<String, Str
             vdContainerElements["android:rotation"] = rotation.toString()
         }
     }
-
-    vdContainerElements.putAll(mapAttributes(attributes))
 
     return vdContainerElements
 }
@@ -319,7 +318,7 @@ private fun convertTopLevelAttributes(attributes: ScalableVectorGraphic.Attribut
     return VectorDrawable.Attributes(attributes.name, vdElementAttributes)
 }
 
-private fun mapAttributes(attributes: MutableMap<String, String>): Map<String, String> {
+private fun mapAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
     val newAttributes = mutableMapOf<String, String>()
 
     fun addAttribute(key: String, value: String) {

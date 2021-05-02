@@ -54,7 +54,7 @@ private fun parseGroupElement(node: Node): Group {
 private fun parsePathElement(node: Node): Path {
     val attributes = node.attributes.toPathAttributes()
 
-    val data = CommandString(node.attributes.getNamedItem("d").textContent)
+    val data = CommandString(attributes.foreign.remove("d")!!)
 
     return Path(data.toCommandList(), attributes)
 }

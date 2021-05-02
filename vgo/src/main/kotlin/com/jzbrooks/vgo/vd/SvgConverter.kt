@@ -43,6 +43,7 @@ private fun process(containerElement: ContainerElement): Element {
     }
 
     val newAttributes = convertContainerElementAttributes(containerElement.attributes.foreign.toMutableMap())
+    containerElement.attributes.foreign.clear()
     containerElement.attributes.foreign.putAll(newAttributes)
 
     return containerElement.apply { elements = newElements }
@@ -67,7 +68,6 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
         }
 
         val svgKey = when (key) {
-            "android:name" -> "id"
             "android:fillColor" -> "fill"
             "android:fillType" -> "fill-rule"
             "android:fillAlpha" -> "fill-opacity"
@@ -96,16 +96,6 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
 private fun convertContainerElementAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
     val svgPathElementAttributes = mutableMapOf<String, String>()
 
-    for ((key, value) in attributes.filterKeys { !transformationPropertyNames.contains(it) }) {
-
-        val svgKey = when (key) {
-            "android:name" -> "id"
-            else -> key
-        }
-
-        svgPathElementAttributes[svgKey] = value
-    }
-
     val transform = computeTransformationMatrix(attributes)
     if (transform != Matrix3.IDENTITY) {
         val matrixStringBuilder = StringBuilder("matrix(").apply {
@@ -126,9 +116,6 @@ private fun convertContainerElementAttributes(attributes: MutableMap<String, Str
         svgPathElementAttributes["transform"] = matrixStringBuilder.toString()
     }
 
-    // We've mangled the map at this point...
-    attributes.clear()
-
     return svgPathElementAttributes
 }
 
@@ -144,26 +131,8 @@ private fun convertTopLevelAttributes(attributes: VectorDrawable.Attributes): Sc
         "viewPort" to "0 0 $viewportWidth $viewportHeight"
     )
 
-    for ((key, value) in foreignAttributes) {
-
-        val svgValue = when (key) {
-            "android:height" -> "100%"
-            "android:width" -> "100%"
-            else -> value
-        }
-
-        val svgKey = when (key) {
-            "android:name" -> "id"
-            "android:width" -> "width"
-            "android:height" -> "height"
-            else -> key
-        }
-
-        svgElementAttributes[svgKey] = svgValue
-    }
-
-    // We've mangled the map at this point...
-    foreignAttributes.clear()
+    svgElementAttributes["width"] = "100%"
+    svgElementAttributes["height"] = "100%"
 
     return ScalableVectorGraphic.Attributes(attributes.name, svgElementAttributes)
 }
