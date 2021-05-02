@@ -8,7 +8,12 @@ import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Path
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.util.assertk.containsKey
 import com.jzbrooks.vgo.util.assertk.containsKeys
@@ -62,14 +67,14 @@ class ScalableVectorGraphicReaderTests {
         val path = graphic.elements.first() as Path
 
         assertThat(path.commands).isEqualTo(
-                listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 30f))),
-                        EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(20f, 20f, 0f, EllipticalArcCurve.ArcFlag.SMALL, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(50f, 30f)))),
-                        EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(20f, 20f, 0f, EllipticalArcCurve.ArcFlag.SMALL, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(90f, 30f)))),
-                        QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(90f, 60f), Point(50f, 90f)))),
-                        QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(10f, 60f), Point(10f, 30f)))),
-                        ClosePath
-                )
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 30f))),
+                EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(20f, 20f, 0f, EllipticalArcCurve.ArcFlag.SMALL, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(50f, 30f)))),
+                EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(20f, 20f, 0f, EllipticalArcCurve.ArcFlag.SMALL, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(90f, 30f)))),
+                QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(90f, 60f), Point(50f, 90f)))),
+                QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(10f, 60f), Point(10f, 30f)))),
+                ClosePath
+            )
         )
         assertThat(graphic.elements).hasSize(1)
     }
@@ -139,7 +144,7 @@ class ScalableVectorGraphicReaderTests {
             |</svg>
             |""".trimMargin().toByteArray()
 
-        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f,0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath))
+        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath))
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use { input ->
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {

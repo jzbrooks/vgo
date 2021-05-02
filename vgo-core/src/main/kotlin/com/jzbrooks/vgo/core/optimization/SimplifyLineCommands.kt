@@ -1,8 +1,13 @@
 package com.jzbrooks.vgo.core.optimization
 
 import com.jzbrooks.vgo.core.graphic.PathElement
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.ParameterizedCommand
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import kotlin.math.sign
 
 /**

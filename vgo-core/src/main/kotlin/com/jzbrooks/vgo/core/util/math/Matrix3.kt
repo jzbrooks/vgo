@@ -30,11 +30,13 @@ interface Matrix3 {
 interface MutableMatrix3 : Matrix3 {
     operator fun set(row: Int, column: Int, value: Float)
     companion object {
-        fun identity(): MutableMatrix3 = ArrayMatrix3(arrayOf(
+        fun identity(): MutableMatrix3 = ArrayMatrix3(
+            arrayOf(
                 floatArrayOf(1f, 0f, 0f),
                 floatArrayOf(1f, 1f, 0f),
                 floatArrayOf(1f, 0f, 1f)
-        ))
+            )
+        )
         fun from(data: Array<FloatArray>): MutableMatrix3 = ArrayMatrix3(data)
     }
 }
@@ -81,9 +83,9 @@ private class ArrayMatrix3(private val data: Array<FloatArray>) : MutableMatrix3
 
     override operator fun times(other: Vector3): Vector3 {
         return Vector3(
-                this[0, 0] * other.i + this[0, 1] * other.j + this[0, 2] * other.k,
-                this[1, 0] * other.i + this[1, 1] * other.j + this[1, 2] * other.k,
-                this[2, 0] * other.i + this[2, 1] * other.j + this[2, 2] * other.k
+            this[0, 0] * other.i + this[0, 1] * other.j + this[0, 2] * other.k,
+            this[1, 0] * other.i + this[1, 1] * other.j + this[1, 2] * other.k,
+            this[2, 0] * other.i + this[2, 1] * other.j + this[2, 2] * other.k
         )
     }
 }

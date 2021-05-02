@@ -28,23 +28,23 @@ class RemoveRedundantAttributesTests {
     companion object {
         @JvmStatic
         fun provideVectorDrawableAttributes() = listOf(
-                Arguments.of("android:alpha", "1.0"),
-                Arguments.of("android:autoMirrored", "false"),
-                Arguments.of("android:tintMode", "src_in")
+            Arguments.of("android:alpha", "1.0"),
+            Arguments.of("android:autoMirrored", "false"),
+            Arguments.of("android:tintMode", "src_in")
         )
 
         @JvmStatic
         fun providePathElementAttributes() = listOf(
-                Arguments.of("android:strokeWidth", "0"),
-                Arguments.of("android:strokeAlpha", "1"),
-                Arguments.of("android:strokeLineCap", "butt"),
-                Arguments.of("android:strokeLineJoin", "miter"),
-                Arguments.of("android:strokeMiterLimit", "4"),
-                Arguments.of("android:fillAlpha", "1"),
-                Arguments.of("android:fillType", "nonZero"),
-                Arguments.of("android:trimPathStart", "0"),
-                Arguments.of("android:trimPathEnd", "1"),
-                Arguments.of("android:trimPathOffset", "0")
+            Arguments.of("android:strokeWidth", "0"),
+            Arguments.of("android:strokeAlpha", "1"),
+            Arguments.of("android:strokeLineCap", "butt"),
+            Arguments.of("android:strokeLineJoin", "miter"),
+            Arguments.of("android:strokeMiterLimit", "4"),
+            Arguments.of("android:fillAlpha", "1"),
+            Arguments.of("android:fillType", "nonZero"),
+            Arguments.of("android:trimPathStart", "0"),
+            Arguments.of("android:trimPathEnd", "1"),
+            Arguments.of("android:trimPathOffset", "0")
         )
     }
 }

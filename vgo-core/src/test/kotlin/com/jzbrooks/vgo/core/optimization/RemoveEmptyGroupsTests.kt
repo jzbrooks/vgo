@@ -60,8 +60,8 @@ class RemoveEmptyGroupsTests {
     @Test
     fun testCollapseEmptyGroupAndAvoidAdjacentElements() {
         val nestedEmptyGroups = listOf(
-                Group(emptyList()),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f)))))
+            Group(emptyList()),
+            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f)))))
         )
 
         val graphic = object : Graphic {

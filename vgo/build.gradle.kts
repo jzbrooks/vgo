@@ -48,12 +48,12 @@ tasks {
             from(configurations.runtimeClasspath.get().asFileTree.files.map(::zipTree))
 
             exclude(
-                    "**/*.kotlin_metadata",
-                    "**/*.kotlin_module",
-                    "**/*.kotlin_builtins",
-                    "**/module-info.class",
-                    "META-INF/maven/**",
-                    "META-INF/*.version"
+                "**/*.kotlin_metadata",
+                "**/*.kotlin_module",
+                "**/*.kotlin_builtins",
+                "**/module-info.class",
+                "META-INF/maven/**",
+                "META-INF/*.version"
             )
         }
     }
@@ -104,17 +104,17 @@ tasks {
         outputs.file(optimizedJar)
 
         val javaHome = System.getenv("JAVA_HOME") ?: javaInstalls
-                .installationForCurrentVirtualMachine.get()
-                .installationDirectory.toString()
+            .installationForCurrentVirtualMachine.get()
+            .installationDirectory.toString()
 
         classpath = files("$rootDir/tools/r8.jar")
         args = listOf(
-                "--release",
-                "--classfile",
-                "--lib", javaHome,
-                "--output", "$buildDir/libs/vgo.jar",
-                "--pg-conf", "$rootDir/optimize.pro",
-                "$buildDir/libs/debug/vgo-$version.jar"
+            "--release",
+            "--classfile",
+            "--lib", javaHome,
+            "--output", "$buildDir/libs/vgo.jar",
+            "--pg-conf", "$rootDir/optimize.pro",
+            "$buildDir/libs/debug/vgo-$version.jar"
         )
 
         dependsOn(getByName("jar"))

@@ -1,11 +1,23 @@
 package com.jzbrooks.vgo.vd
 
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
+import com.jzbrooks.vgo.core.graphic.command.Command
+import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
-class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrinter {
+class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrinter {
     private val formatter = DecimalFormat().apply {
         maximumFractionDigits = decimalDigits
         isDecimalSeparatorAlwaysShown = false
@@ -13,7 +25,7 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int): CommandPrint
     }
 
     override fun print(command: Command): String {
-        return when(command) {
+        return when (command) {
             is MoveTo -> print(command)
             is LineTo -> print(command)
             is VerticalLineTo -> print(command)

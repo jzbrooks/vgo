@@ -1,7 +1,11 @@
 package com.jzbrooks.vgo.core.graphic.command
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.containsExactly
+import assertk.assertions.hasClass
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFailure
+import assertk.assertions.prop
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
@@ -18,14 +22,13 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         val expected = QuadraticBezierCurve(
-                CommandVariant.ABSOLUTE,
-                listOf(
-                        QuadraticBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f))
-                )
+            CommandVariant.ABSOLUTE,
+            listOf(
+                QuadraticBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f))
+            )
         )
 
-        assertThat(commands[0])
-                .isEqualTo(expected)
+        assertThat(commands[0]).isEqualTo(expected)
     }
 
     @Test
@@ -36,8 +39,7 @@ class ParserTests {
 
         val expected = SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(1f, 3f)))
 
-        assertThat(commands[0])
-                .isEqualTo(expected)
+        assertThat(commands[0]).isEqualTo(expected)
     }
 
     @Test
@@ -47,14 +49,13 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         val expected = CubicBezierCurve(
-                CommandVariant.ABSOLUTE,
-                listOf(
-                        CubicBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f), Point(4f, 3f))
-                )
+            CommandVariant.ABSOLUTE,
+            listOf(
+                CubicBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f), Point(4f, 3f))
+            )
         )
 
-        assertThat(commands[0])
-                .isEqualTo(expected)
+        assertThat(commands[0]).isEqualTo(expected)
     }
 
     @Test
@@ -64,12 +65,11 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         val expected = SmoothCubicBezierCurve(
-                CommandVariant.ABSOLUTE,
-                listOf(SmoothCubicBezierCurve.Parameter(Point(1f, 3f), Point(2f, 4f)))
+            CommandVariant.ABSOLUTE,
+            listOf(SmoothCubicBezierCurve.Parameter(Point(1f, 3f), Point(2f, 4f)))
         )
 
-        assertThat(commands[0])
-                .isEqualTo(expected)
+        assertThat(commands[0]).isEqualTo(expected)
     }
 
     @Test
@@ -79,21 +79,20 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         val expected = EllipticalArcCurve(
-                CommandVariant.ABSOLUTE,
-                listOf(
-                        EllipticalArcCurve.Parameter(
-                                1f,
-                                3f,
-                                97f,
-                                EllipticalArcCurve.ArcFlag.LARGE,
-                                EllipticalArcCurve.SweepFlag.ANTICLOCKWISE,
-                                Point(10f, 10f)
-                        )
+            CommandVariant.ABSOLUTE,
+            listOf(
+                EllipticalArcCurve.Parameter(
+                    1f,
+                    3f,
+                    97f,
+                    EllipticalArcCurve.ArcFlag.LARGE,
+                    EllipticalArcCurve.SweepFlag.ANTICLOCKWISE,
+                    Point(10f, 10f)
                 )
+            )
         )
 
-        assertThat(commands[0])
-                .isEqualTo(expected)
+        assertThat(commands[0]).isEqualTo(expected)
     }
 
     @Test
@@ -102,14 +101,12 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        assertThat(commands[0])
-                .isEqualTo(moveToSingle)
-        assertThat(commands[1])
-                .isEqualTo(lineToSingle)
-        assertThat(commands[2])
-                .isEqualTo(verticalLineToSingle)
-        assertThat(commands[3])
-                .isInstanceOf(ClosePath::class.java)
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            lineToSingle,
+            verticalLineToSingle,
+            ClosePath,
+        )
     }
 
     @Test
@@ -118,14 +115,12 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        assertThat(commands[0])
-                .isEqualTo(moveToSingle)
-        assertThat(commands[1])
-                .isEqualTo(lineToSingle)
-        assertThat(commands[2])
-                .isEqualTo(verticalLineToSingle)
-        assertThat(commands[3])
-                .isInstanceOf(ClosePath::class.java)
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            lineToSingle,
+            verticalLineToSingle,
+            ClosePath,
+        )
     }
 
     @Test
@@ -134,14 +129,12 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        assertThat(commands[0])
-                .isEqualTo(moveToSingle)
-        assertThat(commands[1])
-                .isEqualTo(lineToSingle)
-        assertThat(commands[2])
-                .isEqualTo(verticalLineToSingle)
-        assertThat(commands[3])
-                .isInstanceOf(ClosePath::class.java)
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            lineToSingle,
+            verticalLineToSingle,
+            ClosePath,
+        )
     }
 
     @Test
@@ -150,14 +143,12 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        assertThat(commands[0])
-                .isEqualTo(moveToImplicit)
-        assertThat(commands[1])
-                .isEqualTo(lineToSingle)
-        assertThat(commands[2])
-                .isEqualTo(verticalLineToSingle)
-        assertThat(commands[3])
-                .isInstanceOf(ClosePath::class.java)
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            lineToSingle,
+            verticalLineToSingle,
+            ClosePath,
+        )
     }
 
     @Test
@@ -166,14 +157,12 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        assertThat(commands[0])
-                .isEqualTo(moveToSingle)
-        assertThat(commands[1])
-                .isEqualTo(lineToSingle)
-        assertThat(commands[2])
-                .isEqualTo(verticalLineToSingle)
-        assertThat(commands[3])
-                .isInstanceOf(ClosePath::class.java)
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            lineToSingle,
+            verticalLineToSingle,
+            ClosePath,
+        )
     }
 
     @Test
@@ -182,14 +171,12 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        assertThat(commands[0])
-                .isEqualTo(moveToImplicit)
-        assertThat(commands[1])
-                .isEqualTo(lineToSingle)
-        assertThat(commands[2])
-                .isEqualTo(verticalLineToSingle)
-        assertThat(commands[3])
-                .isInstanceOf(ClosePath::class.java)
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            lineToSingle,
+            verticalLineToSingle,
+            ClosePath,
+        )
     }
 
     @Test
@@ -198,14 +185,12 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        assertThat(commands[0])
-                .isEqualTo(moveToImplicit)
-        assertThat(commands[1])
-                .isEqualTo(lineToSingle)
-        assertThat(commands[2])
-                .isEqualTo(verticalLineToSingle)
-        assertThat(commands[3])
-                .isInstanceOf(ClosePath::class.java)
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            lineToSingle,
+            verticalLineToSingle,
+            ClosePath,
+        )
     }
 
     @Test
@@ -215,8 +200,8 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands[0])
-                .prop("variant") { (it as ParameterizedCommand<*>).variant }
-                .isEqualTo(CommandVariant.RELATIVE)
+            .prop("variant") { (it as ParameterizedCommand<*>).variant }
+            .isEqualTo(CommandVariant.RELATIVE)
     }
 
     @Test
@@ -227,8 +212,7 @@ class ParserTests {
 
         val lineCommand = commands[0] as LineTo
 
-        assertThat(lineCommand.parameters[0])
-                .isEqualTo(Point(2.1f, 5f))
+        assertThat(lineCommand.parameters[0]).isEqualTo(Point(2.1f, 5f))
     }
 
     @Test
@@ -239,8 +223,7 @@ class ParserTests {
 
         val lineCommand = commands[0] as LineTo
 
-        assertThat(lineCommand.parameters[0])
-                .isEqualTo(Point(200f, 5f))
+        assertThat(lineCommand.parameters[0]).isEqualTo(Point(200f, 5f))
     }
 
     @Test

@@ -1,8 +1,15 @@
 package com.jzbrooks.vgo.core.optimization
 
 import com.jzbrooks.vgo.core.graphic.PathElement
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.ParameterizedCommand
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.util.math.Point
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -38,33 +45,56 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
 
                         val next = existingCommands.getOrNull(index + 1)
                         if (next is SmoothCubicBezierCurve) {
-                            commands.add(CubicBezierCurve(next.variant, next.parameters.map {
-                                CubicBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.endControl, it.endControl, it.end)
-                            }))
+                            commands.add(
+                                CubicBezierCurve(
+                                    next.variant,
+                                    next.parameters.map {
+                                        CubicBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.endControl, it.endControl, it.end)
+                                    }
+                                )
+                            )
                             skipAnother = true
                         }
 
                         continue@loop
                     }
                     if (lastAdded is CubicBezierCurve &&
-                            currentFinalParameter.startControl == (lastAdded.parameters.last().run { end - endControl })) {
-                        commands.add(SmoothCubicBezierCurve(current.variant, current.parameters.map {
-                            SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
-                        }))
+                        currentFinalParameter.startControl == (lastAdded.parameters.last().run { end - endControl })
+                    ) {
+                        commands.add(
+                            SmoothCubicBezierCurve(
+                                current.variant,
+                                current.parameters.map {
+                                    SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
+                                }
+                            )
+                        )
                         continue@loop
                     }
                     if (lastAdded is SmoothCubicBezierCurve &&
-                            currentFinalParameter.startControl == (lastAdded.parameters.last().run { end - endControl })) {
-                        commands.add(SmoothCubicBezierCurve(current.variant, current.parameters.map {
-                            SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
-                        }))
+                        currentFinalParameter.startControl == (lastAdded.parameters.last().run { end - endControl })
+                    ) {
+                        commands.add(
+                            SmoothCubicBezierCurve(
+                                current.variant,
+                                current.parameters.map {
+                                    SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
+                                }
+                            )
+                        )
                         continue@loop
                     }
                     if (lastAdded !is SmoothCubicBezierCurve && lastAdded !is CubicBezierCurve &&
-                            currentFinalParameter.startControl == Point.ZERO) {
-                        commands.add(SmoothCubicBezierCurve(current.variant, current.parameters.map {
-                            SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
-                        }))
+                        currentFinalParameter.startControl == Point.ZERO
+                    ) {
+                        commands.add(
+                            SmoothCubicBezierCurve(
+                                current.variant,
+                                current.parameters.map {
+                                    SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
+                                }
+                            )
+                        )
                         continue@loop
                     }
                 }
@@ -76,9 +106,14 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
 
                     val next = existingCommands.getOrNull(index + 1)
                     if (next is SmoothCubicBezierCurve) {
-                        commands.add(CubicBezierCurve(next.variant, next.parameters.map {
-                            CubicBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.endControl, it.endControl, it.end)
-                        }))
+                        commands.add(
+                            CubicBezierCurve(
+                                next.variant,
+                                next.parameters.map {
+                                    CubicBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.endControl, it.endControl, it.end)
+                                }
+                            )
+                        )
                         skipAnother = true
                     }
 
@@ -92,9 +127,14 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
 
                         val next = existingCommands.getOrNull(index + 1)
                         if (next is SmoothQuadraticBezierCurve) {
-                            commands.add(QuadraticBezierCurve(next.variant, next.parameters.map {
-                                QuadraticBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.control, it)
-                            }))
+                            commands.add(
+                                QuadraticBezierCurve(
+                                    next.variant,
+                                    next.parameters.map {
+                                        QuadraticBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.control, it)
+                                    }
+                                )
+                            )
                             skipAnother = true
                         }
 
@@ -102,25 +142,38 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                     }
 
                     if (lastAdded is QuadraticBezierCurve &&
-                            currentFinalParameter.control == (lastAdded.parameters.last().run { end - control })) {
-                        commands.add(SmoothQuadraticBezierCurve(current.variant, current.parameters.map {
-                            it.end
-                        }))
+                        currentFinalParameter.control == (lastAdded.parameters.last().run { end - control })
+                    ) {
+                        commands.add(
+                            SmoothQuadraticBezierCurve(
+                                current.variant,
+                                current.parameters.map {
+                                    it.end
+                                }
+                            )
+                        )
                         continue@loop
                     }
 
                     if (lastAdded is SmoothQuadraticBezierCurve &&
-                            currentFinalParameter.end == lastAdded.parameters.last()) {
-                        commands.add(SmoothQuadraticBezierCurve(current.variant, current.parameters.map {
-                            it.end
-                        }))
+                        currentFinalParameter.end == lastAdded.parameters.last()
+                    ) {
+                        commands.add(
+                            SmoothQuadraticBezierCurve(
+                                current.variant,
+                                current.parameters.map {
+                                    it.end
+                                }
+                            )
+                        )
                         continue@loop
                     }
                 }
 
                 if (current is SmoothQuadraticBezierCurve &&
-                        lastAdded !is QuadraticBezierCurve &&
-                        lastAdded !is SmoothQuadraticBezierCurve) {
+                    lastAdded !is QuadraticBezierCurve &&
+                    lastAdded !is SmoothQuadraticBezierCurve
+                ) {
                     val currentFinalParameter = current.parameters.last()
                     commands.add(LineTo(current.variant, listOf(currentFinalParameter)))
                     continue@loop

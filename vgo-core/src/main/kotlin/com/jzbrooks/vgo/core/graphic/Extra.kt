@@ -8,4 +8,4 @@ data class Extra(
     var name: String,
     override var elements: List<Element>,
     override val attributes: MutableMap<String, String>
-): ContainerElement
+) : ContainerElement

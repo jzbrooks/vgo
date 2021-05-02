@@ -18,25 +18,25 @@ class Matrix3Tests {
     @Test
     fun testMultiply() {
         val first = Matrix3.from(
-                arrayOf(
-                        floatArrayOf(10f, 20f, 10f),
-                        floatArrayOf(4f, 5f, 6f),
-                        floatArrayOf(2f, 3f, 5f)
-                )
+            arrayOf(
+                floatArrayOf(10f, 20f, 10f),
+                floatArrayOf(4f, 5f, 6f),
+                floatArrayOf(2f, 3f, 5f)
+            )
         )
         val second = Matrix3.from(
-                arrayOf(
-                        floatArrayOf(3f, 2f, 4f),
-                        floatArrayOf(3f, 3f, 9f),
-                        floatArrayOf(4f, 4f, 2f)
-                )
+            arrayOf(
+                floatArrayOf(3f, 2f, 4f),
+                floatArrayOf(3f, 3f, 9f),
+                floatArrayOf(4f, 4f, 2f)
+            )
         )
         val expected = Matrix3.from(
-                arrayOf(
-                        floatArrayOf(130f, 120f, 240f),
-                        floatArrayOf(51f, 47f, 73f),
-                        floatArrayOf(35f, 33f, 45f)
-                )
+            arrayOf(
+                floatArrayOf(130f, 120f, 240f),
+                floatArrayOf(51f, 47f, 73f),
+                floatArrayOf(35f, 33f, 45f)
+            )
         )
 
         val third = first * second
@@ -47,11 +47,11 @@ class Matrix3Tests {
     @Test
     fun testMatrixVectorMultiplication() {
         val matrix = Matrix3.from(
-                arrayOf(
-                        floatArrayOf(10f, 10f, 4f),
-                        floatArrayOf(0f, 1f, 0f),
-                        floatArrayOf(0f, 0f, 1f)
-                )
+            arrayOf(
+                floatArrayOf(10f, 10f, 4f),
+                floatArrayOf(0f, 1f, 0f),
+                floatArrayOf(0f, 0f, 1f)
+            )
         )
         val vector = Vector3(10f, 9f, 8f)
 

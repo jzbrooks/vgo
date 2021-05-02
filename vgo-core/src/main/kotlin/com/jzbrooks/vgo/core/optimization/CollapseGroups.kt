@@ -1,6 +1,11 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.*
+import com.jzbrooks.vgo.core.graphic.ContainerElement
+import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.PathElement
 
 /**
  * Collapse unnecessary nested groups into a single group

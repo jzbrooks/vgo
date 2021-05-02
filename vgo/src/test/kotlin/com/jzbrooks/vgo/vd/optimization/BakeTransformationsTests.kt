@@ -1,12 +1,21 @@
 package com.jzbrooks.vgo.vd.optimization
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.containsExactly
+import assertk.assertions.doesNotContain
+import assertk.assertions.isCloseTo
+import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.util.assertk.containsKey
 import com.jzbrooks.vgo.util.assertk.doesNotContainKey
@@ -16,8 +25,8 @@ class BakeTransformationsTests {
     @Test
     fun testAvoidCrashIfParsedPathDataDoesNotExist() {
         val group = Group(
-                listOf(Path(emptyList())),
-                mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
+            listOf(Path(emptyList())),
+            mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
         )
 
         BakeTransformations().optimize(object : Graphic {
@@ -32,11 +41,15 @@ class BakeTransformationsTests {
     @Test
     fun testAvoidCrashIfTransformsAreSpecifiedByResources() {
         val group = Group(
-                listOf(Path(listOf(
+            listOf(
+                Path(
+                    listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
-                ))),
-                mutableMapOf("android:translateX" to "@integer/translating_thing")
+                    )
+                )
+            ),
+            mutableMapOf("android:translateX" to "@integer/translating_thing")
         )
 
         BakeTransformations().optimize(object : Graphic {
@@ -50,17 +63,20 @@ class BakeTransformationsTests {
     @Test
     fun testAvoidCrashIfASharedTransformIsSpecifiedByResource() {
         val group = Group(
-                listOf(
-                        Group(listOf(
-                                Path(listOf(
-                                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
-                                ))
-                        ),
-                                mutableMapOf("android:translateX" to "@integer/translating_thing")
+            listOf(
+                Group(
+                    listOf(
+                        Path(
+                            listOf(
+                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
+                            )
                         )
-                ),
-                mutableMapOf("android:translateX" to "15")
+                    ),
+                    mutableMapOf("android:translateX" to "@integer/translating_thing")
+                )
+            ),
+            mutableMapOf("android:translateX" to "15")
         )
 
         BakeTransformations().optimize(object : Graphic {
@@ -76,17 +92,18 @@ class BakeTransformationsTests {
         assertThat(originalNestedGroup.attributes).doesNotContain("android:translateX", "@integer/translating_thing")
     }
 
-
     @Test
     fun testTransformationAttributesRemoved() {
         val group = Group(
-                listOf(
-                        Path(listOf(
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
-                        ))
-                ),
-                mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
+            listOf(
+                Path(
+                    listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
+                    )
+                )
+            ),
+            mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
         )
 
         BakeTransformations().optimize(object : Graphic {
@@ -101,13 +118,15 @@ class BakeTransformationsTests {
     @Test
     fun testAncestorGroupTransformationAppliedToPathElements() {
         val group = Group(
-                listOf(
-                        Path(listOf(
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
-                        ))
-                ),
-                mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
+            listOf(
+                Path(
+                    listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
+                    )
+                )
+            ),
+            mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
         )
 
         BakeTransformations().optimize(object : Graphic {
@@ -117,24 +136,26 @@ class BakeTransformationsTests {
 
         val path = group.elements.first() as Path
         assertThat(path.commands)
-                .containsExactly(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(24f, 24f))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(54f, 18f)))
-                )
+            .containsExactly(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(24f, 24f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(54f, 18f)))
+            )
     }
 
     @Test
     fun testBakeHandlesRelativeCommands() {
         val group = Group(
-                listOf(
-                        Path(listOf(
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                                LineTo(CommandVariant.RELATIVE, listOf(Point(4f, 4f))),
-                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
-                                ClosePath
-                        ))
-                ),
-                mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
+            listOf(
+                Path(
+                    listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                        LineTo(CommandVariant.RELATIVE, listOf(Point(4f, 4f))),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
+                        ClosePath
+                    )
+                )
+            ),
+            mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
         )
 
         BakeTransformations().optimize(object : Graphic {
@@ -144,24 +165,26 @@ class BakeTransformationsTests {
 
         val path = group.elements.first() as Path
         assertThat(path.commands)
-                .containsExactly(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(24f, 24f))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(28f, 28f))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(18f, 18f))),
-                        ClosePath
-                )
+            .containsExactly(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(24f, 24f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(28f, 28f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(18f, 18f))),
+                ClosePath
+            )
     }
 
     @Test
     fun testGroupRotationApplied() {
         val group = Group(
-                listOf(
-                        Path(listOf(
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                                LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f)))
-                        ))
-                ),
-                mutableMapOf("android:rotation" to "90")
+            listOf(
+                Path(
+                    listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                        LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f)))
+                    )
+                )
+            ),
+            mutableMapOf("android:rotation" to "90")
         )
 
         BakeTransformations().optimize(object : Graphic {
@@ -182,16 +205,18 @@ class BakeTransformationsTests {
     @Test
     fun testGroupRotationAppliedWithSequentialRelativeCommands() {
         val group = Group(
-                listOf(
-                        Path(listOf(
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                                HorizontalLineTo(CommandVariant.RELATIVE, listOf(4f)),
-                                VerticalLineTo(CommandVariant.RELATIVE, listOf(4f)),
-                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 14f))),
-                                ClosePath
-                        ))
-                ),
-                mutableMapOf("android:pivotX" to "10", "android:pivotY" to "10", "android:rotation" to "15")
+            listOf(
+                Path(
+                    listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                        HorizontalLineTo(CommandVariant.RELATIVE, listOf(4f)),
+                        VerticalLineTo(CommandVariant.RELATIVE, listOf(4f)),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 14f))),
+                        ClosePath
+                    )
+                )
+            ),
+            mutableMapOf("android:pivotX" to "10", "android:pivotY" to "10", "android:rotation" to "15")
         )
 
         BakeTransformations().optimize(object : Graphic {

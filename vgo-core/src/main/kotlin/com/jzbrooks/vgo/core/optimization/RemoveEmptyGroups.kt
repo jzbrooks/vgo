@@ -9,8 +9,8 @@ import com.jzbrooks.vgo.core.graphic.Group
 class RemoveEmptyGroups : Optimization {
     override fun optimize(graphic: Graphic) {
         graphic.elements = graphic.elements.asSequence()
-                .dropWhile { item -> item is Group && isEmpty(item) }
-                .toList()
+            .dropWhile { item -> item is Group && isEmpty(item) }
+            .toList()
     }
 
     private fun isEmpty(group: Group): Boolean {

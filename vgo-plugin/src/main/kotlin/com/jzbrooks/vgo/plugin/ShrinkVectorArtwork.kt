@@ -2,8 +2,8 @@ package com.jzbrooks.vgo.plugin
 
 import com.jzbrooks.vgo.Application
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 
 open class ShrinkVectorArtwork : DefaultTask() {

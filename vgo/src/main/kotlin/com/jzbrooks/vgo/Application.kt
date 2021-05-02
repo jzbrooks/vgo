@@ -2,8 +2,12 @@ package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
-import com.jzbrooks.vgo.svg.*
 import com.jzbrooks.vgo.core.util.xml.asSequence
+import com.jzbrooks.vgo.svg.ScalableVectorGraphic
+import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
+import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
+import com.jzbrooks.vgo.svg.parse
+import com.jzbrooks.vgo.svg.toVectorDrawable
 import com.jzbrooks.vgo.vd.VectorDrawable
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter
@@ -97,7 +101,8 @@ class Application {
                     return 65
                 }
                 else -> {
-                    System.err.println("""
+                    System.err.println(
+                        """
                     A given input and output pair (grouped positionally)
                     must be either files or directories.
                     Input is a ${if (input.isFile) "file" else "directory"}
@@ -110,7 +115,7 @@ class Application {
                         isWritable: ${input.canWrite()}
 
                     Storage: ${output.usableSpace} / ${output.totalSpace} is usable.
-                    """.trimIndent()
+                        """.trimIndent()
                     )
 
                     return 65
@@ -132,7 +137,7 @@ class Application {
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
             var graphic = when {
                 rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> parse(rootNodes.first())
-                rootNodes.any { it.nodeName == "vector" && input.extension == "xml"} -> com.jzbrooks.vgo.vd.parse(
+                rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } -> com.jzbrooks.vgo.vd.parse(
                     rootNodes.first()
                 )
                 else -> if (input == output) return else null
@@ -165,7 +170,7 @@ class Application {
                     writer.write(graphic, outputStream)
                 }
 
-                if (graphic is ScalableVectorGraphic){
+                if (graphic is ScalableVectorGraphic) {
                     val writer = ScalableVectorGraphicWriter(options)
                     writer.write(graphic, outputStream)
                 }
@@ -201,12 +206,14 @@ class Application {
         if (printStats) {
             val message = "| Total bytes saved: ${(totalBytesBefore - totalBytesAfter).roundToInt()} |"
             val border = "-".repeat(message.length)
-            println("""
+            println(
+                """
                         
                         $border
                         $message
                         $border
-                    """.trimIndent())
+                """.trimIndent()
+            )
         }
     }
 

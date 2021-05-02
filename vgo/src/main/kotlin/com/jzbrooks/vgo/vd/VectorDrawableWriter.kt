@@ -1,7 +1,10 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Writer
-import com.jzbrooks.vgo.core.graphic.*
+import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream

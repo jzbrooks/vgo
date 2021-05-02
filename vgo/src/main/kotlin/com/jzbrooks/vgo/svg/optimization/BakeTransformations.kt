@@ -2,13 +2,22 @@ package com.jzbrooks.vgo.svg.optimization
 
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.PathElement
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.optimization.GroupVisitor
 import com.jzbrooks.vgo.core.optimization.TopDownOptimization
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.Vector3
-import java.util.*
+import java.util.Stack
 
 /**
  * Apply transformations to paths command coordinates in a group
@@ -28,7 +37,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
             // We can only do transform baking if everything in the group can be transform baked
             // todo: handle baking nested groups
             if (group.elements.count { it is PathElement } == group.elements.size) {
-                for(child in group.elements) {
+                for (child in group.elements) {
                     if (child is PathElement) {
                         applyTransform(child, groupTransform)
                     }
