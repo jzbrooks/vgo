@@ -23,7 +23,7 @@ class BakeTransformations : Optimization {
 
     private fun topDownTraverse(element: Element): Element {
         return when {
-            element is Group && element.attributes.values.none { it.startsWith("@") } -> {
+            element is Group && element.attributes.foreign.values.none { it.startsWith("@") } -> {
                 bakeIntoGroup(element)
                 element.apply { elements.map(::topDownTraverse) }
             }
@@ -35,7 +35,7 @@ class BakeTransformations : Optimization {
     }
 
     private fun bakeIntoGroup(group: Group) {
-        val groupTransforms = group.attributes.keys intersect transformationPropertyNames
+        val groupTransforms = group.attributes.foreign.keys intersect transformationPropertyNames
 
         if (groupTransforms.isNotEmpty()) {
             val groupTransform = computeTransformationMatrix(group)
@@ -43,33 +43,33 @@ class BakeTransformations : Optimization {
             val children = mutableListOf<Element>()
             for(child in group.elements) {
                 if (child is Group) {
-                    val childTransformations = child.attributes.keys intersect transformationPropertyNames
+                    val childTransformations = child.attributes.foreign.keys intersect transformationPropertyNames
                     val shared = groupTransforms intersect childTransformations
                     val notShared = groupTransforms - childTransformations
 
                     for (transformKey in notShared) {
-                        child.attributes[transformKey] = group.attributes.getValue(transformKey)
+                        child.attributes.foreign[transformKey] = group.attributes.foreign.getValue(transformKey)
                     }
 
                     for (transformKey in shared) {
-                        val groupValue = group.attributes.getValue(transformKey).toFloat()
-                        val childValue = child.attributes.getValue(transformKey).toFloatOrNull()
+                        val groupValue = group.attributes.foreign.getValue(transformKey).toFloat()
+                        val childValue = child.attributes.foreign.getValue(transformKey).toFloatOrNull()
 
                         // If the child has a resource-specified value, then
                         // merging isn't possible. Wrap the child in a new group with the
                         // current group transform value and proceed to bake siblings in
                         // case this child had other path element siblings.
                         if (childValue == null) {
-                            val transforms = child.attributes.filterKeys{childTransformations.contains(it)}
+                            val transforms = child.attributes.foreign.filterKeys{childTransformations.contains(it)}
                             for ((transform) in transforms) {
-                                child.attributes.remove(transform)
+                                child.attributes.foreign.remove(transform)
                             }
 
-                            children.add(Group(listOf(child), transforms.toMutableMap()))
+                            children.add(Group(listOf(child), Group.Attributes(null, transforms.toMutableMap())))
                             continue
                         }
 
-                        child.attributes[transformKey] = when {
+                        child.attributes.foreign[transformKey] = when {
                             transformKey.startsWith("android:scale") -> (childValue * groupValue).toString()
                             transformKey == "android:rotation" -> ((childValue + groupValue) % 360).toString()
                             else -> (childValue + groupValue).toString()
@@ -85,7 +85,7 @@ class BakeTransformations : Optimization {
             group.elements = children
 
             for (transformAttribute in groupTransforms) {
-                group.attributes.remove(transformAttribute)
+                group.attributes.foreign.remove(transformAttribute)
             }
         }
     }
@@ -345,16 +345,16 @@ class BakeTransformations : Optimization {
     }
 
     private fun computeTransformationMatrix(group: Group): Matrix3 {
-        val scaleX = group.attributes["android:scaleX"]?.toFloat()
-        val scaleY = group.attributes["android:scaleY"]?.toFloat()
+        val scaleX = group.attributes.foreign["android:scaleX"]?.toFloat()
+        val scaleY = group.attributes.foreign["android:scaleY"]?.toFloat()
 
-        val translationX = group.attributes["android:translateX"]?.toFloat()
-        val translationY = group.attributes["android:translateY"]?.toFloat()
+        val translationX = group.attributes.foreign["android:translateX"]?.toFloat()
+        val translationY = group.attributes.foreign["android:translateY"]?.toFloat()
 
-        val pivotX = group.attributes["android:pivotX"]?.toFloat()
-        val pivotY = group.attributes["android:pivotY"]?.toFloat()
+        val pivotX = group.attributes.foreign["android:pivotX"]?.toFloat()
+        val pivotY = group.attributes.foreign["android:pivotY"]?.toFloat()
 
-        val rotation = group.attributes["android:rotation"]?.toFloat()
+        val rotation = group.attributes.foreign["android:rotation"]?.toFloat()
 
         val scale = Matrix3.from(arrayOf(
                 floatArrayOf(scaleX ?: 1f, 0f, 0f),

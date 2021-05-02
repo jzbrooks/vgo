@@ -20,7 +20,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
     }
 
     private fun bakeIntoGroup(group: Group) {
-        val groupTransforms = group.attributes.keys intersect transformationPropertyNames
+        val groupTransforms = group.attributes.foreign.keys intersect transformationPropertyNames
 
         if (groupTransforms.isNotEmpty()) {
             val groupTransform = computeTransformationMatrix(group)
@@ -35,7 +35,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                 }
 
                 for (transformAttribute in groupTransforms) {
-                    group.attributes.remove(transformAttribute)
+                    group.attributes.foreign.remove(transformAttribute)
                 }
             }
         }
@@ -296,7 +296,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
 
     private fun computeTransformationMatrix(group: Group): Matrix3 {
         // todo: handle other transform types
-        val transformValue = group.attributes["transform"]
+        val transformValue = group.attributes.foreign["transform"]
         return if (transformValue != null) {
             val f = transformValueRegex.find(transformValue)!!
             val values = f.groupValues[1].split(',').map { it.toFloat() }

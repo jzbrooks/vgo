@@ -2,10 +2,7 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
-import com.jzbrooks.vgo.core.graphic.Element
-import com.jzbrooks.vgo.core.graphic.Graphic
-import com.jzbrooks.vgo.core.graphic.Group
-import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.math.Point
@@ -19,7 +16,10 @@ class CollapseGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = mutableMapOf<String, String>()
+            override var attributes = object : Attributes {
+                override val name: String? = null
+                override val foreign: MutableMap<String, String> = mutableMapOf()
+            }
         }
 
         CollapseGroups().optimize(graphic)
@@ -34,7 +34,10 @@ class CollapseGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = mutableMapOf<String, String>()
+            override var attributes = object : Attributes {
+    override val name: String? = null
+    override val foreign: MutableMap<String, String> = mutableMapOf()
+}
         }
 
         CollapseGroups().optimize(graphic)
@@ -45,12 +48,15 @@ class CollapseGroupsTests {
     @Test
     fun testRetainNestedGroupWithAttributes() {
         val innerPath = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
-        val innerGroupWithAttributes = Group(listOf(innerPath), mutableMapOf("android:scaleX" to "20"))
+        val innerGroupWithAttributes = Group(listOf(innerPath), Group.Attributes(null, mutableMapOf("android:scaleX" to "20")))
         val group = Group(listOf(innerGroupWithAttributes))
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = mutableMapOf<String, String>()
+            override var attributes = object : Attributes {
+                override val name: String? = null
+                override val foreign: MutableMap<String, String> = mutableMapOf()
+            }
         }
 
         CollapseGroups().optimize(graphic)

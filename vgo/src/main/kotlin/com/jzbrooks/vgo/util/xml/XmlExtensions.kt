@@ -30,3 +30,13 @@ fun NamedNodeMap.toMutableMap(): MutableMap<String, String> {
     }
     return map
 }
+
+fun NamedNodeMap.removeOrNull(key: String): Node? {
+    val value = getNamedItem(key)
+
+    if (value != null) {
+        removeNamedItem(key)
+    }
+
+    return value
+}
