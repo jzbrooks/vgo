@@ -5,19 +5,20 @@ import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.svg.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
+import java.util.Collections.emptySet
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-class ScalableVectorGraphicWriter(override val options: Set<Writer.Option> = emptySet()) : Writer {
+class ScalableVectorGraphicWriter(
+    override val options: Set<Writer.Option> = emptySet(),
+) : Writer<ScalableVectorGraphic> {
 
     private val commandPrinter = ScalableVectorGraphicCommandPrinter(3)
 
-    override fun write(graphic: Graphic, stream: OutputStream) {
-        require(graphic is ScalableVectorGraphic)
-
+    override fun write(graphic: ScalableVectorGraphic, stream: OutputStream) {
         val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val document = builder.newDocument()
 
