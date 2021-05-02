@@ -103,7 +103,8 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val rootNode = output.firstChild
 
-            assertThat(rootNode.attributes.length).isEqualTo(topLevelAttributes.foreign.size)
+            // +1 for name
+            assertThat(rootNode.attributes.length).isEqualTo(topLevelAttributes.foreign.size + 1)
         }
     }
 

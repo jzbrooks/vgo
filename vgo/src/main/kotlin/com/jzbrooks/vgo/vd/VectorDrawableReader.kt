@@ -95,28 +95,28 @@ private fun parseExtraElement(node: Node): Extra {
 }
 
 private fun NamedNodeMap.toGraphicAttributes() = VectorDrawable.Attributes(
-    removeOrNull("id")?.nodeValue,
+    removeOrNull("android:name")?.nodeValue,
     toMutableMap(),
 )
 
 private fun NamedNodeMap.toPathAttributes(): Path.Attributes {
     return Path.Attributes(
-        removeOrNull("id")?.nodeValue,
+        removeOrNull("android:name")?.nodeValue,
         toMutableMap(),
     )
 }
 
 private fun NamedNodeMap.toClipPathAttributes() = ClipPath.Attributes(
-    removeOrNull("id")?.nodeValue,
+    removeOrNull("android:name")?.nodeValue,
     toMutableMap(),
 )
 
 private fun NamedNodeMap.toGroupAttributes() = Group.Attributes(
-    removeOrNull("id")?.nodeValue,
+    removeOrNull("android:name")?.nodeValue,
     toMutableMap(),
 )
 
 private fun NamedNodeMap.toExtraAttributes() = Extra.Attributes(
-    removeOrNull("id")?.nodeValue,
+    removeOrNull("android:name")?.nodeValue,
     toMutableMap(),
 )

@@ -307,16 +307,16 @@ private fun convertTopLevelAttributes(attributes: ScalableVectorGraphic.Attribut
     }
 
     val vdElementAttributes = mutableMapOf(
-            "xmlns:android" to "http://schemas.android.com/apk/res/android",
-            "android:viewportWidth" to viewBox[2],
-            "android:viewportHeight" to viewBox[3],
-            "android:width" to "${width}dp",
-            "android:height" to "${height}dp"
+        "xmlns:android" to "http://schemas.android.com/apk/res/android",
+        "android:viewportWidth" to viewBox[2],
+        "android:viewportHeight" to viewBox[3],
+        "android:width" to "${width}dp",
+        "android:height" to "${height}dp"
     )
 
     vdElementAttributes.putAll(mapAttributes(foreignAttributes))
 
-    return VectorDrawable.Attributes(attributes.name, attributes.foreign)
+    return VectorDrawable.Attributes(attributes.name, vdElementAttributes)
 }
 
 private fun mapAttributes(attributes: MutableMap<String, String>): Map<String, String> {

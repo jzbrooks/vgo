@@ -11,11 +11,10 @@ import com.jzbrooks.vgo.vd.graphic.ClipPath as AndroidClipPath
 
 class VectorDrawableConverterTests {
     private val topLevelAttributes = ScalableVectorGraphic.Attributes(
-        null,
+        "visibilitystrike",
         mutableMapOf(
             "xmlns" to "http://www.w3.org/2000/svg",
-            "id" to "visibilitystrike",
-            "viewBox" to "0 0 24 24"
+            "viewBox" to "0 0 24 24",
         )
     )
 
@@ -27,11 +26,11 @@ class VectorDrawableConverterTests {
 
         assertThat(vectorDrawable.attributes.name).isEqualTo("visibilitystrike")
         assertThat(vectorDrawable.attributes.foreign).containsOnly(
-                "xmlns:android" to "http://schemas.android.com/apk/res/android",
-                "android:height" to "24dp",
-                "android:width" to "24dp",
-                "android:viewportHeight" to "24",
-                "android:viewportWidth" to "24"
+            "xmlns:android" to "http://schemas.android.com/apk/res/android",
+            "android:height" to "24dp",
+            "android:width" to "24dp",
+            "android:viewportHeight" to "24",
+            "android:viewportWidth" to "24",
         )
     }
 
