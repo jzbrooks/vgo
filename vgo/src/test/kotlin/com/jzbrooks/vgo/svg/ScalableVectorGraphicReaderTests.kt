@@ -1,10 +1,7 @@
 package com.jzbrooks.vgo.svg
 
 import assertk.assertThat
-import assertk.assertions.containsExactly
-import assertk.assertions.hasSize
-import assertk.assertions.isEmpty
-import assertk.assertions.isEqualTo
+import assertk.assertions.*
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Path
@@ -34,7 +31,7 @@ class ScalableVectorGraphicReaderTests {
     fun testParseDimensions() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic.attributes["viewBox"]).isEqualTo("0 0 100 100")
+        assertThat(graphic.attributes.foreign).contains("viewBox", "0 0 100 100")
     }
 
     @Test
@@ -43,7 +40,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes).doesNotContainKey("d")
+        assertThat(path.attributes.foreign).doesNotContainKey("d")
     }
 
     @Test
@@ -52,7 +49,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes).containsKeys("stroke", "fill")
+        assertThat(path.attributes.foreign).containsKeys("stroke", "fill")
     }
 
     @Test
@@ -80,8 +77,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes).containsKey("id")
-        assertThat(path.attributes["id"]).isEqualTo("heart")
+        assertThat(path.attributes.name).isEqualTo("heart")
     }
 
     @Test

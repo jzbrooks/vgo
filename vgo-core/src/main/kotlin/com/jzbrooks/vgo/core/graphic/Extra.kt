@@ -9,7 +9,7 @@ import com.jzbrooks.vgo.core.graphic.Attributes as CoreAttributes
 data class Extra(
     var name: String,
     override var elements: List<Element>,
-    override var attributes: Attributes,
+    override var attributes: Attributes = Attributes(null, mutableMapOf()),
 ): ContainerElement {
 
     data class Attributes(override val name: String?, override val foreign: MutableMap<String, String>) : CoreAttributes
