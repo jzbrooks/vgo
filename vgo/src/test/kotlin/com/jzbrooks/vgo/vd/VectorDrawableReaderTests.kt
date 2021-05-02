@@ -36,53 +36,54 @@ class VectorDrawableReaderTests {
     fun testParseDimensions() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic.attributes["android:width"]).isEqualTo("24dp")
-        assertThat(graphic.attributes["android:height"]).isEqualTo("24dp")
+        assertThat(graphic.attributes.foreign["android:width"]).isEqualTo("24dp")
+        assertThat(graphic.attributes.foreign["android:height"]).isEqualTo("24dp")
     }
 
     @Test
     fun testParseMetadataDoesNotContainPathData() {
-            val graphic: Graphic = parse(node)
+        val graphic: Graphic = parse(node)
 
-            val path = graphic.elements.first() as Path
+        val path = graphic.elements.first() as Path
 
-            assertThat(path.attributes).doesNotContainKey("android:pathData")
+        assertThat(path.attributes.foreign).doesNotContainKey("android:pathData")
     }
 
     @Test
     fun testParseMetadata() {
-            val graphic: Graphic = parse(node)
+        val graphic: Graphic = parse(node)
 
-            val path = graphic.elements.first() as Path
+        val path = graphic.elements.first() as Path
 
-            assertThat(path.attributes).containsKeys("android:name", "android:strokeWidth", "android:fillColor")
+        assertThat(path.attributes.name).isNotNull()
+        assertThat(path.attributes.foreign).containsKeys("android:strokeWidth", "android:fillColor")
     }
 
     @Test
     fun testParsePaths() {
-            val graphic: Graphic = parse(node)
+        val graphic: Graphic = parse(node)
 
-            val path = graphic.elements.first() as Path
-            assertThat(path.commands).isEqualTo(
-                    listOf(
-                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 4.27f))),
-                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(3.27f, 3f))),
-                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(3.27f, 3f))),
-                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 4.27f))),
-                            ClosePath
-                    )
+        val path = graphic.elements.first() as Path
+        assertThat(path.commands).isEqualTo(
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 4.27f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(3.27f, 3f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(3.27f, 3f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 4.27f))),
+                ClosePath
             )
-            assertThat(graphic.elements).hasSize(3)
+        )
+        assertThat(graphic.elements).hasSize(3)
     }
 
     @Test
     fun testStoreNameForPath() {
-            val graphic: Graphic = parse(node)
+        val graphic: Graphic = parse(node)
 
-            val path = graphic.elements.first() as Path
+        val path = graphic.elements.first() as Path
 
-            assertThat(path.attributes).containsKey("android:name")
-            assertThat(path.attributes["android:name"]).isEqualTo("strike_thru_path")
+        assertThat(path.attributes.foreign).containsKey("android:name")
+        assertThat(path.attributes.foreign["android:name"]).isEqualTo("strike_thru_path")
     }
 
     @Test
@@ -175,6 +176,6 @@ class VectorDrawableReaderTests {
         val path = graphic.elements.first() as Path
 
         assertThat(path.commands).isEmpty()
-        assertThat(path.attributes).contains("android:pathData", "@string/path_data")
+        assertThat(path.attributes.foreign).contains("android:pathData", "@string/path_data")
     }
 }

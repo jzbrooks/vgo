@@ -12,17 +12,17 @@ class RemoveRedundantAttributesTests {
     @ParameterizedTest
     @MethodSource("provideVectorDrawableAttributes")
     fun testVectorDrawableDefaultsRemoved(key: String, value: String) {
-        val vectorDrawable = VectorDrawable(emptyList(), mutableMapOf(key to value))
+        val vectorDrawable = VectorDrawable(emptyList(), VectorDrawable.Attributes(null, mutableMapOf(key to value)))
         RemoveRedundantAttributes().visit(vectorDrawable)
-        assertThat(vectorDrawable.attributes).isEmpty()
+        assertThat(vectorDrawable.attributes.foreign).isEmpty()
     }
 
     @ParameterizedTest
     @MethodSource("providePathElementAttributes")
     fun testVectorDrawableAutoMirrored(key: String, value: String) {
-        val path = Path(emptyList(), mutableMapOf(key to value))
+        val path = Path(emptyList(), Path.Attributes(null, mutableMapOf(key to value)))
         RemoveRedundantAttributes().visit(path)
-        assertThat(path.attributes).isEmpty()
+        assertThat(path.attributes.foreign).isEmpty()
     }
 
     companion object {
