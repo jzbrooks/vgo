@@ -30,11 +30,11 @@ private fun process(containerElement: ContainerElement): Element {
     for ((index, element) in containerElement.elements.withIndex()) {
         if (element !is ClipPath) {
             if (defs != null) {
-                element.attributes["clip-path"] = "url(#${defs.attributes["id"]})"
+                element.attributes.foreign["clip-path"] = "url(#${defs.attributes.name})"
             }
             newElements.add(traverse(element))
         } else {
-            defs = Extra("defs", listOf(Path(element.commands)), mutableMapOf("id" to "clip_$index"))
+            defs = Extra("defs", listOf(Path(element.commands)), Extra.Attributes("clip_$index", mutableMapOf()))
         }
     }
 
@@ -42,16 +42,17 @@ private fun process(containerElement: ContainerElement): Element {
         newElements.add(defs)
     }
 
-    val newAttributes = convertContainerElementAttributes(containerElement.attributes)
-    containerElement.attributes.putAll(newAttributes)
+    val newAttributes = convertContainerElementAttributes(containerElement.attributes.foreign.toMutableMap())
+    containerElement.attributes.foreign.putAll(newAttributes)
 
     return containerElement.apply { elements = newElements }
 }
 
 private fun process(pathElement: PathElement): Element {
     return pathElement.apply {
-        val newElements = convertPathElementAttributes(attributes)
-        attributes.putAll(newElements)
+        val newElements = convertPathElementAttributes(attributes.foreign.toMutableMap())
+        attributes.foreign.clear()
+        attributes.foreign.putAll(newElements)
     }
 }
 
@@ -131,18 +132,19 @@ private fun convertContainerElementAttributes(attributes: MutableMap<String, Str
     return svgPathElementAttributes
 }
 
-private fun convertTopLevelAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
+private fun convertTopLevelAttributes(attributes: VectorDrawable.Attributes): ScalableVectorGraphic.Attributes {
+    val foreignAttributes = attributes.foreign
 
-    val viewportHeight = attributes.remove("android:viewportHeight") ?: "24"
-    val viewportWidth = attributes.remove("android:viewportWidth") ?: "24"
-    attributes.remove("xmlns:android")
+    val viewportHeight = foreignAttributes.remove("android:viewportHeight") ?: "24"
+    val viewportWidth = foreignAttributes.remove("android:viewportWidth") ?: "24"
+    foreignAttributes.remove("xmlns:android")
 
     val svgElementAttributes = mutableMapOf(
-            "xmlns" to "http://www.w3.org/2000/svg",
-            "viewPort" to "0 0 $viewportWidth $viewportHeight"
+        "xmlns" to "http://www.w3.org/2000/svg",
+        "viewPort" to "0 0 $viewportWidth $viewportHeight"
     )
 
-    for ((key, value) in attributes) {
+    for ((key, value) in foreignAttributes) {
 
         val svgValue = when (key) {
             "android:height" -> "100%"
@@ -161,9 +163,9 @@ private fun convertTopLevelAttributes(attributes: MutableMap<String, String>): M
     }
 
     // We've mangled the map at this point...
-    attributes.clear()
+    foreignAttributes.clear()
 
-    return svgElementAttributes
+    return ScalableVectorGraphic.Attributes(attributes.name, svgElementAttributes)
 }
 
 // Duplicated from vd.BakeTransform

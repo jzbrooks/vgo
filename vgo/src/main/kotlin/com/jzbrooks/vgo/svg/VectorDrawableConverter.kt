@@ -187,12 +187,12 @@ private fun traverse(element: Element): Element {
 private fun process(containerElement: ContainerElement): Element {
     val clipPaths = containerElement.elements
             .filterIsInstance<ClipPath>()
-            .associateBy { it.attributes.getValue("id") }
+            .associateBy { it.attributes.foreign.getValue("id") }
 
     val newElements = mutableListOf<Element>()
     for (element in containerElement.elements.filter { it !is ClipPath }) {
-        if (element.attributes.containsKey("clip-path")) {
-            val id = element.attributes
+        if (element.attributes.foreign.containsKey("clip-path")) {
+            val id = element.attributes.foreign
                     .remove("clip-path")!!
                     .removePrefix("url(#")
                     .trimEnd(')')
@@ -200,7 +200,7 @@ private fun process(containerElement: ContainerElement): Element {
             val clip = clipPaths.getValue(id)
             val vdClipPaths = clip.elements
                     .filterIsInstance<Path>()
-                    .map { AndroidClipPath(it.commands, it.attributes) }
+                    .map { AndroidClipPath(it.commands, AndroidClipPath.Attributes(it.attributes.name, it.attributes.foreign.toMutableMap())) }
 
             // I'm not sure grouping clip paths like this
             // is a very good long-term solution, but it works
@@ -214,16 +214,17 @@ private fun process(containerElement: ContainerElement): Element {
         }
     }
 
-    val newAttributes = convertContainerElementAttributes(containerElement.attributes)
-    containerElement.attributes.putAll(newAttributes)
+    val newAttributes = convertContainerElementAttributes(containerElement.attributes.foreign.toMutableMap())
+    containerElement.attributes.foreign.putAll(newAttributes)
 
     return containerElement.apply { elements = newElements.map(::traverse) }
 }
 
 private fun process(pathElement: PathElement): Element {
     return pathElement.apply {
-        val newElements = convertPathElementAttributes(attributes)
-        attributes.putAll(newElements)
+        val newElements = convertPathElementAttributes(attributes.foreign.toMutableMap())
+        attributes.foreign.clear()
+        attributes.foreign.putAll(newElements)
     }
 }
 
@@ -281,13 +282,14 @@ private fun convertContainerElementAttributes(attributes: MutableMap<String, Str
     return vdContainerElements
 }
 
-private fun convertTopLevelAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
-    attributes.remove("xmlns")
+private fun convertTopLevelAttributes(attributes: ScalableVectorGraphic.Attributes): VectorDrawable.Attributes {
+    val foreignAttributes = attributes.foreign
+    foreignAttributes.remove("xmlns")
 
-    val viewBox = attributes.remove("viewBox")!!.split(" ")
+    val viewBox = foreignAttributes.remove("viewBox")!!.split(" ")
 
     val width = run {
-        val w = attributes.remove("width")
+        val w = foreignAttributes.remove("width")
         if (w != null && !w.endsWith('%')) {
             w
         } else {
@@ -296,7 +298,7 @@ private fun convertTopLevelAttributes(attributes: MutableMap<String, String>): M
     }
 
     val height = run {
-        val h = attributes.remove("height")
+        val h = foreignAttributes.remove("height")
         if (h != null && !h.endsWith('%')) {
             h
         } else {
@@ -312,9 +314,9 @@ private fun convertTopLevelAttributes(attributes: MutableMap<String, String>): M
             "android:height" to "${height}dp"
     )
 
-    vdElementAttributes.putAll(mapAttributes(attributes))
+    vdElementAttributes.putAll(mapAttributes(foreignAttributes))
 
-    return vdElementAttributes
+    return VectorDrawable.Attributes(attributes.name, attributes.foreign)
 }
 
 private fun mapAttributes(attributes: MutableMap<String, String>): Map<String, String> {
