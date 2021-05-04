@@ -2,6 +2,8 @@ package com.jzbrooks.vgo.vd
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsExactly
+import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Extra

@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.hasSize
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo

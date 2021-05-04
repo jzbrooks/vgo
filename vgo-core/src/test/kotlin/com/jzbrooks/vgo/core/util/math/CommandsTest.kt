@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.core.util.math
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo

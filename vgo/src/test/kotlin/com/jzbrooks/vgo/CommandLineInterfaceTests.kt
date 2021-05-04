@@ -2,7 +2,10 @@ package com.jzbrooks.vgo
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
+import assertk.assertions.matches
+import assertk.assertions.startsWith
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

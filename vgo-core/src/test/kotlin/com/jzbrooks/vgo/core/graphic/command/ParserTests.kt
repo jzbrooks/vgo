@@ -144,7 +144,7 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands).containsExactly(
-            moveToSingle,
+            moveToImplicit,
             lineToSingle,
             verticalLineToSingle,
             ClosePath,
@@ -172,7 +172,7 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands).containsExactly(
-            moveToSingle,
+            moveToImplicit,
             lineToSingle,
             verticalLineToSingle,
             ClosePath,
@@ -186,7 +186,7 @@ class ParserTests {
         val commands = CommandString(pathCommandString).toCommandList()
 
         assertThat(commands).containsExactly(
-            moveToSingle,
+            moveToImplicit,
             lineToSingle,
             verticalLineToSingle,
             ClosePath,

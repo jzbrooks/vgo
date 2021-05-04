@@ -4,7 +4,9 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.Command
+import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve

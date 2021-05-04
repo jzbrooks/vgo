@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.svg.optimization
 
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve

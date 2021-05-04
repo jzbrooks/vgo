@@ -71,7 +71,7 @@ tasks {
                     appendln(
                         """
                                |package com.jzbrooks
-                               |                           
+                               |
                                |object BuildConstants {
                                """.trimMargin()
                     )
