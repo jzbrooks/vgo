@@ -84,13 +84,13 @@ class BaselineTests {
             // with _optimized
             assets = try {
                 Files.list(Paths.get("src/test/resources"))
-                        .asSequence()
-                        .filterNot { Files.isDirectory(it) }
-                        .map { unoptimizedFile ->
-                            val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
-                            val optimizedDirectory = unoptimizedFile.parent.resolve("baseline")
-                            unoptimizedFile to optimizedDirectory.resolve("${fileName}_optimized.$fileExtension")
-                        }.toList()
+                    .asSequence()
+                    .filterNot { Files.isDirectory(it) }
+                    .map { unoptimizedFile ->
+                        val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
+                        val optimizedDirectory = unoptimizedFile.parent.resolve("baseline")
+                        unoptimizedFile to optimizedDirectory.resolve("${fileName}_optimized.$fileExtension")
+                    }.toList()
             } catch (e: Throwable) {
                 System.err.println(e)
                 throw e

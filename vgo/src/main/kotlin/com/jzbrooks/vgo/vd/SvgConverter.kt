@@ -1,6 +1,10 @@
 package com.jzbrooks.vgo.vd
 
-import com.jzbrooks.vgo.core.graphic.*
+import com.jzbrooks.vgo.core.graphic.ContainerElement
+import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.vd.graphic.ClipPath
@@ -99,17 +103,17 @@ private fun convertContainerElementAttributes(attributes: MutableMap<String, Str
     val transform = computeTransformationMatrix(attributes)
     if (transform != Matrix3.IDENTITY) {
         val matrixStringBuilder = StringBuilder("matrix(").apply {
-            append(transform[0,0])
+            append(transform[0, 0])
             append(", ")
-            append(transform[1,0])
+            append(transform[1, 0])
             append(", ")
-            append(transform[0,1])
+            append(transform[0, 1])
             append(", ")
-            append(transform[1,1])
+            append(transform[1, 1])
             append(", ")
-            append(transform[0,2])
+            append(transform[0, 2])
             append(", ")
-            append(transform[1,2])
+            append(transform[1, 2])
             append(")")
         }
 
@@ -139,13 +143,13 @@ private fun convertTopLevelAttributes(attributes: VectorDrawable.Attributes): Sc
 
 // Duplicated from vd.BakeTransform
 private val transformationPropertyNames = setOf(
-        "android:scaleX",
-        "android:scaleY",
-        "android:translateX",
-        "android:translateY",
-        "android:pivotX",
-        "android:pivotY",
-        "android:rotation"
+    "android:scaleX",
+    "android:scaleY",
+    "android:translateX",
+    "android:translateY",
+    "android:pivotX",
+    "android:pivotY",
+    "android:rotation"
 )
 
 private fun computeTransformationMatrix(groupAttributes: Map<String, String>): Matrix3 {
@@ -160,37 +164,47 @@ private fun computeTransformationMatrix(groupAttributes: Map<String, String>): M
 
     val rotation = groupAttributes["android:rotation"]?.toFloat()
 
-    val scale = Matrix3.from(arrayOf(
+    val scale = Matrix3.from(
+        arrayOf(
             floatArrayOf(scaleX ?: 1f, 0f, 0f),
             floatArrayOf(0f, scaleY ?: 1f, 0f),
             floatArrayOf(0f, 0f, 1f)
-    ))
+        )
+    )
 
-    val translation = Matrix3.from(arrayOf(
+    val translation = Matrix3.from(
+        arrayOf(
             floatArrayOf(1f, 0f, translationX ?: 0f),
             floatArrayOf(0f, 1f, translationY ?: 0f),
             floatArrayOf(0f, 0f, 1f)
-    ))
+        )
+    )
 
-    val pivot = Matrix3.from(arrayOf(
+    val pivot = Matrix3.from(
+        arrayOf(
             floatArrayOf(1f, 0f, pivotX ?: 0f),
             floatArrayOf(0f, 1f, pivotY ?: 0f),
             floatArrayOf(0f, 0f, 1f)
-    ))
+        )
+    )
 
-    val pivotInverse = Matrix3.from(arrayOf(
+    val pivotInverse = Matrix3.from(
+        arrayOf(
             floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1),
             floatArrayOf(0f, 1f, (pivotY ?: 0f) * -1),
             floatArrayOf(0f, 0f, 1f)
-    ))
+        )
+    )
 
     val rotate = rotation?.let {
         val radians = it * PI.toFloat() / 180f
-        Matrix3.from(arrayOf(
+        Matrix3.from(
+            arrayOf(
                 floatArrayOf(cos(radians), -sin(radians), 0f),
                 floatArrayOf(sin(radians), cos(radians), 0f),
                 floatArrayOf(0f, 0f, 1f)
-        ))
+            )
+        )
     } ?: Matrix3.IDENTITY
 
     return listOf(pivot, translation, rotate, scale, pivotInverse).reduce(Matrix3::times)

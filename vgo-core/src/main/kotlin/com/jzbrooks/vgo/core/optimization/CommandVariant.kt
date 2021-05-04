@@ -1,10 +1,21 @@
 package com.jzbrooks.vgo.core.optimization
 
 import com.jzbrooks.vgo.core.graphic.PathElement
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
+import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.ParameterizedCommand
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
-import java.util.*
+import java.util.Stack
 
 /**
  * Converts commands to use relative, absolute,
@@ -58,17 +69,17 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
     private fun process(command: MoveTo): MoveTo {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
-                    variant = CommandVariant.ABSOLUTE,
-                    parameters = command.parameters.map { commandPoint ->
-                        (commandPoint + currentPoint)
-                    }.also { currentPoint = it.last().copy() }
+                variant = CommandVariant.ABSOLUTE,
+                parameters = command.parameters.map { commandPoint ->
+                    (commandPoint + currentPoint)
+                }.also { currentPoint = it.last().copy() }
             )
         } else {
             command.copy(
-                    variant = CommandVariant.RELATIVE,
-                    parameters = command.parameters.map { commandPoint ->
-                        (commandPoint - currentPoint)
-                    }.also { currentPoint += it.last() }
+                variant = CommandVariant.RELATIVE,
+                parameters = command.parameters.map { commandPoint ->
+                    (commandPoint - currentPoint)
+                }.also { currentPoint += it.last() }
             )
         }
 
@@ -80,17 +91,17 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
     private fun process(command: LineTo): LineTo {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
-                    variant = CommandVariant.ABSOLUTE,
-                    parameters = command.parameters.map { commandPoint ->
-                        (commandPoint + currentPoint)
-                    }.also { currentPoint = it.last().copy() }
+                variant = CommandVariant.ABSOLUTE,
+                parameters = command.parameters.map { commandPoint ->
+                    (commandPoint + currentPoint)
+                }.also { currentPoint = it.last().copy() }
             )
         } else {
             command.copy(
-                    variant = CommandVariant.RELATIVE,
-                    parameters = command.parameters.map { commandPoint ->
-                        (commandPoint - currentPoint)
-                    }.also { currentPoint += it.last() }
+                variant = CommandVariant.RELATIVE,
+                parameters = command.parameters.map { commandPoint ->
+                    (commandPoint - currentPoint)
+                }.also { currentPoint += it.last() }
             )
         }
 
@@ -100,17 +111,17 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
     private fun process(command: HorizontalLineTo): HorizontalLineTo {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
-                    variant = CommandVariant.ABSOLUTE,
-                    parameters = command.parameters.map { x ->
-                        (x + currentPoint.x)
-                    }.also { currentPoint = currentPoint.copy(x = it.last()) }
+                variant = CommandVariant.ABSOLUTE,
+                parameters = command.parameters.map { x ->
+                    (x + currentPoint.x)
+                }.also { currentPoint = currentPoint.copy(x = it.last()) }
             )
         } else {
             command.copy(
-                    variant = CommandVariant.RELATIVE,
-                    parameters = command.parameters.map { x ->
-                        (x - currentPoint.x)
-                    }.also { currentPoint = currentPoint.copy(x = currentPoint.x + it.last()) }
+                variant = CommandVariant.RELATIVE,
+                parameters = command.parameters.map { x ->
+                    (x - currentPoint.x)
+                }.also { currentPoint = currentPoint.copy(x = currentPoint.x + it.last()) }
             )
         }
 
@@ -120,17 +131,17 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
     private fun process(command: VerticalLineTo): VerticalLineTo {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
-                    variant = CommandVariant.ABSOLUTE,
-                    parameters = command.parameters.map { y ->
-                        (y + currentPoint.y)
-                    }.also { currentPoint = currentPoint.copy(y = it.last()) }
+                variant = CommandVariant.ABSOLUTE,
+                parameters = command.parameters.map { y ->
+                    (y + currentPoint.y)
+                }.also { currentPoint = currentPoint.copy(y = it.last()) }
             )
         } else {
             command.copy(
-                    variant = CommandVariant.RELATIVE,
-                    parameters = command.parameters.map { y ->
-                        (y - currentPoint.y)
-                    }.also { currentPoint = currentPoint.copy(y = currentPoint.y + it.last()) }
+                variant = CommandVariant.RELATIVE,
+                parameters = command.parameters.map { y ->
+                    (y - currentPoint.y)
+                }.also { currentPoint = currentPoint.copy(y = currentPoint.y + it.last()) }
             )
         }
 
@@ -143,9 +154,9 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
                 variant = CommandVariant.ABSOLUTE,
                 parameters = command.parameters.map {
                     it.copy(
-                            startControl = it.startControl + currentPoint,
-                            endControl = it.endControl + currentPoint,
-                            end = it.end + currentPoint
+                        startControl = it.startControl + currentPoint,
+                        endControl = it.endControl + currentPoint,
+                        end = it.end + currentPoint
                     )
                 }.also {
                     currentPoint = it.last().end.copy()
@@ -156,9 +167,9 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
                 variant = CommandVariant.RELATIVE,
                 parameters = command.parameters.map {
                     it.copy(
-                            startControl = it.startControl - currentPoint,
-                            endControl = it.endControl - currentPoint,
-                            end = it.end - currentPoint
+                        startControl = it.startControl - currentPoint,
+                        endControl = it.endControl - currentPoint,
+                        end = it.end - currentPoint
                     )
                 }.also {
                     currentPoint += it.last().end
@@ -172,27 +183,27 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
     private fun process(command: SmoothCubicBezierCurve): SmoothCubicBezierCurve {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
-                    variant = CommandVariant.ABSOLUTE,
-                    parameters = command.parameters.map {
-                        it.copy(
-                                endControl = it.endControl + currentPoint,
-                                end = it.end + currentPoint
-                        )
-                    }.also {
-                        currentPoint = it.last().end.copy()
-                    }
+                variant = CommandVariant.ABSOLUTE,
+                parameters = command.parameters.map {
+                    it.copy(
+                        endControl = it.endControl + currentPoint,
+                        end = it.end + currentPoint
+                    )
+                }.also {
+                    currentPoint = it.last().end.copy()
+                }
             )
         } else {
             command.copy(
-                    variant = CommandVariant.RELATIVE,
-                    parameters = command.parameters.map {
-                        it.copy(
-                                endControl = it.endControl - currentPoint,
-                                end = it.end - currentPoint
-                        )
-                    }.also {
-                        currentPoint += it.last().end
-                    }
+                variant = CommandVariant.RELATIVE,
+                parameters = command.parameters.map {
+                    it.copy(
+                        endControl = it.endControl - currentPoint,
+                        end = it.end - currentPoint
+                    )
+                }.also {
+                    currentPoint += it.last().end
+                }
             )
         }
 
@@ -202,27 +213,27 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
     private fun process(command: QuadraticBezierCurve): QuadraticBezierCurve {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
-                    variant = CommandVariant.ABSOLUTE,
-                    parameters = command.parameters.map {
-                        it.copy(
-                                control = it.control + currentPoint,
-                                end = it.end + currentPoint
-                        )
-                    }.also {
-                        currentPoint = it.last().end.copy()
-                    }
+                variant = CommandVariant.ABSOLUTE,
+                parameters = command.parameters.map {
+                    it.copy(
+                        control = it.control + currentPoint,
+                        end = it.end + currentPoint
+                    )
+                }.also {
+                    currentPoint = it.last().end.copy()
+                }
             )
         } else {
             command.copy(
-                    variant = CommandVariant.RELATIVE,
-                    parameters = command.parameters.map {
-                        it.copy(
-                                control = it.control - currentPoint,
-                                end = it.end - currentPoint
-                        )
-                    }.also {
-                        currentPoint += it.last().end
-                    }
+                variant = CommandVariant.RELATIVE,
+                parameters = command.parameters.map {
+                    it.copy(
+                        control = it.control - currentPoint,
+                        end = it.end - currentPoint
+                    )
+                }.also {
+                    currentPoint += it.last().end
+                }
             )
         }
 
@@ -232,19 +243,19 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
     private fun process(command: SmoothQuadraticBezierCurve): SmoothQuadraticBezierCurve {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
-                    variant = CommandVariant.ABSOLUTE,
-                    parameters = command.parameters.map { commandPoint ->
-                        (commandPoint + currentPoint)
-                    }.also { currentPoint = it.last().copy() }
+                variant = CommandVariant.ABSOLUTE,
+                parameters = command.parameters.map { commandPoint ->
+                    (commandPoint + currentPoint)
+                }.also { currentPoint = it.last().copy() }
             )
         } else {
             command.copy(
-                    variant = CommandVariant.RELATIVE,
-                    parameters = command.parameters.map { commandPoint ->
-                        (commandPoint - currentPoint)
-                    }.also {
-                        currentPoint += it.last()
-                    }
+                variant = CommandVariant.RELATIVE,
+                parameters = command.parameters.map { commandPoint ->
+                    (commandPoint - currentPoint)
+                }.also {
+                    currentPoint += it.last()
+                }
             )
         }
 
@@ -254,21 +265,21 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
     private fun process(command: EllipticalArcCurve): EllipticalArcCurve {
         val convertedCommand = if (command.variant == CommandVariant.RELATIVE) {
             command.copy(
-                    variant = CommandVariant.ABSOLUTE,
-                    parameters = command.parameters.map {
-                        it.copy(end = it.end + currentPoint)
-                    }.also {
-                        currentPoint = it.last().end.copy()
-                    }
+                variant = CommandVariant.ABSOLUTE,
+                parameters = command.parameters.map {
+                    it.copy(end = it.end + currentPoint)
+                }.also {
+                    currentPoint = it.last().end.copy()
+                }
             )
         } else {
             command.copy(
-                    variant = CommandVariant.RELATIVE,
-                    parameters = command.parameters.map {
-                        it.copy(end = it.end - currentPoint)
-                    }.also {
-                        currentPoint += it.last().end
-                    }
+                variant = CommandVariant.RELATIVE,
+                parameters = command.parameters.map {
+                    it.copy(end = it.end - currentPoint)
+                }.also {
+                    currentPoint += it.last().end
+                }
             )
         }
 

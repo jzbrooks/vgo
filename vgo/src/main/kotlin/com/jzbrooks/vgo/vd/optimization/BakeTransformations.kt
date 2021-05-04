@@ -1,12 +1,26 @@
 package com.jzbrooks.vgo.vd.optimization
 
-import com.jzbrooks.vgo.core.graphic.*
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.ContainerElement
+import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.optimization.Optimization
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.Vector3
-import java.util.*
+import java.util.Stack
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -41,7 +55,7 @@ class BakeTransformations : Optimization {
             val groupTransform = computeTransformationMatrix(group)
 
             val children = mutableListOf<Element>()
-            for(child in group.elements) {
+            for (child in group.elements) {
                 if (child is Group) {
                     val childTransformations = child.attributes.foreign.keys intersect transformationPropertyNames
                     val shared = groupTransforms intersect childTransformations
@@ -60,7 +74,7 @@ class BakeTransformations : Optimization {
                         // current group transform value and proceed to bake siblings in
                         // case this child had other path element siblings.
                         if (childValue == null) {
-                            val transforms = child.attributes.foreign.filterKeys{childTransformations.contains(it)}
+                            val transforms = child.attributes.foreign.filterKeys { childTransformations.contains(it) }
                             for ((transform) in transforms) {
                                 child.attributes.foreign.remove(transform)
                             }
@@ -356,37 +370,47 @@ class BakeTransformations : Optimization {
 
         val rotation = group.attributes.foreign["android:rotation"]?.toFloat()
 
-        val scale = Matrix3.from(arrayOf(
+        val scale = Matrix3.from(
+            arrayOf(
                 floatArrayOf(scaleX ?: 1f, 0f, 0f),
                 floatArrayOf(0f, scaleY ?: 1f, 0f),
                 floatArrayOf(0f, 0f, 1f)
-        ))
+            )
+        )
 
-        val translation = Matrix3.from(arrayOf(
+        val translation = Matrix3.from(
+            arrayOf(
                 floatArrayOf(1f, 0f, translationX ?: 0f),
                 floatArrayOf(0f, 1f, translationY ?: 0f),
                 floatArrayOf(0f, 0f, 1f)
-        ))
+            )
+        )
 
-        val pivot = Matrix3.from(arrayOf(
+        val pivot = Matrix3.from(
+            arrayOf(
                 floatArrayOf(1f, 0f, pivotX ?: 0f),
                 floatArrayOf(0f, 1f, pivotY ?: 0f),
                 floatArrayOf(0f, 0f, 1f)
-        ))
+            )
+        )
 
-        val pivotInverse = Matrix3.from(arrayOf(
+        val pivotInverse = Matrix3.from(
+            arrayOf(
                 floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1),
                 floatArrayOf(0f, 1f, (pivotY ?: 0f) * -1),
                 floatArrayOf(0f, 0f, 1f)
-        ))
+            )
+        )
 
         val rotate = rotation?.let {
             val radians = it * PI.toFloat() / 180f
-            Matrix3.from(arrayOf(
+            Matrix3.from(
+                arrayOf(
                     floatArrayOf(cos(radians), -sin(radians), 0f),
                     floatArrayOf(sin(radians), cos(radians), 0f),
                     floatArrayOf(0f, 0f, 1f)
-            ))
+                )
+            )
         } ?: Matrix3.IDENTITY
 
         return listOf(pivot, translation, rotate, scale, pivotInverse).reduce(Matrix3::times)
@@ -394,13 +418,13 @@ class BakeTransformations : Optimization {
 
     companion object {
         private val transformationPropertyNames = setOf(
-                "android:scaleX",
-                "android:scaleY",
-                "android:translateX",
-                "android:translateY",
-                "android:pivotX",
-                "android:pivotY",
-                "android:rotation"
+            "android:scaleX",
+            "android:scaleY",
+            "android:translateX",
+            "android:translateY",
+            "android:pivotX",
+            "android:pivotY",
+            "android:rotation"
         )
     }
 }

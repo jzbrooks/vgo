@@ -2,7 +2,11 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
-import com.jzbrooks.vgo.core.graphic.*
+import com.jzbrooks.vgo.core.graphic.Attributes
+import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.math.Point
@@ -35,9 +39,9 @@ class CollapseGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
             override var attributes = object : Attributes {
-    override val name: String? = null
-    override val foreign: MutableMap<String, String> = mutableMapOf()
-}
+                override val name: String? = null
+                override val foreign: MutableMap<String, String> = mutableMapOf()
+            }
         }
 
         CollapseGroups().optimize(graphic)

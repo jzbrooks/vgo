@@ -1,7 +1,12 @@
 package com.jzbrooks.vgo.svg
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.containsOnly
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isTrue
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
@@ -36,9 +41,11 @@ class VectorDrawableConverterTests {
 
     @Test
     fun testRootElementStyleAttributeIsConverted() {
-        val attributes = topLevelAttributes.copy(foreign = topLevelAttributes.foreign.apply {
-            this["style"] = "stroke-linejoin:round;stroke-miterlimit:2;"
-        })
+        val attributes = topLevelAttributes.copy(
+            foreign = topLevelAttributes.foreign.apply {
+                this["style"] = "stroke-linejoin:round;stroke-miterlimit:2;"
+            }
+        )
 
         val svg = ScalableVectorGraphic(emptyList(), attributes)
 
@@ -59,62 +66,74 @@ class VectorDrawableConverterTests {
     @Test
     fun testPathElementAttributesAreConverted() {
         val svg = ScalableVectorGraphic(
-                listOf(
-                        Path(CommandString("""M 10,30"
+            listOf(
+                Path(
+                    CommandString(
+                        """M 10,30"
                                 A 20,20 0,0,1 50,30
                                 A 20,20 0,0,1 90,30
                                 Q 90,60 50,90
-                                Q 10,60 10,30 z""").toCommandList(),
-                            Path.Attributes("heart",
-                                mutableMapOf(
-                                    "stroke" to "red",
-                                    "fill" to "none"
-                                )
-                            )
+                                Q 10,60 10,30 z"""
+                    ).toCommandList(),
+                    Path.Attributes(
+                        "heart",
+                        mutableMapOf(
+                            "stroke" to "red",
+                            "fill" to "none"
                         )
-                ),
-                topLevelAttributes
+                    )
+                )
+            ),
+            topLevelAttributes
         )
 
         val vectorDrawable = svg.toVectorDrawable()
 
         val first = vectorDrawable.elements.first()
         assertThat(first.attributes.name).isEqualTo("heart")
-        assertThat(first.attributes.foreign).isEqualTo(mapOf(
-            "android:strokeColor" to "#ff0000",
-            "android:strokeWidth" to "1"
-        ))
+        assertThat(first.attributes.foreign).isEqualTo(
+            mapOf(
+                "android:strokeColor" to "#ff0000",
+                "android:strokeWidth" to "1"
+            )
+        )
     }
 
     @Test
     fun testPathStyleElementAttributeIsConverted() {
 
         val svg = ScalableVectorGraphic(
-                listOf(
-                        Path(CommandString("""M 10,30"
+            listOf(
+                Path(
+                    CommandString(
+                        """M 10,30"
                                 A 20,20 0,0,1 50,30
                                 A 20,20 0,0,1 90,30
                                 Q 90,60 50,90
-                                Q 10,60 10,30 z""").toCommandList(),
-                            Path.Attributes("heart",
-                                mutableMapOf(
-                                    "stroke" to "red",
-                                    "style" to "stroke:red"
-                                )
-                            )
+                                Q 10,60 10,30 z"""
+                    ).toCommandList(),
+                    Path.Attributes(
+                        "heart",
+                        mutableMapOf(
+                            "stroke" to "red",
+                            "style" to "stroke:red"
                         )
-                ),
-                topLevelAttributes
+                    )
+                )
+            ),
+            topLevelAttributes
         )
 
         val vectorDrawable = svg.toVectorDrawable()
 
         val first = vectorDrawable.elements.first()
         assertThat(first.attributes.name).isEqualTo("heart")
-        assertThat(first.attributes.foreign).isEqualTo(mapOf(
-            "android:strokeColor" to "#ff0000",
-            "android:strokeWidth" to "1"
-        ))
+        assertThat(first.attributes.foreign).isEqualTo(
+            mapOf(
+                "android:strokeColor" to "#ff0000",
+                "android:strokeWidth" to "1"
+            )
+        )
     }
 
     @Test
@@ -132,10 +151,12 @@ class VectorDrawableConverterTests {
 
         val first = vectorDrawable.elements.first()
         assertThat(first.attributes.name).isEqualTo("transform_group")
-        assertThat(first.attributes.foreign).isEqualTo(mapOf(
-            "android:translateX" to "3",
-            "android:translateY" to "4"
-        ))
+        assertThat(first.attributes.foreign).isEqualTo(
+            mapOf(
+                "android:translateX" to "3",
+                "android:translateY" to "4"
+            )
+        )
     }
 
     @Test
@@ -179,11 +200,14 @@ class VectorDrawableConverterTests {
     fun testRgbColorIsConverted() {
         val svg = ScalableVectorGraphic(
             listOf(
-                Path(CommandString("""M 10,30"
+                Path(
+                    CommandString(
+                        """M 10,30"
                                 A 20,20 0,0,1 50,30
                                 A 20,20 0,0,1 90,30
                                 Q 90,60 50,90
-                                Q 10,60 10,30 z""").toCommandList(),
+                                Q 10,60 10,30 z"""
+                    ).toCommandList(),
                     Path.Attributes(null, mutableMapOf("stroke" to "rgb(23, 0, 23)")),
                 )
             ),

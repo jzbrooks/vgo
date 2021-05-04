@@ -1,13 +1,25 @@
 package com.jzbrooks.vgo.core.util.math
 
-import com.jzbrooks.vgo.core.graphic.command.*
-import java.util.*
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
+import com.jzbrooks.vgo.core.graphic.command.Command
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.ParameterizedCommand
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import java.util.Stack
 
 /**
  * Computes absolute coordinates for a given command in the sequence.
  * By default, the absolute coordinate of the last command is returned.
  * @param commands: The complete list of **relative** commands for a given path. The initial moveto can be absolute.
-  */
+ */
 fun computeAbsoluteCoordinates(commands: List<Command>): Point {
     assert(commands.drop(1).filterIsInstance<ParameterizedCommand<*>>().all { it.variant == CommandVariant.RELATIVE })
 

@@ -1,12 +1,16 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.*
+import com.jzbrooks.vgo.core.graphic.ContainerElement
+import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.PathElement
 
 abstract class OptimizationRegistry(
-        private val prePass: List<Optimization>,
-        private val topDownOptimizations: List<TopDownOptimization>,
-        private val bottomUpOptimizations: List<BottomUpOptimization>,
-        private val postPass: List<Optimization>
+    private val prePass: List<Optimization>,
+    private val topDownOptimizations: List<TopDownOptimization>,
+    private val bottomUpOptimizations: List<BottomUpOptimization>,
+    private val postPass: List<Optimization>
 ) {
 
     fun apply(graphic: Graphic) {

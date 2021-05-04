@@ -4,16 +4,20 @@ import io.codearte.gradle.nexus.NexusStagingExtension
 buildscript {
     repositories {
         jcenter()
+        gradlePluginPortal()
         mavenCentral()
     }
 
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.0.0")
         classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0")
     }
 }
 
-allprojects {
+subprojects {
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
     group = "com.jzbrooks"
     version = properties["vgo_version"]?.toString() ?: ""
 

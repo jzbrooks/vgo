@@ -1,8 +1,8 @@
 package com.jzbrooks.vgo.vd
 
-import com.jzbrooks.vgo.core.graphic.Attributes as CoreAttributes
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Attributes as CoreAttributes
 
 data class VectorDrawable(
     override var elements: List<Element>,
@@ -10,5 +10,4 @@ data class VectorDrawable(
 ) : Graphic {
 
     data class Attributes(override val name: String?, override val foreign: MutableMap<String, String>) : CoreAttributes
-
 }

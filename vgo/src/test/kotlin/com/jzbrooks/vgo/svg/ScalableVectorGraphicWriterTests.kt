@@ -48,8 +48,8 @@ class ScalableVectorGraphicWriterTests {
             val firstGenNodes = output.firstChild.childNodes.toList()
 
             assertThat(firstGenNodes)
-                    .transform { it.count { item -> item.nodeName == "path" } }
-                    .isEqualTo(2)
+                .transform { it.count { item -> item.nodeName == "path" } }
+                .isEqualTo(2)
         }
     }
 
@@ -130,9 +130,9 @@ class ScalableVectorGraphicWriterTests {
 
     private fun ByteArrayOutputStream.toDocument(): Document {
         return DocumentBuilderFactory
-                .newInstance()
-                .newDocumentBuilder()
-                .parse(ByteArrayInputStream(this.toByteArray()))
+            .newInstance()
+            .newDocumentBuilder()
+            .parse(ByteArrayInputStream(this.toByteArray()))
     }
 
     companion object {

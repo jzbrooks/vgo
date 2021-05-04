@@ -33,16 +33,16 @@ class LineSegmentTests {
         @JvmStatic
         fun testIntersections(): List<Intersection> {
             return listOf(
-                    Intersection(
-                            LineSegment(Point(0f, 10f), Point(0f, -10f)),
-                            LineSegment(Point(-1f, 0f), Point(1f, 0f)),
-                            Point.ZERO
-                    ),
-                    Intersection(
-                            LineSegment(Point(1f, 1f), Point(4f, 4f)),
-                            LineSegment(Point(1f, 8f), Point(2f, 4f)),
-                            Point(2.4f, 2.4f)
-                    )
+                Intersection(
+                    LineSegment(Point(0f, 10f), Point(0f, -10f)),
+                    LineSegment(Point(-1f, 0f), Point(1f, 0f)),
+                    Point.ZERO
+                ),
+                Intersection(
+                    LineSegment(Point(1f, 1f), Point(4f, 4f)),
+                    LineSegment(Point(1f, 8f), Point(2f, 4f)),
+                    Point(2.4f, 2.4f)
+                )
 
             )
         }
@@ -50,7 +50,7 @@ class LineSegmentTests {
         @JvmStatic
         fun testParallelLinesReturnsNull(): List<Pair<LineSegment, LineSegment>> {
             return listOf(
-                    LineSegment(Point(0f, 3f), Point(0f, 3f)) to LineSegment(Point(1f, 3f), Point(1f, 3f))
+                LineSegment(Point(0f, 3f), Point(0f, 3f)) to LineSegment(Point(1f, 3f), Point(1f, 3f))
             )
         }
     }

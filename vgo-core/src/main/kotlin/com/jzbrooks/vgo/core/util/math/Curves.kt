@@ -63,8 +63,8 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
     val paramSquare = param * param
 
     return Point(
-            3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
-            3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y
+        3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
+        3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y
     )
 }
 
@@ -88,10 +88,10 @@ fun CubicCurve<*>.isConvex(tolerance: Float = 1e-3f): Boolean {
     val intersection = secondDiagonal.intersection(firstDiagonal, tolerance)
 
     return intersection != null &&
-            endControl.x < intersection.x == intersection.x < 0 &&
-            endControl.y < intersection.y == intersection.y < 0 &&
-            end.x < intersection.x == intersection.x < startControl.x &&
-            end.y < intersection.y == intersection.y < startControl.y
+        endControl.x < intersection.x == intersection.x < 0 &&
+        endControl.y < intersection.y == intersection.y < 0 &&
+        end.x < intersection.x == intersection.x < startControl.x &&
+        end.y < intersection.y == intersection.y < startControl.y
 }
 
 /**
@@ -110,9 +110,12 @@ fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBez
         else -> throw IllegalStateException("A destructuring of control points is required for ${previous::class.simpleName}.")
     }
 
-    return CubicBezierCurve(variant, parameters.map { (endControl, end) ->
-        CubicBezierCurve.Parameter( prevEnd - prevEndControl, endControl, end)
-    })
+    return CubicBezierCurve(
+        variant,
+        parameters.map { (endControl, end) ->
+            CubicBezierCurve.Parameter(prevEnd - prevEndControl, endControl, end)
+        }
+    )
 }
 
 fun CubicCurve<*>.liesOnCircle(circle: Circle, tolerance: Float = 1e-3f): Boolean {

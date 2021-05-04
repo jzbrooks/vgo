@@ -1,12 +1,15 @@
 package com.jzbrooks.vgo.vd
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.containsOnly
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.isLessThan
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
-import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.junit.jupiter.api.Test
 

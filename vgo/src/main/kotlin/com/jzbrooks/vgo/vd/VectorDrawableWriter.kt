@@ -1,23 +1,25 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Writer
-import com.jzbrooks.vgo.core.graphic.*
+import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
+import java.util.Collections.emptySet
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()) : Writer {
+class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()) : Writer<VectorDrawable> {
 
     private val commandPrinter = VectorDrawableCommandPrinter(3)
 
-    override fun write(graphic: Graphic, stream: OutputStream) {
-        require(graphic is VectorDrawable)
-
+    override fun write(graphic: VectorDrawable, stream: OutputStream) {
         val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val document = builder.newDocument()
 

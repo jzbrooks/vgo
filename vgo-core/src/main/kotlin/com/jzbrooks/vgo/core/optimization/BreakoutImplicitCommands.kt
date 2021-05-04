@@ -1,7 +1,18 @@
 package com.jzbrooks.vgo.core.optimization
 
 import com.jzbrooks.vgo.core.graphic.PathElement
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.Command
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.ParameterizedCommand
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 
 /**
  * Enables more resolution in the the other command
@@ -23,8 +34,8 @@ class BreakoutImplicitCommands : TopDownOptimization, PathElementVisitor {
         pathElement.commands = commands
     }
 
-    private fun divideParameters(first: ParameterizedCommand<*>) : List<Command> {
-        return when(first) {
+    private fun divideParameters(first: ParameterizedCommand<*>): List<Command> {
+        return when (first) {
             is MoveTo -> first.parameters.mapIndexed { i, it ->
                 if (i == 0) first.copy(parameters = listOf(it)) else LineTo(first.variant, listOf(it))
             }

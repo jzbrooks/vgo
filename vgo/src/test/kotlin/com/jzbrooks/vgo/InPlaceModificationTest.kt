@@ -57,7 +57,7 @@ class InPlaceModificationTest {
         Application().run(arguments)
 
         assertThat(systemOutput.toString())
-                .contains(Paths.get("src/test/resources/in-place-modify/avocado_example.xml").toString())
+            .contains(Paths.get("src/test/resources/in-place-modify/avocado_example.xml").toString())
     }
 
     @Test
@@ -67,7 +67,7 @@ class InPlaceModificationTest {
         Application().run(arguments)
 
         assertThat(systemOutput.toString())
-                .doesNotContain("src/test/resources/in-place-modify/non_vector.xml")
+            .doesNotContain("src/test/resources/in-place-modify/non_vector.xml")
     }
 
     @Test
@@ -77,7 +77,7 @@ class InPlaceModificationTest {
         Application().run(arguments)
 
         assertThat(systemOutput.toString())
-                .doesNotContain("src/test/resources/in-place-modify/avocado_example_optimized.xml")
+            .doesNotContain("src/test/resources/in-place-modify/avocado_example_optimized.xml")
     }
 
     @Test

@@ -4,7 +4,7 @@ import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.PathElement
-import java.util.*
+import java.util.Stack
 
 /**
  * Merges multiple paths into a single path where possible
@@ -54,9 +54,8 @@ class MergePaths : Optimization {
     private fun merge(paths: List<PathElement>): List<PathElement> {
         if (paths.isEmpty()) return emptyList()
 
-        val mergedPaths = Stack<PathElement>().apply {
-            add(paths.first())
-        }
+        val mergedPaths = Stack<PathElement>()
+        mergedPaths.add(paths.first())
 
         for (item in paths.slice(1 until paths.size)) {
             val previous = mergedPaths.peek()

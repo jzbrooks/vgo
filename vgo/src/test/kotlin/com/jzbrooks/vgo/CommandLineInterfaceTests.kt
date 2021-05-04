@@ -1,7 +1,11 @@
 package com.jzbrooks.vgo
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.doesNotContain
+import assertk.assertions.isEqualTo
+import assertk.assertions.matches
+import assertk.assertions.startsWith
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -83,10 +87,10 @@ class CommandLineInterfaceTests {
     fun `unmodified files are omitted from statistics`() {
         val input = "src/test/resources/baseline/simple_heart_optimized.xml"
         val arguments = arrayOf(
-                input,
-                "-o",
-                "build/integrationTest/unmodified-stats-omitted.xml",
-                "--stats"
+            input,
+            "-o",
+            "build/integrationTest/unmodified-stats-omitted.xml",
+            "--stats"
         )
         val exitCode = Application().run(arguments)
         assertThat(exitCode).isEqualTo(0)
@@ -97,10 +101,10 @@ class CommandLineInterfaceTests {
     @Test
     fun `directory inputs include a filename with statistics`() {
         val arguments = arrayOf(
-                "src/test/resources/in-place-modify",
-                "-o",
-                "build/integrationTest/multi-stats-test-directory",
-                "--stats"
+            "src/test/resources/in-place-modify",
+            "-o",
+            "build/integrationTest/multi-stats-test-directory",
+            "--stats"
         )
         val exitCode = Application().run(arguments)
         assertThat(exitCode).isEqualTo(0)
@@ -111,13 +115,13 @@ class CommandLineInterfaceTests {
     @Test
     fun `multiple file inputs include a filename with statistics`() {
         val arguments = arrayOf(
-                avocadoExampleRelativePath,
-                "-o",
-                "build/integrationTest/multi-stats-test-one.xml",
-                heartExampleRelativePath,
-                "-o",
-                "build/integrationTest/multi-stats-test-two.xml",
-                "--stats"
+            avocadoExampleRelativePath,
+            "-o",
+            "build/integrationTest/multi-stats-test-one.xml",
+            heartExampleRelativePath,
+            "-o",
+            "build/integrationTest/multi-stats-test-two.xml",
+            "--stats"
         )
         val exitCode = Application().run(arguments)
         assertThat(exitCode).isEqualTo(0)

@@ -1,12 +1,15 @@
 package com.jzbrooks.vgo.svg
 
-import com.jzbrooks.vgo.core.graphic.*
+import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
-import com.jzbrooks.vgo.svg.graphic.ClipPath
 import com.jzbrooks.vgo.core.util.xml.asSequence
 import com.jzbrooks.vgo.core.util.xml.removeOrNull
 import com.jzbrooks.vgo.core.util.xml.toMutableMap
+import com.jzbrooks.vgo.svg.graphic.ClipPath
 import org.w3c.dom.Comment
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
@@ -249,7 +252,7 @@ private val NAMED_COLORS = mapOf(
     "rebeccapurple"	to "#663399"
 )
 
-//private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
+// private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
 //    var value = removeOrNull(key)?.nodeValue ?: return default
 //
 //    val hex = if (value.startsWith("rgb")) {
@@ -271,4 +274,4 @@ private val NAMED_COLORS = mapOf(
 //    val b = colorInt.toUByte()
 //
 //    return Color(a, r, g, b)
-//}
+// }
