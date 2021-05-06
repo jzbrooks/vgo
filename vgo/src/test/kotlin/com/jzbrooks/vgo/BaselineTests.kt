@@ -76,36 +76,31 @@ class BaselineTests {
 
     companion object {
 
-        private val assets: List<Pair<Path, Path>>
-
-        init {
-            // Loads the files based on the convention that optimized files
-            // live in src/test/resources/baseline and are suffixed
-            // with _optimized
-            assets = try {
-                Files.list(Paths.get("src/test/resources"))
-                    .asSequence()
-                    .filterNot { Files.isDirectory(it) }
-                    .map { unoptimizedFile ->
-                        val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
-                        val optimizedDirectory = unoptimizedFile.parent.resolve("baseline")
-                        unoptimizedFile to optimizedDirectory.resolve("${fileName}_optimized.$fileExtension")
-                    }.toList()
-            } catch (e: Throwable) {
-                System.err.println(e)
-                throw e
-            }
+        // Loads the files based on the convention that optimized files
+        // live in src/test/resources/baseline and are suffixed with _optimized
+        private val assets: List<Pair<Path, Path>> = try {
+            Files.list(Paths.get("src/test/resources"))
+                .asSequence()
+                .filterNot { Files.isDirectory(it) }
+                .map { unoptimizedFile ->
+                    val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
+                    val optimizedDirectory = unoptimizedFile.parent.resolve("baseline")
+                    unoptimizedFile to optimizedDirectory.resolve("${fileName}_optimized.$fileExtension")
+                }.toList()
+        } catch (e: Throwable) {
+            System.err.println(e)
+            throw e
         }
 
         @JvmStatic
-        private fun provideUnoptimizedAssets(): List<Arguments> {
+        fun provideUnoptimizedAssets(): List<Arguments> {
             return assets.map {
                 Arguments.of(it.first)
             }
         }
 
         @JvmStatic
-        private fun provideUnoptimizedAndOptimizedAssets(): List<Arguments> {
+        fun provideUnoptimizedAndOptimizedAssets(): List<Arguments> {
             return assets.map {
                 Arguments.of(it.first, it.second)
             }

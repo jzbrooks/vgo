@@ -103,9 +103,7 @@ tasks {
         inputs.file("$buildDir/libs/debug/vgo-$version.jar")
         outputs.file(optimizedJar)
 
-        val javaHome = System.getenv("JAVA_HOME") ?: javaInstalls
-            .installationForCurrentVirtualMachine.get()
-            .installationDirectory.toString()
+        val javaHome = System.getProperty("java.home")
 
         classpath = files("$rootDir/tools/r8.jar")
         args = listOf(

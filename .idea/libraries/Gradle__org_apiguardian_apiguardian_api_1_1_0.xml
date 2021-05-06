@@ -2,6 +2,7 @@
   <library name="Gradle: org.apiguardian:apiguardian-api:1.1.0">
     <CLASSES>
       <root url="jar://$MAVEN_REPOSITORY$/org/apiguardian/apiguardian-api/1.1.0/apiguardian-api-1.1.0.jar!/" />
+      <root url="jar://$USER_HOME$/.m2/repository/org/apiguardian/apiguardian-api/1.1.0/apiguardian-api-1.1.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
