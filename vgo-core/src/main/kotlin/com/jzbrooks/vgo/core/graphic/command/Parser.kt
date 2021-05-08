@@ -2,7 +2,8 @@ package com.jzbrooks.vgo.core.graphic.command
 
 import com.jzbrooks.vgo.core.util.math.Point
 
-inline class CommandString(val data: String) {
+@JvmInline
+value class CommandString(val data: String) {
     fun toCommandList(): List<Command> {
         return data.split(commandRegex)
             .asSequence()

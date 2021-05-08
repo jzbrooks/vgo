@@ -3,13 +3,12 @@ import io.codearte.gradle.nexus.NexusStagingExtension
 
 buildscript {
     repositories {
-        jcenter()
         gradlePluginPortal()
         mavenCentral()
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.30")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.0")
         classpath("org.jlleitschuh.gradle:ktlint-gradle:10.0.0")
         classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0")
     }
@@ -17,6 +16,18 @@ buildscript {
 
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    configurations.all {
+        if (name.startsWith("ktlint")) {
+            resolutionStrategy {
+                eachDependency {
+                    // Force Kotlin to our version
+                    if (requested.group == "org.jetbrains.kotlin") {
+                        useVersion("1.5.0")
+                    }
+                }
+            }
+        }
+    }
 
     group = "com.jzbrooks"
     version = properties["vgo_version"]?.toString() ?: ""
@@ -29,8 +40,6 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_11.toString()
-            freeCompilerArgs = listOf("-Xinline-classes")
-            useIR = true
         }
     }
 
