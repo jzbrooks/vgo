@@ -3,7 +3,6 @@ import io.codearte.gradle.nexus.NexusStagingExtension
 
 buildscript {
     repositories {
-        jcenter()
         gradlePluginPortal()
         mavenCentral()
     }
