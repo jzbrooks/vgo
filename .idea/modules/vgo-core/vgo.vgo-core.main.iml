@@ -14,8 +14,8 @@
           <option name="noReflect" value="true" />
           <option name="moduleName" value="vgo-core" />
           <option name="jvmTarget" value="11" />
-          <option name="languageVersion" value="1.4" />
-          <option name="apiVersion" value="1.4" />
+          <option name="languageVersion" value="1.5" />
+          <option name="apiVersion" value="1.5" />
           <option name="pluginOptions">
             <array />
           </option>
