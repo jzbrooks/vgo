@@ -8,5 +8,6 @@ build/
 .idea/usage.statistics.xml
 .idea/shelf
 
-.idea/modules.xml 
+.idea/misc.xml
+.idea/modules.xml
 .idea/libraries

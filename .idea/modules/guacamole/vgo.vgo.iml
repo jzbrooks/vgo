@@ -4,7 +4,6 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../vgo">
-      <excludeFolder url="file://$MODULE_DIR$/../../../guacamole/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../../vgo/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../../vgo/build" />
     </content>
