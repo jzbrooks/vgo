@@ -1,7 +1,6 @@
 package com.jzbrooks.vgo.vd
 
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.containsOnly
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
@@ -10,11 +9,12 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.junit.jupiter.api.Test
 
 class SvgConverterTests {
-    val topLevelAttributes = VectorDrawable.Attributes(
+    private val topLevelAttributes = VectorDrawable.Attributes(
         "visibilitystrike",
         mutableMapOf(
             "xmlns:android" to "http://schemas.android.com/apk/res/android",
@@ -22,6 +22,14 @@ class SvgConverterTests {
             "android:width" to "24dp",
             "android:viewportHeight" to "24",
             "android:viewportWidth" to "24"
+        )
+    )
+
+    private val translationMatrix = Matrix3.from(
+        arrayOf(
+            floatArrayOf(1f, 0f, 10f),
+            floatArrayOf(0f, 1f, 10f),
+            floatArrayOf(0f, 0f, 1f),
         )
     )
 
@@ -36,7 +44,7 @@ class SvgConverterTests {
 
         val svg = vectorDrawable.toSvg()
 
-        assertThat(svg.attributes.name).isEqualTo("visibilitystrike")
+        assertThat(svg.attributes.id).isEqualTo("visibilitystrike")
         assertThat(svg.attributes.foreign).containsOnly(
             "xmlns" to "http://www.w3.org/2000/svg",
             "height" to "100%",
@@ -64,7 +72,7 @@ class SvgConverterTests {
         val graphic = pathElementGraphic.toSvg()
 
         val first = graphic.elements.first()
-        assertThat(first.attributes.name).isEqualTo("strike_thru_path")
+        assertThat(first.attributes.id).isEqualTo("strike_thru_path")
         assertThat(first.attributes.foreign).containsOnly("stroke-width" to "10")
     }
 
@@ -88,7 +96,7 @@ class SvgConverterTests {
         val graphic = pathElementGraphic.toSvg()
 
         val first = graphic.elements.first()
-        assertThat(first.attributes.name).isEqualTo("strike_thru_path")
+        assertThat(first.attributes.id).isEqualTo("strike_thru_path")
         assertThat(first.attributes.foreign).containsOnly(
             "stroke-width" to "10",
             "fill" to "#FF00FF",
@@ -116,7 +124,7 @@ class SvgConverterTests {
     }
 
     @Test
-    fun testContainerElementTransformsConverted() {
+    fun testContainerElementTransformsRemainIntact() {
         val groupTransformGraphic = VectorDrawable(
             listOf(
                 Group(
@@ -126,7 +134,6 @@ class SvgConverterTests {
                             Path.Attributes(
                                 "vect",
                                 mutableMapOf(
-
                                     "android:fillColor" to "#FF000000",
                                     "android:fillAlpha" to ".3",
                                 )
@@ -138,12 +145,9 @@ class SvgConverterTests {
                         )
                     ),
                     Group.Attributes(
-                        "rotationGroup",
-                        mutableMapOf(
-                            "android:pivotX" to "10.0",
-                            "android:pivotY" to "10.0",
-                            "android:rotation" to "15.0"
-                        )
+                        "translationGroup",
+                        translationMatrix,
+                        mutableMapOf(),
                     )
                 )
             ),
@@ -152,9 +156,9 @@ class SvgConverterTests {
 
         val graphic = groupTransformGraphic.toSvg()
 
-        val groupAttributes = (graphic.elements.first() as Group).attributes.foreign
+        val transformAfterConversion = (graphic.elements.first() as Group).attributes.transform
 
-        assertThat(groupAttributes).contains("transform", "matrix(0.9659258, 0.25881904, -0.25881904, 0.9659258, 2.9289327, -2.247448)")
+        assertThat(transformAfterConversion).isEqualTo(translationMatrix)
     }
 
     @Test
@@ -168,7 +172,6 @@ class SvgConverterTests {
                             Path.Attributes(
                                 "vect",
                                 mutableMapOf(
-
                                     "android:fillColor" to "#FF000000",
                                     "android:fillAlpha" to ".3",
                                 )
@@ -180,12 +183,9 @@ class SvgConverterTests {
                         )
                     ),
                     Group.Attributes(
-                        "rotationGroup",
-                        mutableMapOf(
-                            "android:pivotX" to "10.0",
-                            "android:pivotY" to "10.0",
-                            "android:rotation" to "15.0"
-                        )
+                        "translationGroup",
+                        translationMatrix,
+                        mutableMapOf(),
                     )
                 )
             ),
@@ -195,6 +195,6 @@ class SvgConverterTests {
 
         val groupAttributes = (graphic.elements.first() as Group).attributes
 
-        assertThat(groupAttributes.name).isEqualTo("rotationGroup")
+        assertThat(groupAttributes.id).isEqualTo("translationGroup")
     }
 }

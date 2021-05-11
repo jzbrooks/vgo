@@ -1,21 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="15">
-      <module name="com.jzbrooks.vgo.vgo-core.test" target="11" />
-      <module name="com.jzbrooks.vgo.vgo-plugin.main" target="11" />
-      <module name="com.jzbrooks.vgo.vgo-plugin.test" target="11" />
-      <module name="com.jzbrooks.vgo.vgo.main" target="11" />
-      <module name="com.jzbrooks.vgo.vgo.test" target="11" />
-      <module name="guacamole.guacamole-core.main" target="13" />
-      <module name="guacamole.guacamole-core.test" target="13" />
-      <module name="guacamole.guacamole.integrationTest" target="13" />
-      <module name="guacamole.guacamole.main" target="13" />
-      <module name="guacamole.guacamole.test" target="13" />
-      <module name="vgo.vgo" target="11" />
-      <module name="vgo.vgo-core" target="11" />
-      <module name="vgo.vgo-core.main" target="11" />
-      <module name="vgo.vgo-plugin" target="11" />
-    </bytecodeTargetLevel>
+    <bytecodeTargetLevel target="11" />
   </component>
 </project>

@@ -30,7 +30,7 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -72,7 +72,7 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -126,7 +126,7 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -177,7 +177,7 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -222,7 +222,7 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -268,7 +268,7 @@ class MergePathsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = paths
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -297,6 +297,6 @@ class MergePathsTests {
     }
 
     data class PseudoPath(override var commands: List<Command>, override val attributes: Attributes = Attributes(null, mutableMapOf())) : PathElement {
-        data class Attributes(override val name: String?, override val foreign: MutableMap<String, String>) : com.jzbrooks.vgo.core.graphic.Attributes
+        data class Attributes(override val id: String?, override val foreign: MutableMap<String, String>) : com.jzbrooks.vgo.core.graphic.Attributes
     }
 }

@@ -85,7 +85,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes.name).isEqualTo("heart")
+        assertThat(path.attributes.id).isEqualTo("heart")
     }
 
     @Test

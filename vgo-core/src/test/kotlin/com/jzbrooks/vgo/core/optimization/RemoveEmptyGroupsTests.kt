@@ -9,6 +9,7 @@ import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
@@ -20,7 +21,7 @@ class RemoveEmptyGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -38,7 +39,7 @@ class RemoveEmptyGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -51,12 +52,12 @@ class RemoveEmptyGroupsTests {
 
     @Test
     fun testAvoidCollapsingNestedGroupWithAttributes() {
-        val nestedEmptyGroups = listOf(Group(listOf(Group(listOf(Group(emptyList(), Group.Attributes("base", mutableMapOf())))))))
+        val nestedEmptyGroups = listOf(Group(listOf(Group(listOf(Group(emptyList(), Group.Attributes("base", Matrix3.IDENTITY, mutableMapOf())))))))
 
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -77,7 +78,7 @@ class RemoveEmptyGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }

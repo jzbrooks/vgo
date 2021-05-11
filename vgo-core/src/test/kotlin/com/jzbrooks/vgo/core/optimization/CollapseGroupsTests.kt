@@ -9,6 +9,7 @@ import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
@@ -21,7 +22,7 @@ class CollapseGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -39,7 +40,7 @@ class CollapseGroupsTests {
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }
@@ -51,14 +52,22 @@ class CollapseGroupsTests {
 
     @Test
     fun testRetainNestedGroupWithAttributes() {
+        val scale = Matrix3.from(
+            arrayOf(
+                floatArrayOf(20f, 0f, 0f),
+                floatArrayOf(0f, 1f, 0f),
+                floatArrayOf(0f, 0f, 1f),
+            ),
+        )
+
         val innerPath = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
-        val innerGroupWithAttributes = Group(listOf(innerPath), Group.Attributes(null, mutableMapOf("android:scaleX" to "20")))
+        val innerGroupWithAttributes = Group(listOf(innerPath), Group.Attributes(null, scale, mutableMapOf()))
         val group = Group(listOf(innerGroupWithAttributes))
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
             override var attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         }

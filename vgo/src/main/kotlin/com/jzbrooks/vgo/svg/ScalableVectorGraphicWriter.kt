@@ -5,9 +5,12 @@ import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.svg.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.util.Collections.emptySet
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -21,12 +24,18 @@ class ScalableVectorGraphicWriter(
 
     private val commandPrinter = ScalableVectorGraphicCommandPrinter(3)
 
+    private val formatter = DecimalFormat().apply {
+        maximumFractionDigits = 2 // todo: parameterize?
+        isDecimalSeparatorAlwaysShown = false
+        roundingMode = RoundingMode.HALF_UP
+    }
+
     override fun write(graphic: ScalableVectorGraphic, stream: OutputStream) {
         val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val document = builder.newDocument()
 
         val root = document.createElement("svg")
-        val elementName = graphic.attributes.name
+        val elementName = graphic.attributes.id
         if (elementName != null) {
             root.setAttribute("id", elementName)
         }
@@ -51,9 +60,23 @@ class ScalableVectorGraphicWriter(
                 }
             }
             is Group -> {
-                document.createElement("g").also {
+                document.createElement("g").also { node ->
+                    if (element.attributes.transform !== Matrix3.IDENTITY) {
+                        val matrix = element.attributes.transform
+                        val matrixElements = listOf(
+                            formatter.format(matrix[0, 0]),
+                            formatter.format(matrix[1, 0]),
+                            formatter.format(matrix[0, 1]),
+                            formatter.format(matrix[1, 1]),
+                            formatter.format(matrix[0, 2]),
+                            formatter.format(matrix[1, 2]),
+                        ).joinToString(separator = ",")
+
+                        node.setAttribute("transform", "matrix($matrixElements)")
+                    }
+
                     for (child in element.elements) {
-                        write(it, child, document)
+                        write(node, child, document)
                     }
                 }
             }
@@ -75,7 +98,7 @@ class ScalableVectorGraphicWriter(
         }
 
         if (node != null) {
-            val elementName = element.attributes.name
+            val elementName = element.attributes.id
             if (elementName != null) {
                 node.setAttribute("id", elementName)
             }

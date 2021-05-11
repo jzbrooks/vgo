@@ -21,9 +21,6 @@ import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.Vector3
 import java.util.Stack
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 
 /**
  * Apply transformations to paths command coordinates in a group
@@ -49,59 +46,51 @@ class BakeTransformations : Optimization {
     }
 
     private fun bakeIntoGroup(group: Group) {
-        val groupTransforms = group.attributes.foreign.keys intersect transformationPropertyNames
+        val groupTransform = group.attributes.transform
 
-        if (groupTransforms.isNotEmpty()) {
-            val groupTransform = computeTransformationMatrix(group)
+        val children = mutableListOf<Element>()
+        for (child in group.elements) {
+            if (child is Group) {
+                val childTransform = child.attributes.transform
+                val childForeignTransformations = child.attributes.foreign.filterKeys(TRANSFORM_KEYS::contains)
 
-            val children = mutableListOf<Element>()
-            for (child in group.elements) {
-                if (child is Group) {
-                    val childTransformations = child.attributes.foreign.keys intersect transformationPropertyNames
-                    val shared = groupTransforms intersect childTransformations
-                    val notShared = groupTransforms - childTransformations
+                if (childForeignTransformations.isEmpty()) {
+                    child.attributes.transform = groupTransform * childTransform
+                } else {
+                    // If the child has a foreign transform value (usually this means non-literal),
+                    // then merging isn't possible. Wrap the child in a new group with the
+                    // current group transform value and proceed to bake siblings in
+                    // case this child had other path element siblings.
 
-                    for (transformKey in notShared) {
-                        child.attributes.foreign[transformKey] = group.attributes.foreign.getValue(transformKey)
+                    for ((transform) in childForeignTransformations) {
+                        child.attributes.foreign.remove(transform)
                     }
 
-                    for (transformKey in shared) {
-                        val groupValue = group.attributes.foreign.getValue(transformKey).toFloat()
-                        val childValue = child.attributes.foreign.getValue(transformKey).toFloatOrNull()
+                    val syntheticGroup = Group(
+                        listOf(child),
+                        Group.Attributes(
+                            null,
+                            groupTransform * childTransform,
+                            childForeignTransformations.toMutableMap()
+                        ),
+                    )
 
-                        // If the child has a resource-specified value, then
-                        // merging isn't possible. Wrap the child in a new group with the
-                        // current group transform value and proceed to bake siblings in
-                        // case this child had other path element siblings.
-                        if (childValue == null) {
-                            val transforms = child.attributes.foreign.filterKeys { childTransformations.contains(it) }
-                            for ((transform) in transforms) {
-                                child.attributes.foreign.remove(transform)
-                            }
-
-                            children.add(Group(listOf(child), Group.Attributes(null, transforms.toMutableMap())))
-                            continue
-                        }
-
-                        child.attributes.foreign[transformKey] = when {
-                            transformKey.startsWith("android:scale") -> (childValue * groupValue).toString()
-                            transformKey == "android:rotation" -> ((childValue + groupValue) % 360).toString()
-                            else -> (childValue + groupValue).toString()
-                        }
-                        children.add(child)
-                    }
-                } else if (child is PathElement) {
-                    applyTransform(child, groupTransform)
-                    children.add(child)
+                    children.add(syntheticGroup)
                 }
-            }
+            } else if (child is PathElement) {
 
-            group.elements = children
+                if (groupTransform !== Matrix3.IDENTITY) {
+                    applyTransform(child, groupTransform)
+                }
 
-            for (transformAttribute in groupTransforms) {
-                group.attributes.foreign.remove(transformAttribute)
+                children.add(child)
             }
         }
+
+        // Transform is baked. We don't want to apply it twice.
+        group.attributes.transform = Matrix3.IDENTITY
+
+        group.elements = children
     }
 
     private fun applyTransform(element: PathElement, transform: Matrix3) {
@@ -358,66 +347,8 @@ class BakeTransformations : Optimization {
         }
     }
 
-    private fun computeTransformationMatrix(group: Group): Matrix3 {
-        val scaleX = group.attributes.foreign["android:scaleX"]?.toFloat()
-        val scaleY = group.attributes.foreign["android:scaleY"]?.toFloat()
-
-        val translationX = group.attributes.foreign["android:translateX"]?.toFloat()
-        val translationY = group.attributes.foreign["android:translateY"]?.toFloat()
-
-        val pivotX = group.attributes.foreign["android:pivotX"]?.toFloat()
-        val pivotY = group.attributes.foreign["android:pivotY"]?.toFloat()
-
-        val rotation = group.attributes.foreign["android:rotation"]?.toFloat()
-
-        val scale = Matrix3.from(
-            arrayOf(
-                floatArrayOf(scaleX ?: 1f, 0f, 0f),
-                floatArrayOf(0f, scaleY ?: 1f, 0f),
-                floatArrayOf(0f, 0f, 1f)
-            )
-        )
-
-        val translation = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, translationX ?: 0f),
-                floatArrayOf(0f, 1f, translationY ?: 0f),
-                floatArrayOf(0f, 0f, 1f)
-            )
-        )
-
-        val pivot = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, pivotX ?: 0f),
-                floatArrayOf(0f, 1f, pivotY ?: 0f),
-                floatArrayOf(0f, 0f, 1f)
-            )
-        )
-
-        val pivotInverse = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1),
-                floatArrayOf(0f, 1f, (pivotY ?: 0f) * -1),
-                floatArrayOf(0f, 0f, 1f)
-            )
-        )
-
-        val rotate = rotation?.let {
-            val radians = it * PI.toFloat() / 180f
-            Matrix3.from(
-                arrayOf(
-                    floatArrayOf(cos(radians), -sin(radians), 0f),
-                    floatArrayOf(sin(radians), cos(radians), 0f),
-                    floatArrayOf(0f, 0f, 1f)
-                )
-            )
-        } ?: Matrix3.IDENTITY
-
-        return listOf(pivot, translation, rotate, scale, pivotInverse).reduce(Matrix3::times)
-    }
-
     companion object {
-        private val transformationPropertyNames = setOf(
+        private val TRANSFORM_KEYS = hashSetOf(
             "android:scaleX",
             "android:scaleY",
             "android:translateX",

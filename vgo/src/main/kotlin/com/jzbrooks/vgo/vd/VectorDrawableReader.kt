@@ -5,6 +5,7 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.xml.asSequence
 import com.jzbrooks.vgo.core.util.xml.removeOrNull
 import com.jzbrooks.vgo.core.util.xml.toMutableMap
@@ -13,6 +14,9 @@ import org.w3c.dom.Comment
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
 import org.w3c.dom.Text
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 private val HEX_WITH_ALPHA = Regex("#[a-fA-F\\d]{8}")
 
@@ -116,6 +120,7 @@ private fun NamedNodeMap.toClipPathAttributes() = ClipPath.Attributes(
 
 private fun NamedNodeMap.toGroupAttributes() = Group.Attributes(
     removeOrNull("android:name")?.nodeValue,
+    computeTransformationMatrix(),
     toMutableMap(),
 )
 
@@ -123,3 +128,78 @@ private fun NamedNodeMap.toExtraAttributes() = Extra.Attributes(
     removeOrNull("android:name")?.nodeValue,
     toMutableMap(),
 )
+
+private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
+    val scaleX = removeFloatOrNull("android:scaleX")
+    val scaleY = removeFloatOrNull("android:scaleY")
+
+    val translationX = removeFloatOrNull("android:translateX")
+    val translationY = removeFloatOrNull("android:translateY")
+
+    val pivotX = removeFloatOrNull("android:pivotX")
+    val pivotY = removeFloatOrNull("android:pivotY")
+
+    val rotation = removeFloatOrNull("android:rotation")
+
+    if (scaleX == null && scaleY == null &&
+        translationX == null && translationY == null &&
+        pivotX == null && pivotY == null && rotation == null
+    ) return Matrix3.IDENTITY
+
+    val scale = Matrix3.from(
+        arrayOf(
+            floatArrayOf(scaleX ?: 1f, 0f, 0f),
+            floatArrayOf(0f, scaleY ?: 1f, 0f),
+            floatArrayOf(0f, 0f, 1f)
+        )
+    )
+
+    val translation = Matrix3.from(
+        arrayOf(
+            floatArrayOf(1f, 0f, translationX ?: 0f),
+            floatArrayOf(0f, 1f, translationY ?: 0f),
+            floatArrayOf(0f, 0f, 1f)
+        )
+    )
+
+    val pivot = Matrix3.from(
+        arrayOf(
+            floatArrayOf(1f, 0f, pivotX ?: 0f),
+            floatArrayOf(0f, 1f, pivotY ?: 0f),
+            floatArrayOf(0f, 0f, 1f)
+        )
+    )
+
+    val pivotInverse = Matrix3.from(
+        arrayOf(
+            floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1),
+            floatArrayOf(0f, 1f, (pivotY ?: 0f) * -1),
+            floatArrayOf(0f, 0f, 1f)
+        )
+    )
+
+    val rotate = if (rotation != null) {
+        val radians = rotation * PI.toFloat() / 180f
+        Matrix3.from(
+            arrayOf(
+                floatArrayOf(cos(radians), -sin(radians), 0f),
+                floatArrayOf(sin(radians), cos(radians), 0f),
+                floatArrayOf(0f, 0f, 1f)
+            )
+        )
+    } else {
+        Matrix3.IDENTITY
+    }
+
+    return listOf(pivot, translation, rotate, scale, pivotInverse).reduce(Matrix3::times)
+}
+
+private fun NamedNodeMap.removeFloatOrNull(key: String): Float? {
+    val value = getNamedItem(key)?.nodeValue?.toFloatOrNull()
+
+    if (value != null) {
+        removeNamedItem(key)
+    }
+
+    return value
+}

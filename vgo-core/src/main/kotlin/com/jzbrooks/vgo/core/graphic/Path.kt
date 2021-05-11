@@ -8,5 +8,5 @@ data class Path(
     override var attributes: Attributes = Attributes(null, mutableMapOf()) // todo: maybe remove the default?
 ) : PathElement {
 
-    data class Attributes(override val name: String?, override val foreign: MutableMap<String, String>) : CoreAttributes
+    data class Attributes(override val id: String?, override val foreign: MutableMap<String, String>) : CoreAttributes
 }

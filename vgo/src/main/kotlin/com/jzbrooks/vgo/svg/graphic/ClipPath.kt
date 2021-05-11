@@ -9,5 +9,5 @@ data class ClipPath(
     override val attributes: Attributes = Attributes(null, mutableMapOf()),
 ) : ContainerElement {
 
-    data class Attributes(override val name: String?, override val foreign: MutableMap<String, String>) : CoreAttributes
+    data class Attributes(override val id: String?, override val foreign: MutableMap<String, String>) : CoreAttributes
 }

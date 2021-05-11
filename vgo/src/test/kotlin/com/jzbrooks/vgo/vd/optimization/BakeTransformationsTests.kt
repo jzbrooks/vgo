@@ -17,23 +17,34 @@ import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.util.assertk.containsKey
 import com.jzbrooks.vgo.util.assertk.doesNotContainKey
 import org.junit.jupiter.api.Test
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 class BakeTransformationsTests {
     @Test
     fun testAvoidCrashIfParsedPathDataDoesNotExist() {
+        val transform = Matrix3.from(
+            arrayOf(
+                floatArrayOf(1f, 0f, 14f),
+                floatArrayOf(0f, 1f, 14f),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        )
         val group = Group(
             listOf(Path(emptyList())),
-            Group.Attributes(null, mutableMapOf("android:translateX" to "14", "android:translateY" to "14"))
+            Group.Attributes(null, transform, mutableMapOf())
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
             override val attributes: Attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         })
@@ -55,6 +66,7 @@ class BakeTransformationsTests {
             ),
             Group.Attributes(
                 null,
+                Matrix3.IDENTITY,
                 mutableMapOf("android:translateX" to "@integer/translating_thing")
             )
         )
@@ -62,7 +74,7 @@ class BakeTransformationsTests {
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
             override val attributes: Attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         })
@@ -72,6 +84,14 @@ class BakeTransformationsTests {
 
     @Test
     fun testAvoidCrashIfASharedTransformIsSpecifiedByResource() {
+        val transform = Matrix3.from(
+            arrayOf(
+                floatArrayOf(1f, 0f, 15f),
+                floatArrayOf(0f, 1f, 0f),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        )
+
         val group = Group(
             listOf(
                 Group(
@@ -85,20 +105,18 @@ class BakeTransformationsTests {
                     ),
                     Group.Attributes(
                         null,
+                        Matrix3.IDENTITY,
                         mutableMapOf("android:translateX" to "@integer/translating_thing")
                     )
                 )
             ),
-            Group.Attributes(
-                null,
-                mutableMapOf("android:translateX" to "15")
-            )
+            Group.Attributes(null, transform, mutableMapOf())
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
             override val attributes: Attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         })
@@ -113,6 +131,14 @@ class BakeTransformationsTests {
 
     @Test
     fun testTransformationAttributesRemoved() {
+        val transform = Matrix3.from(
+            arrayOf(
+                floatArrayOf(1f, 0f, 14f),
+                floatArrayOf(0f, 1f, 14f),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        )
+
         val group = Group(
             listOf(
                 Path(
@@ -122,16 +148,13 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(
-                null,
-                mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
-            )
+            Group.Attributes(null, transform, mutableMapOf())
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
             override val attributes: Attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         })
@@ -142,6 +165,14 @@ class BakeTransformationsTests {
 
     @Test
     fun testAncestorGroupTransformationAppliedToPathElements() {
+        val transform = Matrix3.from(
+            arrayOf(
+                floatArrayOf(1f, 0f, 14f),
+                floatArrayOf(0f, 1f, 14f),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        )
+
         val group = Group(
             listOf(
                 Path(
@@ -151,16 +182,13 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(
-                null,
-                mutableMapOf("android:translateX" to "14", "android:translateY" to "14")
-            )
+            Group.Attributes(null, transform, mutableMapOf())
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
             override val attributes: Attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         })
@@ -175,6 +203,14 @@ class BakeTransformationsTests {
 
     @Test
     fun testBakeHandlesRelativeCommands() {
+        val transform = Matrix3.from(
+            arrayOf(
+                floatArrayOf(1f, 0f, 14f),
+                floatArrayOf(0f, 1f, 14f),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        )
+
         val group = Group(
             listOf(
                 Path(
@@ -186,16 +222,13 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(
-                null,
-                mutableMapOf("android:translateX" to "14", "android:translateY" to "14"),
-            )
+            Group.Attributes(null, transform, mutableMapOf())
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
             override val attributes: Attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         })
@@ -212,6 +245,15 @@ class BakeTransformationsTests {
 
     @Test
     fun testGroupRotationApplied() {
+        val rad = (90.0 * PI / 180.0).toFloat()
+        val rotationMatrix = Matrix3.from(
+            arrayOf(
+                floatArrayOf(cos(rad), -sin(rad), 0f),
+                floatArrayOf(sin(rad), cos(rad), 0f),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        )
+
         val group = Group(
             listOf(
                 Path(
@@ -221,13 +263,13 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(null, mutableMapOf("android:rotation" to "90"))
+            Group.Attributes(null, rotationMatrix, mutableMapOf())
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
             override val attributes: Attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         })
@@ -244,6 +286,33 @@ class BakeTransformationsTests {
 
     @Test
     fun testGroupRotationAppliedWithSequentialRelativeCommands() {
+        val rad = (15.0 * PI / 180.0).toFloat()
+        val rotationMatrix = Matrix3.from(
+            arrayOf(
+                floatArrayOf(cos(rad), -sin(rad), 0f),
+                floatArrayOf(sin(rad), cos(rad), 0f),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        )
+
+        val pivot = Matrix3.from(
+            arrayOf(
+                floatArrayOf(1f, 0f, 10f),
+                floatArrayOf(0f, 1f, 10f),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        )
+
+        val pivotInverse = Matrix3.from(
+            arrayOf(
+                floatArrayOf(1f, 0f, -10f),
+                floatArrayOf(0f, 1f, -10f),
+                floatArrayOf(0f, 0f, 1f),
+            )
+        )
+
+        val transform = pivot * rotationMatrix * pivotInverse
+
         val group = Group(
             listOf(
                 Path(
@@ -256,16 +325,13 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(
-                null,
-                mutableMapOf("android:pivotX" to "10", "android:pivotY" to "10", "android:rotation" to "15")
-            )
+            Group.Attributes(null, transform, mutableMapOf())
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
             override val attributes: Attributes = object : Attributes {
-                override val name: String? = null
+                override val id: String? = null
                 override val foreign: MutableMap<String, String> = mutableMapOf()
             }
         })

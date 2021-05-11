@@ -5,19 +5,31 @@ import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
+import java.math.RoundingMode
+import java.text.DecimalFormat
 import java.util.Collections.emptySet
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import kotlin.math.abs
+import kotlin.math.atan
+import kotlin.math.hypot
 
 class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()) : Writer<VectorDrawable> {
 
     private val commandPrinter = VectorDrawableCommandPrinter(3)
+
+    private val formatter = DecimalFormat().apply {
+        maximumFractionDigits = 2 // todo: parameterize?
+        isDecimalSeparatorAlwaysShown = false
+        roundingMode = RoundingMode.HALF_UP
+    }
 
     override fun write(graphic: VectorDrawable, stream: OutputStream) {
         val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
@@ -25,7 +37,7 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
 
         val root = document.createElement("vector")
 
-        val elementName = graphic.attributes.name
+        val elementName = graphic.attributes.id
         if (elementName != null) {
             root.setAttribute("android:name", elementName)
         }
@@ -51,9 +63,16 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                 }
             }
             is Group -> {
-                document.createElement("group").also {
+                document.createElement("group").also { node ->
+                    // There's no reason to output the transforms if the
+                    // value of the transform is referentially equal to the
+                    // identity matrix constant
+                    if (element.attributes.transform !== Matrix3.IDENTITY) {
+                        writeTransforms(element, node)
+                    }
+
                     for (child in element.elements) {
-                        write(it, child, document)
+                        write(node, child, document)
                     }
                 }
             }
@@ -74,15 +93,48 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         }
 
         if (node != null) {
-            val elementName = element.attributes.name
+            val elementName = element.attributes.id
             if (elementName != null) {
                 node.setAttribute("android:name", elementName)
             }
 
-            for (item in element.attributes.foreign) {
-                node.setAttribute(item.key, item.value)
+            for ((key, value) in element.attributes.foreign) {
+                node.setAttribute(key, value)
             }
+
             parent.appendChild(node)
+        }
+    }
+
+    private fun writeTransforms(group: Group, node: org.w3c.dom.Element) {
+        val a = group.attributes.transform[0, 0]
+        val b = group.attributes.transform[0, 1]
+        val c = group.attributes.transform[1, 0]
+        val d = group.attributes.transform[1, 1]
+        val e = group.attributes.transform[0, 2]
+        val f = group.attributes.transform[1, 2]
+
+        if (abs(e) >= 0.01f) {
+            node.setAttribute("android:translateX", formatter.format(e))
+        }
+
+        if (abs(f) >= 0.01f) {
+            node.setAttribute("android:translateY", formatter.format(f))
+        }
+
+        val scaleX = hypot(a, c)
+        if (abs(scaleX) >= 1.01f) {
+            node.setAttribute("android:scaleX", formatter.format(scaleX))
+        }
+
+        val scaleY = hypot(b, d)
+        if (abs(scaleY) != 1.01f) {
+            node.setAttribute("android:scaleY", formatter.format(scaleY))
+        }
+
+        val rotation = atan(c / d)
+        if (abs(rotation) >= 0.01f) {
+            node.setAttribute("android:rotation", formatter.format(rotation))
         }
     }
 

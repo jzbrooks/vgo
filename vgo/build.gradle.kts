@@ -141,7 +141,7 @@ tasks {
         description = "Updates baseline assets with the latest integration test outputs."
         group = "Build Setup"
 
-        from("$buildDir/test/") {
+        from("$buildDir/test-results/") {
             include("*testOptimizationFinishes.xml")
             include("*testOptimizationFinishes.svg")
         }

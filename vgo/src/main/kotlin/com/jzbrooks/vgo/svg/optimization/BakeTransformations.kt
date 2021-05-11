@@ -30,24 +30,19 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
     }
 
     private fun bakeIntoGroup(group: Group) {
-        val groupTransforms = group.attributes.foreign.keys intersect transformationPropertyNames
+        val groupTransform = group.attributes.transform
 
-        if (groupTransforms.isNotEmpty()) {
-            val groupTransform = computeTransformationMatrix(group)
-
-            // We can only do transform baking if everything in the group can be transform baked
-            // todo: handle baking nested groups
-            if (group.elements.count { it is PathElement } == group.elements.size) {
-                for (child in group.elements) {
-                    if (child is PathElement) {
-                        applyTransform(child, groupTransform)
-                    }
-                }
-
-                for (transformAttribute in groupTransforms) {
-                    group.attributes.foreign.remove(transformAttribute)
+        // We can only do transform baking if everything in the group can be transform baked
+        // todo: handle baking nested groups
+        if (groupTransform != Matrix3.IDENTITY && group.elements.count { it is PathElement } == group.elements.size) {
+            for (child in group.elements) {
+                if (child is PathElement) {
+                    applyTransform(child, groupTransform)
                 }
             }
+
+            // Transforms are baked. Don't apply them again when rendering.
+            group.attributes.transform = Matrix3.IDENTITY
         }
     }
 
@@ -302,32 +297,5 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                 else -> throw IllegalStateException("Unexpected command: $command")
             }
         }
-    }
-
-    private fun computeTransformationMatrix(group: Group): Matrix3 {
-        // todo: handle other transform types
-        val transformValue = group.attributes.foreign["transform"]
-        return if (transformValue != null) {
-            val f = transformValueRegex.find(transformValue)!!
-            val values = f.groupValues[1].split(',').map { it.toFloat() }
-
-            // matrix(a, b, c, d, e, f)
-            // ->
-            // [a, c, e]
-            // [b, d, f]
-            // [0, 0, 1]
-            val firstRow = floatArrayOf(values[0], values[2], values[4])
-            val secondRow = floatArrayOf(values[1], values[3], values[5])
-
-            Matrix3.from(arrayOf(firstRow, secondRow, floatArrayOf(0f, 0f, 1f)))
-        } else {
-            Matrix3.IDENTITY
-        }
-    }
-
-    companion object {
-        private val transformationPropertyNames = setOf("transform")
-        private val number = Regex("""[-+]?(?:\d*\.\d+|\d+\.?)([eE][-+]?\d+)?""")
-        private val transformValueRegex = Regex("""matrix\(((?:(?:${number.pattern})(?:,\s?)?){6})\)""")
     }
 }

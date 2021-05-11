@@ -7,8 +7,6 @@ import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.svg.graphic.ClipPath
 import com.jzbrooks.vgo.vd.VectorDrawable
-import kotlin.math.atan
-import kotlin.math.hypot
 import com.jzbrooks.vgo.vd.graphic.ClipPath as AndroidClipPath
 
 private val namedColorValues = mapOf(
@@ -191,7 +189,7 @@ private fun traverse(element: Element): Element {
 private fun process(containerElement: ContainerElement): Element {
     val clipPaths = containerElement.elements
         .filterIsInstance<ClipPath>()
-        .associateBy { it.attributes.name }
+        .associateBy { it.attributes.id }
 
     val newElements = mutableListOf<Element>()
     for (element in containerElement.elements.filter { it !is ClipPath }) {
@@ -204,7 +202,7 @@ private fun process(containerElement: ContainerElement): Element {
             val clip = clipPaths.getValue(id)
             val vdClipPaths = clip.elements
                 .filterIsInstance<Path>()
-                .map { AndroidClipPath(it.commands, AndroidClipPath.Attributes(it.attributes.name, it.attributes.foreign.toMutableMap())) }
+                .map { AndroidClipPath(it.commands, AndroidClipPath.Attributes(it.attributes.id, it.attributes.foreign.toMutableMap())) }
 
             // I'm not sure grouping clip paths like this
             // is a very good long-term solution, but it works
@@ -217,10 +215,6 @@ private fun process(containerElement: ContainerElement): Element {
             newElements.add(element)
         }
     }
-
-    val newAttributes = convertContainerElementAttributes(containerElement.attributes.foreign.toMutableMap())
-    containerElement.attributes.foreign.clear()
-    containerElement.attributes.foreign.putAll(newAttributes)
 
     return containerElement.apply { elements = newElements.map(::traverse) }
 }
@@ -240,49 +234,6 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
     vdPathElementAttributes.putIfAbsent("android:strokeWidth", "1")
 
     return vdPathElementAttributes
-}
-
-private fun convertContainerElementAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
-    val vdContainerElements: MutableMap<String, String> = mapAttributes(attributes)
-
-    vdContainerElements.remove("transform")?.let { matrix ->
-        val entries = matrix.removePrefix("matrix(")
-            .trimEnd(')')
-            .split(',')
-            .map { it.trim() }
-
-        val a = entries[0].toDouble()
-        val b = entries[2].toDouble()
-        val c = entries[1].toDouble()
-        val d = entries[3].toDouble()
-
-        if (entries[4] != "0") {
-            vdContainerElements["android:translateX"] = entries[4]
-        }
-
-        if (entries[5] != "0") {
-            vdContainerElements["android:translateY"] = entries[5]
-        }
-
-        // todo(jzb): truncate at some precision
-        // todo(jzb): compare floats with some epsilon
-        val scaleX = hypot(a, c)
-        if (scaleX != 1.0) {
-            vdContainerElements["android:scaleX"] = scaleX.toString()
-        }
-
-        val scaleY = hypot(b, d)
-        if (scaleY != 1.0) {
-            vdContainerElements["android:scaleY"] = scaleY.toString()
-        }
-
-        val rotation = atan(c / d)
-        if (rotation != 0.0) {
-            vdContainerElements["android:rotation"] = rotation.toString()
-        }
-    }
-
-    return vdContainerElements
 }
 
 private fun convertTopLevelAttributes(attributes: ScalableVectorGraphic.Attributes): VectorDrawable.Attributes {
@@ -319,7 +270,7 @@ private fun convertTopLevelAttributes(attributes: ScalableVectorGraphic.Attribut
 
     vdElementAttributes.putAll(mapAttributes(foreignAttributes))
 
-    return VectorDrawable.Attributes(attributes.name, vdElementAttributes)
+    return VectorDrawable.Attributes(attributes.id, vdElementAttributes)
 }
 
 private fun mapAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {

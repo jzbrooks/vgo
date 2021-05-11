@@ -89,6 +89,7 @@ private fun NamedNodeMap.toClipPathAttributes() = ClipPath.Attributes(
 
 private fun NamedNodeMap.toGroupAttributes() = Group.Attributes(
     removeOrNull("id")?.nodeValue,
+    extractTransformMatrix(),
     toMutableMap(),
 )
 
@@ -97,8 +98,22 @@ private fun NamedNodeMap.toExtraAttributes() = Extra.Attributes(
     toMutableMap(),
 )
 
-// todo: implement this
-private fun NamedNodeMap.extractTransformMatrix(): Matrix3 = Matrix3.IDENTITY
+private fun NamedNodeMap.extractTransformMatrix(): Matrix3 {
+    val transform = removeOrNull("transform")?.nodeValue ?: return Matrix3.IDENTITY
+
+    val entries = transform.removePrefix("matrix(")
+        .trimEnd(')')
+        .split(',')
+        .map(String::toFloat)
+
+    return Matrix3.from(
+        arrayOf(
+            floatArrayOf(entries[0], entries[2], entries[4]),
+            floatArrayOf(entries[1], entries[3], entries[5]),
+            floatArrayOf(0f, 0f, 1f),
+        )
+    )
+}
 
 // todo(optimization): Make this Map<String, Color>
 private val NAMED_COLORS = mapOf(
