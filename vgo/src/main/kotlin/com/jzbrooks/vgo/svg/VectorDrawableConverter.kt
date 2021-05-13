@@ -175,7 +175,44 @@ private val attributeNames = mapOf(
 
 fun ScalableVectorGraphic.toVectorDrawable(): VectorDrawable {
     val graphic = traverse(this) as ContainerElement
-    return VectorDrawable(graphic.elements, convertTopLevelAttributes(attributes))
+
+    foreign.remove("xmlns")
+
+    val viewBox = foreign.remove("viewBox")!!.split(" ")
+
+    val width = run {
+        val w = foreign.remove("width")
+        if (w != null && !w.endsWith('%')) {
+            w
+        } else {
+            viewBox[2]
+        }
+    }
+
+    val height = run {
+        val h = foreign.remove("height")
+        if (h != null && !h.endsWith('%')) {
+            h
+        } else {
+            viewBox[3]
+        }
+    }
+
+    val vdElementAttributes = mutableMapOf(
+        "xmlns:android" to "http://schemas.android.com/apk/res/android",
+        "android:viewportWidth" to viewBox[2],
+        "android:viewportHeight" to viewBox[3],
+        "android:width" to "${width}dp",
+        "android:height" to "${height}dp"
+    )
+
+    vdElementAttributes.putAll(mapAttributes(foreign))
+
+    return VectorDrawable(
+        graphic.elements,
+        graphic.id,
+        vdElementAttributes,
+    )
 }
 
 private fun traverse(element: Element): Element {
@@ -189,12 +226,12 @@ private fun traverse(element: Element): Element {
 private fun process(containerElement: ContainerElement): Element {
     val clipPaths = containerElement.elements
         .filterIsInstance<ClipPath>()
-        .associateBy { it.attributes.id }
+        .associateBy { it.id }
 
     val newElements = mutableListOf<Element>()
     for (element in containerElement.elements.filter { it !is ClipPath }) {
-        if (element.attributes.foreign.containsKey("clip-path")) {
-            val id = element.attributes.foreign
+        if (element.foreign.containsKey("clip-path")) {
+            val id = element.foreign
                 .remove("clip-path")!!
                 .removePrefix("url(#")
                 .trimEnd(')')
@@ -202,7 +239,7 @@ private fun process(containerElement: ContainerElement): Element {
             val clip = clipPaths.getValue(id)
             val vdClipPaths = clip.elements
                 .filterIsInstance<Path>()
-                .map { AndroidClipPath(it.commands, AndroidClipPath.Attributes(it.attributes.id, it.attributes.foreign.toMutableMap())) }
+                .map { AndroidClipPath(it.commands, it.id, it.foreign.toMutableMap()) }
 
             // I'm not sure grouping clip paths like this
             // is a very good long-term solution, but it works
@@ -221,9 +258,9 @@ private fun process(containerElement: ContainerElement): Element {
 
 private fun process(pathElement: PathElement): Element {
     return pathElement.apply {
-        val newElements = convertPathElementAttributes(attributes.foreign.toMutableMap())
-        attributes.foreign.clear()
-        attributes.foreign.putAll(newElements)
+        val newElements = convertPathElementAttributes(pathElement.foreign.toMutableMap())
+        pathElement.foreign.clear()
+        pathElement.foreign.putAll(newElements)
     }
 }
 
@@ -234,43 +271,6 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
     vdPathElementAttributes.putIfAbsent("android:strokeWidth", "1")
 
     return vdPathElementAttributes
-}
-
-private fun convertTopLevelAttributes(attributes: ScalableVectorGraphic.Attributes): VectorDrawable.Attributes {
-    val foreignAttributes = attributes.foreign
-    foreignAttributes.remove("xmlns")
-
-    val viewBox = foreignAttributes.remove("viewBox")!!.split(" ")
-
-    val width = run {
-        val w = foreignAttributes.remove("width")
-        if (w != null && !w.endsWith('%')) {
-            w
-        } else {
-            viewBox[2]
-        }
-    }
-
-    val height = run {
-        val h = foreignAttributes.remove("height")
-        if (h != null && !h.endsWith('%')) {
-            h
-        } else {
-            viewBox[3]
-        }
-    }
-
-    val vdElementAttributes = mutableMapOf(
-        "xmlns:android" to "http://schemas.android.com/apk/res/android",
-        "android:viewportWidth" to viewBox[2],
-        "android:viewportHeight" to viewBox[3],
-        "android:width" to "${width}dp",
-        "android:height" to "${height}dp"
-    )
-
-    vdElementAttributes.putAll(mapAttributes(foreignAttributes))
-
-    return VectorDrawable.Attributes(attributes.id, vdElementAttributes)
 }
 
 private fun mapAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {

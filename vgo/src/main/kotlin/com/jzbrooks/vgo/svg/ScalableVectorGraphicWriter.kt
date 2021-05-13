@@ -35,11 +35,11 @@ class ScalableVectorGraphicWriter(
         val document = builder.newDocument()
 
         val root = document.createElement("svg")
-        val elementName = graphic.attributes.id
+        val elementName = graphic.id
         if (elementName != null) {
             root.setAttribute("id", elementName)
         }
-        for (item in graphic.attributes.foreign) {
+        for (item in graphic.foreign) {
             root.setAttribute(item.key, item.value)
         }
         document.appendChild(root)
@@ -61,8 +61,8 @@ class ScalableVectorGraphicWriter(
             }
             is Group -> {
                 document.createElement("g").also { node ->
-                    if (element.attributes.transform !== Matrix3.IDENTITY) {
-                        val matrix = element.attributes.transform
+                    if (element.transform !== Matrix3.IDENTITY) {
+                        val matrix = element.transform
                         val matrixElements = listOf(
                             formatter.format(matrix[0, 0]),
                             formatter.format(matrix[1, 0]),
@@ -98,11 +98,11 @@ class ScalableVectorGraphicWriter(
         }
 
         if (node != null) {
-            val elementName = element.attributes.id
+            val elementName = element.id
             if (elementName != null) {
                 node.setAttribute("id", elementName)
             }
-            for (item in element.attributes.foreign) {
+            for (item in element.foreign) {
                 node.setAttribute(item.key, item.value)
             }
             parent.appendChild(node)

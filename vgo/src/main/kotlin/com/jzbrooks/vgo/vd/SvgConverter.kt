@@ -12,7 +12,20 @@ private val hexWithAlpha = Regex("#[a-fA-F\\d]{8}")
 
 fun VectorDrawable.toSvg(): ScalableVectorGraphic {
     val graphic = traverse(this) as ContainerElement
-    return ScalableVectorGraphic(graphic.elements, convertTopLevelAttributes(attributes))
+
+    val viewportHeight = foreign.remove("android:viewportHeight") ?: "24"
+    val viewportWidth = foreign.remove("android:viewportWidth") ?: "24"
+    foreign.remove("xmlns:android")
+
+    val svgElementAttributes = mutableMapOf(
+        "xmlns" to "http://www.w3.org/2000/svg",
+        "viewPort" to "0 0 $viewportWidth $viewportHeight"
+    )
+
+    svgElementAttributes["width"] = "100%"
+    svgElementAttributes["height"] = "100%"
+
+    return ScalableVectorGraphic(graphic.elements, id, svgElementAttributes)
 }
 
 private fun traverse(element: Element): Element {
@@ -30,11 +43,11 @@ private fun process(containerElement: ContainerElement): Element {
     for ((index, element) in containerElement.elements.withIndex()) {
         if (element !is ClipPath) {
             if (defs != null) {
-                element.attributes.foreign["clip-path"] = "url(#${defs.attributes.id})"
+                element.foreign["clip-path"] = "url(#${defs.id})"
             }
             newElements.add(traverse(element))
         } else {
-            defs = Extra("defs", listOf(Path(element.commands)), Extra.Attributes("clip_$index", mutableMapOf()))
+            defs = Extra("defs", listOf(Path(element.commands)), "clip_$index", mutableMapOf())
         }
     }
 
@@ -47,9 +60,9 @@ private fun process(containerElement: ContainerElement): Element {
 
 private fun process(pathElement: PathElement): Element {
     return pathElement.apply {
-        val newElements = convertPathElementAttributes(attributes.foreign.toMutableMap())
-        attributes.foreign.clear()
-        attributes.foreign.putAll(newElements)
+        val newElements = convertPathElementAttributes(foreign.toMutableMap())
+        foreign.clear()
+        foreign.putAll(newElements)
     }
 }
 
@@ -87,22 +100,4 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
     attributes.clear()
 
     return svgPathElementAttributes
-}
-
-private fun convertTopLevelAttributes(attributes: VectorDrawable.Attributes): ScalableVectorGraphic.Attributes {
-    val foreignAttributes = attributes.foreign
-
-    val viewportHeight = foreignAttributes.remove("android:viewportHeight") ?: "24"
-    val viewportWidth = foreignAttributes.remove("android:viewportWidth") ?: "24"
-    foreignAttributes.remove("xmlns:android")
-
-    val svgElementAttributes = mutableMapOf(
-        "xmlns" to "http://www.w3.org/2000/svg",
-        "viewPort" to "0 0 $viewportWidth $viewportHeight"
-    )
-
-    svgElementAttributes["width"] = "100%"
-    svgElementAttributes["height"] = "100%"
-
-    return ScalableVectorGraphic.Attributes(attributes.id, svgElementAttributes)
 }

@@ -6,7 +6,6 @@ import assertk.assertions.containsExactly
 import assertk.assertions.doesNotContain
 import assertk.assertions.isCloseTo
 import assertk.assertions.isEqualTo
-import com.jzbrooks.vgo.core.graphic.Attributes
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
@@ -38,19 +37,20 @@ class BakeTransformationsTests {
         )
         val group = Group(
             listOf(Path(emptyList())),
-            Group.Attributes(null, transform, mutableMapOf())
+            null,
+            mutableMapOf(),
+            transform,
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override val attributes: Attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         })
 
-        assertThat(group.attributes.foreign).doesNotContainKey("android:translateX")
-        assertThat(group.attributes.foreign).doesNotContainKey("android:translateY")
+        assertThat(group.foreign).doesNotContainKey("android:translateX")
+        assertThat(group.foreign).doesNotContainKey("android:translateY")
     }
 
     @Test
@@ -64,22 +64,19 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(
-                null,
-                Matrix3.IDENTITY,
-                mutableMapOf("android:translateX" to "@integer/translating_thing")
-            )
+            null,
+            mutableMapOf("android:translateX" to "@integer/translating_thing"),
+            Matrix3.IDENTITY,
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override val attributes: Attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         })
 
-        assertThat(group.attributes.foreign).containsKey("android:translateX")
+        assertThat(group.foreign).containsKey("android:translateX")
     }
 
     @Test
@@ -103,30 +100,29 @@ class BakeTransformationsTests {
                             )
                         )
                     ),
-                    Group.Attributes(
-                        null,
-                        Matrix3.IDENTITY,
-                        mutableMapOf("android:translateX" to "@integer/translating_thing")
-                    )
+                    null,
+                    mutableMapOf("android:translateX" to "@integer/translating_thing"),
+                    Matrix3.IDENTITY,
                 )
             ),
-            Group.Attributes(null, transform, mutableMapOf())
+            null,
+            mutableMapOf(),
+            transform,
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override val attributes: Attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         })
 
         val insertedGroup = group.elements.first() as Group
         val originalNestedGroup = insertedGroup.elements.first() as Group
 
-        assertThat(group.attributes.foreign).doesNotContain("android:translateX", "15")
-        assertThat(insertedGroup.attributes.foreign).contains("android:translateX", "@integer/translating_thing")
-        assertThat(originalNestedGroup.attributes.foreign).doesNotContain("android:translateX", "@integer/translating_thing")
+        assertThat(group.foreign).doesNotContain("android:translateX", "15")
+        assertThat(insertedGroup.foreign).contains("android:translateX", "@integer/translating_thing")
+        assertThat(originalNestedGroup.foreign).doesNotContain("android:translateX", "@integer/translating_thing")
     }
 
     @Test
@@ -148,19 +144,20 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(null, transform, mutableMapOf())
+            null,
+            mutableMapOf(),
+            transform,
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override val attributes: Attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         })
 
-        assertThat(group.attributes.foreign).doesNotContainKey("android:translateX")
-        assertThat(group.attributes.foreign).doesNotContainKey("android:translateY")
+        assertThat(group.foreign).doesNotContainKey("android:translateX")
+        assertThat(group.foreign).doesNotContainKey("android:translateY")
     }
 
     @Test
@@ -182,15 +179,16 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(null, transform, mutableMapOf())
+            null,
+            mutableMapOf(),
+            transform,
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override val attributes: Attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         })
 
         val path = group.elements.first() as Path
@@ -222,15 +220,16 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(null, transform, mutableMapOf())
+            null,
+            mutableMapOf(),
+            transform,
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override val attributes: Attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         })
 
         val path = group.elements.first() as Path
@@ -263,15 +262,16 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(null, rotationMatrix, mutableMapOf())
+            null,
+            mutableMapOf(),
+            rotationMatrix,
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override val attributes: Attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         })
 
         val path = group.elements.first() as Path
@@ -325,15 +325,15 @@ class BakeTransformationsTests {
                     )
                 )
             ),
-            Group.Attributes(null, transform, mutableMapOf())
+            null,
+            mutableMapOf(),
+            transform,
         )
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override val attributes: Attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         })
 
         val path = group.elements.first() as Path

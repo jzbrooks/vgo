@@ -30,7 +30,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
     }
 
     private fun bakeIntoGroup(group: Group) {
-        val groupTransform = group.attributes.transform
+        val groupTransform = group.transform
 
         // We can only do transform baking if everything in the group can be transform baked
         // todo: handle baking nested groups
@@ -42,7 +42,7 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
             }
 
             // Transforms are baked. Don't apply them again when rendering.
-            group.attributes.transform = Matrix3.IDENTITY
+            group.transform = Matrix3.IDENTITY
         }
     }
 

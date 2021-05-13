@@ -34,7 +34,7 @@ class BakeTransformations : Optimization {
 
     private fun topDownTraverse(element: Element): Element {
         return when {
-            element is Group && element.attributes.foreign.values.none { it.startsWith("@") } -> {
+            element is Group && element.foreign.values.none { it.startsWith("@") } -> {
                 bakeIntoGroup(element)
                 element.apply { elements.map(::topDownTraverse) }
             }
@@ -46,16 +46,16 @@ class BakeTransformations : Optimization {
     }
 
     private fun bakeIntoGroup(group: Group) {
-        val groupTransform = group.attributes.transform
+        val groupTransform = group.transform
 
         val children = mutableListOf<Element>()
         for (child in group.elements) {
             if (child is Group) {
-                val childTransform = child.attributes.transform
-                val childForeignTransformations = child.attributes.foreign.filterKeys(TRANSFORM_KEYS::contains)
+                val childTransform = child.transform
+                val childForeignTransformations = child.foreign.filterKeys(TRANSFORM_KEYS::contains)
 
                 if (childForeignTransformations.isEmpty()) {
-                    child.attributes.transform = groupTransform * childTransform
+                    child.transform = groupTransform * childTransform
                 } else {
                     // If the child has a foreign transform value (usually this means non-literal),
                     // then merging isn't possible. Wrap the child in a new group with the
@@ -63,16 +63,14 @@ class BakeTransformations : Optimization {
                     // case this child had other path element siblings.
 
                     for ((transform) in childForeignTransformations) {
-                        child.attributes.foreign.remove(transform)
+                        child.foreign.remove(transform)
                     }
 
                     val syntheticGroup = Group(
                         listOf(child),
-                        Group.Attributes(
-                            null,
-                            groupTransform * childTransform,
-                            childForeignTransformations.toMutableMap()
-                        ),
+                        null,
+                        childForeignTransformations.toMutableMap(),
+                        groupTransform * childTransform,
                     )
 
                     children.add(syntheticGroup)
@@ -88,7 +86,7 @@ class BakeTransformations : Optimization {
         }
 
         // Transform is baked. We don't want to apply it twice.
-        group.attributes.transform = Matrix3.IDENTITY
+        group.transform = Matrix3.IDENTITY
 
         group.elements = children
     }

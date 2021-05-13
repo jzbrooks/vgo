@@ -6,6 +6,7 @@ import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.util.math.Matrix3
 
 /**
  * Collapse unnecessary nested groups into a single group
@@ -18,7 +19,8 @@ class CollapseGroups : Optimization {
     private val Group.isMergeable: Boolean
         get() {
             val hasValidClipPath = elements.any { it is PathElement && it !is Path }
-            return !hasValidClipPath && elements.isNotEmpty() && attributes.isEmpty()
+            val hasAttributes = id != null || transform !== Matrix3.IDENTITY || foreign.isNotEmpty()
+            return !hasValidClipPath && elements.isNotEmpty() && !hasAttributes
         }
 
     override fun optimize(graphic: Graphic) {

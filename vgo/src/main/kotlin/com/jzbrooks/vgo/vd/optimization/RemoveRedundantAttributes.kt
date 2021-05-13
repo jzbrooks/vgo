@@ -10,7 +10,7 @@ import com.jzbrooks.vgo.vd.VectorDrawable
 class RemoveRedundantAttributes : TopDownOptimization, ContainerElementVisitor, PathElementVisitor {
     override fun visit(containerElement: ContainerElement) {
         if (containerElement is VectorDrawable) {
-            val attributes = containerElement.attributes.foreign
+            val attributes = containerElement.foreign
 
             attributes.remove("android:alpha", "1.0")
             attributes.remove("android:autoMirrored", "false")
@@ -19,7 +19,7 @@ class RemoveRedundantAttributes : TopDownOptimization, ContainerElementVisitor, 
     }
 
     override fun visit(pathElement: PathElement) {
-        val attributes = pathElement.attributes.foreign
+        val attributes = pathElement.foreign
 
         attributes.remove("android:strokeWidth", "0")
         attributes.remove("android:strokeAlpha", "1")

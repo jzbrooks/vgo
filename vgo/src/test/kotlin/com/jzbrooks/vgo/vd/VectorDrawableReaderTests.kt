@@ -39,8 +39,8 @@ class VectorDrawableReaderTests {
     fun testParseDimensions() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic.attributes.foreign["android:width"]).isEqualTo("24dp")
-        assertThat(graphic.attributes.foreign["android:height"]).isEqualTo("24dp")
+        assertThat(graphic.foreign["android:width"]).isEqualTo("24dp")
+        assertThat(graphic.foreign["android:height"]).isEqualTo("24dp")
     }
 
     @Test
@@ -49,7 +49,7 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes.foreign).doesNotContainKey("android:pathData")
+        assertThat(path.foreign).doesNotContainKey("android:pathData")
     }
 
     @Test
@@ -58,8 +58,8 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes.id).isNotNull()
-        assertThat(path.attributes.foreign).containsKeys("android:strokeWidth", "android:fillColor")
+        assertThat(path.id).isNotNull()
+        assertThat(path.foreign).containsKeys("android:strokeWidth", "android:fillColor")
     }
 
     @Test
@@ -85,7 +85,7 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes.id).isEqualTo("strike_thru_path")
+        assertThat(path.id).isEqualTo("strike_thru_path")
     }
 
     @Test
@@ -178,6 +178,6 @@ class VectorDrawableReaderTests {
         val path = graphic.elements.first() as Path
 
         assertThat(path.commands).isEmpty()
-        assertThat(path.attributes.foreign).contains("android:pathData", "@string/path_data")
+        assertThat(path.foreign).contains("android:pathData", "@string/path_data")
     }
 }

@@ -39,7 +39,7 @@ class ScalableVectorGraphicReaderTests {
     fun testParseDimensions() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic.attributes.foreign).contains("viewBox", "0 0 100 100")
+        assertThat(graphic.foreign).contains("viewBox", "0 0 100 100")
     }
 
     @Test
@@ -48,7 +48,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes.foreign).doesNotContainKey("d")
+        assertThat(path.foreign).doesNotContainKey("d")
     }
 
     @Test
@@ -57,7 +57,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes.foreign).containsKeys("stroke", "fill")
+        assertThat(path.foreign).containsKeys("stroke", "fill")
     }
 
     @Test
@@ -85,7 +85,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes.id).isEqualTo("heart")
+        assertThat(path.id).isEqualTo("heart")
     }
 
     @Test

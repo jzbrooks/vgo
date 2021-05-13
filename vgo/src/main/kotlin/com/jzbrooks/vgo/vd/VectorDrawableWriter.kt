@@ -37,12 +37,12 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
 
         val root = document.createElement("vector")
 
-        val elementName = graphic.attributes.id
+        val elementName = graphic.id
         if (elementName != null) {
             root.setAttribute("android:name", elementName)
         }
 
-        for (item in graphic.attributes.foreign) {
+        for (item in graphic.foreign) {
             root.setAttribute(item.key, item.value)
         }
         document.appendChild(root)
@@ -67,7 +67,7 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                     // There's no reason to output the transforms if the
                     // value of the transform is referentially equal to the
                     // identity matrix constant
-                    if (element.attributes.transform !== Matrix3.IDENTITY) {
+                    if (element.transform !== Matrix3.IDENTITY) {
                         writeTransforms(element, node)
                     }
 
@@ -93,12 +93,12 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         }
 
         if (node != null) {
-            val elementName = element.attributes.id
+            val elementName = element.id
             if (elementName != null) {
                 node.setAttribute("android:name", elementName)
             }
 
-            for ((key, value) in element.attributes.foreign) {
+            for ((key, value) in element.foreign) {
                 node.setAttribute(key, value)
             }
 
@@ -107,12 +107,12 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
     }
 
     private fun writeTransforms(group: Group, node: org.w3c.dom.Element) {
-        val a = group.attributes.transform[0, 0]
-        val b = group.attributes.transform[0, 1]
-        val c = group.attributes.transform[1, 0]
-        val d = group.attributes.transform[1, 1]
-        val e = group.attributes.transform[0, 2]
-        val f = group.attributes.transform[1, 2]
+        val a = group.transform[0, 0]
+        val b = group.transform[0, 1]
+        val c = group.transform[1, 0]
+        val d = group.transform[1, 1]
+        val e = group.transform[0, 2]
+        val f = group.transform[1, 2]
 
         if (abs(e) >= 0.01f) {
             node.setAttribute("android:translateX", formatter.format(e))

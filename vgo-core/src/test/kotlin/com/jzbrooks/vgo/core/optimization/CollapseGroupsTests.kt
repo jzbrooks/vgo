@@ -2,7 +2,6 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
-import com.jzbrooks.vgo.core.graphic.Attributes
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
@@ -21,10 +20,8 @@ class CollapseGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
         CollapseGroups().optimize(graphic)
@@ -39,10 +36,8 @@ class CollapseGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
         CollapseGroups().optimize(graphic)
@@ -61,15 +56,13 @@ class CollapseGroupsTests {
         )
 
         val innerPath = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
-        val innerGroupWithAttributes = Group(listOf(innerPath), Group.Attributes(null, scale, mutableMapOf()))
+        val innerGroupWithAttributes = Group(listOf(innerPath), null, mutableMapOf(), scale)
         val group = Group(listOf(innerGroupWithAttributes))
 
         val graphic = object : Graphic {
             override var elements: List<Element> = listOf(group)
-            override var attributes = object : Attributes {
-                override val id: String? = null
-                override val foreign: MutableMap<String, String> = mutableMapOf()
-            }
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
         CollapseGroups().optimize(graphic)

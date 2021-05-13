@@ -20,7 +20,11 @@ fun parse(root: Node): ScalableVectorGraphic {
         .mapNotNull(::parseElement)
         .toList()
 
-    return ScalableVectorGraphic(elements, root.attributes.toGraphicAttributes())
+    return ScalableVectorGraphic(
+        elements,
+        root.attributes.removeOrNull("id")?.nodeValue,
+        root.attributes.toMutableMap(),
+    )
 }
 
 private fun parseElement(node: Node): Element? {
@@ -35,68 +39,50 @@ private fun parseElement(node: Node): Element? {
 }
 
 private fun parseClipPath(node: Node): ClipPath {
-    val attributes = node.attributes.toClipPathAttributes()
-
     val childElements = node.childNodes.asSequence()
         .mapNotNull(::parseElement)
         .toList()
 
-    return ClipPath(childElements, attributes)
+    return ClipPath(
+        childElements,
+        node.attributes.removeOrNull("id")?.nodeValue,
+        node.attributes.toMutableMap(),
+    )
 }
 
 private fun parseGroupElement(node: Node): Group {
-    val attributes = node.attributes.toGroupAttributes()
-
     val childElements = node.childNodes.asSequence()
         .mapNotNull(::parseElement)
         .toList()
 
-    return Group(childElements, attributes)
+    // This has to happen before foreign property collection
+    val transform = node.attributes.extractTransformMatrix()
+    return Group(
+        childElements,
+        node.attributes.removeOrNull("id")?.nodeValue,
+        node.attributes.toMutableMap(),
+        transform,
+    )
 }
 
-private fun parsePathElement(node: Node): Path {
-    val attributes = node.attributes.toPathAttributes()
-
-    val data = CommandString(attributes.foreign.remove("d")!!)
-
-    return Path(data.toCommandList(), attributes)
-}
+private fun parsePathElement(node: Node) = Path(
+    CommandString(node.attributes.removeNamedItem("d").nodeValue.toString()).toCommandList(),
+    node.attributes.removeOrNull("id")?.nodeValue,
+    node.attributes.toMutableMap(),
+)
 
 private fun parseExtraElement(node: Node): Extra {
     val containedElements = node.childNodes.asSequence()
         .mapNotNull(::parseElement)
         .toList()
 
-    return Extra(node.nodeValue ?: node.nodeName, containedElements, node.attributes.toExtraAttributes())
-}
-
-private fun NamedNodeMap.toGraphicAttributes() = ScalableVectorGraphic.Attributes(
-    removeOrNull("id")?.nodeValue,
-    toMutableMap(),
-)
-
-private fun NamedNodeMap.toPathAttributes(): Path.Attributes {
-    return Path.Attributes(
-        removeOrNull("id")?.nodeValue,
-        toMutableMap(),
+    return Extra(
+        node.nodeValue ?: node.nodeName,
+        containedElements,
+        node.attributes.removeOrNull("id")?.nodeValue,
+        node.attributes.toMutableMap(),
     )
 }
-
-private fun NamedNodeMap.toClipPathAttributes() = ClipPath.Attributes(
-    removeOrNull("id")?.nodeValue,
-    toMutableMap(),
-)
-
-private fun NamedNodeMap.toGroupAttributes() = Group.Attributes(
-    removeOrNull("id")?.nodeValue,
-    extractTransformMatrix(),
-    toMutableMap(),
-)
-
-private fun NamedNodeMap.toExtraAttributes() = Extra.Attributes(
-    removeOrNull("id")?.nodeValue,
-    toMutableMap(),
-)
 
 private fun NamedNodeMap.extractTransformMatrix(): Matrix3 {
     val transform = removeOrNull("transform")?.nodeValue ?: return Matrix3.IDENTITY

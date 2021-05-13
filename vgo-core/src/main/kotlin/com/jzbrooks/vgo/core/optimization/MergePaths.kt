@@ -57,9 +57,10 @@ class MergePaths : Optimization {
         val mergedPaths = Stack<PathElement>()
         mergedPaths.add(paths.first())
 
-        for (item in paths.slice(1 until paths.size)) {
+        for (item in paths.drop(1)) {
             val previous = mergedPaths.peek()
-            if (item::class != previous::class || item.attributes != previous.attributes) {
+
+            if (item::class != previous::class || !item.hasSameAttributes(previous)) {
                 mergedPaths.push(item)
             } else {
                 previous.commands += item.commands

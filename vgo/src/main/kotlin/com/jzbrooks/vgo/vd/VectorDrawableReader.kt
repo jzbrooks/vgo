@@ -21,13 +21,16 @@ import kotlin.math.sin
 private val HEX_WITH_ALPHA = Regex("#[a-fA-F\\d]{8}")
 
 fun parse(root: Node): VectorDrawable {
-    val rootMetadata = root.attributes.toGraphicAttributes()
 
     val elements = root.childNodes.asSequence()
         .mapNotNull(::parseElement)
         .toList()
 
-    return VectorDrawable(elements, rootMetadata)
+    return VectorDrawable(
+        elements,
+        root.attributes.removeOrNull("android:name")?.nodeValue,
+        root.attributes.toMutableMap(),
+    )
 }
 
 private fun parseElement(node: Node): Element? {
@@ -41,24 +44,38 @@ private fun parseElement(node: Node): Element? {
     }
 }
 
-private fun parseGroup(groupNode: Node): Group {
-    val groupChildElements = groupNode.childNodes.asSequence()
+private fun parseGroup(node: Node): Group {
+    val groupChildElements = node.childNodes.asSequence()
         .mapNotNull(::parseElement)
         .toList()
-    val groupMetadata = groupNode.attributes.toGroupAttributes()
-    return Group(groupChildElements, groupMetadata)
+
+    // This has to happen before foreign property collection
+    val transform = node.attributes.computeTransformationMatrix()
+    return Group(
+        groupChildElements,
+        node.attributes.removeOrNull("android:name")?.nodeValue,
+        node.attributes.toMutableMap(),
+        transform,
+    )
 }
 
 private fun parsePath(node: Node): Path {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
 
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
-        Path(emptyList(), node.attributes.toPathAttributes())
+        Path(
+            emptyList(),
+            node.attributes.removeOrNull("android:name")?.nodeValue,
+            node.attributes.toMutableMap(),
+        )
     } else {
         node.attributes.removeNamedItem("android:pathData")
 
-        val data = CommandString(pathDataString)
-        Path(data.toCommandList(), node.attributes.toPathAttributes())
+        Path(
+            CommandString(pathDataString).toCommandList(),
+            node.attributes.removeOrNull("android:name")?.nodeValue,
+            node.attributes.toMutableMap(),
+        )
     }
 }
 
@@ -66,31 +83,20 @@ private fun parseClipPath(node: Node): ClipPath {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
 
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
-        ClipPath(emptyList(), node.attributes.toClipPathAttributes())
+        ClipPath(
+            emptyList(),
+            node.attributes.removeOrNull("android:name")?.nodeValue,
+            node.attributes.toMutableMap()
+        )
     } else {
         node.attributes.removeNamedItem("android:pathData")
 
-        val data = CommandString(pathDataString)
-        ClipPath(data.toCommandList(), node.attributes.toClipPathAttributes())
+        ClipPath(
+            CommandString(pathDataString).toCommandList(),
+            node.attributes.removeOrNull("android:name")?.nodeValue,
+            node.attributes.toMutableMap()
+        )
     }
-}
-
-private fun parseGroupElement(node: Node): Group {
-    val attributes = node.attributes.toGroupAttributes()
-
-    val childElements = node.childNodes.asSequence()
-        .mapNotNull(::parseElement)
-        .toList()
-
-    return Group(childElements, attributes)
-}
-
-private fun parsePathElement(node: Node): Path {
-    val attributes = node.attributes.toPathAttributes()
-
-    val data = CommandString(node.attributes.removeNamedItem("android:pathData").textContent)
-
-    return Path(data.toCommandList(), attributes)
 }
 
 private fun parseExtraElement(node: Node): Extra {
@@ -98,36 +104,13 @@ private fun parseExtraElement(node: Node): Extra {
         .mapNotNull(::parseElement)
         .toList()
 
-    return Extra(node.nodeValue ?: node.nodeName, containedElements, node.attributes.toExtraAttributes())
-}
-
-private fun NamedNodeMap.toGraphicAttributes() = VectorDrawable.Attributes(
-    removeOrNull("android:name")?.nodeValue,
-    toMutableMap(),
-)
-
-private fun NamedNodeMap.toPathAttributes(): Path.Attributes {
-    return Path.Attributes(
-        removeOrNull("android:name")?.nodeValue,
-        toMutableMap(),
+    return Extra(
+        node.nodeValue ?: node.nodeName,
+        containedElements,
+        node.attributes.removeOrNull("android:name")?.nodeValue,
+        node.attributes.toMutableMap(),
     )
 }
-
-private fun NamedNodeMap.toClipPathAttributes() = ClipPath.Attributes(
-    removeOrNull("android:name")?.nodeValue,
-    toMutableMap(),
-)
-
-private fun NamedNodeMap.toGroupAttributes() = Group.Attributes(
-    removeOrNull("android:name")?.nodeValue,
-    computeTransformationMatrix(),
-    toMutableMap(),
-)
-
-private fun NamedNodeMap.toExtraAttributes() = Extra.Attributes(
-    removeOrNull("android:name")?.nodeValue,
-    toMutableMap(),
-)
 
 private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
     val scaleX = removeFloatOrNull("android:scaleX")
