@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.vd
 
+import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
@@ -7,6 +8,7 @@ import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.xml.asSequence
+import com.jzbrooks.vgo.core.util.xml.removeFloatOrNull
 import com.jzbrooks.vgo.core.util.xml.removeOrNull
 import com.jzbrooks.vgo.core.util.xml.toMutableMap
 import com.jzbrooks.vgo.vd.graphic.ClipPath
@@ -61,12 +63,14 @@ private fun parseGroup(node: Node): Group {
 
 private fun parsePath(node: Node): Path {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
-
+    // todo: handle android:fillAlpha
+    val color = node.attributes.extractColor("android:fillColor", Color(0x00000000u))
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
         Path(
             emptyList(),
             node.attributes.removeOrNull("android:name")?.nodeValue,
             node.attributes.toMutableMap(),
+            color,
         )
     } else {
         node.attributes.removeNamedItem("android:pathData")
@@ -75,6 +79,7 @@ private fun parsePath(node: Node): Path {
             CommandString(pathDataString).toCommandList(),
             node.attributes.removeOrNull("android:name")?.nodeValue,
             node.attributes.toMutableMap(),
+            color,
         )
     }
 }
@@ -177,12 +182,10 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
     return listOf(pivot, translation, rotate, scale, pivotInverse).reduce(Matrix3::times)
 }
 
-private fun NamedNodeMap.removeFloatOrNull(key: String): Float? {
-    val value = getNamedItem(key)?.nodeValue?.toFloatOrNull()
+private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
+    val value = removeOrNull(key)?.nodeValue?.toString() ?: return default
 
-    if (value != null) {
-        removeNamedItem(key)
-    }
+    val colorInt = value.trim('#').toUInt(radix = 16) or 0xFF000000u
 
-    return value
+    return Color(colorInt)
 }

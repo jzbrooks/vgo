@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.vd
 
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -47,7 +48,19 @@ private fun process(containerElement: ContainerElement): Element {
             }
             newElements.add(traverse(element))
         } else {
-            defs = Extra("defs", listOf(Path(element.commands)), "clip_$index", mutableMapOf())
+            defs = Extra(
+                "defs",
+                listOf(
+                    Path(
+                        element.commands,
+                        null,
+                        mutableMapOf(),
+                        Colors.BLACK,
+                    )
+                ),
+                "clip_$index",
+                mutableMapOf(),
+            )
         }
     }
 

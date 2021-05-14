@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.core.optimization
 import assertk.assertThat
 import assertk.assertions.containsNone
 import assertk.assertions.hasSize
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -19,8 +20,11 @@ class RemoveRedundantCommandsTests {
                 MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 1f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 0f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(103f, 6f))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         RemoveRedundantCommands().visit(path)
@@ -36,8 +40,11 @@ class RemoveRedundantCommandsTests {
                 MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 1f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(103f, 6f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(106f, 7f), Point(93f, 10f))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         RemoveRedundantCommands().visit(path)
@@ -53,8 +60,11 @@ class RemoveRedundantCommandsTests {
                 LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 1f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(-3f, -2f))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         RemoveRedundantCommands().visit(path)

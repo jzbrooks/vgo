@@ -2,6 +2,8 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
@@ -20,10 +22,30 @@ class MergePathsTests {
     @Test
     fun testMergeSeveralPathsIntoOne() {
         val paths = listOf(
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            )
         )
 
         val graphic = object : Graphic {
@@ -42,26 +64,57 @@ class MergePathsTests {
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                )
-            )
+                ),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
         )
     }
 
     @Test
     fun testMergeGroupPaths() {
         val paths = listOf(
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
             Path(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                     SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                     LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
+                ),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
             ),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), null, mutableMapOf("android:strokeWidth" to "1")),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                null,
+                mutableMapOf("android:strokeWidth" to "1"),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            )
         )
 
         val group = Group(paths)
@@ -85,15 +138,26 @@ class MergePathsTests {
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                                 SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
-                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                            )
+                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            ),
+                            null,
+                            mutableMapOf(),
+                            Colors.BLACK,
                         ),
-                        Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), null, mutableMapOf("android:strokeWidth" to "1")),
+                        Path(
+                            listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                            null,
+                            mutableMapOf("android:strokeWidth" to "1"),
+                            Colors.BLACK,
+                        ),
                         Path(
                             listOf(
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                            )
+                            ),
+                            null,
+                            mutableMapOf(),
+                            Colors.BLACK,
                         )
                     )
                 )
@@ -104,18 +168,46 @@ class MergePathsTests {
     @Test
     fun testMergePaths() {
         val paths = listOf(
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
             Path(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                     SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                     LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
+                ),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
             ),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), null, mutableMapOf("android:strokeWidth" to "1")),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                null,
+                mutableMapOf("android:strokeWidth" to "1"),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            )
         )
 
         val graphic = object : Graphic {
@@ -136,15 +228,26 @@ class MergePathsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                         SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                    )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
                 ),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), null, mutableMapOf("android:strokeWidth" to "1")),
+                Path(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                    null,
+                    mutableMapOf("android:strokeWidth" to "1"),
+                    Colors.BLACK,
+                ),
                 Path(
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                    )
-                )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
+                ),
             )
         )
     }
@@ -152,19 +255,47 @@ class MergePathsTests {
     @Test
     fun testMergePathsWithMixedElements() {
         val paths = listOf(
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
             Path(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                     SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                     LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
+                ),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
             ),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), null, mutableMapOf("android:strokeWidth" to "1")),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                null,
+                mutableMapOf("android:strokeWidth" to "1"),
+                Colors.BLACK,
+            ),
             Group(emptyList()),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            )
         )
 
         val graphic = object : Graphic {
@@ -185,16 +316,27 @@ class MergePathsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                         SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                    )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
                 ),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))), null, mutableMapOf("android:strokeWidth" to "1")),
+                Path(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                    null,
+                    mutableMapOf("android:strokeWidth" to "1"),
+                    Colors.BLACK,
+                ),
                 Group(emptyList()),
                 Path(
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                    )
-                )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
+                ),
             )
         )
     }
@@ -202,12 +344,32 @@ class MergePathsTests {
     @Test
     fun testMergePathsWithMixedPathElements() {
         val paths = listOf(
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
             PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))))),
             PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            )
         )
 
         val graphic = object : Graphic {
@@ -225,7 +387,10 @@ class MergePathsTests {
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                    )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
                 ),
                 PseudoPath(
                     listOf(
@@ -237,8 +402,11 @@ class MergePathsTests {
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                    )
-                )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
+                ),
             )
         )
     }
@@ -246,12 +414,32 @@ class MergePathsTests {
     @Test
     fun testMergePathsWithAttributesAfterMergedPathElement() {
         val paths = listOf(
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            ),
             PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))))),
             PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))), null, mutableMapOf("android:fillColor" to "#FF0011FF")),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                null,
+                mutableMapOf(),
+                Color(0xFF0011FFu),
+            ),
+            Path(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                null,
+                mutableMapOf(),
+                Colors.BLACK,
+            )
         )
 
         val graphic = object : Graphic {
@@ -269,7 +457,10 @@ class MergePathsTests {
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                    )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
                 ),
                 PseudoPath(
                     listOf(
@@ -277,8 +468,18 @@ class MergePathsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
                     )
                 ),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))), null, mutableMapOf("android:fillColor" to "#FF0011FF")),
-                Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))))
+                Path(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                    null,
+                    mutableMapOf(),
+                    Color(0xFF0011FFu),
+                ),
+                Path(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
+                )
             )
         )
     }

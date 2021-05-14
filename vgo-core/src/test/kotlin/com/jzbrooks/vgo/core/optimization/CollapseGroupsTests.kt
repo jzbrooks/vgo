@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
@@ -15,7 +16,12 @@ import org.junit.jupiter.api.Test
 class CollapseGroupsTests {
     @Test
     fun testCollapseSingleUnnecessaryGroup() {
-        val innerPath = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
+        val innerPath = Path(
+            listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
+        )
         val group = Group(listOf(innerPath))
 
         val graphic = object : Graphic {
@@ -31,7 +37,13 @@ class CollapseGroupsTests {
 
     @Test
     fun testCollapseSingleUnnecessaryNestedGroups() {
-        val innerPath = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
+        val innerPath = Path(
+            listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
+        )
+
         val group = Group(listOf(Group(listOf(innerPath))))
 
         val graphic = object : Graphic {
@@ -55,7 +67,12 @@ class CollapseGroupsTests {
             ),
         )
 
-        val innerPath = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
+        val innerPath = Path(
+            listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
+        )
         val innerGroupWithAttributes = Group(listOf(innerPath), null, mutableMapOf(), scale)
         val group = Group(listOf(innerGroupWithAttributes))
 

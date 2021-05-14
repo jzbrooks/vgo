@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
@@ -30,7 +31,10 @@ class ConvertCurvesToArcsTest {
                         )
                     )
                 )
-            )
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)).visit(path)
@@ -81,7 +85,10 @@ class ConvertCurvesToArcsTest {
                         )
                     )
                 )
-            )
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         val before = path.copy()
@@ -142,7 +149,10 @@ class ConvertCurvesToArcsTest {
                         )
                     )
                 )
-            )
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)).visit(path)

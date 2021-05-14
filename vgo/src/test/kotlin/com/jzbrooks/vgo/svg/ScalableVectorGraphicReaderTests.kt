@@ -6,6 +6,7 @@ import assertk.assertions.containsExactly
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Path
@@ -57,7 +58,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.foreign).containsKeys("stroke", "fill")
+        assertThat(path.foreign).containsKeys("stroke")
     }
 
     @Test
@@ -143,7 +144,16 @@ class ScalableVectorGraphicReaderTests {
             |</svg>
             |""".trimMargin().toByteArray()
 
-        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath))
+        val expectedChild = Path(
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))),
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
+        )
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use { input ->
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {

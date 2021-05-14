@@ -40,3 +40,13 @@ fun NamedNodeMap.removeOrNull(key: String): Node? {
 
     return value
 }
+
+fun NamedNodeMap.removeFloatOrNull(key: String): Float? {
+    val value = getNamedItem(key)?.nodeValue?.toFloatOrNull()
+
+    if (value != null) {
+        removeNamedItem(key)
+    }
+
+    return value
+}

@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.core.optimization
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isTrue
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -27,8 +28,11 @@ class BreakoutImplicitCommandsTests {
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(103f, 6f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f), Point(93f, 10f))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         BreakoutImplicitCommands().visit(path)
@@ -50,8 +54,11 @@ class BreakoutImplicitCommandsTests {
                         Point(93f, 10f)
                     )
                 ),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         BreakoutImplicitCommands().visit(path)
@@ -73,8 +80,11 @@ class BreakoutImplicitCommandsTests {
                 QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(112f, -10f), Point(109f, -3f)))),
                 SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                 EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
         val sizeBefore = path.commands.size
 

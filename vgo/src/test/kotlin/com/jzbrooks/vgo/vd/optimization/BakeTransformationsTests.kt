@@ -6,6 +6,7 @@ import assertk.assertions.containsExactly
 import assertk.assertions.doesNotContain
 import assertk.assertions.isCloseTo
 import assertk.assertions.isEqualTo
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
@@ -36,7 +37,7 @@ class BakeTransformationsTests {
             )
         )
         val group = Group(
-            listOf(Path(emptyList())),
+            listOf(Path(emptyList(), null, mutableMapOf(), Colors.TRANSPARENT)),
             null,
             mutableMapOf(),
             transform,
@@ -61,7 +62,10 @@ class BakeTransformationsTests {
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
-                    )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
                 )
             ),
             null,
@@ -71,7 +75,6 @@ class BakeTransformationsTests {
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-
             override val id: String? = null
             override val foreign: MutableMap<String, String> = mutableMapOf()
         })
@@ -97,7 +100,10 @@ class BakeTransformationsTests {
                             listOf(
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
-                            )
+                            ),
+                            null,
+                            mutableMapOf(),
+                            Colors.BLACK,
                         )
                     ),
                     null,
@@ -112,7 +118,6 @@ class BakeTransformationsTests {
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-
             override val id: String? = null
             override val foreign: MutableMap<String, String> = mutableMapOf()
         })
@@ -141,7 +146,10 @@ class BakeTransformationsTests {
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
-                    )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
                 )
             ),
             null,
@@ -151,7 +159,6 @@ class BakeTransformationsTests {
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-
             override val id: String? = null
             override val foreign: MutableMap<String, String> = mutableMapOf()
         })
@@ -176,7 +183,10 @@ class BakeTransformationsTests {
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
-                    )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
                 )
             ),
             null,
@@ -186,7 +196,6 @@ class BakeTransformationsTests {
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-
             override val id: String? = null
             override val foreign: MutableMap<String, String> = mutableMapOf()
         })
@@ -216,8 +225,11 @@ class BakeTransformationsTests {
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(4f, 4f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
-                        ClosePath
-                    )
+                        ClosePath,
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
                 )
             ),
             null,
@@ -227,7 +239,6 @@ class BakeTransformationsTests {
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-
             override val id: String? = null
             override val foreign: MutableMap<String, String> = mutableMapOf()
         })
@@ -259,8 +270,11 @@ class BakeTransformationsTests {
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f)))
-                    )
-                )
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
+                ),
             ),
             null,
             mutableMapOf(),
@@ -269,7 +283,6 @@ class BakeTransformationsTests {
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-
             override val id: String? = null
             override val foreign: MutableMap<String, String> = mutableMapOf()
         })
@@ -321,9 +334,12 @@ class BakeTransformationsTests {
                         HorizontalLineTo(CommandVariant.RELATIVE, listOf(4f)),
                         VerticalLineTo(CommandVariant.RELATIVE, listOf(4f)),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 14f))),
-                        ClosePath
-                    )
-                )
+                        ClosePath,
+                    ),
+                    null,
+                    mutableMapOf(),
+                    Colors.BLACK,
+                ),
             ),
             null,
             mutableMapOf(),

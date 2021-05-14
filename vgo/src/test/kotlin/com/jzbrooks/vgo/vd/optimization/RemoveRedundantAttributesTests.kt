@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.vd.optimization
 
 import assertk.assertThat
 import assertk.assertions.isEmpty
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.vd.VectorDrawable
 import org.junit.jupiter.params.ParameterizedTest
@@ -20,7 +21,7 @@ class RemoveRedundantAttributesTests {
     @ParameterizedTest
     @MethodSource("providePathElementAttributes")
     fun testVectorDrawableAutoMirrored(key: String, value: String) {
-        val path = Path(emptyList(), null, mutableMapOf(key to value))
+        val path = Path(emptyList(), null, mutableMapOf(key to value), Colors.BLACK)
         RemoveRedundantAttributes().visit(path)
         assertThat(path.foreign).isEmpty()
     }

@@ -7,6 +7,7 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Path
@@ -59,7 +60,8 @@ class VectorDrawableReaderTests {
         val path = graphic.elements.first() as Path
 
         assertThat(path.id).isNotNull()
-        assertThat(path.foreign).containsKeys("android:strokeWidth", "android:fillColor")
+        assertThat(path.foreign).containsKeys("android:strokeWidth")
+        assertThat(path.fill).isEqualTo(Colors.BLACK)
     }
 
     @Test
@@ -143,7 +145,16 @@ class VectorDrawableReaderTests {
             |</vector>
             |""".trimMargin().toByteArray()
 
-        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath))
+        val expectedChild = Path(
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))),
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.TRANSPARENT,
+        )
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {

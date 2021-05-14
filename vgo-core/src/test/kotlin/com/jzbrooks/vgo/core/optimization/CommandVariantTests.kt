@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.core.optimization
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.Command
@@ -45,8 +46,11 @@ class CommandVariantTests {
                 QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(112f, -10f), Point(109f, -3f)))),
                 SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                 EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -62,8 +66,11 @@ class CommandVariantTests {
                 LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
                 HorizontalLineTo(CommandVariant.RELATIVE, listOf(0f)),
-                VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f))
-            )
+                VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f)),
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -80,7 +87,10 @@ class CommandVariantTests {
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(3f, 7f))),
                 HorizontalLineTo(CommandVariant.RELATIVE, listOf(0f)),
                 VerticalLineTo(CommandVariant.ABSOLUTE, listOf(-14f))
-            )
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -105,8 +115,11 @@ class CommandVariantTests {
                 QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(112f, -10f), Point(109f, -3f)))),
                 SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                 EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -121,8 +134,11 @@ class CommandVariantTests {
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f), Point(101f, 1f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(103f, 6f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f), Point(93f, 10f))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -140,8 +156,11 @@ class CommandVariantTests {
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                 CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(CubicBezierCurve.Parameter(Point(105f, 8f), Point(115f, 10f), Point(100f, 10f)))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -159,8 +178,11 @@ class CommandVariantTests {
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
                 ClosePath,
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(107f, 7f))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -180,8 +202,11 @@ class CommandVariantTests {
                 ClosePath,
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(17f, 21f))),
-                ClosePath
-            )
+                ClosePath,
+            ),
+            null,
+            mutableMapOf(),
+            Colors.BLACK,
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
