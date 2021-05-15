@@ -37,18 +37,19 @@ value class Color(private val argb: UInt) {
                 )
             }
         } else {
-            // todo: make non 0 shorthand work e.g. #444
             val pattern = if (red == green && red == blue) {
-                "#%01x%01x%01x"
+                "#%02x%02x%02x"
             } else {
                 "#%02x%02x%02x"
             }
 
-            pattern.format(
-                red.toInt(),
-                green.toInt(),
-                blue.toInt(),
-            )
+            val hexColor = pattern.format(red.toInt(), green.toInt(), blue.toInt())
+
+            if (hexColor.drop(2).all { it == hexColor[1]}) {
+                hexColor.dropLast(3)
+            } else {
+                hexColor
+            }
         }
     }
 

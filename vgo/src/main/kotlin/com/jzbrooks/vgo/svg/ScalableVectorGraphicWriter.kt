@@ -61,8 +61,12 @@ class ScalableVectorGraphicWriter(
                     setAttribute("d", data)
 
                     if (element.fill != Colors.BLACK) {
-                        val color = NAMED_COLORS[element.fill] ?: element.fill.toHexString(Color.HexFormat.RGBA)
-                        setAttribute("fill", color)
+                        if (element.fill.alpha == 0.toUByte()) {
+                            setAttribute("fill", "none")
+                        } else {
+                            val color = NAMED_COLORS[element.fill] ?: element.fill.toHexString(Color.HexFormat.RGBA)
+                            setAttribute("fill", color)
+                        }
                     }
                 }
             }

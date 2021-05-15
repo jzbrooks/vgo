@@ -185,7 +185,11 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
 private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
     val value = removeOrNull(key)?.nodeValue?.toString() ?: return default
 
-    val colorInt = value.trim('#').toUInt(radix = 16) or 0xFF000000u
+    val colorInt = if (value.length == 9) {
+        value.trim('#').toUInt(radix = 16)
+    } else {
+        value.trim('#').toUInt(radix = 16) or 0xFF000000u
+    }
 
     return Color(colorInt)
 }
