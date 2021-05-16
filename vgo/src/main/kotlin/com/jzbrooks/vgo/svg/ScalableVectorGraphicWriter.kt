@@ -68,6 +68,15 @@ class ScalableVectorGraphicWriter(
                             setAttribute("fill", color)
                         }
                     }
+
+                    if (element.stroke != Colors.TRANSPARENT && element.stroke.alpha != 0.toUByte()) {
+                        val color = NAMED_COLORS[element.fill] ?: element.fill.toHexString(Color.HexFormat.RGBA)
+                        setAttribute("fill", color)
+                    }
+
+                    if (element.strokeWidth != 0u) {
+                        setAttribute("stroke-width", element.strokeWidth.toString())
+                    }
                 }
             }
             is Group -> {

@@ -3,8 +3,6 @@ package com.jzbrooks.vgo.core.optimization
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
-import com.jzbrooks.vgo.core.Colors
-import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
@@ -19,6 +17,7 @@ import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 import com.jzbrooks.vgo.core.optimization.CommandVariant as CommandVariantOpt
@@ -33,7 +32,7 @@ class CommandVariantTests {
 
     @Test
     fun testConvertOnlyAbsoluteCommands() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(103f, 6f))),
@@ -47,10 +46,7 @@ class CommandVariantTests {
                 SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                 EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
                 ClosePath,
-            ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
+            )
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -60,17 +56,14 @@ class CommandVariantTests {
 
     @Test
     fun testConvertOnlyRelativeCommands() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 1f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
                 HorizontalLineTo(CommandVariant.RELATIVE, listOf(0f)),
                 VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f)),
-            ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
+            )
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -80,17 +73,14 @@ class CommandVariantTests {
 
     @Test
     fun testConvertMixedCommands() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.RELATIVE, listOf(Point(10f, 1f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(3f, 7f))),
                 HorizontalLineTo(CommandVariant.RELATIVE, listOf(0f)),
                 VerticalLineTo(CommandVariant.ABSOLUTE, listOf(-14f))
-            ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
+            )
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -100,7 +90,7 @@ class CommandVariantTests {
 
     @Test
     fun testConvertCommandsWithSubPath() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(103f, 6f))),
@@ -116,10 +106,7 @@ class CommandVariantTests {
                 SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
                 EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
                 ClosePath,
-            ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
+            )
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -129,16 +116,13 @@ class CommandVariantTests {
 
     @Test
     fun testConvertMoveToWithImplicitLineTo() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f), Point(101f, 1f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(103f, 6f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f), Point(93f, 10f))),
                 ClosePath,
-            ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
+            )
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -151,16 +135,13 @@ class CommandVariantTests {
 
     @Test
     fun testComputedRelativeCommandUpdatesCurrentPointByAllComponents() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                 CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(CubicBezierCurve.Parameter(Point(105f, 8f), Point(115f, 10f), Point(100f, 10f)))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f))),
                 ClosePath,
-            ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
+            )
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -170,7 +151,7 @@ class CommandVariantTests {
 
     @Test
     fun testNestedSubpathConversion() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(15f, 5f))),
@@ -179,10 +160,7 @@ class CommandVariantTests {
                 ClosePath,
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(107f, 7f))),
                 ClosePath,
-            ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
+            )
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
@@ -194,7 +172,7 @@ class CommandVariantTests {
 
     @Test
     fun testSequentialSubpathConversion() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(15f, 5f))),
@@ -203,10 +181,7 @@ class CommandVariantTests {
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(17f, 21f))),
                 ClosePath,
-            ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
+            )
         )
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)

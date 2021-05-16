@@ -6,7 +6,6 @@ import assertk.assertions.containsExactly
 import assertk.assertions.doesNotContain
 import assertk.assertions.isCloseTo
 import assertk.assertions.isEqualTo
-import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
@@ -21,6 +20,7 @@ import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.util.assertk.containsKey
 import com.jzbrooks.vgo.util.assertk.doesNotContainKey
+import com.jzbrooks.vgo.util.element.createPath
 import org.junit.jupiter.api.Test
 import kotlin.math.PI
 import kotlin.math.cos
@@ -37,7 +37,7 @@ class BakeTransformationsTests {
             )
         )
         val group = Group(
-            listOf(Path(emptyList(), null, mutableMapOf(), Colors.TRANSPARENT)),
+            listOf(createPath()),
             null,
             mutableMapOf(),
             transform,
@@ -45,7 +45,6 @@ class BakeTransformationsTests {
 
         BakeTransformations().optimize(object : Graphic {
             override var elements: List<Element> = listOf(group)
-
             override val id: String? = null
             override val foreign: MutableMap<String, String> = mutableMapOf()
         })
@@ -58,14 +57,11 @@ class BakeTransformationsTests {
     fun testAvoidCrashIfTransformsAreSpecifiedByResources() {
         val group = Group(
             listOf(
-                Path(
+                createPath(
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
                     ),
-                    null,
-                    mutableMapOf(),
-                    Colors.BLACK,
                 )
             ),
             null,
@@ -96,14 +92,11 @@ class BakeTransformationsTests {
             listOf(
                 Group(
                     listOf(
-                        Path(
+                        createPath(
                             listOf(
                                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
                             ),
-                            null,
-                            mutableMapOf(),
-                            Colors.BLACK,
                         )
                     ),
                     null,
@@ -142,14 +135,11 @@ class BakeTransformationsTests {
 
         val group = Group(
             listOf(
-                Path(
+                createPath(
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
                     ),
-                    null,
-                    mutableMapOf(),
-                    Colors.BLACK,
                 )
             ),
             null,
@@ -179,14 +169,11 @@ class BakeTransformationsTests {
 
         val group = Group(
             listOf(
-                Path(
+                createPath(
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
                     ),
-                    null,
-                    mutableMapOf(),
-                    Colors.BLACK,
                 )
             ),
             null,
@@ -220,16 +207,13 @@ class BakeTransformationsTests {
 
         val group = Group(
             listOf(
-                Path(
+                createPath(
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(4f, 4f))),
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
                         ClosePath,
                     ),
-                    null,
-                    mutableMapOf(),
-                    Colors.BLACK,
                 )
             ),
             null,
@@ -266,14 +250,11 @@ class BakeTransformationsTests {
 
         val group = Group(
             listOf(
-                Path(
+                createPath(
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f)))
                     ),
-                    null,
-                    mutableMapOf(),
-                    Colors.BLACK,
                 ),
             ),
             null,
@@ -328,7 +309,7 @@ class BakeTransformationsTests {
 
         val group = Group(
             listOf(
-                Path(
+                createPath(
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         HorizontalLineTo(CommandVariant.RELATIVE, listOf(4f)),
@@ -336,9 +317,6 @@ class BakeTransformationsTests {
                         LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 14f))),
                         ClosePath,
                     ),
-                    null,
-                    mutableMapOf(),
-                    Colors.BLACK,
                 ),
             ),
             null,

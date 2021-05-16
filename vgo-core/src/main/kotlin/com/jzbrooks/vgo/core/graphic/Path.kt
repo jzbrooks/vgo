@@ -8,11 +8,15 @@ data class Path(
     override val id: String?,
     override val foreign: MutableMap<String, String>,
     val fill: Color,
+    val stroke: Color,
+    val strokeWidth: UInt,
 ) : PathElement {
     override fun hasSameAttributes(other: PathElement): Boolean {
         return other is Path &&
             id == other.id &&
             foreign == other.foreign &&
-            fill == other.fill
+            fill == other.fill &&
+            stroke == other.stroke &&
+            strokeWidth == other.strokeWidth
     }
 }

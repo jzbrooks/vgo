@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
@@ -63,23 +64,31 @@ private fun parseGroup(node: Node): Group {
 
 private fun parsePath(node: Node): Path {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
-    // todo: handle android:fillAlpha
-    val color = node.attributes.extractColor("android:fillColor", Color(0x00000000u))
+
+    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val fill = node.attributes.extractColor("android:fillColor", Colors.TRANSPARENT)
+    val stroke = node.attributes.extractColor("android:strokeColor", Colors.TRANSPARENT)
+    val strokeWidth = node.attributes.removeOrNull("android:strokeWidth")?.nodeValue?.toUIntOrNull() ?: 0u
+
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
         Path(
             emptyList(),
-            node.attributes.removeOrNull("android:name")?.nodeValue,
+            id,
             node.attributes.toMutableMap(),
-            color,
+            fill,
+            stroke,
+            strokeWidth
         )
     } else {
         node.attributes.removeNamedItem("android:pathData")
 
         Path(
             CommandString(pathDataString).toCommandList(),
-            node.attributes.removeOrNull("android:name")?.nodeValue,
+            id,
             node.attributes.toMutableMap(),
-            color,
+            fill,
+            stroke,
+            strokeWidth
         )
     }
 }

@@ -18,6 +18,7 @@ import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.util.assertk.containsKeys
 import com.jzbrooks.vgo.util.assertk.doesNotContainKey
+import com.jzbrooks.vgo.util.element.createPath
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Node
@@ -145,15 +146,12 @@ class VectorDrawableReaderTests {
             |</vector>
             |""".trimMargin().toByteArray()
 
-        val expectedChild = Path(
+        val expectedChild = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                 LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))),
                 ClosePath,
             ),
-            null,
-            mutableMapOf(),
-            Colors.TRANSPARENT,
         )
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {

@@ -45,7 +45,7 @@ value class Color(private val argb: UInt) {
 
             val hexColor = pattern.format(red.toInt(), green.toInt(), blue.toInt())
 
-            if (hexColor.drop(2).all { it == hexColor[1]}) {
+            if (hexColor.drop(2).all { it == hexColor[1] }) {
                 hexColor.dropLast(3)
             } else {
                 hexColor

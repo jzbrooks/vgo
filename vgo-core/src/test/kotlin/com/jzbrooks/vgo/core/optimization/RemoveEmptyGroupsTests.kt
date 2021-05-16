@@ -2,13 +2,13 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.hasSize
-import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
@@ -39,12 +39,7 @@ class RemoveEmptyGroupsTests {
                         listOf(
                             Group(
                                 listOf(
-                                    Path(
-                                        listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f)))),
-                                        null,
-                                        mutableMapOf(),
-                                        Colors.BLACK,
-                                    )
+                                    createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f)))))
                                 )
                             )
                         )
@@ -85,12 +80,7 @@ class RemoveEmptyGroupsTests {
     fun testCollapseEmptyGroupAndAvoidAdjacentElements() {
         val nestedEmptyGroups = listOf(
             Group(emptyList()),
-            Path(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f)))),
-                null,
-                mutableMapOf(),
-                Colors.BLACK,
-            )
+            createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f))))),
         )
 
         val graphic = object : Graphic {

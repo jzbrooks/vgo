@@ -3,8 +3,6 @@ package com.jzbrooks.vgo.core.optimization
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isTrue
-import com.jzbrooks.vgo.core.Colors
-import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
@@ -17,22 +15,20 @@ import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
 class BreakoutImplicitCommandsTests {
     @Test
     fun testImplicitCommandsBrokenOut() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(103f, 6f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(106f, 7f), Point(93f, 10f))),
                 ClosePath,
             ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
         )
 
         BreakoutImplicitCommands().visit(path)
@@ -43,7 +39,7 @@ class BreakoutImplicitCommandsTests {
 
     @Test
     fun testImplicitLineToCommandsInMoveToAreBrokenOut() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(
                     CommandVariant.ABSOLUTE,
@@ -56,9 +52,6 @@ class BreakoutImplicitCommandsTests {
                 ),
                 ClosePath,
             ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
         )
 
         BreakoutImplicitCommands().visit(path)
@@ -69,7 +62,7 @@ class BreakoutImplicitCommandsTests {
 
     @Test
     fun testSingleParameterCommandsAreNotModified() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
                 CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(CubicBezierCurve.Parameter(Point(109f, 8f), Point(113f, 12f), Point(120f, 10f)))),
@@ -82,9 +75,6 @@ class BreakoutImplicitCommandsTests {
                 EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(EllipticalArcCurve.Parameter(4f, 3f, 93f, EllipticalArcCurve.ArcFlag.LARGE, EllipticalArcCurve.SweepFlag.CLOCKWISE, Point(109f, 15f)))),
                 ClosePath,
             ),
-            null,
-            mutableMapOf(),
-            Colors.BLACK,
         )
         val sizeBefore = path.commands.size
 

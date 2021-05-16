@@ -68,13 +68,19 @@ private fun parseGroupElement(node: Node): Group {
 }
 
 private fun parsePathElement(node: Node): Path {
-    val color = node.attributes.extractColor("fill", Colors.BLACK)
+    val commands = CommandString(node.attributes.removeNamedItem("d").nodeValue.toString()).toCommandList()
+    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val fill = node.attributes.extractColor("fill", Colors.BLACK)
+    val stroke = node.attributes.extractColor("stroke", Colors.TRANSPARENT)
+    val strokeWidth = node.attributes.removeOrNull("stroke-width")?.nodeValue?.toUIntOrNull() ?: 1u
 
     return Path(
-        CommandString(node.attributes.removeNamedItem("d").nodeValue.toString()).toCommandList(),
-        node.attributes.removeOrNull("id")?.nodeValue,
+        commands,
+        id,
         node.attributes.toMutableMap(),
-        color,
+        fill,
+        stroke,
+        strokeWidth,
     )
 }
 

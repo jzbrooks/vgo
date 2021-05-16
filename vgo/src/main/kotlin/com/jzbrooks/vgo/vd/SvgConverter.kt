@@ -56,6 +56,8 @@ private fun process(containerElement: ContainerElement): Element {
                         null,
                         mutableMapOf(),
                         Colors.BLACK,
+                        Colors.TRANSPARENT,
+                        1u,
                     )
                 ),
                 "clip_$index",
