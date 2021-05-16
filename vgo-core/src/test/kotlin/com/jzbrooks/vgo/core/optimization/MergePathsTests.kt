@@ -74,7 +74,7 @@ class MergePathsTests {
             ),
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                strokeWidth = 5u,
+                strokeWidth = 5f,
             ),
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))
@@ -110,7 +110,7 @@ class MergePathsTests {
                         ),
                         createPath(
                             listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                            strokeWidth = 5u,
+                            strokeWidth = 5f,
                         ),
                         createPath(
                             listOf(
@@ -142,7 +142,7 @@ class MergePathsTests {
             ),
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                strokeWidth = 5u,
+                strokeWidth = 5f,
             ),
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))
@@ -174,7 +174,7 @@ class MergePathsTests {
                 ),
                 createPath(
                     listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                    strokeWidth = 5u
+                    strokeWidth = 5f,
                 ),
                 createPath(
                     listOf(
@@ -204,7 +204,7 @@ class MergePathsTests {
             ),
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                strokeWidth = 5u,
+                strokeWidth = 5f,
             ),
             Group(emptyList()),
             createPath(
@@ -237,7 +237,7 @@ class MergePathsTests {
                 ),
                 createPath(
                     listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                    strokeWidth = 5u,
+                    strokeWidth = 5f,
                 ),
                 Group(emptyList()),
                 createPath(

@@ -137,6 +137,12 @@ tasks {
         }
     }
 
+    val updateInPlaceBaselines by registering(Copy::class) {
+        from("$buildDir/test-results/avocado_example_testOptimizationFinishes.xml")
+        into("src/test/resources/in-place-modify/")
+        rename("avocado_example_testOptimizationFinishes.xml", "avocado_example_optimized.xml")
+    }
+
     val updateBaselineOptimizations by registering(Copy::class) {
         description = "Updates baseline assets with the latest integration test outputs."
         group = "Build Setup"
@@ -146,14 +152,9 @@ tasks {
             include("*testOptimizationFinishes.svg")
         }
         into("src/test/resources/baseline/")
-        rename { original ->
-            val originalAssetName = original.let {
-                val i = it.lastIndexOf('_')
-                it.substring(0 until i)
-            }
-            val fileExtension = original.split('.').last()
-            "${originalAssetName}_optimized.$fileExtension"
-        }
+        rename("(\\w+)_testOptimizationFinishes.(xml|svg)", "$1_optimized.$2")
+
+        dependsOn(updateInPlaceBaselines)
     }
 
     val sourcesJar by creating(Jar::class) {

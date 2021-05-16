@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -68,12 +69,12 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                     }
 
                     if (element.stroke.alpha != 0.toUByte()) {
-                        val color = element.fill.toHexString(Color.HexFormat.ARGB)
+                        val color = element.stroke.toHexString(Color.HexFormat.ARGB)
                         setAttribute("android:strokeColor", color)
                     }
 
-                    if (element.strokeWidth != 0u) {
-                        setAttribute("android:strokeWidth", element.strokeWidth.toString())
+                    if (element.strokeWidth != 0f) {
+                        setAttribute("android:strokeWidth", formatter.format(element.strokeWidth))
                     }
                 }
             }

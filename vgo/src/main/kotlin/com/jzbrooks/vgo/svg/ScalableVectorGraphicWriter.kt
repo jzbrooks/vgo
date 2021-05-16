@@ -69,13 +69,13 @@ class ScalableVectorGraphicWriter(
                         }
                     }
 
-                    if (element.stroke != Colors.TRANSPARENT && element.stroke.alpha != 0.toUByte()) {
-                        val color = NAMED_COLORS[element.fill] ?: element.fill.toHexString(Color.HexFormat.RGBA)
-                        setAttribute("fill", color)
+                    if (element.stroke.alpha != 0.toUByte()) {
+                        val color = NAMED_COLORS[element.stroke] ?: element.stroke.toHexString(Color.HexFormat.RGBA)
+                        setAttribute("stroke", color)
                     }
 
-                    if (element.strokeWidth != 0u) {
-                        setAttribute("stroke-width", element.strokeWidth.toString())
+                    if (element.strokeWidth != 1f) {
+                        setAttribute("stroke-width", formatter.format(element.strokeWidth))
                     }
                 }
             }

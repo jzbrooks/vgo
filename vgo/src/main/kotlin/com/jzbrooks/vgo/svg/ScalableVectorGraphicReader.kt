@@ -9,6 +9,7 @@ import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.xml.asSequence
+import com.jzbrooks.vgo.core.util.xml.removeFloatOrNull
 import com.jzbrooks.vgo.core.util.xml.removeOrNull
 import com.jzbrooks.vgo.core.util.xml.toMutableMap
 import com.jzbrooks.vgo.svg.graphic.ClipPath
@@ -72,7 +73,7 @@ private fun parsePathElement(node: Node): Path {
     val id = node.attributes.removeOrNull("id")?.nodeValue
     val fill = node.attributes.extractColor("fill", Colors.BLACK)
     val stroke = node.attributes.extractColor("stroke", Colors.TRANSPARENT)
-    val strokeWidth = node.attributes.removeOrNull("stroke-width")?.nodeValue?.toUIntOrNull() ?: 1u
+    val strokeWidth = node.attributes.removeFloatOrNull("stroke-width") ?: 1f
 
     return Path(
         commands,

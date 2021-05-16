@@ -11,7 +11,7 @@ fun createPath(
     foreign: MutableMap<String, String> = mutableMapOf(),
     fill: Color = Colors.BLACK,
     stroke: Color = Colors.TRANSPARENT,
-    strokeWidth: UInt = 1u,
+    strokeWidth: Float = 1f,
 ) = Path(
     commands,
     id,

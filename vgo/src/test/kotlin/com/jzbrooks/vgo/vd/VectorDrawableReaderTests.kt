@@ -61,7 +61,7 @@ class VectorDrawableReaderTests {
         val path = graphic.elements.first() as Path
 
         assertThat(path.id).isNotNull()
-        assertThat(path.foreign).containsKeys("android:strokeWidth")
+        assertThat(path.strokeWidth).isEqualTo(1f)
         assertThat(path.fill).isEqualTo(Colors.BLACK)
     }
 
@@ -152,6 +152,8 @@ class VectorDrawableReaderTests {
                 LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))),
                 ClosePath,
             ),
+            fill = Colors.TRANSPARENT,
+            strokeWidth = 0f,
         )
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {

@@ -65,10 +65,10 @@ private fun parseGroup(node: Node): Group {
 private fun parsePath(node: Node): Path {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
 
-    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val id = node.attributes.removeOrNull("android:name")?.nodeValue
     val fill = node.attributes.extractColor("android:fillColor", Colors.TRANSPARENT)
     val stroke = node.attributes.extractColor("android:strokeColor", Colors.TRANSPARENT)
-    val strokeWidth = node.attributes.removeOrNull("android:strokeWidth")?.nodeValue?.toUIntOrNull() ?: 0u
+    val strokeWidth = node.attributes.removeFloatOrNull("android:strokeWidth") ?: 0f
 
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
         Path(
@@ -195,9 +195,9 @@ private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
     val value = removeOrNull(key)?.nodeValue?.toString() ?: return default
 
     val colorInt = if (value.length == 9) {
-        value.trim('#').toUInt(radix = 16)
+        value.trimStart('#').toUInt(radix = 16)
     } else {
-        value.trim('#').toUInt(radix = 16) or 0xFF000000u
+        value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
     }
 
     return Color(colorInt)
