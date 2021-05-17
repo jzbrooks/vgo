@@ -99,6 +99,10 @@ class ScalableVectorGraphicWriter(
                         }
                         setAttribute("stroke-linejoin", lineJoin)
                     }
+
+                    if (element.strokeMiterLimit != 4f) {
+                        setAttribute("stroke-miterlimit", formatter.format(element.strokeMiterLimit))
+                    }
                 }
             }
             is Group -> {

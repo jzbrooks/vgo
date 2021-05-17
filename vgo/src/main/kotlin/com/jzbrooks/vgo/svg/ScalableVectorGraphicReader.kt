@@ -78,6 +78,7 @@ private fun parsePathElement(node: Node): Path {
     val strokeWidth = node.attributes.removeFloatOrNull("stroke-width") ?: 1f
     val strokeLineCap = node.attributes.extractLineCap("stroke-linecap")
     val strokeLineJoin = node.attributes.extractLineJoin("stroke-linejoin")
+    val strokeMiterLimit = node.attributes.removeFloatOrNull("stroke-miterlimit") ?: 4f
 
     return Path(
         commands,
@@ -88,6 +89,7 @@ private fun parsePathElement(node: Node): Path {
         strokeWidth,
         strokeLineCap,
         strokeLineJoin,
+        strokeMiterLimit,
     )
 }
 

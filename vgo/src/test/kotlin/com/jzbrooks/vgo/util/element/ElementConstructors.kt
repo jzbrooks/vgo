@@ -14,6 +14,7 @@ fun createPath(
     strokeWidth: Float = 1f,
     strokeLineCap: Path.LineCap = Path.LineCap.BUTT,
     strokeLineJoin: Path.LineJoin = Path.LineJoin.MITER,
+    strokeMiterLimit: Float = 4f,
 ) = Path(
     commands,
     id,
@@ -23,4 +24,5 @@ fun createPath(
     strokeWidth,
     strokeLineCap,
     strokeLineJoin,
+    strokeMiterLimit,
 )

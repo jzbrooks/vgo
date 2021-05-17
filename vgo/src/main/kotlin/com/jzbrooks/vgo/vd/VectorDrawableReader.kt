@@ -73,6 +73,7 @@ private fun parsePath(node: Node): Path {
     val strokeWidth = node.attributes.removeFloatOrNull("android:strokeWidth") ?: 0f
     val strokeLineCap = node.attributes.extractLineCap("android:strokeLineCap")
     val strokeLineJoin = node.attributes.extractLineJoin("android:strokeLineJoin")
+    val strokeMiterLimit = node.attributes.removeFloatOrNull("android:strokeMiterLimit") ?: 4f
 
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
         Path(
@@ -84,6 +85,7 @@ private fun parsePath(node: Node): Path {
             strokeWidth,
             strokeLineCap,
             strokeLineJoin,
+            strokeMiterLimit,
         )
     } else {
         node.attributes.removeNamedItem("android:pathData")
@@ -97,6 +99,7 @@ private fun parsePath(node: Node): Path {
             strokeWidth,
             strokeLineCap,
             strokeLineJoin,
+            strokeMiterLimit,
         )
     }
 }

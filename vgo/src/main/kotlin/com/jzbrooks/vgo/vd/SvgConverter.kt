@@ -60,6 +60,7 @@ private fun process(containerElement: ContainerElement): Element {
                         1f,
                         Path.LineCap.BUTT,
                         Path.LineJoin.MITER,
+                        4f,
                     )
                 ),
                 "clip_$index",

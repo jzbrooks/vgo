@@ -98,6 +98,10 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                         }
                         setAttribute("android:strokeLineJoin", lineJoin)
                     }
+
+                    if (element.strokeMiterLimit != 4f) {
+                        setAttribute("android:strokeLineJoin", formatter.format(element.strokeMiterLimit))
+                    }
                 }
             }
             is Group -> {
