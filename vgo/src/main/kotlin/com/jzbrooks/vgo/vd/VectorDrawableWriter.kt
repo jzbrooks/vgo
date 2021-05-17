@@ -84,6 +84,20 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                         }
                         setAttribute("android:strokeLineCap", lineCap)
                     }
+
+                    if (element.strokeLineJoin != Path.LineJoin.MITER) {
+                        val lineJoin = when (val lineJoin = element.strokeLineJoin) {
+                            Path.LineJoin.ROUND -> "round"
+                            Path.LineJoin.BEVEL -> "bevel"
+                            Path.LineJoin.MITER -> throw IllegalStateException(
+                                "Default linejoin ('miter') shouldn't ever be written."
+                            )
+                            Path.LineJoin.MITER_CLIP, Path.LineJoin.ARCS -> throw IllegalStateException(
+                                "VectorDrawable does not support line join: $lineJoin"
+                            )
+                        }
+                        setAttribute("android:strokeLineJoin", lineJoin)
+                    }
                 }
             }
             is Group -> {

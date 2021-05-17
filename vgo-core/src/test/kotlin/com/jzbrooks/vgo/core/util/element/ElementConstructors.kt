@@ -13,6 +13,7 @@ fun createPath(
     stroke: Color = Colors.TRANSPARENT,
     strokeWidth: Float = 1f,
     strokeLineCap: Path.LineCap = Path.LineCap.BUTT,
+    strokeLineJoin: Path.LineJoin = Path.LineJoin.MITER,
 ) = Path(
     commands,
     id,
@@ -21,4 +22,5 @@ fun createPath(
     stroke,
     strokeWidth,
     strokeLineCap,
+    strokeLineJoin,
 )

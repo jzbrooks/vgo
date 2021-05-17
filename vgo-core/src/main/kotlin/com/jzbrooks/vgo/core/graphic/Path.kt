@@ -11,6 +11,7 @@ data class Path(
     val stroke: Color,
     val strokeWidth: Float,
     val strokeLineCap: LineCap,
+    val strokeLineJoin: LineJoin,
 ) : PathElement {
     override fun hasSameAttributes(other: PathElement): Boolean {
         return other is Path &&
@@ -19,12 +20,21 @@ data class Path(
             fill == other.fill &&
             stroke == other.stroke &&
             strokeWidth == other.strokeWidth &&
-            strokeLineCap == other.strokeLineCap
+            strokeLineCap == other.strokeLineCap &&
+            strokeLineJoin == other.strokeLineJoin
     }
 
     enum class LineCap {
         BUTT,
         ROUND,
         SQUARE,
+    }
+
+    enum class LineJoin {
+        MITER,
+        ROUND,
+        BEVEL,
+        ARCS,
+        MITER_CLIP,
     }
 }

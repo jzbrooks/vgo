@@ -10,6 +10,7 @@ import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.xml.asSequence
 import com.jzbrooks.vgo.core.util.xml.extractLineCap
+import com.jzbrooks.vgo.core.util.xml.extractLineJoin
 import com.jzbrooks.vgo.core.util.xml.removeFloatOrNull
 import com.jzbrooks.vgo.core.util.xml.removeOrNull
 import com.jzbrooks.vgo.core.util.xml.toMutableMap
@@ -71,6 +72,8 @@ private fun parsePath(node: Node): Path {
     val stroke = node.attributes.extractColor("android:strokeColor", Colors.TRANSPARENT)
     val strokeWidth = node.attributes.removeFloatOrNull("android:strokeWidth") ?: 0f
     val strokeLineCap = node.attributes.extractLineCap("android:strokeLineCap")
+    val strokeLineJoin = node.attributes.extractLineJoin("android:strokeLineJoin")
+
 
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
         Path(
@@ -81,6 +84,7 @@ private fun parsePath(node: Node): Path {
             stroke,
             strokeWidth,
             strokeLineCap,
+            strokeLineJoin,
         )
     } else {
         node.attributes.removeNamedItem("android:pathData")
@@ -93,6 +97,7 @@ private fun parsePath(node: Node): Path {
             stroke,
             strokeWidth,
             strokeLineCap,
+            strokeLineJoin,
         )
     }
 }
@@ -192,7 +197,7 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
         Matrix3.IDENTITY
     }
 
-    return listOf(pivot, translation, rotate, scale, pivotInverse).reduce(Matrix3::times)
+    return pivot * translation * rotate * scale * pivotInverse
 }
 
 private fun NamedNodeMap.extractColor(key: String, default: Color): Color {

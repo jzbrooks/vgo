@@ -86,6 +86,19 @@ class ScalableVectorGraphicWriter(
                         }
                         setAttribute("stroke-linecap", lineCap)
                     }
+
+                    if (element.strokeLineJoin != Path.LineJoin.MITER) {
+                        val lineJoin = when (element.strokeLineJoin) {
+                            Path.LineJoin.ROUND -> "round"
+                            Path.LineJoin.BEVEL -> "bevel"
+                            Path.LineJoin.MITER_CLIP -> "miter-clip"
+                            Path.LineJoin.ARCS -> "arcs"
+                            Path.LineJoin.MITER -> throw IllegalStateException(
+                                "Default linejoin ('miter') shouldn't ever be written."
+                            )
+                        }
+                        setAttribute("stroke-linejoin", lineJoin)
+                    }
                 }
             }
             is Group -> {

@@ -10,6 +10,7 @@ import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.xml.asSequence
 import com.jzbrooks.vgo.core.util.xml.extractLineCap
+import com.jzbrooks.vgo.core.util.xml.extractLineJoin
 import com.jzbrooks.vgo.core.util.xml.removeFloatOrNull
 import com.jzbrooks.vgo.core.util.xml.removeOrNull
 import com.jzbrooks.vgo.core.util.xml.toMutableMap
@@ -76,6 +77,7 @@ private fun parsePathElement(node: Node): Path {
     val stroke = node.attributes.extractColor("stroke", Colors.TRANSPARENT)
     val strokeWidth = node.attributes.removeFloatOrNull("stroke-width") ?: 1f
     val strokeLineCap = node.attributes.extractLineCap("stroke-linecap")
+    val strokeLineJoin = node.attributes.extractLineJoin("stroke-linejoin")
 
     return Path(
         commands,
@@ -85,6 +87,7 @@ private fun parsePathElement(node: Node): Path {
         stroke,
         strokeWidth,
         strokeLineCap,
+        strokeLineJoin,
     )
 }
 

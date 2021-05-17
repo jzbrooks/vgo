@@ -57,3 +57,11 @@ fun NamedNodeMap.extractLineCap(key: String) = when (removeOrNull(key)?.nodeValu
     "square" -> Path.LineCap.SQUARE
     else -> Path.LineCap.BUTT
 }
+
+fun NamedNodeMap.extractLineJoin(key: String) = when (removeOrNull(key)?.nodeValue) {
+    "round" -> Path.LineJoin.ROUND
+    "bevel" -> Path.LineJoin.BEVEL
+    "arcs" -> Path.LineJoin.ARCS
+    "miter-clip" -> Path.LineJoin.MITER_CLIP
+    else -> Path.LineJoin.MITER
+}
