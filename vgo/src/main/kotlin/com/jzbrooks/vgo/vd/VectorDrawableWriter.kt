@@ -76,6 +76,15 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                     if (element.strokeWidth != 0f) {
                         setAttribute("android:strokeWidth", formatter.format(element.strokeWidth))
                     }
+
+                    if (element.strokeLineCap != Path.LineCap.BUTT) {
+                        val lineCap = when (element.strokeLineCap) {
+                            Path.LineCap.SQUARE -> "square"
+                            Path.LineCap.ROUND -> "round"
+                            else -> throw IllegalStateException("Default linecap ('butt') shouldn't ever be written.")
+                        }
+                        setAttribute("android:strokeLineCap", lineCap)
+                    }
                 }
             }
             is Group -> {

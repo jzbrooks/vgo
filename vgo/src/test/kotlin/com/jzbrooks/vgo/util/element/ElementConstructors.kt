@@ -12,6 +12,7 @@ fun createPath(
     fill: Color = Colors.BLACK,
     stroke: Color = Colors.TRANSPARENT,
     strokeWidth: Float = 1f,
+    strokeLineCap: Path.LineCap = Path.LineCap.BUTT,
 ) = Path(
     commands,
     id,
@@ -19,4 +20,5 @@ fun createPath(
     fill,
     stroke,
     strokeWidth,
+    strokeLineCap,
 )

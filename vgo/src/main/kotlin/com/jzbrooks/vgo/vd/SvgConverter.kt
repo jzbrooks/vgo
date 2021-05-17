@@ -58,6 +58,7 @@ private fun process(containerElement: ContainerElement): Element {
                         Colors.BLACK,
                         Colors.TRANSPARENT,
                         1f,
+                        Path.LineCap.BUTT,
                     )
                 ),
                 "clip_$index",
