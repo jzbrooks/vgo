@@ -74,7 +74,6 @@ private fun parsePath(node: Node): Path {
     val strokeLineCap = node.attributes.extractLineCap("android:strokeLineCap")
     val strokeLineJoin = node.attributes.extractLineJoin("android:strokeLineJoin")
 
-
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
         Path(
             emptyList(),
