@@ -16,7 +16,6 @@ import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.math.Point
-import com.jzbrooks.vgo.util.assertk.containsKeys
 import com.jzbrooks.vgo.util.assertk.doesNotContainKey
 import com.jzbrooks.vgo.util.element.createPath
 import org.junit.jupiter.api.BeforeEach

@@ -1,7 +1,6 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Color
-import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
