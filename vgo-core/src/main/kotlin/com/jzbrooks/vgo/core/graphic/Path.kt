@@ -8,6 +8,7 @@ data class Path(
     override val id: String?,
     override val foreign: MutableMap<String, String>,
     val fill: Color,
+    val fillRule: FillRule,
     val stroke: Color,
     val strokeWidth: Float,
     val strokeLineCap: LineCap,
@@ -19,11 +20,17 @@ data class Path(
             id == other.id &&
             foreign == other.foreign &&
             fill == other.fill &&
+            fillRule == other.fillRule &&
             stroke == other.stroke &&
             strokeWidth == other.strokeWidth &&
             strokeLineCap == other.strokeLineCap &&
             strokeLineJoin == other.strokeLineJoin &&
             strokeMiterLimit == other.strokeMiterLimit
+    }
+
+    enum class FillRule {
+        NON_ZERO,
+        EVEN_ODD,
     }
 
     enum class LineCap {

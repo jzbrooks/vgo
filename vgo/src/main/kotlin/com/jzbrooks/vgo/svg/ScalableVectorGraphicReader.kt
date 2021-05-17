@@ -74,6 +74,7 @@ private fun parsePathElement(node: Node): Path {
     val commands = CommandString(node.attributes.removeNamedItem("d").nodeValue.toString()).toCommandList()
     val id = node.attributes.removeOrNull("id")?.nodeValue
     val fill = node.attributes.extractColor("fill", Colors.BLACK)
+    val fillRule = node.attributes.extractFillRule("fill-rule")
     val stroke = node.attributes.extractColor("stroke", Colors.TRANSPARENT)
     val strokeWidth = node.attributes.removeFloatOrNull("stroke-width") ?: 1f
     val strokeLineCap = node.attributes.extractLineCap("stroke-linecap")
@@ -85,6 +86,7 @@ private fun parsePathElement(node: Node): Path {
         id,
         node.attributes.toMutableMap(),
         fill,
+        fillRule,
         stroke,
         strokeWidth,
         strokeLineCap,
@@ -143,4 +145,9 @@ private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
     }
 
     return Color(hex.toUInt(radix = 16) or 0xFF000000u)
+}
+
+private fun NamedNodeMap.extractFillRule(key: String) = when (removeOrNull(key)?.nodeValue) {
+    "evenodd" -> Path.FillRule.EVEN_ODD
+    else -> Path.FillRule.NON_ZERO
 }

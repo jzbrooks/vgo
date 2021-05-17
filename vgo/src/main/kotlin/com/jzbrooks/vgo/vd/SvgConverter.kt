@@ -56,6 +56,7 @@ private fun process(containerElement: ContainerElement): Element {
                         null,
                         mutableMapOf(),
                         Colors.BLACK,
+                        Path.FillRule.NON_ZERO,
                         Colors.TRANSPARENT,
                         1f,
                         Path.LineCap.BUTT,

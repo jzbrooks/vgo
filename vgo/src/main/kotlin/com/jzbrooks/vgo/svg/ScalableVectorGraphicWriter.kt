@@ -69,6 +69,16 @@ class ScalableVectorGraphicWriter(
                         }
                     }
 
+                    if (element.fillRule != Path.FillRule.NON_ZERO) {
+                        val fillRule = when (element.fillRule) {
+                            Path.FillRule.EVEN_ODD -> "evenodd"
+                            Path.FillRule.NON_ZERO -> throw IllegalStateException(
+                                "Default fill rule ('nonzero') should never be written"
+                            )
+                        }
+                        setAttribute("fill-rule", fillRule)
+                    }
+
                     if (element.stroke.alpha != 0.toUByte()) {
                         val color = Colors.NAMES_BY_COLORS[element.stroke] ?: element.stroke.toHexString(Color.HexFormat.RGBA)
                         setAttribute("stroke", color)

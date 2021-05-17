@@ -67,6 +67,16 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                         setAttribute("android:fillColor", color)
                     }
 
+                    if (element.fillRule != Path.FillRule.NON_ZERO) {
+                        val fillType = when (element.fillRule) {
+                            Path.FillRule.EVEN_ODD -> "evenOdd"
+                            Path.FillRule.NON_ZERO -> throw IllegalStateException(
+                                "Default fill type ('nonZero') should never be written"
+                            )
+                        }
+                        setAttribute("android:fillType", fillType)
+                    }
+
                     if (element.stroke.alpha != 0.toUByte()) {
                         val color = element.stroke.toHexString(Color.HexFormat.ARGB)
                         setAttribute("android:strokeColor", color)
@@ -80,7 +90,9 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                         val lineCap = when (element.strokeLineCap) {
                             Path.LineCap.SQUARE -> "square"
                             Path.LineCap.ROUND -> "round"
-                            else -> throw IllegalStateException("Default linecap ('butt') shouldn't ever be written.")
+                            Path.LineCap.BUTT -> throw IllegalStateException(
+                                "Default linecap ('butt') shouldn't ever be written."
+                            )
                         }
                         setAttribute("android:strokeLineCap", lineCap)
                     }

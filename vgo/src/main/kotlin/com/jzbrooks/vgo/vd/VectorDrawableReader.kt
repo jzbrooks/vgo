@@ -69,6 +69,7 @@ private fun parsePath(node: Node): Path {
 
     val id = node.attributes.removeOrNull("android:name")?.nodeValue
     val fill = node.attributes.extractColor("android:fillColor", Colors.TRANSPARENT)
+    val fillRule = node.attributes.extractFillRule("android:fillType")
     val stroke = node.attributes.extractColor("android:strokeColor", Colors.TRANSPARENT)
     val strokeWidth = node.attributes.removeFloatOrNull("android:strokeWidth") ?: 0f
     val strokeLineCap = node.attributes.extractLineCap("android:strokeLineCap")
@@ -81,6 +82,7 @@ private fun parsePath(node: Node): Path {
             id,
             node.attributes.toMutableMap(),
             fill,
+            fillRule,
             stroke,
             strokeWidth,
             strokeLineCap,
@@ -95,6 +97,7 @@ private fun parsePath(node: Node): Path {
             id,
             node.attributes.toMutableMap(),
             fill,
+            fillRule,
             stroke,
             strokeWidth,
             strokeLineCap,
@@ -212,4 +215,9 @@ private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
     }
 
     return Color(colorInt)
+}
+
+fun NamedNodeMap.extractFillRule(key: String) = when (removeOrNull(key)?.nodeValue) {
+    "evenOdd" -> Path.FillRule.EVEN_ODD
+    else -> Path.FillRule.NON_ZERO
 }
