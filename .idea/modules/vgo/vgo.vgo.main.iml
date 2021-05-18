@@ -43,7 +43,6 @@
       <sourceFolder url="file://$MODULE_DIR$/../../../vgo/src/generated/kotlin" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../../../vgo/src/main">
-      <sourceFolder url="file://$MODULE_DIR$/../../../vgo/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../../vgo/src/main/kotlin" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />

@@ -21,6 +21,7 @@ import org.w3c.dom.Node
 import org.w3c.dom.Text
 import kotlin.math.PI
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
 private val HEX_WITH_ALPHA = Regex("#[a-fA-F\\d]{8}")
@@ -68,9 +69,9 @@ private fun parsePath(node: Node): Path {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
 
     val id = node.attributes.removeOrNull("android:name")?.nodeValue
-    val fill = node.attributes.extractColor("android:fillColor", Colors.TRANSPARENT)
+    val fill = node.attributes.extractColor("android:fillColor", "android:fillAlpha", Colors.TRANSPARENT)
     val fillRule = node.attributes.extractFillRule("android:fillType")
-    val stroke = node.attributes.extractColor("android:strokeColor", Colors.TRANSPARENT)
+    val stroke = node.attributes.extractColor("android:strokeColor", "android:strokeAlpha", Colors.TRANSPARENT)
     val strokeWidth = node.attributes.removeFloatOrNull("android:strokeWidth") ?: 0f
     val strokeLineCap = node.attributes.extractLineCap("android:strokeLineCap")
     val strokeLineJoin = node.attributes.extractLineJoin("android:strokeLineJoin")
@@ -205,13 +206,27 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
     return pivot * translation * rotate * scale * pivotInverse
 }
 
-private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
-    val value = removeOrNull(key)?.nodeValue?.toString() ?: return default
+private fun NamedNodeMap.extractColor(key: String, alphaKey: String, default: Color): Color {
+    // This will be overwritten at the end of path writing as a foreign property
+    if (getNamedItem(key)?.nodeValue?.startsWith('@') == true ||
+        getNamedItem(alphaKey)?.nodeValue?.startsWith('@') == true
+    ) return default
 
-    val colorInt = if (value.length == 9) {
+    val value = removeOrNull(key)?.nodeValue ?: return default
+
+    val alpha = removeFloatOrNull(alphaKey)?.let { alpha ->
+        (alpha * 255).roundToInt().toUInt()
+    }
+
+    var colorInt = if (value.length == 9) {
         value.trimStart('#').toUInt(radix = 16)
     } else {
         value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
+    }
+
+    // Alpha is determined by min(color MSB, alpha attribute)
+    if (alpha != null && alpha < (colorInt shr 24)) {
+        colorInt = colorInt and 0x00FFFFFFu or (alpha shl 24)
     }
 
     return Color(colorInt)

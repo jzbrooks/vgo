@@ -49,7 +49,6 @@
     <content url="file://$MODULE_DIR$/../../../vgo-core/src/test">
       <sourceFolder url="file://$MODULE_DIR$/../../../vgo-core/src/test/kotlin" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/../../../vgo-core/src/test/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/../../../vgo-core/src/test/java" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

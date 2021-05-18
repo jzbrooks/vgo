@@ -7,6 +7,7 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -133,6 +134,48 @@ class VectorDrawableReaderTests {
 
         assertThat(unknown.name).isEqualTo("bicycle")
         assertThat(unknown.elements).isEmpty()
+    }
+
+    @Test
+    fun testMinimumFillAlphaIsPreferred() {
+        val vectorText = """
+            |<vector>
+            |  <path android:pathData="M0,0l2,3Z" android:fillColor="#FF00FF00" android:fillAlpha="0.5" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
+
+        val path = graphic.elements.first() as Path
+
+        assertThat(path.fill).isEqualTo(Color(0x8000FF00u))
+    }
+
+    @Test
+    fun testMinimumStrokeAlphaIsPreferred() {
+        val vectorText = """
+            |<vector>
+            |  <path android:pathData="M0,0l2,3Z" android:strokeColor="#FF00FF00" android:strokeAlpha="0.5" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
+
+        val path = graphic.elements.first() as Path
+
+        assertThat(path.stroke).isEqualTo(Color(0x8000FF00u))
     }
 
     @Test

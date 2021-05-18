@@ -44,7 +44,6 @@
     <output url="file://$MODULE_DIR$/../../../vgo-plugin/build/classes/java/main" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/../../../vgo-plugin/src/main">
-      <sourceFolder url="file://$MODULE_DIR$/../../../vgo-plugin/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../../vgo-plugin/src/main/kotlin" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
