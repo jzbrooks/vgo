@@ -1,36 +1,25 @@
-package com.jzbrooks.vgo.core.util.xml
+package com.jzbrooks.vgo.util.xml
 
 import com.jzbrooks.vgo.core.graphic.Path
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 
-fun NodeList.toList(): List<Node> {
-    val list = mutableListOf<Node>()
-    for (i in 0 until this.length) {
-        list.add(this.item(i))
-    }
-    return list
-}
-
 fun NodeList.asSequence(): Sequence<Node> {
     var i = 0
-    return generateSequence { this.item(i).also { i++ } }
+    return generateSequence { item(i++) }
 }
+
+fun NodeList.toList() = asSequence().toList()
 
 fun NamedNodeMap.asSequence(): Sequence<Node> {
     var i = 0
-    return generateSequence { this.item(i).also { i++ } }
+    return generateSequence { item(i++) }
 }
 
-fun NamedNodeMap.toMutableMap(): MutableMap<String, String> {
-    val map = mutableMapOf<String, String>()
-    for (i in 0 until this.length) {
-        val item = this.item(i)
-        map[item.nodeName] = item.nodeValue
-    }
-    return map
-}
+fun NamedNodeMap.toMutableMap() = asSequence()
+    .associate { it.nodeName to it.nodeValue }
+    .toMutableMap()
 
 fun NamedNodeMap.removeOrNull(key: String): Node? {
     val value = getNamedItem(key)

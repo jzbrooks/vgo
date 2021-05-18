@@ -8,7 +8,7 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
-import com.jzbrooks.vgo.core.util.xml.toList
+import com.jzbrooks.vgo.util.xml.toList
 import com.jzbrooks.vgo.util.assertk.hasName
 import com.jzbrooks.vgo.util.assertk.hasNames
 import com.jzbrooks.vgo.util.assertk.hasValue
