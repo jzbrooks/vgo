@@ -7,5 +7,6 @@ package com.jzbrooks.vgo.core.graphic
 data class Extra(
     var name: String,
     override var elements: List<Element>,
-    override val attributes: MutableMap<String, String>
+    override val id: String?,
+    override val foreign: MutableMap<String, String>,
 ) : ContainerElement

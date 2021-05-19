@@ -141,19 +141,12 @@ tasks {
         description = "Updates baseline assets with the latest integration test outputs."
         group = "Build Setup"
 
-        from("$buildDir/test/") {
+        from("$buildDir/test-results/") {
             include("*testOptimizationFinishes.xml")
             include("*testOptimizationFinishes.svg")
         }
         into("src/test/resources/baseline/")
-        rename { original ->
-            val originalAssetName = original.let {
-                val i = it.lastIndexOf('_')
-                it.substring(0 until i)
-            }
-            val fileExtension = original.split('.').last()
-            "${originalAssetName}_optimized.$fileExtension"
-        }
+        rename("(\\w+)_testOptimizationFinishes.(xml|svg)", "$1_optimized.$2")
     }
 
     val sourcesJar by creating(Jar::class) {

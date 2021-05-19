@@ -6,6 +6,9 @@ import assertk.assertions.containsExactly
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Path
@@ -14,9 +17,8 @@ import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.math.Point
-import com.jzbrooks.vgo.util.assertk.containsKey
-import com.jzbrooks.vgo.util.assertk.containsKeys
 import com.jzbrooks.vgo.util.assertk.doesNotContainKey
+import com.jzbrooks.vgo.util.element.createPath
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Node
@@ -39,8 +41,8 @@ class VectorDrawableReaderTests {
     fun testParseDimensions() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic.attributes["android:width"]).isEqualTo("24dp")
-        assertThat(graphic.attributes["android:height"]).isEqualTo("24dp")
+        assertThat(graphic.foreign["android:width"]).isEqualTo("24dp")
+        assertThat(graphic.foreign["android:height"]).isEqualTo("24dp")
     }
 
     @Test
@@ -49,7 +51,7 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes).doesNotContainKey("android:pathData")
+        assertThat(path.foreign).doesNotContainKey("android:pathData")
     }
 
     @Test
@@ -58,7 +60,9 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes).containsKeys("android:name", "android:strokeWidth", "android:fillColor")
+        assertThat(path.id).isNotNull()
+        assertThat(path.strokeWidth).isEqualTo(1f)
+        assertThat(path.fill).isEqualTo(Colors.BLACK)
     }
 
     @Test
@@ -84,8 +88,7 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes).containsKey("android:name")
-        assertThat(path.attributes["android:name"]).isEqualTo("strike_thru_path")
+        assertThat(path.id).isEqualTo("strike_thru_path")
     }
 
     @Test
@@ -134,6 +137,48 @@ class VectorDrawableReaderTests {
     }
 
     @Test
+    fun testMinimumFillAlphaIsPreferred() {
+        val vectorText = """
+            |<vector>
+            |  <path android:pathData="M0,0l2,3Z" android:fillColor="#FF00FF00" android:fillAlpha="0.5" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
+
+        val path = graphic.elements.first() as Path
+
+        assertThat(path.fill).isEqualTo(Color(0x8000FF00u))
+    }
+
+    @Test
+    fun testMinimumStrokeAlphaIsPreferred() {
+        val vectorText = """
+            |<vector>
+            |  <path android:pathData="M0,0l2,3Z" android:strokeColor="#FF00FF00" android:strokeAlpha="0.5" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val graphic: Graphic = parse(unknownElementDocument.firstChild)
+
+        val path = graphic.elements.first() as Path
+
+        assertThat(path.stroke).isEqualTo(Color(0x8000FF00u))
+    }
+
+    @Test
     fun testParseUnknownElementWithChildren() {
         val vectorText = """
             |<vector>
@@ -143,7 +188,15 @@ class VectorDrawableReaderTests {
             |</vector>
             |""".trimMargin().toByteArray()
 
-        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath))
+        val expectedChild = createPath(
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))),
+                ClosePath,
+            ),
+            fill = Colors.TRANSPARENT,
+            strokeWidth = 0f,
+        )
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
@@ -178,6 +231,6 @@ class VectorDrawableReaderTests {
         val path = graphic.elements.first() as Path
 
         assertThat(path.commands).isEmpty()
-        assertThat(path.attributes).contains("android:pathData", "@string/path_data")
+        assertThat(path.foreign).contains("android:pathData", "@string/path_data")
     }
 }

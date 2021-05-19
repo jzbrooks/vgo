@@ -7,8 +7,6 @@ import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.svg.graphic.ClipPath
 import com.jzbrooks.vgo.vd.VectorDrawable
-import kotlin.math.atan
-import kotlin.math.hypot
 import com.jzbrooks.vgo.vd.graphic.ClipPath as AndroidClipPath
 
 private val namedColorValues = mapOf(
@@ -177,121 +175,13 @@ private val attributeNames = mapOf(
 
 fun ScalableVectorGraphic.toVectorDrawable(): VectorDrawable {
     val graphic = traverse(this) as ContainerElement
-    return VectorDrawable(graphic.elements, convertTopLevelAttributes(attributes))
-}
 
-private fun traverse(element: Element): Element {
-    return when (element) {
-        is ContainerElement -> process(element)
-        is PathElement -> process(element)
-        else -> element
-    }
-}
+    foreign.remove("xmlns")
 
-private fun process(containerElement: ContainerElement): Element {
-    val clipPaths = containerElement.elements
-        .filterIsInstance<ClipPath>()
-        .associateBy { it.attributes.getValue("id") }
-
-    val newElements = mutableListOf<Element>()
-    for (element in containerElement.elements.filter { it !is ClipPath }) {
-        if (element.attributes.containsKey("clip-path")) {
-            val id = element.attributes
-                .remove("clip-path")!!
-                .removePrefix("url(#")
-                .trimEnd(')')
-
-            val clip = clipPaths.getValue(id)
-            val vdClipPaths = clip.elements
-                .filterIsInstance<Path>()
-                .map { AndroidClipPath(it.commands, it.attributes) }
-
-            // I'm not sure grouping clip paths like this
-            // is a very good long-term solution, but it works
-            // for relatively simple cases.
-            val group = mutableListOf<Element>()
-            group.addAll(vdClipPaths)
-            group.add(element)
-            newElements.add(Group(group))
-        } else if (element !is ClipPath) {
-            newElements.add(element)
-        }
-    }
-
-    val newAttributes = convertContainerElementAttributes(containerElement.attributes)
-    containerElement.attributes.putAll(newAttributes)
-
-    return containerElement.apply { elements = newElements.map(::traverse) }
-}
-
-private fun process(pathElement: PathElement): Element {
-    return pathElement.apply {
-        val newElements = convertPathElementAttributes(attributes)
-        attributes.putAll(newElements)
-    }
-}
-
-private fun convertPathElementAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
-    val vdPathElementAttributes = mutableMapOf<String, String>()
-
-    vdPathElementAttributes.putAll(mapAttributes(attributes))
-    vdPathElementAttributes.putIfAbsent("android:strokeWidth", "1")
-
-    return vdPathElementAttributes
-}
-
-private fun convertContainerElementAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
-    val vdContainerElements = mutableMapOf<String, String>()
-
-    attributes.remove("transform")?.let { matrix ->
-        val entries = matrix.removePrefix("matrix(")
-            .trimEnd(')')
-            .split(',')
-            .map { it.trim() }
-
-        val a = entries[0].toDouble()
-        val b = entries[2].toDouble()
-        val c = entries[1].toDouble()
-        val d = entries[3].toDouble()
-
-        if (entries[4] != "0") {
-            vdContainerElements["android:translateX"] = entries[4]
-        }
-
-        if (entries[5] != "0") {
-            vdContainerElements["android:translateY"] = entries[5]
-        }
-
-        // todo(jzb): truncate at some precision
-        // todo(jzb): compare floats with some epsilon
-        val scaleX = hypot(a, c)
-        if (scaleX != 1.0) {
-            vdContainerElements["android:scaleX"] = scaleX.toString()
-        }
-
-        val scaleY = hypot(b, d)
-        if (scaleY != 1.0) {
-            vdContainerElements["android:scaleY"] = scaleY.toString()
-        }
-
-        val rotation = atan(c / d)
-        if (rotation != 0.0) {
-            vdContainerElements["android:rotation"] = rotation.toString()
-        }
-    }
-
-    vdContainerElements.putAll(mapAttributes(attributes))
-
-    return vdContainerElements
-}
-
-private fun convertTopLevelAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
-    attributes.remove("xmlns")
-
-    val viewBox = attributes.remove("viewBox")!!.split(" ")
+    val viewBox = foreign.remove("viewBox")!!.split(" ")
 
     val width = run {
-        val w = attributes.remove("width")
+        val w = foreign.remove("width")
         if (w != null && !w.endsWith('%')) {
             w
         } else {
@@ -300,7 +190,7 @@ private fun convertTopLevelAttributes(attributes: MutableMap<String, String>): M
     }
 
     val height = run {
-        val h = attributes.remove("height")
+        val h = foreign.remove("height")
         if (h != null && !h.endsWith('%')) {
             h
         } else {
@@ -316,12 +206,74 @@ private fun convertTopLevelAttributes(attributes: MutableMap<String, String>): M
         "android:height" to "${height}dp"
     )
 
-    vdElementAttributes.putAll(mapAttributes(attributes))
+    vdElementAttributes.putAll(mapAttributes(foreign))
 
-    return vdElementAttributes
+    return VectorDrawable(
+        graphic.elements,
+        graphic.id,
+        vdElementAttributes,
+    )
 }
 
-private fun mapAttributes(attributes: MutableMap<String, String>): Map<String, String> {
+private fun traverse(element: Element): Element {
+    return when (element) {
+        is ContainerElement -> process(element)
+        is PathElement -> process(element)
+        else -> element
+    }
+}
+
+private fun process(containerElement: ContainerElement): Element {
+    val clipPaths = containerElement.elements
+        .filterIsInstance<ClipPath>()
+        .associateBy { it.id }
+
+    val newElements = mutableListOf<Element>()
+    for (element in containerElement.elements.filter { it !is ClipPath }) {
+        if (element.foreign.containsKey("clip-path")) {
+            val id = element.foreign
+                .remove("clip-path")!!
+                .removePrefix("url(#")
+                .trimEnd(')')
+
+            val clip = clipPaths.getValue(id)
+            val vdClipPaths = clip.elements
+                .filterIsInstance<Path>()
+                .map { AndroidClipPath(it.commands, it.id, it.foreign.toMutableMap()) }
+
+            // I'm not sure grouping clip paths like this
+            // is a very good long-term solution, but it works
+            // for relatively simple cases.
+            val group = mutableListOf<Element>()
+            group.addAll(vdClipPaths)
+            group.add(element)
+            newElements.add(Group(group))
+        } else if (element !is ClipPath) {
+            newElements.add(element)
+        }
+    }
+
+    return containerElement.apply { elements = newElements.map(::traverse) }
+}
+
+private fun process(pathElement: PathElement): Element {
+    return pathElement.apply {
+        val newElements = convertPathElementAttributes(pathElement.foreign.toMutableMap())
+        pathElement.foreign.clear()
+        pathElement.foreign.putAll(newElements)
+    }
+}
+
+private fun convertPathElementAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
+    val vdPathElementAttributes = mutableMapOf<String, String>()
+
+    vdPathElementAttributes.putAll(mapAttributes(attributes))
+    vdPathElementAttributes.putIfAbsent("android:strokeWidth", "1")
+
+    return vdPathElementAttributes
+}
+
+private fun mapAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
     val newAttributes = mutableMapOf<String, String>()
 
     fun addAttribute(key: String, value: String) {

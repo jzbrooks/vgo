@@ -1,10 +1,12 @@
 package com.jzbrooks.vgo.svg
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsExactly
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Path
@@ -15,9 +17,8 @@ import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.util.math.Point
-import com.jzbrooks.vgo.util.assertk.containsKey
-import com.jzbrooks.vgo.util.assertk.containsKeys
 import com.jzbrooks.vgo.util.assertk.doesNotContainKey
+import com.jzbrooks.vgo.util.element.createPath
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Node
@@ -39,7 +40,7 @@ class ScalableVectorGraphicReaderTests {
     fun testParseDimensions() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic.attributes["viewBox"]).isEqualTo("0 0 100 100")
+        assertThat(graphic.foreign).contains("viewBox", "0 0 100 100")
     }
 
     @Test
@@ -48,7 +49,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes).doesNotContainKey("d")
+        assertThat(path.foreign).doesNotContainKey("d")
     }
 
     @Test
@@ -57,7 +58,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes).containsKeys("stroke", "fill")
+        assertThat(path.stroke).isEqualTo(Color(0xFFFF0000u))
     }
 
     @Test
@@ -85,8 +86,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.attributes).containsKey("id")
-        assertThat(path.attributes["id"]).isEqualTo("heart")
+        assertThat(path.id).isEqualTo("heart")
     }
 
     @Test
@@ -144,7 +144,13 @@ class ScalableVectorGraphicReaderTests {
             |</svg>
             |""".trimMargin().toByteArray()
 
-        val expectedChild = Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))), LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))), ClosePath))
+        val expectedChild = createPath(
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))),
+                ClosePath,
+            ),
+        )
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use { input ->
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {

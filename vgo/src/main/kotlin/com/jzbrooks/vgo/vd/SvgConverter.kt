@@ -1,22 +1,32 @@
 package com.jzbrooks.vgo.vd
 
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.PathElement
-import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.vd.graphic.ClipPath
-import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sin
 
 private val hexWithAlpha = Regex("#[a-fA-F\\d]{8}")
 
 fun VectorDrawable.toSvg(): ScalableVectorGraphic {
     val graphic = traverse(this) as ContainerElement
-    return ScalableVectorGraphic(graphic.elements, convertTopLevelAttributes(attributes))
+
+    val viewportHeight = foreign.remove("android:viewportHeight") ?: "24"
+    val viewportWidth = foreign.remove("android:viewportWidth") ?: "24"
+    foreign.remove("xmlns:android")
+
+    val svgElementAttributes = mutableMapOf(
+        "xmlns" to "http://www.w3.org/2000/svg",
+        "viewPort" to "0 0 $viewportWidth $viewportHeight"
+    )
+
+    svgElementAttributes["width"] = "100%"
+    svgElementAttributes["height"] = "100%"
+
+    return ScalableVectorGraphic(graphic.elements, id, svgElementAttributes)
 }
 
 private fun traverse(element: Element): Element {
@@ -34,11 +44,29 @@ private fun process(containerElement: ContainerElement): Element {
     for ((index, element) in containerElement.elements.withIndex()) {
         if (element !is ClipPath) {
             if (defs != null) {
-                element.attributes["clip-path"] = "url(#${defs.attributes["id"]})"
+                element.foreign["clip-path"] = "url(#${defs.id})"
             }
             newElements.add(traverse(element))
         } else {
-            defs = Extra("defs", listOf(Path(element.commands)), mutableMapOf("id" to "clip_$index"))
+            defs = Extra(
+                "defs",
+                listOf(
+                    Path(
+                        element.commands,
+                        null,
+                        mutableMapOf(),
+                        Colors.BLACK,
+                        Path.FillRule.NON_ZERO,
+                        Colors.TRANSPARENT,
+                        1f,
+                        Path.LineCap.BUTT,
+                        Path.LineJoin.MITER,
+                        4f,
+                    )
+                ),
+                "clip_$index",
+                mutableMapOf(),
+            )
         }
     }
 
@@ -46,16 +74,14 @@ private fun process(containerElement: ContainerElement): Element {
         newElements.add(defs)
     }
 
-    val newAttributes = convertContainerElementAttributes(containerElement.attributes)
-    containerElement.attributes.putAll(newAttributes)
-
     return containerElement.apply { elements = newElements }
 }
 
 private fun process(pathElement: PathElement): Element {
     return pathElement.apply {
-        val newElements = convertPathElementAttributes(attributes)
-        attributes.putAll(newElements)
+        val newElements = convertPathElementAttributes(foreign.toMutableMap())
+        foreign.clear()
+        foreign.putAll(newElements)
     }
 }
 
@@ -70,7 +96,6 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
         }
 
         val svgKey = when (key) {
-            "android:name" -> "id"
             "android:fillColor" -> "fill"
             "android:fillType" -> "fill-rule"
             "android:fillAlpha" -> "fill-opacity"
@@ -94,147 +119,4 @@ private fun convertPathElementAttributes(attributes: MutableMap<String, String>)
     attributes.clear()
 
     return svgPathElementAttributes
-}
-
-private fun convertContainerElementAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
-    val svgPathElementAttributes = mutableMapOf<String, String>()
-
-    for ((key, value) in attributes.filterKeys { !transformationPropertyNames.contains(it) }) {
-
-        val svgKey = when (key) {
-            "android:name" -> "id"
-            else -> key
-        }
-
-        svgPathElementAttributes[svgKey] = value
-    }
-
-    val transform = computeTransformationMatrix(attributes)
-    if (transform != Matrix3.IDENTITY) {
-        val matrixStringBuilder = StringBuilder("matrix(").apply {
-            append(transform[0, 0])
-            append(", ")
-            append(transform[1, 0])
-            append(", ")
-            append(transform[0, 1])
-            append(", ")
-            append(transform[1, 1])
-            append(", ")
-            append(transform[0, 2])
-            append(", ")
-            append(transform[1, 2])
-            append(")")
-        }
-
-        svgPathElementAttributes["transform"] = matrixStringBuilder.toString()
-    }
-
-    // We've mangled the map at this point...
-    attributes.clear()
-
-    return svgPathElementAttributes
-}
-
-private fun convertTopLevelAttributes(attributes: MutableMap<String, String>): MutableMap<String, String> {
-
-    val viewportHeight = attributes.remove("android:viewportHeight") ?: "24"
-    val viewportWidth = attributes.remove("android:viewportWidth") ?: "24"
-    attributes.remove("xmlns:android")
-
-    val svgElementAttributes = mutableMapOf(
-        "xmlns" to "http://www.w3.org/2000/svg",
-        "viewPort" to "0 0 $viewportWidth $viewportHeight"
-    )
-
-    for ((key, value) in attributes) {
-
-        val svgValue = when (key) {
-            "android:height" -> "100%"
-            "android:width" -> "100%"
-            else -> value
-        }
-
-        val svgKey = when (key) {
-            "android:name" -> "id"
-            "android:width" -> "width"
-            "android:height" -> "height"
-            else -> key
-        }
-
-        svgElementAttributes[svgKey] = svgValue
-    }
-
-    // We've mangled the map at this point...
-    attributes.clear()
-
-    return svgElementAttributes
-}
-
-// Duplicated from vd.BakeTransform
-private val transformationPropertyNames = setOf(
-    "android:scaleX",
-    "android:scaleY",
-    "android:translateX",
-    "android:translateY",
-    "android:pivotX",
-    "android:pivotY",
-    "android:rotation"
-)
-
-private fun computeTransformationMatrix(groupAttributes: Map<String, String>): Matrix3 {
-    val scaleX = groupAttributes["android:scaleX"]?.toFloat()
-    val scaleY = groupAttributes["android:scaleY"]?.toFloat()
-
-    val translationX = groupAttributes["android:translateX"]?.toFloat()
-    val translationY = groupAttributes["android:translateY"]?.toFloat()
-
-    val pivotX = groupAttributes["android:pivotX"]?.toFloat()
-    val pivotY = groupAttributes["android:pivotY"]?.toFloat()
-
-    val rotation = groupAttributes["android:rotation"]?.toFloat()
-
-    val scale = Matrix3.from(
-        arrayOf(
-            floatArrayOf(scaleX ?: 1f, 0f, 0f),
-            floatArrayOf(0f, scaleY ?: 1f, 0f),
-            floatArrayOf(0f, 0f, 1f)
-        )
-    )
-
-    val translation = Matrix3.from(
-        arrayOf(
-            floatArrayOf(1f, 0f, translationX ?: 0f),
-            floatArrayOf(0f, 1f, translationY ?: 0f),
-            floatArrayOf(0f, 0f, 1f)
-        )
-    )
-
-    val pivot = Matrix3.from(
-        arrayOf(
-            floatArrayOf(1f, 0f, pivotX ?: 0f),
-            floatArrayOf(0f, 1f, pivotY ?: 0f),
-            floatArrayOf(0f, 0f, 1f)
-        )
-    )
-
-    val pivotInverse = Matrix3.from(
-        arrayOf(
-            floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1),
-            floatArrayOf(0f, 1f, (pivotY ?: 0f) * -1),
-            floatArrayOf(0f, 0f, 1f)
-        )
-    )
-
-    val rotate = rotation?.let {
-        val radians = it * PI.toFloat() / 180f
-        Matrix3.from(
-            arrayOf(
-                floatArrayOf(cos(radians), -sin(radians), 0f),
-                floatArrayOf(sin(radians), cos(radians), 0f),
-                floatArrayOf(0f, 0f, 1f)
-            )
-        )
-    } ?: Matrix3.IDENTITY
-
-    return listOf(pivot, translation, rotate, scale, pivotInverse).reduce(Matrix3::times)
 }

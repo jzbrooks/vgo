@@ -4,20 +4,20 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.optimization.ConvertCurvesToArcs
 import com.jzbrooks.vgo.core.util.math.Point
+import com.jzbrooks.vgo.util.element.createPath
 import com.jzbrooks.vgo.vd.VectorDrawableCommandPrinter
 import org.junit.jupiter.api.Test
 
 class ConvertCurvesToArcsTest {
     @Test
     fun `Convert curves to arcs`() {
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 30f))),
                 CubicBezierCurve(
@@ -30,7 +30,7 @@ class ConvertCurvesToArcsTest {
                         )
                     )
                 )
-            )
+            ),
         )
 
         ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)).visit(path)
@@ -58,7 +58,7 @@ class ConvertCurvesToArcsTest {
         // in visibility_strike.xml. It presented tolerance challenges
         // w.r.t. over-smoothing sharp edges into ellipses.
 
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(12f, 4.5f))),
                 CubicBezierCurve(
@@ -81,7 +81,7 @@ class ConvertCurvesToArcsTest {
                         )
                     )
                 )
-            )
+            ),
         )
 
         val before = path.copy()
@@ -99,7 +99,7 @@ class ConvertCurvesToArcsTest {
         // c2.5,0,4.526,2.026,4.526,4.525
         // c0,2.5-2.026,4.526-4.526,4.526
         // z
-        val path = Path(
+        val path = createPath(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(45.4f, 27.726f))),
                 CubicBezierCurve(
@@ -142,7 +142,7 @@ class ConvertCurvesToArcsTest {
                         )
                     )
                 )
-            )
+            ),
         )
 
         ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)).visit(path)

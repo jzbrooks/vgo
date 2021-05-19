@@ -41,6 +41,8 @@ interface MutableMatrix3 : Matrix3 {
     }
 }
 
+// todo: this would probably be a good candidate for a value class.
+//  equals and hashCode are a problem for now...
 private class ArrayMatrix3(private val data: Array<FloatArray>) : MutableMatrix3 {
 
     override fun equals(other: Any?): Boolean {

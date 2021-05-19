@@ -5,5 +5,6 @@ import com.jzbrooks.vgo.core.graphic.Graphic
 
 data class ScalableVectorGraphic(
     override var elements: List<Element>,
-    override var attributes: MutableMap<String, String>
+    override val id: String?,
+    override val foreign: MutableMap<String, String>,
 ) : Graphic

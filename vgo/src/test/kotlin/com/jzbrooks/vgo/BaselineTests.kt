@@ -19,7 +19,7 @@ class BaselineTests {
     fun testOptimizationFinishes(unoptimizedAsset: Path) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
-        val outputFilePath = "build/integrationTest/${inputFileName}_testOptimizationFinishes.${inputFile.extension}"
+        val outputFilePath = "build/test-results/${inputFileName}_testOptimizationFinishes.${inputFile.extension}"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
         val exitCode = Application().run(arguments)
@@ -32,7 +32,7 @@ class BaselineTests {
     fun testOptimizedAssetIsEquivalentToBaseline(unoptimizedAsset: Path, baselineAsset: Path) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
-        val outputFilePath = "build/integrationTest/${inputFileName}_testOptimizedAssetIsEquivalentToBaseline.${inputFile.extension}"
+        val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsEquivalentToBaseline.${inputFile.extension}"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
         Application().run(arguments)
@@ -47,7 +47,7 @@ class BaselineTests {
     fun testOptimizedAssetIsNotLargerThanBaseline(unoptimizedAsset: Path, baselineAsset: Path) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
-        val outputFilePath = "build/integrationTest/${inputFileName}_testOptimizedAssetIsNotLargerThanBaseline.${inputFile.extension}"
+        val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsNotLargerThanBaseline.${inputFile.extension}"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
         Application().run(arguments)
@@ -63,7 +63,7 @@ class BaselineTests {
     fun testOptimizedAssetIsNotLargerThanOriginal(unoptimizedAsset: Path) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
-        val outputFilePath = "build/integrationTest/${inputFileName}_testOptimizedAssetIsNotLargerThanOriginal.${inputFile.extension}"
+        val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsNotLargerThanOriginal.${inputFile.extension}"
         val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
 
         Application().run(arguments)

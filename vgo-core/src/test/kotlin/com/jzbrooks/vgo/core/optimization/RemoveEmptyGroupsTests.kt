@@ -8,6 +8,8 @@ import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.util.element.createPath
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
@@ -18,7 +20,8 @@ class RemoveEmptyGroupsTests {
 
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
-            override var attributes = mutableMapOf<String, String>()
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
         val emptyGroups = RemoveEmptyGroups()
@@ -29,11 +32,26 @@ class RemoveEmptyGroupsTests {
 
     @Test
     fun testAvoidCollapsingNestedGroupWithPath() {
-        val nestedEmptyGroups = listOf(Group(listOf(Group(listOf(Group(listOf(Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f))))))))))))
+        val nestedEmptyGroups = listOf(
+            Group(
+                listOf(
+                    Group(
+                        listOf(
+                            Group(
+                                listOf(
+                                    createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f)))))
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
 
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
-            override var attributes = mutableMapOf<String, String>()
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
         val emptyGroups = RemoveEmptyGroups()
@@ -44,11 +62,12 @@ class RemoveEmptyGroupsTests {
 
     @Test
     fun testAvoidCollapsingNestedGroupWithAttributes() {
-        val nestedEmptyGroups = listOf(Group(listOf(Group(listOf(Group(emptyList(), mutableMapOf("android:name" to "base")))))))
+        val nestedEmptyGroups = listOf(Group(listOf(Group(listOf(Group(emptyList(), "base", mutableMapOf(), Matrix3.IDENTITY))))))
 
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
-            override var attributes = mutableMapOf<String, String>()
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
         val emptyGroups = RemoveEmptyGroups()
@@ -61,12 +80,13 @@ class RemoveEmptyGroupsTests {
     fun testCollapseEmptyGroupAndAvoidAdjacentElements() {
         val nestedEmptyGroups = listOf(
             Group(emptyList()),
-            Path(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f)))))
+            createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f))))),
         )
 
         val graphic = object : Graphic {
             override var elements: List<Element> = nestedEmptyGroups
-            override var attributes = mutableMapOf<String, String>()
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
         val emptyGroups = RemoveEmptyGroups()

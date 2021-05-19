@@ -19,14 +19,14 @@ class InPlaceModificationTest {
     @BeforeEach
     fun copyToSide() {
         val originalFolder = File("src/test/resources/in-place-modify/")
-        val reservedFolder = File("build/integrationTest/inPlaceModification/reserved/")
+        val reservedFolder = File("build/test-results/inPlaceModification/reserved/")
         originalFolder.copyRecursively(reservedFolder, true)
     }
 
     @AfterEach
     fun resetFiles() {
         val originalFolder = File("src/test/resources/in-place-modify/")
-        val reservedFolder = File("build/integrationTest/inPlaceModification/reserved/")
+        val reservedFolder = File("build/test-results/inPlaceModification/reserved/")
         reservedFolder.copyRecursively(originalFolder, true)
     }
 

@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.core.graphic
 
 interface Element {
-    val attributes: MutableMap<String, String>
+    val id: String?
+    val foreign: MutableMap<String, String>
 }
