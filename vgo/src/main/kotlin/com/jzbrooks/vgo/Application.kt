@@ -2,12 +2,12 @@ package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
-import com.jzbrooks.vgo.util.xml.asSequence
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
 import com.jzbrooks.vgo.svg.parse
 import com.jzbrooks.vgo.svg.toVectorDrawable
+import com.jzbrooks.vgo.util.xml.asSequence
 import com.jzbrooks.vgo.vd.VectorDrawable
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter

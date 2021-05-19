@@ -5,11 +5,11 @@ import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.CommandString
-import com.jzbrooks.vgo.util.xml.toList
 import com.jzbrooks.vgo.util.assertk.hasName
 import com.jzbrooks.vgo.util.assertk.hasNames
 import com.jzbrooks.vgo.util.assertk.hasValue
 import com.jzbrooks.vgo.util.element.createPath
+import com.jzbrooks.vgo.util.xml.toList
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream

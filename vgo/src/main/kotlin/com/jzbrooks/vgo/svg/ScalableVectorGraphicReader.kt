@@ -8,13 +8,13 @@ import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
+import com.jzbrooks.vgo.svg.graphic.ClipPath
 import com.jzbrooks.vgo.util.xml.asSequence
 import com.jzbrooks.vgo.util.xml.extractLineCap
 import com.jzbrooks.vgo.util.xml.extractLineJoin
 import com.jzbrooks.vgo.util.xml.removeFloatOrNull
 import com.jzbrooks.vgo.util.xml.removeOrNull
 import com.jzbrooks.vgo.util.xml.toMutableMap
-import com.jzbrooks.vgo.svg.graphic.ClipPath
 import org.w3c.dom.Comment
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
