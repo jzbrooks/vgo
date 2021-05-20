@@ -2,12 +2,8 @@ package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
-import com.jzbrooks.vgo.core.graphic.Group
-import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.PathElement
-import com.jzbrooks.vgo.svg.graphic.ClipPath
 import com.jzbrooks.vgo.vd.VectorDrawable
-import com.jzbrooks.vgo.vd.graphic.ClipPath as AndroidClipPath
 
 private val namedColorValues = mapOf(
     "black" to "#000000",
@@ -217,43 +213,9 @@ fun ScalableVectorGraphic.toVectorDrawable(): VectorDrawable {
 
 private fun traverse(element: Element): Element {
     return when (element) {
-        is ContainerElement -> process(element)
         is PathElement -> process(element)
         else -> element
     }
-}
-
-private fun process(containerElement: ContainerElement): Element {
-    val clipPaths = containerElement.elements
-        .filterIsInstance<ClipPath>()
-        .associateBy { it.id }
-
-    val newElements = mutableListOf<Element>()
-    for (element in containerElement.elements.filter { it !is ClipPath }) {
-        if (element.foreign.containsKey("clip-path")) {
-            val id = element.foreign
-                .remove("clip-path")!!
-                .removePrefix("url(#")
-                .trimEnd(')')
-
-            val clip = clipPaths.getValue(id)
-            val vdClipPaths = clip.elements
-                .filterIsInstance<Path>()
-                .map { AndroidClipPath(it.commands, it.id, it.foreign.toMutableMap()) }
-
-            // I'm not sure grouping clip paths like this
-            // is a very good long-term solution, but it works
-            // for relatively simple cases.
-            val group = mutableListOf<Element>()
-            group.addAll(vdClipPaths)
-            group.add(element)
-            newElements.add(Group(group))
-        } else if (element !is ClipPath) {
-            newElements.add(element)
-        }
-    }
-
-    return containerElement.apply { elements = newElements.map(::traverse) }
 }
 
 private fun process(pathElement: PathElement): Element {

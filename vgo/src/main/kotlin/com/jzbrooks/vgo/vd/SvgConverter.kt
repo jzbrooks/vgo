@@ -1,13 +1,9 @@
 package com.jzbrooks.vgo.vd
 
-import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
-import com.jzbrooks.vgo.core.graphic.Extra
-import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
-import com.jzbrooks.vgo.vd.graphic.ClipPath
 
 private val hexWithAlpha = Regex("#[a-fA-F\\d]{8}")
 
@@ -31,50 +27,9 @@ fun VectorDrawable.toSvg(): ScalableVectorGraphic {
 
 private fun traverse(element: Element): Element {
     return when (element) {
-        is ContainerElement -> process(element)
         is PathElement -> process(element)
         else -> element
     }
-}
-
-private fun process(containerElement: ContainerElement): Element {
-    val newElements = mutableListOf<Element>()
-    var defs: Extra? = null
-
-    for ((index, element) in containerElement.elements.withIndex()) {
-        if (element !is ClipPath) {
-            if (defs != null) {
-                element.foreign["clip-path"] = "url(#${defs.id})"
-            }
-            newElements.add(traverse(element))
-        } else {
-            defs = Extra(
-                "defs",
-                listOf(
-                    Path(
-                        element.commands,
-                        null,
-                        mutableMapOf(),
-                        Colors.BLACK,
-                        Path.FillRule.NON_ZERO,
-                        Colors.TRANSPARENT,
-                        1f,
-                        Path.LineCap.BUTT,
-                        Path.LineJoin.MITER,
-                        4f,
-                    )
-                ),
-                "clip_$index",
-                mutableMapOf(),
-            )
-        }
-    }
-
-    if (defs != null) {
-        newElements.add(defs)
-    }
-
-    return containerElement.apply { elements = newElements }
 }
 
 private fun process(pathElement: PathElement): Element {

@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.endsWith
 import assertk.assertions.isEqualTo
 import assertk.assertions.startsWith
+import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.CommandString
@@ -13,7 +14,6 @@ import com.jzbrooks.vgo.util.assertk.hasNames
 import com.jzbrooks.vgo.util.assertk.hasValue
 import com.jzbrooks.vgo.util.element.createPath
 import com.jzbrooks.vgo.util.xml.toList
-import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
@@ -207,7 +207,11 @@ class VectorDrawableWriterTests {
                     groupTransform,
                 ),
                 ClipPath(
-                    CommandString("M 0 0 L 24 0 L 24 24 L 0 24 L 0 0 Z M 4.54 1.73 L 3.27 3 L 3.27 3 L 4.54 1.73 Z").toCommandList(),
+                    listOf(
+                        createPath(
+                            CommandString("M 0 0 L 24 0 L 24 24 L 0 24 L 0 0 Z M 4.54 1.73 L 3.27 3 L 3.27 3 L 4.54 1.73 Z").toCommandList()
+                        )
+                    ),
                     null,
                     mutableMapOf(),
                 ),

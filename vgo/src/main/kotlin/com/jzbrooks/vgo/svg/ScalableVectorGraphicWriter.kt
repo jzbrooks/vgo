@@ -3,12 +3,12 @@ package com.jzbrooks.vgo.svg
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.Writer
+import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.util.math.Matrix3
-import com.jzbrooks.vgo.svg.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
 import java.math.RoundingMode

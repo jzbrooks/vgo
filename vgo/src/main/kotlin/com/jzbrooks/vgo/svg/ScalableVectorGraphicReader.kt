@@ -2,13 +2,13 @@ package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
-import com.jzbrooks.vgo.svg.graphic.ClipPath
 import com.jzbrooks.vgo.util.xml.asSequence
 import com.jzbrooks.vgo.util.xml.extractLineCap
 import com.jzbrooks.vgo.util.xml.extractLineJoin

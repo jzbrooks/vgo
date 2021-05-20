@@ -2,12 +2,12 @@ package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Writer
+import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.util.math.Matrix3
-import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.w3c.dom.Document
 import java.io.OutputStream
 import java.math.RoundingMode
@@ -132,7 +132,9 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
             }
             is ClipPath -> {
                 document.createElement("clip-path").apply {
-                    val data = element.commands.joinToString(separator = "", transform = commandPrinter::print)
+                    val data = (element.elements[0] as Path).commands
+                        .joinToString(separator = "", transform = commandPrinter::print)
+
                     setAttribute("android:pathData", data)
                 }
             }

@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
@@ -14,7 +15,6 @@ import com.jzbrooks.vgo.util.xml.extractLineJoin
 import com.jzbrooks.vgo.util.xml.removeFloatOrNull
 import com.jzbrooks.vgo.util.xml.removeOrNull
 import com.jzbrooks.vgo.util.xml.toMutableMap
-import com.jzbrooks.vgo.vd.graphic.ClipPath
 import org.w3c.dom.Comment
 import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
@@ -23,8 +23,6 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
-
-private val HEX_WITH_ALPHA = Regex("#[a-fA-F\\d]{8}")
 
 fun parse(root: Node): VectorDrawable {
 
@@ -113,17 +111,43 @@ private fun parseClipPath(node: Node): ClipPath {
 
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
         ClipPath(
-            emptyList(),
+            listOf(
+                Path(
+                    emptyList(),
+                    null,
+                    mutableMapOf(),
+                    Colors.TRANSPARENT,
+                    Path.FillRule.NON_ZERO,
+                    Colors.TRANSPARENT,
+                    0f,
+                    Path.LineCap.BUTT,
+                    Path.LineJoin.MITER,
+                    4f
+                ),
+            ),
             node.attributes.removeOrNull("android:name")?.nodeValue,
-            node.attributes.toMutableMap()
+            node.attributes.toMutableMap(),
         )
     } else {
         node.attributes.removeNamedItem("android:pathData")
 
         ClipPath(
-            CommandString(pathDataString).toCommandList(),
+            listOf(
+                Path(
+                    CommandString(pathDataString).toCommandList(),
+                    null,
+                    mutableMapOf(),
+                    Colors.TRANSPARENT,
+                    Path.FillRule.NON_ZERO,
+                    Colors.TRANSPARENT,
+                    0f,
+                    Path.LineCap.BUTT,
+                    Path.LineJoin.MITER,
+                    4f
+                ),
+            ),
             node.attributes.removeOrNull("android:name")?.nodeValue,
-            node.attributes.toMutableMap()
+            node.attributes.toMutableMap(),
         )
     }
 }
