@@ -154,10 +154,10 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                         val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
                             currentPoint + parameters.map { it.end }.reduce(Point::plus)
                         } else {
-                            parameters.map { it.end }.last()
+                            parameters.last().end
                         }
 
-                        parameters.forEach { parameter ->
+                        for (parameter in parameters) {
                             val control = if (variant == CommandVariant.RELATIVE) {
                                 currentPoint + parameter.control
                             } else {
@@ -205,10 +205,10 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                         val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
                             currentPoint + parameters.map { it.end }.reduce(Point::plus)
                         } else {
-                            parameters.map { it.end }.last()
+                            parameters.last().end
                         }
 
-                        parameters.forEach { parameter ->
+                        for (parameter in parameters) {
                             val startControl = if (variant == CommandVariant.RELATIVE) {
                                 currentPoint + parameter.startControl
                             } else {
@@ -241,10 +241,10 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                         val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
                             currentPoint + parameters.map { it.end }.reduce(Point::plus)
                         } else {
-                            parameters.map { it.end }.last()
+                            parameters.last().end
                         }
 
-                        parameters.forEach { parameter ->
+                        for (parameter in parameters) {
                             val endControl = if (variant == CommandVariant.RELATIVE) {
                                 currentPoint + parameter.endControl
                             } else {
@@ -270,10 +270,10 @@ class BakeTransformations : TopDownOptimization, GroupVisitor {
                         val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
                             currentPoint + parameters.map { it.end }.reduce(Point::plus)
                         } else {
-                            parameters.map { it.end }.last()
+                            parameters.last().end
                         }
 
-                        parameters.forEach { parameter ->
+                        for (parameter in parameters) {
                             val end = if (variant == CommandVariant.RELATIVE) {
                                 currentPoint + parameter.end
                             } else {
