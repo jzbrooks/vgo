@@ -16,17 +16,8 @@ buildscript {
 
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
-    configurations.all {
-        if (name.startsWith("ktlint")) {
-            resolutionStrategy {
-                eachDependency {
-                    // Force Kotlin to our version
-                    if (requested.group == "org.jetbrains.kotlin") {
-                        useVersion("1.5.0")
-                    }
-                }
-            }
-        }
+    extensions.configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        version.set("0.41.0")
     }
 
     group = "com.jzbrooks"
