@@ -20,7 +20,7 @@ sourceSets {
 dependencies {
     implementation(project(":vgo-core"))
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.23.1")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.24")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.1")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
