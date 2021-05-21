@@ -43,7 +43,7 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
             root.setAttribute("android:name", elementName)
         }
 
-        for (item in graphic.foreign) {
+        for (item in graphic.foreign.filter { (k, v) -> DEFAULT_ROOT_ATTRIBUTES[k] != v }) {
             root.setAttribute(item.key, item.value)
         }
         document.appendChild(root)
@@ -154,7 +154,7 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                 node.setAttribute("android:name", elementName)
             }
 
-            for ((key, value) in element.foreign) {
+            for ((key, value) in element.foreign.filter { (k, v) -> DEFAULT_PATH_ATTRIBUTES[k] != v }) {
                 node.setAttribute(key, value)
             }
 
@@ -207,5 +207,19 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         val source = DOMSource(document)
         val result = StreamResult(outputStream)
         transformer.transform(source, result)
+    }
+
+    companion object {
+        private val DEFAULT_ROOT_ATTRIBUTES = mapOf(
+            "android:alpha" to "1.0",
+            "android:autoMirrored" to "false",
+            "android:tintMode" to "src_in",
+        )
+
+        private val DEFAULT_PATH_ATTRIBUTES = mapOf(
+            "android:trimPathStart" to "0",
+            "android:trimPathEnd" to "1",
+            "android:trimPathOffset" to "0",
+        )
     }
 }
