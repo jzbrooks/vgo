@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.vd.optimization
+package com.jzbrooks.vgo.core.optimization
 
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
@@ -6,31 +6,14 @@ import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.core.graphic.applyTransform
-import com.jzbrooks.vgo.core.optimization.Optimization
 import com.jzbrooks.vgo.core.util.math.Matrix3
 
 /**
  * Apply transformations to paths command coordinates in a group
- * and remove the transformations from the group
  */
-class BakeTransformations : Optimization {
+class BakeTransformations(private val transformKeys: HashSet<String>) : GroupVisitor, BottomUpOptimization {
 
-    override fun optimize(graphic: Graphic) {
-        graphic.elements = graphic.elements.map(::topDownTraverse)
-    }
-
-    private fun topDownTraverse(element: Element): Element {
-        return when {
-            element is Group && element.foreign.values.none { it.startsWith('@') } -> {
-                bakeIntoGroup(element)
-                element.apply { elements.map(::topDownTraverse) }
-            }
-            element is ContainerElement -> {
-                element.apply { elements.map(::topDownTraverse) }
-            }
-            else -> element
-        }
-    }
+    override fun visit(group: Group) = bakeIntoGroup(group)
 
     private fun bakeIntoGroup(group: Group) {
         val groupTransform = group.transform
@@ -39,7 +22,7 @@ class BakeTransformations : Optimization {
         for (child in group.elements) {
             if (child is Group) {
                 val childTransform = child.transform
-                val childForeignTransformations = child.foreign.filterKeys(TRANSFORM_KEYS::contains)
+                val childForeignTransformations = child.foreign.filterKeys(transformKeys::contains)
 
                 if (childForeignTransformations.isEmpty()) {
                     child.transform = groupTransform * childTransform
@@ -76,17 +59,5 @@ class BakeTransformations : Optimization {
         group.transform = Matrix3.IDENTITY
 
         group.elements = children
-    }
-
-    companion object {
-        private val TRANSFORM_KEYS = hashSetOf(
-            "android:scaleX",
-            "android:scaleY",
-            "android:translateX",
-            "android:translateY",
-            "android:pivotX",
-            "android:pivotY",
-            "android:rotation"
-        )
     }
 }

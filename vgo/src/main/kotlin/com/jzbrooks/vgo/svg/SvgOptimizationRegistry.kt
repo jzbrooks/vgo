@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.svg
 
+import com.jzbrooks.vgo.core.optimization.BakeTransformations
 import com.jzbrooks.vgo.core.optimization.BreakoutImplicitCommands
 import com.jzbrooks.vgo.core.optimization.CollapseGroups
 import com.jzbrooks.vgo.core.optimization.CommandVariant
@@ -12,13 +13,15 @@ import com.jzbrooks.vgo.core.optimization.RemoveRedundantCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyLineCommands
 import com.jzbrooks.vgo.core.optimization.TopDownOptimization
-import com.jzbrooks.vgo.svg.optimization.BakeTransformations
 
-class SvgOptimizationRegistry : OptimizationRegistry(emptyList(), topDownOptimizations, emptyList(), wholeGraphicOptimizations) {
+class SvgOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN, WHOLE_GRAPHIC) {
 
     companion object {
-        private val topDownOptimizations: List<TopDownOptimization> = listOf(
-            BakeTransformations(),
+        private val BOTTOM_UP = listOf(
+            BakeTransformations(hashSetOf()),
+        )
+
+        private val TOP_DOWN: List<TopDownOptimization> = listOf(
             BreakoutImplicitCommands(),
             CommandVariant(CommandVariant.Mode.Relative),
             SimplifyLineCommands(1e-3f),
@@ -29,7 +32,7 @@ class SvgOptimizationRegistry : OptimizationRegistry(emptyList(), topDownOptimiz
             Polycommands()
         )
 
-        private val wholeGraphicOptimizations = listOf(
+        private val WHOLE_GRAPHIC = listOf(
             CollapseGroups(),
             RemoveEmptyGroups(),
             MergePaths()
