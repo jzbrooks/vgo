@@ -26,17 +26,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class BakeTransformationsTests {
-    private val bake = BakeTransformations(
-        hashSetOf(
-            "android:scaleX",
-            "android:scaleY",
-            "android:translateX",
-            "android:translateY",
-            "android:pivotX",
-            "android:pivotY",
-            "android:rotation"
-        )
-    )
+    private val bake = BakeTransformations()
 
     @Test
     fun testAvoidCrashIfParsedPathDataDoesNotExist() {
@@ -82,7 +72,7 @@ class BakeTransformationsTests {
     }
 
     @Test
-    fun testAvoidCrashIfASharedTransformIsSpecifiedByResource() {
+    fun `Resource valued transforms prevent group elision`() {
         val transform = Matrix3.from(
             arrayOf(
                 floatArrayOf(1f, 0f, 15f),
@@ -115,12 +105,10 @@ class BakeTransformationsTests {
         bake.visit(group.elements.first() as Group)
         bake.visit(group)
 
-        val insertedGroup = group.elements.first() as Group
-        val originalNestedGroup = insertedGroup.elements.first() as Group
+        val originalNestedGroup = group.elements.first() as Group
 
         assertThat(group.foreign).doesNotContain("android:translateX", "15")
-        assertThat(insertedGroup.foreign).contains("android:translateX", "@integer/translating_thing")
-        assertThat(originalNestedGroup.foreign).doesNotContain("android:translateX", "@integer/translating_thing")
+        assertThat(originalNestedGroup.foreign).contains("android:translateX", "@integer/translating_thing")
     }
 
     @Test

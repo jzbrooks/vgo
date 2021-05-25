@@ -18,17 +18,7 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_D
 
     companion object {
         private val BOTTOM_UP = listOf(
-            BakeTransformations(
-                hashSetOf(
-                    "android:scaleX",
-                    "android:scaleY",
-                    "android:translateX",
-                    "android:translateY",
-                    "android:pivotX",
-                    "android:pivotY",
-                    "android:rotation"
-                )
-            )
+            BakeTransformations(),
         )
 
         private val TOP_DOWN: List<TopDownOptimization> = listOf(
@@ -39,13 +29,13 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_D
             SimplifyBezierCurveCommands(1e-3f),
             RemoveRedundantCommands(),
             CommandVariant(CommandVariant.Mode.Compact(VectorDrawableCommandPrinter(3))),
-            Polycommands()
+            Polycommands(),
         )
 
         private val WHOLE_GRAPHIC = listOf(
             CollapseGroups(),
             RemoveEmptyGroups(),
-            MergePaths()
+            MergePaths(),
         )
     }
 }

@@ -18,7 +18,7 @@ class SvgOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN, WHOLE_
 
     companion object {
         private val BOTTOM_UP = listOf(
-            BakeTransformations(hashSetOf()),
+            BakeTransformations(),
         )
 
         private val TOP_DOWN: List<TopDownOptimization> = listOf(
@@ -29,13 +29,13 @@ class SvgOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN, WHOLE_
             SimplifyBezierCurveCommands(1e-3f),
             RemoveRedundantCommands(),
             CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3))),
-            Polycommands()
+            Polycommands(),
         )
 
         private val WHOLE_GRAPHIC = listOf(
             CollapseGroups(),
             RemoveEmptyGroups(),
-            MergePaths()
+            MergePaths(),
         )
     }
 }
