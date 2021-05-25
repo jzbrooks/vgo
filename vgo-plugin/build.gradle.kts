@@ -1,9 +1,9 @@
 plugins {
-    `kotlin-dsl`
     id("org.jetbrains.kotlin.jvm")
     id("java-gradle-plugin")
     id("maven-publish")
     id("signing")
+    id("org.gradle.kotlin.kotlin-dsl") version "2.1.4"
 }
 
 dependencies {
