@@ -37,8 +37,8 @@ class BakeTransformations : ContainerElementVisitor, BottomUpOptimization {
 
     private fun areElementsRelocatable(group: Group): Boolean {
         return group.id == null &&
-                group.transform === Matrix3.IDENTITY &&
-                group.foreign.isEmpty() &&
-                group.elements.all { it is PathElement }
+            group.transform === Matrix3.IDENTITY &&
+            group.foreign.isEmpty() &&
+            group.elements.all { it is PathElement }
     }
 }

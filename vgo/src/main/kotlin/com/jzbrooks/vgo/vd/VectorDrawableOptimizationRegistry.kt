@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.vd
 
+import com.jzbrooks.vgo.core.optimization.BakeTransformations
 import com.jzbrooks.vgo.core.optimization.BreakoutImplicitCommands
 import com.jzbrooks.vgo.core.optimization.CollapseGroups
 import com.jzbrooks.vgo.core.optimization.CommandVariant
@@ -12,7 +13,6 @@ import com.jzbrooks.vgo.core.optimization.RemoveRedundantCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyLineCommands
 import com.jzbrooks.vgo.core.optimization.TopDownOptimization
-import com.jzbrooks.vgo.core.optimization.BakeTransformations
 
 class VectorDrawableOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN, WHOLE_GRAPHIC) {
 

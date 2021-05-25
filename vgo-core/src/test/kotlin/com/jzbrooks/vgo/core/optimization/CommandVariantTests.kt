@@ -4,11 +4,10 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
-import com.jzbrooks.vgo.core.graphic.command.Command
-import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.FakeCommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
@@ -23,12 +22,6 @@ import org.junit.jupiter.api.Test
 import com.jzbrooks.vgo.core.optimization.CommandVariant as CommandVariantOpt
 
 class CommandVariantTests {
-    // This is okay because this optimization only ever compares
-    // two commands of the same type, which should have similar
-    // string representations by default
-    private val commandPrinter = object : CommandPrinter {
-        override fun print(command: Command) = command.toString()
-    }
 
     @Test
     fun testConvertOnlyAbsoluteCommands() {
@@ -49,7 +42,7 @@ class CommandVariantTests {
             )
         )
 
-        CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
+        CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(8)
     }
@@ -66,7 +59,7 @@ class CommandVariantTests {
             )
         )
 
-        CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
+        CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(2)
     }
@@ -83,7 +76,7 @@ class CommandVariantTests {
             )
         )
 
-        CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
+        CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(3)
     }
@@ -109,7 +102,7 @@ class CommandVariantTests {
             )
         )
 
-        CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
+        CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(9)
     }
@@ -125,7 +118,7 @@ class CommandVariantTests {
             )
         )
 
-        CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
+        CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         // M100,1 101,1 L103,6 L106,7 93,10 Z
         // M100,1 101,1 l2,5 l3,1 -13,3 Z
@@ -144,7 +137,7 @@ class CommandVariantTests {
             )
         )
 
-        CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
+        CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(2)
     }
@@ -163,7 +156,7 @@ class CommandVariantTests {
             )
         )
 
-        CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
+        CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         val lastLineTo = path.commands.filterIsInstance<LineTo>().last()
         assertThat(lastLineTo.variant).isEqualTo(CommandVariant.RELATIVE)
@@ -184,7 +177,7 @@ class CommandVariantTests {
             )
         )
 
-        CommandVariantOpt(CommandVariantOpt.Mode.Compact(commandPrinter)).visit(path)
+        CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         val lastLineTo = path.commands.filterIsInstance<LineTo>().last()
         assertThat(lastLineTo.variant).isEqualTo(CommandVariant.RELATIVE)

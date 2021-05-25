@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.vd.optimization
+package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.hasSize
@@ -7,11 +7,10 @@ import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.FakeCommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
-import com.jzbrooks.vgo.core.optimization.ConvertCurvesToArcs
+import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.math.Point
-import com.jzbrooks.vgo.util.element.createPath
-import com.jzbrooks.vgo.vd.VectorDrawableCommandPrinter
 import org.junit.jupiter.api.Test
 
 class ConvertCurvesToArcsTest {
@@ -33,7 +32,7 @@ class ConvertCurvesToArcsTest {
             ),
         )
 
-        ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)).visit(path)
+        ConvertCurvesToArcs(FakeCommandPrinter()).visit(path)
 
         assertThat(path.commands[1]).isEqualTo(
             EllipticalArcCurve(
@@ -86,7 +85,7 @@ class ConvertCurvesToArcsTest {
 
         val before = path.copy()
 
-        ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)).visit(path)
+        ConvertCurvesToArcs(FakeCommandPrinter()).visit(path)
 
         assertThat(path).isEqualTo(before)
     }
@@ -145,7 +144,7 @@ class ConvertCurvesToArcsTest {
             ),
         )
 
-        ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)).visit(path)
+        ConvertCurvesToArcs(FakeCommandPrinter()).visit(path)
 
         assertThat(path.commands.filterIsInstance<EllipticalArcCurve>()).hasSize(2)
         assertThat(path.commands.filterIsInstance<CubicBezierCurve>()).isEmpty()

@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.vd.optimization
+package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.contains
@@ -14,12 +14,11 @@ import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
-import com.jzbrooks.vgo.core.optimization.BakeTransformations
+import com.jzbrooks.vgo.core.util.assertk.containsKey
+import com.jzbrooks.vgo.core.util.assertk.doesNotContainKey
+import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
-import com.jzbrooks.vgo.util.assertk.containsKey
-import com.jzbrooks.vgo.util.assertk.doesNotContainKey
-import com.jzbrooks.vgo.util.element.createPath
 import org.junit.jupiter.api.Test
 import kotlin.math.PI
 import kotlin.math.cos
