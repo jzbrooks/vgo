@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.vd
 
+import com.jzbrooks.vgo.core.optimization.BakeTransformations
 import com.jzbrooks.vgo.core.optimization.BreakoutImplicitCommands
 import com.jzbrooks.vgo.core.optimization.CollapseGroups
 import com.jzbrooks.vgo.core.optimization.CommandVariant
@@ -12,16 +13,15 @@ import com.jzbrooks.vgo.core.optimization.RemoveRedundantCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyLineCommands
 import com.jzbrooks.vgo.core.optimization.TopDownOptimization
-import com.jzbrooks.vgo.vd.optimization.BakeTransformations
 
-class VectorDrawableOptimizationRegistry : OptimizationRegistry(prePass, topDownOptimizations, emptyList(), postPass) {
+class VectorDrawableOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN, WHOLE_GRAPHIC) {
 
     companion object {
-        private val prePass = listOf(
-            BakeTransformations()
+        private val BOTTOM_UP = listOf(
+            BakeTransformations(),
         )
 
-        private val topDownOptimizations: List<TopDownOptimization> = listOf(
+        private val TOP_DOWN: List<TopDownOptimization> = listOf(
             BreakoutImplicitCommands(),
             CommandVariant(CommandVariant.Mode.Relative),
             SimplifyLineCommands(1e-3f),
@@ -29,13 +29,13 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(prePass, topDown
             SimplifyBezierCurveCommands(1e-3f),
             RemoveRedundantCommands(),
             CommandVariant(CommandVariant.Mode.Compact(VectorDrawableCommandPrinter(3))),
-            Polycommands()
+            Polycommands(),
         )
 
-        private val postPass = listOf(
+        private val WHOLE_GRAPHIC = listOf(
             CollapseGroups(),
             RemoveEmptyGroups(),
-            MergePaths()
+            MergePaths(),
         )
     }
 }

@@ -7,26 +7,21 @@ import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.PathElement
 
 abstract class OptimizationRegistry(
-    private val prePass: List<Optimization>,
-    private val topDownOptimizations: List<TopDownOptimization>,
     private val bottomUpOptimizations: List<BottomUpOptimization>,
-    private val postPass: List<Optimization>
+    private val topDownOptimizations: List<TopDownOptimization>,
+    private val wholeGraphic: List<Optimization>
 ) {
 
     fun apply(graphic: Graphic) {
-        for (optimization in prePass) {
-            optimization.optimize(graphic)
+        if (bottomUpOptimizations.isNotEmpty()) {
+            graphic.elements = graphic.elements.map(::bottomUpTraversal)
         }
 
         if (topDownOptimizations.isNotEmpty()) {
             graphic.elements = graphic.elements.map(::topDownTraversal)
         }
 
-        if (bottomUpOptimizations.isNotEmpty()) {
-            graphic.elements = graphic.elements.map(::bottomUpTraversal)
-        }
-
-        for (optimization in postPass) {
+        for (optimization in wholeGraphic) {
             optimization.optimize(graphic)
         }
     }
