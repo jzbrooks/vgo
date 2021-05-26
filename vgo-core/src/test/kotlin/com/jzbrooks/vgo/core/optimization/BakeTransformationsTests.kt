@@ -1,13 +1,17 @@
 package com.jzbrooks.vgo.core.optimization
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsExactly
 import assertk.assertions.containsNone
 import assertk.assertions.doesNotContain
+import assertk.assertions.index
 import assertk.assertions.isCloseTo
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import assertk.assertions.key
+import assertk.assertions.prop
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
@@ -45,7 +49,7 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group.foreign.keys).containsNone("android:translateX", "android:translateY")
+        assertThat(group.foreign.keys, "foreign keys").containsNone("android:translateX", "android:translateY")
     }
 
     @Test
@@ -66,7 +70,7 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group.foreign).key("android:translateX").isEqualTo("@integer/translating_thing")
+        assertThat(group::foreign).key("android:translateX").isEqualTo("@integer/translating_thing")
     }
 
     @Test
@@ -105,8 +109,8 @@ class BakeTransformationsTests {
 
         val originalNestedGroup = group.elements.first() as Group
 
-        assertThat(group.foreign).doesNotContain("android:translateX", "15")
-        assertThat(originalNestedGroup.foreign).contains("android:translateX", "@integer/translating_thing")
+        assertThat(group::foreign).doesNotContain("android:translateX", "15")
+        assertThat(originalNestedGroup::foreign).contains("android:translateX", "@integer/translating_thing")
     }
 
     @Test
@@ -135,7 +139,7 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group.foreign.keys).containsNone("android:translateX", "android:translateY")
+        assertThat(group.foreign.keys, "foreign keys").containsNone("android:translateX", "android:translateY")
     }
 
     @Test
@@ -153,7 +157,7 @@ class BakeTransformationsTests {
                 createPath(
                     listOf(
                         MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f))),
                     ),
                 )
             ),
@@ -164,11 +168,12 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        val path = group.elements.first() as Path
-        assertThat(path.commands)
+        assertThat(group::elements).index(0)
+            .isInstanceOf(Path::class)
+            .prop(Path::commands)
             .containsExactly(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(24f, 24f))),
-                LineTo(CommandVariant.ABSOLUTE, listOf(Point(54f, 18f)))
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(54f, 18f))),
             )
     }
 
@@ -200,13 +205,14 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        val path = group.elements.first() as Path
-        assertThat(path.commands)
+        assertThat(group::elements).index(0)
+            .isInstanceOf(Path::class)
+            .prop(Path::commands)
             .containsExactly(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(24f, 24f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(28f, 28f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(18f, 18f))),
-                ClosePath
+                ClosePath,
             )
     }
 
@@ -237,14 +243,19 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        val path = group.elements.first() as Path
-        val firstCommand = path.commands[0] as MoveTo
-        val secondCommand = path.commands[1] as LineTo
+        assertThat(group::elements).index(0)
+            .isInstanceOf(Path::class)
+            .prop(Path::commands).all {
+                index(0).isInstanceOf(MoveTo::class).prop(MoveTo::parameters).index(0).all {
+                    prop(Point::x).isCloseTo(-10f, 0.001f)
+                    prop(Point::y).isCloseTo(10f, 0.001f)
+                }
 
-        assertThat(firstCommand.parameters.first().x).isCloseTo(-10f, 0.001f)
-        assertThat(firstCommand.parameters.first().y).isCloseTo(10f, 0.001f)
-        assertThat(secondCommand.parameters.first().x).isCloseTo(-11f, 0.001f)
-        assertThat(secondCommand.parameters.first().y).isCloseTo(11f, 0.001f)
+                index(1).isInstanceOf(LineTo::class).prop(LineTo::parameters).index(0).all {
+                    prop(Point::x).isCloseTo(-11f, 0.001f)
+                    prop(Point::y).isCloseTo(11f, 0.001f)
+                }
+            }
     }
 
     @Test
@@ -295,24 +306,34 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        val path = group.elements.first() as Path
-        val firstCommand = path.commands[0] as MoveTo
-        val secondCommand = path.commands[1] as LineTo
-        val thirdCommand = path.commands[2] as LineTo
-        val fourthCommand = path.commands[3] as LineTo
+        assertThat(group::elements).index(0)
+            .isInstanceOf(Path::class)
+            .prop(Path::commands).all {
+                index(0).isEqualTo(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
 
-        assertThat(firstCommand).isEqualTo(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
+                index(1).isInstanceOf(LineTo::class).all {
+                    prop(LineTo::variant).isEqualTo(CommandVariant.ABSOLUTE)
+                    prop(LineTo::parameters).index(0).all {
+                        prop(Point::x).isCloseTo(13.863f, 0.001f)
+                        prop(Point::y).isCloseTo(11.035f, 0.001f)
+                    }
+                }
 
-        assertThat(secondCommand.variant).isEqualTo(CommandVariant.ABSOLUTE)
-        assertThat(secondCommand.parameters.first().x).isCloseTo(13.863f, 0.001f)
-        assertThat(secondCommand.parameters.first().y).isCloseTo(11.035f, 0.001f)
+                index(2).isInstanceOf(LineTo::class).all {
+                    prop(LineTo::variant).isEqualTo(CommandVariant.ABSOLUTE)
+                    prop(LineTo::parameters).index(0).all {
+                        prop(Point::x).isCloseTo(12.828f, 0.001f)
+                        prop(Point::y).isCloseTo(14.899f, 0.001f)
+                    }
+                }
 
-        assertThat(thirdCommand.variant).isEqualTo(CommandVariant.ABSOLUTE)
-        assertThat(thirdCommand.parameters.first().x).isCloseTo(12.828f, 0.001f)
-        assertThat(thirdCommand.parameters.first().y).isCloseTo(14.899f, 0.001f)
-
-        assertThat(fourthCommand.variant).isEqualTo(CommandVariant.ABSOLUTE)
-        assertThat(fourthCommand.parameters.first().x).isCloseTo(8.965f, 0.001f)
-        assertThat(fourthCommand.parameters.first().y).isCloseTo(13.864f, 0.001f)
+                index(3).isInstanceOf(LineTo::class).all {
+                    prop(LineTo::variant).isEqualTo(CommandVariant.ABSOLUTE)
+                    prop(LineTo::parameters).index(0).all {
+                        prop(Point::x).isCloseTo(8.965f, 0.001f)
+                        prop(Point::y).isCloseTo(13.864f, 0.001f)
+                    }
+                }
+            }
     }
 }
