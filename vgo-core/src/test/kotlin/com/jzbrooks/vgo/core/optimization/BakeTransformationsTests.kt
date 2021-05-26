@@ -3,9 +3,11 @@ package com.jzbrooks.vgo.core.optimization
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsExactly
+import assertk.assertions.containsNone
 import assertk.assertions.doesNotContain
 import assertk.assertions.isCloseTo
 import assertk.assertions.isEqualTo
+import assertk.assertions.key
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
@@ -14,8 +16,6 @@ import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
-import com.jzbrooks.vgo.core.util.assertk.containsKey
-import com.jzbrooks.vgo.core.util.assertk.doesNotContainKey
 import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
@@ -45,8 +45,7 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group.foreign).doesNotContainKey("android:translateX")
-        assertThat(group.foreign).doesNotContainKey("android:translateY")
+        assertThat(group.foreign.keys).containsNone("android:translateX", "android:translateY")
     }
 
     @Test
@@ -67,7 +66,7 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group.foreign).containsKey("android:translateX")
+        assertThat(group.foreign).key("android:translateX").isEqualTo("@integer/translating_thing")
     }
 
     @Test
@@ -136,8 +135,7 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group.foreign).doesNotContainKey("android:translateX")
-        assertThat(group.foreign).doesNotContainKey("android:translateY")
+        assertThat(group.foreign.keys).containsNone("android:translateX", "android:translateY")
     }
 
     @Test

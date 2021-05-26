@@ -1,12 +1,17 @@
 package com.jzbrooks.vgo.vd
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsExactly
+import assertk.assertions.containsNone
 import assertk.assertions.hasSize
+import assertk.assertions.index
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
+import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -17,7 +22,6 @@ import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.math.Point
-import com.jzbrooks.vgo.util.assertk.doesNotContainKey
 import com.jzbrooks.vgo.util.element.createPath
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,18 +55,18 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.foreign).doesNotContainKey("android:pathData")
+        assertThat(path.foreign.keys).containsNone("android:pathData")
     }
 
     @Test
     fun testParseMetadata() {
         val graphic: Graphic = parse(node)
 
-        val path = graphic.elements.first() as Path
-
-        assertThat(path.id).isNotNull()
-        assertThat(path.strokeWidth).isEqualTo(1f)
-        assertThat(path.fill).isEqualTo(Colors.BLACK)
+        assertThat(graphic.elements).index(0).isInstanceOf(Path::class).all {
+            prop(Path::id).isNotNull()
+            prop(Path::strokeWidth).isEqualTo(1f)
+            prop(Path::fill).isEqualTo(Colors.BLACK)
+        }
     }
 
     @Test
