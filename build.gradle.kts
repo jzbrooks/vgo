@@ -31,7 +31,6 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             jvmTarget = JavaVersion.VERSION_11.toString()
-
         }
     }
 
@@ -46,13 +45,23 @@ subprojects {
                     println("""
                         $border
                         $output
-                        $border
+                        $border                        
                     """.trimIndent()
                     )
                 }
             }
 
-            override fun afterTest(testDescriptor: TestDescriptor?, result: TestResult?) {}
+            override fun afterTest(testDescriptor: TestDescriptor?, result: TestResult?) {
+                if (testDescriptor != null && result?.exception != null) {
+                    println("""
+                        |${testDescriptor.className}
+                        |${testDescriptor.name}
+                        |
+                        |    ${result.exception!!.message}
+                    """.trimMargin()
+                    )
+                }
+            }
             override fun beforeTest(testDescriptor: TestDescriptor?) {}
             override fun beforeSuite(suite: TestDescriptor?) {}
         })
