@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.vd
 
 import assertk.assertThat
 import assertk.assertions.endsWith
+import assertk.assertions.hasSameSizeAs
 import assertk.assertions.isEqualTo
 import assertk.assertions.startsWith
 import com.jzbrooks.vgo.core.graphic.ClipPath
@@ -128,9 +129,9 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val groupNode = output.firstChild.firstChild
+            val groupChildren = output.firstChild.firstChild.childNodes.toList()
 
-            assertThat(groupNode.childNodes.length).isEqualTo((graphic.elements[0] as Group).elements.size)
+            assertThat(groupChildren).hasSameSizeAs((graphic.elements[0] as Group).elements)
         }
     }
 

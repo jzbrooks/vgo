@@ -1,10 +1,14 @@
 package com.jzbrooks.vgo.core.graphic.command
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import assertk.assertions.containsOnly
 import assertk.assertions.hasClass
+import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFailure
+import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
@@ -28,7 +32,7 @@ class ParserTests {
             )
         )
 
-        assertThat(commands[0]).isEqualTo(expected)
+        assertThat(commands).index(0).isEqualTo(expected)
     }
 
     @Test
@@ -39,7 +43,7 @@ class ParserTests {
 
         val expected = SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(Point(1f, 3f)))
 
-        assertThat(commands[0]).isEqualTo(expected)
+        assertThat(commands).index(0).isEqualTo(expected)
     }
 
     @Test
@@ -55,7 +59,7 @@ class ParserTests {
             )
         )
 
-        assertThat(commands[0]).isEqualTo(expected)
+        assertThat(commands).index(0).isEqualTo(expected)
     }
 
     @Test
@@ -64,12 +68,12 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        val expected = SmoothCubicBezierCurve(
-            CommandVariant.ABSOLUTE,
-            listOf(SmoothCubicBezierCurve.Parameter(Point(1f, 3f), Point(2f, 4f)))
-        )
-
-        assertThat(commands[0]).isEqualTo(expected)
+        assertThat(commands, "commands").index(0).all {
+            prop("variant") { (it as ParameterizedCommand<*>).variant }.isEqualTo(CommandVariant.ABSOLUTE)
+            isInstanceOf(SmoothCubicBezierCurve::class)
+                .prop(SmoothCubicBezierCurve::parameters)
+                .containsOnly(SmoothCubicBezierCurve.Parameter(Point(1f, 3f), Point(2f, 4f)))
+        }
     }
 
     @Test
@@ -92,7 +96,7 @@ class ParserTests {
             )
         )
 
-        assertThat(commands[0]).isEqualTo(expected)
+        assertThat(commands).index(0).isEqualTo(expected)
     }
 
     @Test
@@ -199,7 +203,7 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        assertThat(commands[0])
+        assertThat(commands).index(0)
             .prop("variant") { (it as ParameterizedCommand<*>).variant }
             .isEqualTo(CommandVariant.RELATIVE)
     }

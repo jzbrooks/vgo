@@ -37,6 +37,12 @@ subprojects {
     tasks.withType<Test> {
         useJUnitPlatform()
 
+        testLogging {
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+            showExceptions = true
+            showCauses = true
+        }
+
         addTestListener(object : TestListener {
             override fun afterSuite(suite: TestDescriptor, result: TestResult) {
                 if (suite.parent == null) {
@@ -51,17 +57,7 @@ subprojects {
                 }
             }
 
-            override fun afterTest(testDescriptor: TestDescriptor?, result: TestResult?) {
-                if (testDescriptor != null && result?.exception != null) {
-                    println("""
-                        |${testDescriptor.className}
-                        |${testDescriptor.name}
-                        |
-                        |    ${result.exception!!.message}
-                    """.trimMargin()
-                    )
-                }
-            }
+            override fun afterTest(testDescriptor: TestDescriptor?, result: TestResult?) {}
             override fun beforeTest(testDescriptor: TestDescriptor?) {}
             override fun beforeSuite(suite: TestDescriptor?) {}
         })

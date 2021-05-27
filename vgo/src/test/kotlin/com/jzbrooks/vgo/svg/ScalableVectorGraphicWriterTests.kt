@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.svg
 
 import assertk.assertThat
+import assertk.assertions.hasSameSizeAs
 import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
@@ -104,9 +105,9 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
-            val groupNode = output.firstChild.firstChild
+            val groupChildren = output.firstChild.firstChild.childNodes.toList()
 
-            assertThat(groupNode.childNodes.length).isEqualTo(graphic.elements.size)
+            assertThat(groupChildren).hasSameSizeAs(graphic.elements)
         }
     }
 

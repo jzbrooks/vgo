@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.svg
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsExactly
@@ -9,6 +10,7 @@ import assertk.assertions.index
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
+import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -38,11 +40,12 @@ class ScalableVectorGraphicReaderTests {
             node = document.firstChild
         }
     }
+    
     @Test
     fun testParseDimensions() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic.foreign).contains("viewBox", "0 0 100 100")
+        assertThat(graphic::foreign).contains("viewBox", "0 0 100 100")
     }
 
     @Test
@@ -51,7 +54,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.foreign.keys).containsNone("d")
+        assertThat(path.foreign.keys, "foreign keys").containsNone("d")
     }
 
     @Test
@@ -60,7 +63,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.stroke).isEqualTo(Color(0xFFFF0000u))
+        assertThat(path::stroke).isEqualTo(Color(0xFFFF0000u))
     }
 
     @Test
@@ -77,16 +80,16 @@ class ScalableVectorGraphicReaderTests {
             QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(10f, 60f), Point(10f, 30f)))),
             ClosePath
         )
-        assertThat(graphic.elements).hasSize(1)
+        assertThat(graphic::elements).hasSize(1)
     }
 
     @Test
     fun testStoreIdForPath() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic.elements).index(0)
+        assertThat(graphic::elements).index(0)
             .isInstanceOf(Path::class)
-            .transform("id") { it.id }
+            .prop(Path::id)
             .isEqualTo("heart")
     }
 
@@ -100,7 +103,7 @@ class ScalableVectorGraphicReaderTests {
 
         val graphic: Graphic = parse(commentDocument.firstChild)
 
-        assertThat(graphic.elements).isEmpty()
+        assertThat(graphic::elements).isEmpty()
     }
 
     @Test
@@ -113,10 +116,10 @@ class ScalableVectorGraphicReaderTests {
 
         val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
-        val unknown = graphic.elements.first() as Extra
-
-        assertThat(unknown.name).isEqualTo("bicycle")
-        assertThat(unknown.elements).isEmpty()
+        assertThat(graphic::elements).index(0).isInstanceOf(Extra::class).all {
+            prop(Extra::name).isEqualTo("bicycle")
+            prop(Extra::elements).isEmpty()
+        }
     }
 
     @Test
@@ -129,10 +132,10 @@ class ScalableVectorGraphicReaderTests {
 
         val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
-        val unknown = graphic.elements.first() as Extra
-
-        assertThat(unknown.name).isEqualTo("bicycle")
-        assertThat(unknown.elements).isEmpty()
+        assertThat(graphic::elements).index(0).isInstanceOf(Extra::class).all {
+            prop(Extra::name).isEqualTo("bicycle")
+            prop(Extra::elements).isEmpty()
+        }
     }
 
     @Test
@@ -163,7 +166,9 @@ class ScalableVectorGraphicReaderTests {
 
         val unknown = graphic.elements.first() as Extra
 
-        assertThat(unknown.name).isEqualTo("bicycle")
-        assertThat(unknown.elements).containsExactly(expectedChild)
+        assertThat(graphic::elements).index(0).isInstanceOf(Extra::class).all {
+            prop(Extra::name).isEqualTo("bicycle")
+            prop(Extra::elements).containsExactly(expectedChild)
+        }
     }
 }

@@ -1,7 +1,10 @@
 package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
+import assertk.assertions.index
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.prop
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.LineTo
@@ -36,7 +39,9 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(SmoothCubicBezierCurve::class)
+        assertThat(path::commands)
+            .index(path.commands.size - 1)
+            .isInstanceOf(SmoothCubicBezierCurve::class)
     }
 
     @Test
@@ -61,7 +66,9 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(SmoothCubicBezierCurve::class)
+        assertThat(path::commands)
+            .index(path.commands.size - 1)
+            .isInstanceOf(SmoothCubicBezierCurve::class)
     }
 
     @Test
@@ -80,7 +87,9 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(SmoothCubicBezierCurve::class)
+        assertThat(path::commands)
+            .index(path.commands.size - 1)
+            .isInstanceOf(SmoothCubicBezierCurve::class)
     }
 
     @Test
@@ -105,7 +114,9 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(SmoothQuadraticBezierCurve::class)
+        assertThat(path::commands)
+            .index(path.commands.size - 1)
+            .isInstanceOf(SmoothQuadraticBezierCurve::class)
     }
 
     @Test
@@ -136,7 +147,9 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(SmoothQuadraticBezierCurve::class)
+        assertThat(path::commands)
+            .index(path.commands.size - 1)
+            .isInstanceOf(SmoothQuadraticBezierCurve::class)
     }
 
     @Test
@@ -155,7 +168,9 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(LineTo::class)
+        assertThat(path::commands)
+            .index(path.commands.size - 1)
+            .isInstanceOf(LineTo::class)
     }
 
     @Test
@@ -180,7 +195,12 @@ class SimplifyBezierCurveCommandsTests {
 
         SimplifyBezierCurveCommands(0.00001f).visit(path)
 
-        assertThat(path.commands.last()::class).isEqualTo(CubicBezierCurve::class)
-        assertThat((path.commands.last() as CubicBezierCurve).parameters.last().startControl).isEqualTo(Point.ZERO)
+        assertThat(path::commands)
+            .index(path.commands.size - 1)
+            .isInstanceOf(CubicBezierCurve::class)
+            .prop(CubicBezierCurve::parameters)
+            .transform("last element") { it.last() }
+            .prop(CubicBezierCurve.Parameter::startControl)
+            .isEqualTo(Point.ZERO)
     }
 }

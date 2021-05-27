@@ -1,6 +1,8 @@
 package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
+import assertk.assertions.containsExactly
+import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Element
@@ -44,7 +46,7 @@ class MergePathsTests {
         val optimization = MergePaths()
         optimization.optimize(graphic)
 
-        assertThat(graphic.elements.first()).isEqualTo(
+        assertThat(graphic::elements).index(0).isEqualTo(
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
@@ -95,29 +97,28 @@ class MergePathsTests {
         val optimization = MergePaths()
         optimization.optimize(graphic)
 
-        assertThat(graphic.elements).isEqualTo(
-            listOf(
-                Group(
-                    listOf(
-                        createPath(
-                            listOf(
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                                SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
-                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                            ),
+        assertThat(graphic::elements).containsExactly(
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
+                            SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         ),
-                        createPath(
-                            listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                            strokeWidth = 5f,
+                    ),
+                    createPath(
+                        listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                        strokeWidth = 5f,
+                    ),
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
                         ),
-                        createPath(
-                            listOf(
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                            ),
-                        )
+
                     )
                 )
             )
@@ -161,28 +162,26 @@ class MergePathsTests {
         val optimization = MergePaths()
         optimization.optimize(graphic)
 
-        assertThat(graphic.elements).isEqualTo(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                        SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                    )
-                ),
-                createPath(
-                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                    strokeWidth = 5f,
-                ),
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                    )
-                ),
-            )
+        assertThat(graphic::elements).containsExactly(
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
+                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
+                )
+            ),
+            createPath(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                strokeWidth = 5f,
+            ),
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
+                )
+            ),
         )
     }
 
@@ -224,29 +223,28 @@ class MergePathsTests {
         val optimization = MergePaths()
         optimization.optimize(graphic)
 
-        assertThat(graphic.elements).isEqualTo(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                        SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                    )
-                ),
-                createPath(
-                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                    strokeWidth = 5f,
-                ),
-                Group(emptyList()),
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                    )
-                ),
-            )
+        assertThat(graphic::elements).containsExactly(
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
+                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
+                )
+            ),
+            createPath(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                strokeWidth = 5f,
+            ),
+            Group(emptyList()),
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
+                )
+            ),
+
         )
     }
 
@@ -278,27 +276,25 @@ class MergePathsTests {
         val optimization = MergePaths()
         optimization.optimize(graphic)
 
-        assertThat(graphic.elements).isEqualTo(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                    )
-                ),
-                PseudoPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
-                    )
-                ),
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                    )
-                ),
-            )
+        assertThat(graphic::elements).containsExactly(
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
+                )
+            ),
+            PseudoPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
+                )
+            ),
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
+                )
+            ),
         )
     }
 
@@ -331,27 +327,25 @@ class MergePathsTests {
         val optimization = MergePaths()
         optimization.optimize(graphic)
 
-        assertThat(graphic.elements).isEqualTo(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                    )
-                ),
-                PseudoPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
-                    )
-                ),
-                createPath(
-                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
-                    fill = Color(0xFF0011FFu),
-                ),
-                createPath(
-                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))))
+        assertThat(graphic::elements).containsExactly(
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                 )
+            ),
+            PseudoPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
+                )
+            ),
+            createPath(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                fill = Color(0xFF0011FFu),
+            ),
+            createPath(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))))
             )
         )
     }
