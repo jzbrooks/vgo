@@ -40,7 +40,7 @@ class ScalableVectorGraphicReaderTests {
             node = document.firstChild
         }
     }
-    
+
     @Test
     fun testParseDimensions() {
         val graphic: Graphic = parse(node)
