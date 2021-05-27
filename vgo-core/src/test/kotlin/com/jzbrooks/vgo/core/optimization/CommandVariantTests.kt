@@ -159,7 +159,7 @@ class CommandVariantTests {
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         val lastLineTo = path.commands.filterIsInstance<LineTo>().last()
-        assertThat(lastLineTo.variant).isEqualTo(CommandVariant.RELATIVE)
+        assertThat(lastLineTo::variant).isEqualTo(CommandVariant.RELATIVE)
         assertThat(lastLineTo.parameters.last()).isEqualTo(Point(7f, 6f))
     }
 
@@ -180,7 +180,7 @@ class CommandVariantTests {
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
         val lastLineTo = path.commands.filterIsInstance<LineTo>().last()
-        assertThat(lastLineTo.variant).isEqualTo(CommandVariant.RELATIVE)
+        assertThat(lastLineTo::variant).isEqualTo(CommandVariant.RELATIVE)
         assertThat(lastLineTo.parameters.last()).isEqualTo(Point(7f, 6f))
     }
 }

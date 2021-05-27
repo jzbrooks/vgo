@@ -13,7 +13,7 @@ value class CommandString(val data: String) {
                 when {
                     command.startsWith('M', true) -> {
                         val parameters = number.findAll(command)
-                            .map { it.value }
+                            .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(2)
                             .map(::mapPoint)
@@ -23,7 +23,7 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('L', true) -> {
                         val parameters = number.findAll(command)
-                            .map { it.value }
+                            .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(2)
                             .map(::mapPoint)
@@ -47,7 +47,7 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('Q', true) -> {
                         val parameters = number.findAll(command)
-                            .map { it.value }
+                            .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(4)
                             .map(::mapQuadraticBezierCurveParameter)
@@ -57,7 +57,7 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('T', true) -> {
                         val parameters = number.findAll(command)
-                            .map { it.value }
+                            .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(2)
                             .map(::mapPoint)
@@ -67,7 +67,7 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('C', true) -> {
                         val parameters = number.findAll(command)
-                            .map { it.value }
+                            .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(6)
                             .map(::mapCubicBezierCurveParameter)
@@ -77,7 +77,7 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('S', true) -> {
                         val parameters = number.findAll(command)
-                            .map { it.value }
+                            .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(4)
                             .map(::mapShortcutCubicBezierCurveParameter)
@@ -87,7 +87,7 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('A', true) -> {
                         val parameters = number.findAll(command)
-                            .map { it.value }
+                            .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(7)
                             .map(::mapEllipticalArcCurveParameter)

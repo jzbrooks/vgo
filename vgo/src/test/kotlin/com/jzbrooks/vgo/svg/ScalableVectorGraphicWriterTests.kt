@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.svg
 
 import assertk.assertThat
 import assertk.assertions.hasSameSizeAs
+import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
@@ -24,7 +25,7 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, it)
 
             val output = it.toDocument()
-            assertThat(output.firstChild).hasName("svg")
+            assertThat(output.firstChild, "first document element").hasName("svg")
         }
     }
 
@@ -49,7 +50,7 @@ class ScalableVectorGraphicWriterTests {
             val firstGenNodes = output.firstChild.childNodes.toList()
 
             assertThat(firstGenNodes)
-                .transform { it.count { item -> item.nodeName == "path" } }
+                .transform("path element count") { it.count { item -> item.nodeName == "path" } }
                 .isEqualTo(2)
         }
     }
@@ -128,7 +129,7 @@ class ScalableVectorGraphicWriterTests {
             val output = memoryStream.toDocument()
             val extraNode = output.firstChild.childNodes.item(1)
 
-            assertThat(extraNode.nodeName).isEqualTo("bicycle")
+            assertThat(extraNode).hasName("bicycle")
         }
     }
 
@@ -138,9 +139,9 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val extraNode = output.firstChild.childNodes.item(1)
+            val extraChildren = output.firstChild.childNodes.item(1).childNodes.toList()
 
-            assertThat(extraNode.firstChild).hasName("g")
+            assertThat(extraChildren).index(0).hasName("g")
         }
     }
 

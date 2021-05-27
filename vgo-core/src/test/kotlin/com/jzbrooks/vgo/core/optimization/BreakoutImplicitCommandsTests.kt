@@ -80,6 +80,6 @@ class BreakoutImplicitCommandsTests {
 
         BreakoutImplicitCommands().visit(path)
 
-        assertThat(path.commands).hasSize(sizeBefore)
+        assertThat(path::commands).hasSize(sizeBefore)
     }
 }

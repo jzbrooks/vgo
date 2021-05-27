@@ -5,6 +5,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
+import java.io.File
 
 open class ShrinkVectorArtwork : DefaultTask() {
     private val extension = project.extensions.getByType<VgoPluginExtension>()
@@ -19,7 +20,7 @@ open class ShrinkVectorArtwork : DefaultTask() {
     }
 
     @get:Input
-    val files: List<String> = (extension.inputs ?: defaultTree).files.map { it.absolutePath }
+    val files: List<String> = (extension.inputs ?: defaultTree).files.map(File::getAbsolutePath)
 
     @get:Input
     val showStatistics = extension.showStatistics

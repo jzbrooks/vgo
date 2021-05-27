@@ -62,7 +62,7 @@ class VectorDrawableReaderTests {
     fun testParseMetadata() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic.elements).index(0).isInstanceOf(Path::class).all {
+        assertThat(graphic::elements).index(0).isInstanceOf(Path::class).all {
             prop(Path::id).isNotNull()
             prop(Path::strokeWidth).isEqualTo(1f)
             prop(Path::fill).isEqualTo(Colors.BLACK)
@@ -74,7 +74,7 @@ class VectorDrawableReaderTests {
         val graphic: Graphic = parse(node)
 
         val path = graphic.elements.first() as Path
-        assertThat(path.commands).isEqualTo(
+        assertThat(path::commands).isEqualTo(
             listOf(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 4.27f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(3.27f, 3f))),
@@ -83,7 +83,7 @@ class VectorDrawableReaderTests {
                 ClosePath
             )
         )
-        assertThat(graphic.elements).hasSize(3)
+        assertThat(graphic::elements).hasSize(3)
     }
 
     @Test
@@ -92,7 +92,7 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.id).isEqualTo("strike_thru_path")
+        assertThat(path::id).isEqualTo("strike_thru_path")
     }
 
     @Test
@@ -105,7 +105,7 @@ class VectorDrawableReaderTests {
 
         val graphic: Graphic = parse(commentDocument.firstChild)
 
-        assertThat(graphic.elements).isEmpty()
+        assertThat(graphic::elements).isEmpty()
     }
 
     @Test
@@ -120,8 +120,8 @@ class VectorDrawableReaderTests {
 
         val unknown = graphic.elements.first() as Extra
 
-        assertThat(unknown.name).isEqualTo("bicycle")
-        assertThat(unknown.elements).isEmpty()
+        assertThat(unknown::name).isEqualTo("bicycle")
+        assertThat(unknown::elements).isEmpty()
     }
 
     @Test
@@ -136,8 +136,8 @@ class VectorDrawableReaderTests {
 
         val unknown = graphic.elements.first() as Extra
 
-        assertThat(unknown.name).isEqualTo("bicycle")
-        assertThat(unknown.elements).isEmpty()
+        assertThat(unknown::name).isEqualTo("bicycle")
+        assertThat(unknown::elements).isEmpty()
     }
 
     @Test
@@ -158,7 +158,7 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.fill).isEqualTo(Color(0x8000FF00u))
+        assertThat(path::fill).isEqualTo(Color(0x8000FF00u))
     }
 
     @Test
@@ -179,7 +179,7 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.stroke).isEqualTo(Color(0x8000FF00u))
+        assertThat(path::stroke).isEqualTo(Color(0x8000FF00u))
     }
 
     @Test
@@ -212,8 +212,8 @@ class VectorDrawableReaderTests {
 
         val unknown = graphic.elements.first() as Extra
 
-        assertThat(unknown.name).isEqualTo("bicycle")
-        assertThat(unknown.elements).containsExactly(expectedChild)
+        assertThat(unknown::name).isEqualTo("bicycle")
+        assertThat(unknown::elements).containsExactly(expectedChild)
     }
 
     @Test
@@ -234,7 +234,7 @@ class VectorDrawableReaderTests {
 
         val path = graphic.elements.first() as Path
 
-        assertThat(path.commands).isEmpty()
-        assertThat(path.foreign).contains("android:pathData", "@string/path_data")
+        assertThat(path::commands).isEmpty()
+        assertThat(path::foreign).contains("android:pathData", "@string/path_data")
     }
 }

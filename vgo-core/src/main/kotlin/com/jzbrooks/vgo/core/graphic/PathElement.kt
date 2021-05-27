@@ -129,7 +129,7 @@ fun PathElement.applyTransform(transform: Matrix3) {
             is QuadraticBezierCurve -> {
                 command.apply {
                     val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
-                        currentPoint + parameters.map { it.end }.reduce(Point::plus)
+                        currentPoint + parameters.map(QuadraticBezierCurve.Parameter::end).reduce(Point::plus)
                     } else {
                         parameters.last().end
                     }
@@ -180,7 +180,7 @@ fun PathElement.applyTransform(transform: Matrix3) {
             is CubicBezierCurve -> {
                 command.apply {
                     val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
-                        currentPoint + parameters.map { it.end }.reduce(Point::plus)
+                        currentPoint + parameters.map(CubicBezierCurve.Parameter::end).reduce(Point::plus)
                     } else {
                         parameters.last().end
                     }
@@ -216,7 +216,7 @@ fun PathElement.applyTransform(transform: Matrix3) {
             is SmoothCubicBezierCurve -> {
                 command.apply {
                     val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
-                        currentPoint + parameters.map { it.end }.reduce(Point::plus)
+                        currentPoint + parameters.map(SmoothCubicBezierCurve.Parameter::end).reduce(Point::plus)
                     } else {
                         parameters.last().end
                     }
@@ -245,7 +245,7 @@ fun PathElement.applyTransform(transform: Matrix3) {
             is EllipticalArcCurve -> {
                 command.apply {
                     val newCurrentPoint = if (variant == CommandVariant.RELATIVE) {
-                        currentPoint + parameters.map { it.end }.reduce(Point::plus)
+                        currentPoint + parameters.map(EllipticalArcCurve.Parameter::end).reduce(Point::plus)
                     } else {
                         parameters.last().end
                     }

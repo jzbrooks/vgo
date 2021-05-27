@@ -26,7 +26,7 @@ class RemoveRedundantCommandsTests {
         RemoveRedundantCommands().visit(path)
 
         assertThat(path.commands.filterIsInstance<LineTo>()).hasSize(1)
-        assertThat(path.commands).hasSize(3)
+        assertThat(path::commands).hasSize(3)
     }
 
     @Test
@@ -42,7 +42,7 @@ class RemoveRedundantCommandsTests {
 
         RemoveRedundantCommands().visit(path)
 
-        assertThat(path.commands).hasSize(4)
+        assertThat(path::commands).hasSize(4)
     }
 
     @Test
@@ -59,6 +59,6 @@ class RemoveRedundantCommandsTests {
 
         RemoveRedundantCommands().visit(path)
 
-        assertThat(path.commands).containsNone(ClosePath)
+        assertThat(path::commands).containsNone(ClosePath)
     }
 }

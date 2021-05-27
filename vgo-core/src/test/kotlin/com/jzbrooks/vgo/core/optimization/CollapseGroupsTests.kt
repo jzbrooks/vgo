@@ -26,7 +26,7 @@ class CollapseGroupsTests {
 
         CollapseGroups().optimize(graphic)
 
-        assertThat(graphic.elements).containsExactly(innerPath)
+        assertThat(graphic::elements).containsExactly(innerPath)
     }
 
     @Test
@@ -41,7 +41,7 @@ class CollapseGroupsTests {
 
         CollapseGroups().optimize(graphic)
 
-        assertThat(graphic.elements).containsExactly(innerPath)
+        assertThat(graphic::elements).containsExactly(innerPath)
     }
 
     @Test
@@ -66,6 +66,6 @@ class CollapseGroupsTests {
 
         CollapseGroups().optimize(graphic)
 
-        assertThat(graphic.elements).containsExactly(innerGroupWithAttributes)
+        assertThat(graphic::elements).containsExactly(innerGroupWithAttributes)
     }
 }

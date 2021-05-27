@@ -28,7 +28,7 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, it)
 
             val output = it.toDocument()
-            assertThat(output.firstChild).hasName("vector")
+            assertThat(output.firstChild, "first document element").hasName("vector")
         }
     }
 
@@ -68,7 +68,7 @@ class VectorDrawableWriterTests {
             val transformGroupNodes = output.firstChild.firstChild.childNodes.toList()
 
             assertThat(firstGenNodes + transformGroupNodes)
-                .transform { it.count { item -> item.nodeName == "path" } }
+                .transform("path element count") { it.count { item -> item.nodeName == "path" } }
                 .isEqualTo(2)
         }
     }
@@ -156,7 +156,7 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val extraNode = output.firstChild.firstChild.childNodes.item(1)
 
-            assertThat(extraNode.nodeName).isEqualTo("bicycle")
+            assertThat(extraNode).hasName("bicycle")
         }
     }
 

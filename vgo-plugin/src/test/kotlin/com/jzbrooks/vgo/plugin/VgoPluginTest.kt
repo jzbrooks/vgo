@@ -35,7 +35,7 @@ class VgoPluginTest {
 
         val task = project.tasks.getByName<ShrinkVectorArtwork>("shrinkVectorArtwork")
 
-        assertThat(task.files).containsExactly(input.absolutePath)
-        assertThat(task.showStatistics).isTrue()
+        assertThat(task::files).containsExactly(input.absolutePath)
+        assertThat(task::showStatistics).isTrue()
     }
 }

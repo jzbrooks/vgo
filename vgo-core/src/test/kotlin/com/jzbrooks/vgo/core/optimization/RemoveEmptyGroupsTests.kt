@@ -27,7 +27,7 @@ class RemoveEmptyGroupsTests {
         val emptyGroups = RemoveEmptyGroups()
         emptyGroups.optimize(graphic)
 
-        assertThat(graphic.elements).hasSize(0)
+        assertThat(graphic::elements).hasSize(0)
     }
 
     @Test
@@ -57,7 +57,7 @@ class RemoveEmptyGroupsTests {
         val emptyGroups = RemoveEmptyGroups()
         emptyGroups.optimize(graphic)
 
-        assertThat(graphic.elements).hasSize(1)
+        assertThat(graphic::elements).hasSize(1)
     }
 
     @Test
@@ -73,7 +73,7 @@ class RemoveEmptyGroupsTests {
         val emptyGroups = RemoveEmptyGroups()
         emptyGroups.optimize(graphic)
 
-        assertThat(graphic.elements).hasSize(1)
+        assertThat(graphic::elements).hasSize(1)
     }
 
     @Test
