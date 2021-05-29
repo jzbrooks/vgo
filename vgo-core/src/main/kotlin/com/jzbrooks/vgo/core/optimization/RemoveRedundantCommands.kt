@@ -47,14 +47,13 @@ class RemoveRedundantCommands : TopDownOptimization, PathElementVisitor {
                 commands.add(current)
             }
 
-            if (pathElement.commands.last() is ClosePath) {
+            if (commands.last() is ClosePath) {
                 val commandsWithoutFinalClosePath = commands.dropLast(1)
                 val current = computeAbsoluteCoordinates(commandsWithoutFinalClosePath)
                 val firstCurrentPoint = firstCommand.parameters.last()
 
                 if (current == firstCurrentPoint) {
-                    pathElement.commands = commandsWithoutFinalClosePath
-                    return
+                    commands.removeLast()
                 }
             }
 
