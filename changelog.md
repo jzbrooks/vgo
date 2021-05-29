@@ -4,6 +4,7 @@ Change Log
 ## Unpublished (2.0.0)
 
 * Removed non IR related code from the core library
+* Improvement: Remove redundant commands in situations where the command is basically, but not precisely redundant 
 * Fixed: Redundant move commands are removed
 * Fixed: Test failures on Windows due to path handling
 

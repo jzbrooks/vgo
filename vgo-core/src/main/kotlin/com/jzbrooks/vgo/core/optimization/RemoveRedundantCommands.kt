@@ -17,6 +17,7 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.computeAbsoluteCoordinates
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 /**
  * Elide commands that don't contribute to the overall graphic
@@ -33,14 +34,14 @@ class RemoveRedundantCommands : TopDownOptimization, PathElementVisitor {
 
                 when (current) {
                     is MoveTo -> if (current.parameters.reduce(Point::plus).isApproximately(Point.ZERO)) continue
-                    is LineTo -> if (current.parameters.all { it == Point.ZERO }) continue
-                    is VerticalLineTo -> if (current.parameters.all { it == 0f }) continue
-                    is HorizontalLineTo -> if (current.parameters.all { it == 0f }) continue
-                    is CubicBezierCurve -> if (current.parameters.all { it == CubicBezierCurve.Parameter(Point.ZERO, Point.ZERO, Point.ZERO) }) continue
-                    is SmoothCubicBezierCurve -> if (current.parameters.all { it == SmoothCubicBezierCurve.Parameter(Point.ZERO, Point.ZERO) }) continue
-                    is QuadraticBezierCurve -> if (current.parameters.all { it == QuadraticBezierCurve.Parameter(Point.ZERO, Point.ZERO) }) continue
-                    is SmoothQuadraticBezierCurve -> if (current.parameters.all { it == Point.ZERO }) continue
-                    is EllipticalArcCurve -> if (current.parameters.all { (abs(it.radiusX) < 1e-7f && abs(it.radiusY) < 1e-7) || it.end == Point.ZERO }) continue
+                    is LineTo -> if (current.parameters.all { it.isApproximately(Point.ZERO) }) continue
+                    is VerticalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue
+                    is HorizontalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue
+                    is CubicBezierCurve -> if (current.parameters.map(CubicBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
+                    is SmoothCubicBezierCurve -> if (current.parameters.map(SmoothCubicBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
+                    is QuadraticBezierCurve -> if (current.parameters.map(QuadraticBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
+                    is SmoothQuadraticBezierCurve -> if (current.parameters.all { it.isApproximately(Point.ZERO) }) continue
+                    is EllipticalArcCurve -> if (current.parameters.all { (abs(it.radiusX) < 1e-3f && abs(it.radiusY) < 1e-3f) || it.end.isApproximately(Point.ZERO) }) continue
                 }
 
                 commands.add(current)
