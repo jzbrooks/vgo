@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.core.util.math
 
+import kotlin.math.absoluteValue
 import kotlin.math.hypot
 
 data class Point(val x: Float, val y: Float) {
@@ -21,6 +22,10 @@ data class Point(val x: Float, val y: Float) {
 
     fun distanceTo(other: Point): Float {
         return hypot(x - other.x, y - other.y)
+    }
+
+    fun isApproximately(other: Point, error: Float = 0.001f): Boolean {
+        return (x - other.x).absoluteValue < error && (y - other.y).absoluteValue < error
     }
 
     companion object {
