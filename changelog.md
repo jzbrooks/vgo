@@ -1,12 +1,19 @@
 Change Log
 ==========
 
-## Unpublished (2.0.0)
+## 2.0.0
+_05.29.2021_
 
-* Removed non IR related code from the core library
-* Improvement: Remove redundant commands in situations where the command is basically, but not precisely redundant 
+* New, breaking(vgo-core): Structured graphic element attributes. 
+  * This greatly simplifies the conversions between formats
+  * Unstructured attributes will be dropped during conversion between formats
+* Improvement, breaking(vgo): Unified the clip path implementation
+* Improvement, breaking(vgo): Format-specific implementations of optimizations have been traded for format independent implementations, so they can be more easily used by new formats
+* Improvement: The new implementation of the bake transformations optimization operates in many more situations for svg compared to the previous implementation
+* Improvement: Remove redundant commands in situations where the command is effectively but not precisely redundant
 * Fixed: Redundant move commands are removed
 * Fixed: Test failures on Windows due to path handling
+* Upgrade: Build with Kotlin 1.5.10
 
 ## 1.4.1
 _02.16.2021_
