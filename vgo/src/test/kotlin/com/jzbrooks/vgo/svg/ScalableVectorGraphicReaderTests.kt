@@ -164,8 +164,6 @@ class ScalableVectorGraphicReaderTests {
 
         val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
-        val unknown = graphic.elements.first() as Extra
-
         assertThat(graphic::elements).index(0).isInstanceOf(Extra::class).all {
             prop(Extra::name).isEqualTo("bicycle")
             prop(Extra::elements).containsExactly(expectedChild)
