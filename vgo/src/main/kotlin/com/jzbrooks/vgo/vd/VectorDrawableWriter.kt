@@ -121,7 +121,7 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                     // There's no reason to output the transforms if the
                     // value of the transform is referentially equal to the
                     // identity matrix constant
-                    if (element.transform !== Matrix3.IDENTITY) {
+                    if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
                         writeTransforms(element, node)
                     }
 

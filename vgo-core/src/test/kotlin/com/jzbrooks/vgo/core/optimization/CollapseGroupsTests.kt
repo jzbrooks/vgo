@@ -46,13 +46,7 @@ class CollapseGroupsTests {
 
     @Test
     fun testRetainNestedGroupWithAttributes() {
-        val scale = Matrix3.from(
-            arrayOf(
-                floatArrayOf(20f, 0f, 0f),
-                floatArrayOf(0f, 1f, 0f),
-                floatArrayOf(0f, 0f, 1f),
-            ),
-        )
+        val scale = Matrix3.from(floatArrayOf(20f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f))
 
         val innerPath = createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
         val innerGroupWithAttributes = Group(listOf(innerPath), null, mutableMapOf(), scale)

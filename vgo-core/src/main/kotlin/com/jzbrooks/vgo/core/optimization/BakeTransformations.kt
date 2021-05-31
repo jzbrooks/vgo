@@ -24,7 +24,8 @@ class BakeTransformations : ContainerElementVisitor, BottomUpOptimization {
         if (containerElement is Group) {
             val groupTransform = containerElement.transform
 
-            if (containerElement.elements.any { it !is PathElement } || groupTransform == Matrix3.IDENTITY) return
+            if (containerElement.elements.any { it !is PathElement } || groupTransform.contentsEqual(Matrix3.IDENTITY))
+                return
 
             for (child in containerElement.elements) {
                 (child as PathElement).applyTransform(groupTransform)
@@ -37,7 +38,7 @@ class BakeTransformations : ContainerElementVisitor, BottomUpOptimization {
 
     private fun areElementsRelocatable(group: Group): Boolean {
         return group.id == null &&
-            group.transform === Matrix3.IDENTITY &&
+            group.transform.contentsEqual(Matrix3.IDENTITY) &&
             group.foreign.isEmpty() &&
             group.elements.all { it is PathElement }
     }

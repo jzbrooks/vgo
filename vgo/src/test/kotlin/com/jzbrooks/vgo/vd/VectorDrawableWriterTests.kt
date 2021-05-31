@@ -180,14 +180,6 @@ class VectorDrawableWriterTests {
     }
 
     companion object {
-        val groupTransform = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, 10f),
-                floatArrayOf(0f, 1f, 15f),
-                floatArrayOf(0f, 0f, 1f),
-            )
-        )
-
         val graphic = VectorDrawable(
             listOf(
                 Group(
@@ -205,7 +197,7 @@ class VectorDrawableWriterTests {
                     ),
                     "transform_group",
                     mutableMapOf(),
-                    groupTransform,
+                    Matrix3.from(floatArrayOf(1f, 0f, 10f, 0f, 1f, 15f, 0f, 0f, 1f)),
                 ),
                 ClipPath(
                     listOf(

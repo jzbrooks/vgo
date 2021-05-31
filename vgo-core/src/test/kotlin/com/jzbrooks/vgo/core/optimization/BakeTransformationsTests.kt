@@ -33,13 +33,7 @@ class BakeTransformationsTests {
 
     @Test
     fun testAvoidCrashIfParsedPathDataDoesNotExist() {
-        val transform = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, 14f),
-                floatArrayOf(0f, 1f, 14f),
-                floatArrayOf(0f, 0f, 1f),
-            )
-        )
+        val transform = Matrix3.from(floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f))
         val group = Group(
             listOf(createPath()),
             null,
@@ -75,13 +69,7 @@ class BakeTransformationsTests {
 
     @Test
     fun `Resource valued transforms prevent group elision`() {
-        val transform = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, 15f),
-                floatArrayOf(0f, 1f, 0f),
-                floatArrayOf(0f, 0f, 1f),
-            )
-        )
+        val transform = Matrix3.from(floatArrayOf(1f, 0f, 15f, 0f, 1f, 0f, 0f, 0f, 1f))
 
         val group = Group(
             listOf(
@@ -115,13 +103,7 @@ class BakeTransformationsTests {
 
     @Test
     fun testTransformationAttributesRemoved() {
-        val transform = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, 14f),
-                floatArrayOf(0f, 1f, 14f),
-                floatArrayOf(0f, 0f, 1f),
-            )
-        )
+        val transform = Matrix3.from(floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f))
 
         val group = Group(
             listOf(
@@ -145,11 +127,7 @@ class BakeTransformationsTests {
     @Test
     fun testAncestorGroupTransformationAppliedToPathElements() {
         val transform = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, 14f),
-                floatArrayOf(0f, 1f, 14f),
-                floatArrayOf(0f, 0f, 1f),
-            )
+            floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f)
         )
 
         val group = Group(
@@ -180,11 +158,7 @@ class BakeTransformationsTests {
     @Test
     fun testBakeHandlesRelativeCommands() {
         val transform = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, 14f),
-                floatArrayOf(0f, 1f, 14f),
-                floatArrayOf(0f, 0f, 1f),
-            )
+            floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f)
         )
 
         val group = Group(
@@ -219,13 +193,7 @@ class BakeTransformationsTests {
     @Test
     fun testGroupRotationApplied() {
         val rad = (90.0 * PI / 180.0).toFloat()
-        val rotationMatrix = Matrix3.from(
-            arrayOf(
-                floatArrayOf(cos(rad), -sin(rad), 0f),
-                floatArrayOf(sin(rad), cos(rad), 0f),
-                floatArrayOf(0f, 0f, 1f),
-            )
-        )
+        val rotationMatrix = Matrix3.from(floatArrayOf(cos(rad), -sin(rad), 0f, sin(rad), cos(rad), 0f, 0f, 0f, 1f))
 
         val group = Group(
             listOf(
@@ -261,29 +229,10 @@ class BakeTransformationsTests {
     @Test
     fun testGroupRotationAppliedWithSequentialRelativeCommands() {
         val rad = (15.0 * PI / 180.0).toFloat()
-        val rotationMatrix = Matrix3.from(
-            arrayOf(
-                floatArrayOf(cos(rad), -sin(rad), 0f),
-                floatArrayOf(sin(rad), cos(rad), 0f),
-                floatArrayOf(0f, 0f, 1f),
-            )
-        )
 
-        val pivot = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, 10f),
-                floatArrayOf(0f, 1f, 10f),
-                floatArrayOf(0f, 0f, 1f),
-            )
-        )
-
-        val pivotInverse = Matrix3.from(
-            arrayOf(
-                floatArrayOf(1f, 0f, -10f),
-                floatArrayOf(0f, 1f, -10f),
-                floatArrayOf(0f, 0f, 1f),
-            )
-        )
+        val rotationMatrix = Matrix3.from(floatArrayOf(cos(rad), -sin(rad), 0f, sin(rad), cos(rad), 0f, 0f, 0f, 1f))
+        val pivot = Matrix3.from(floatArrayOf(1f, 0f, 10f, 0f, 1f, 10f, 0f, 0f, 1f))
+        val pivotInverse = Matrix3.from(floatArrayOf(1f, 0f, -10f, 0f, 1f, -10f, 0f, 0f, 1f))
 
         val transform = pivot * rotationMatrix * pivotInverse
 

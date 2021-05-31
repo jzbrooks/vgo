@@ -17,7 +17,7 @@ class RemoveEmptyGroups : Optimization {
     private fun isEmpty(group: Group): Boolean {
         if (group.elements.isEmpty() &&
             group.id == null &&
-            group.transform === Matrix3.IDENTITY &&
+            group.transform.contentsEqual(Matrix3.IDENTITY) &&
             group.foreign.isEmpty()
         ) return true
 

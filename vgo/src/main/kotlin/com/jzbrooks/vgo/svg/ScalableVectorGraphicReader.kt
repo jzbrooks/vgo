@@ -117,11 +117,7 @@ private fun NamedNodeMap.extractTransformMatrix(): Matrix3 {
         .map(String::toFloat)
 
     return Matrix3.from(
-        arrayOf(
-            floatArrayOf(entries[0], entries[2], entries[4]),
-            floatArrayOf(entries[1], entries[3], entries[5]),
-            floatArrayOf(0f, 0f, 1f),
-        )
+        floatArrayOf(entries[0], entries[2], entries[4], entries[1], entries[3], entries[5], 0f, 0f, 1f)
     )
 }
 

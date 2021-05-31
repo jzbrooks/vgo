@@ -117,7 +117,7 @@ class ScalableVectorGraphicWriter(
             }
             is Group -> {
                 document.createElement("g").also { node ->
-                    if (element.transform !== Matrix3.IDENTITY) {
+                    if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
                         val matrix = element.transform
                         val matrixElements = listOf(
                             formatter.format(matrix[0, 0]),

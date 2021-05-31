@@ -183,46 +183,24 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
     ) return Matrix3.IDENTITY
 
     val scale = Matrix3.from(
-        arrayOf(
-            floatArrayOf(scaleX ?: 1f, 0f, 0f),
-            floatArrayOf(0f, scaleY ?: 1f, 0f),
-            floatArrayOf(0f, 0f, 1f)
-        )
+        floatArrayOf(scaleX ?: 1f, 0f, 0f, 0f, scaleY ?: 1f, 0f, 0f, 0f, 1f),
     )
 
     val translation = Matrix3.from(
-        arrayOf(
-            floatArrayOf(1f, 0f, translationX ?: 0f),
-            floatArrayOf(0f, 1f, translationY ?: 0f),
-            floatArrayOf(0f, 0f, 1f)
-        )
+        floatArrayOf(1f, 0f, translationX ?: 0f, 0f, 1f, translationY ?: 0f, 0f, 0f, 1f),
     )
 
     val pivot = Matrix3.from(
-        arrayOf(
-            floatArrayOf(1f, 0f, pivotX ?: 0f),
-            floatArrayOf(0f, 1f, pivotY ?: 0f),
-            floatArrayOf(0f, 0f, 1f)
-        )
+        floatArrayOf(1f, 0f, pivotX ?: 0f, 0f, 1f, pivotY ?: 0f, 0f, 0f, 1f),
     )
 
     val pivotInverse = Matrix3.from(
-        arrayOf(
-            floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1),
-            floatArrayOf(0f, 1f, (pivotY ?: 0f) * -1),
-            floatArrayOf(0f, 0f, 1f)
-        )
+        floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1, 0f, 1f, (pivotY ?: 0f) * -1, 0f, 0f, 1f),
     )
 
     val rotate = if (rotation != null) {
         val radians = rotation * PI.toFloat() / 180f
-        Matrix3.from(
-            arrayOf(
-                floatArrayOf(cos(radians), -sin(radians), 0f),
-                floatArrayOf(sin(radians), cos(radians), 0f),
-                floatArrayOf(0f, 0f, 1f)
-            )
-        )
+        Matrix3.from(floatArrayOf(cos(radians), -sin(radians), 0f, sin(radians), cos(radians), 0f, 0f, 0f, 1f))
     } else {
         Matrix3.IDENTITY
     }

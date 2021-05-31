@@ -19,7 +19,7 @@ class CollapseGroups : Optimization {
     private val Group.isMergeable: Boolean
         get() {
             val hasValidClipPath = elements.any { it is PathElement && it !is Path }
-            val hasAttributes = id != null || transform !== Matrix3.IDENTITY || foreign.isNotEmpty()
+            val hasAttributes = id != null || !transform.contentsEqual(Matrix3.IDENTITY) || foreign.isNotEmpty()
             return !hasValidClipPath && elements.isNotEmpty() && !hasAttributes
         }
 
