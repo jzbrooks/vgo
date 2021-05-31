@@ -1,15 +1,15 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.util.math.Matrix3
 
 /**
  * Remove unnecessary groups
  */
-class RemoveEmptyGroups : Optimization {
-    override fun optimize(graphic: Graphic) {
-        graphic.elements = graphic.elements.dropWhile { element ->
+class RemoveEmptyGroups : BottomUpOptimization, ContainerElementVisitor {
+    override fun visit(containerElement: ContainerElement) {
+        containerElement.elements = containerElement.elements.dropWhile { element ->
             element is Group && isEmpty(element)
         }
     }

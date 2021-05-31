@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.optimization.BakeTransformations
+import com.jzbrooks.vgo.core.optimization.BottomUpOptimization
 import com.jzbrooks.vgo.core.optimization.BreakoutImplicitCommands
 import com.jzbrooks.vgo.core.optimization.CollapseGroups
 import com.jzbrooks.vgo.core.optimization.CommandVariant
@@ -17,8 +18,10 @@ import com.jzbrooks.vgo.core.optimization.TopDownOptimization
 class VectorDrawableOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN, WHOLE_GRAPHIC) {
 
     companion object {
-        private val BOTTOM_UP = listOf(
+        private val BOTTOM_UP = listOf<BottomUpOptimization>(
             BakeTransformations(),
+            CollapseGroups(),
+            RemoveEmptyGroups(),
         )
 
         private val TOP_DOWN: List<TopDownOptimization> = listOf(
@@ -33,8 +36,6 @@ class VectorDrawableOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_D
         )
 
         private val WHOLE_GRAPHIC = listOf(
-            CollapseGroups(),
-            RemoveEmptyGroups(),
             MergePaths(),
         )
     }

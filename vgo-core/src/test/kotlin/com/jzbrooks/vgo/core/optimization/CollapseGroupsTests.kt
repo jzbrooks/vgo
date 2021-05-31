@@ -2,12 +2,14 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.element.createPath
+import com.jzbrooks.vgo.core.util.element.traverseBottomUp
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
@@ -24,7 +26,10 @@ class CollapseGroupsTests {
             override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
-        CollapseGroups().optimize(graphic)
+        val groupCollapser = CollapseGroups()
+        traverseBottomUp(graphic) {
+            if (it is ContainerElement) groupCollapser.visit(it)
+        }
 
         assertThat(graphic::elements).containsExactly(innerPath)
     }
@@ -39,7 +44,10 @@ class CollapseGroupsTests {
             override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
-        CollapseGroups().optimize(graphic)
+        val groupCollapser = CollapseGroups()
+        traverseBottomUp(graphic) {
+            if (it is ContainerElement) groupCollapser.visit(it)
+        }
 
         assertThat(graphic::elements).containsExactly(innerPath)
     }
@@ -58,7 +66,10 @@ class CollapseGroupsTests {
             override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
-        CollapseGroups().optimize(graphic)
+        val groupCollapser = CollapseGroups()
+        traverseBottomUp(graphic) {
+            if (it is ContainerElement) groupCollapser.visit(it)
+        }
 
         assertThat(graphic::elements).containsExactly(innerGroupWithAttributes)
     }

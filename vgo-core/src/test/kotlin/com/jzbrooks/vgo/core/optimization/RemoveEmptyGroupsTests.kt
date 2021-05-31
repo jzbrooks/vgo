@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.hasSize
+import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
@@ -9,6 +10,7 @@ import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.element.createPath
+import com.jzbrooks.vgo.core.util.element.traverseBottomUp
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
@@ -24,8 +26,11 @@ class RemoveEmptyGroupsTests {
             override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
-        val emptyGroups = RemoveEmptyGroups()
-        emptyGroups.optimize(graphic)
+        val groupRemover = RemoveEmptyGroups()
+
+        traverseBottomUp(graphic) {
+            if (it is ContainerElement) groupRemover.visit(it)
+        }
 
         assertThat(graphic::elements).hasSize(0)
     }
@@ -54,8 +59,11 @@ class RemoveEmptyGroupsTests {
             override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
-        val emptyGroups = RemoveEmptyGroups()
-        emptyGroups.optimize(graphic)
+        val groupRemover = RemoveEmptyGroups()
+
+        traverseBottomUp(graphic) {
+            if (it is ContainerElement) groupRemover.visit(it)
+        }
 
         assertThat(graphic::elements).hasSize(1)
     }
@@ -70,8 +78,11 @@ class RemoveEmptyGroupsTests {
             override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
-        val emptyGroups = RemoveEmptyGroups()
-        emptyGroups.optimize(graphic)
+        val groupRemover = RemoveEmptyGroups()
+
+        traverseBottomUp(graphic) {
+            if (it is ContainerElement) groupRemover.visit(it)
+        }
 
         assertThat(graphic::elements).hasSize(1)
     }
@@ -89,8 +100,11 @@ class RemoveEmptyGroupsTests {
             override val foreign: MutableMap<String, String> = mutableMapOf()
         }
 
-        val emptyGroups = RemoveEmptyGroups()
-        emptyGroups.optimize(graphic)
+        val groupRemover = RemoveEmptyGroups()
+
+        traverseBottomUp(graphic) {
+            if (it is ContainerElement) groupRemover.visit(it)
+        }
 
         assertThat(graphic.elements.filterIsInstance<Path>()).hasSize(1)
     }
