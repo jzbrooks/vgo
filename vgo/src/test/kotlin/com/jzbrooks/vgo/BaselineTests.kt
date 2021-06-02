@@ -20,7 +20,7 @@ class BaselineTests {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizationFinishes.${inputFile.extension}"
-        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
+        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath, "--indent", "2")
 
         val exitCode = Application().run(arguments)
 
@@ -33,7 +33,7 @@ class BaselineTests {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsEquivalentToBaseline.${inputFile.extension}"
-        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
+        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath, "--indent", "2")
 
         Application().run(arguments)
 
@@ -48,7 +48,7 @@ class BaselineTests {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsNotLargerThanBaseline.${inputFile.extension}"
-        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
+        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath, "--indent", "2")
 
         Application().run(arguments)
 
@@ -64,7 +64,7 @@ class BaselineTests {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsNotLargerThanOriginal.${inputFile.extension}"
-        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath)
+        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath, "--indent", "2")
 
         Application().run(arguments)
 
