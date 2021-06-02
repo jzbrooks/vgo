@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -72,5 +73,31 @@ class CollapseGroupsTests {
         }
 
         assertThat(graphic::elements).containsExactly(innerGroupWithAttributes)
+    }
+
+    @Test
+    fun testAvoidCollapsingGroupsWithClipPaths() {
+        val clip = createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
+        val group = Group(
+            listOf(
+                ClipPath(listOf(clip), null, mutableMapOf()),
+                Group(
+                    listOf(ClipPath(listOf(clip), null, mutableMapOf()))
+                )
+            )
+        )
+
+        val graphic = object : Graphic {
+            override var elements: List<Element> = listOf(group)
+            override val id: String? = null
+            override val foreign: MutableMap<String, String> = mutableMapOf()
+        }
+
+        val groupCollapser = CollapseGroups()
+        traverseBottomUp(graphic) {
+            if (it is ContainerElement) groupCollapser.visit(it)
+        }
+
+        assertThat(graphic::elements).containsExactly(group)
     }
 }
