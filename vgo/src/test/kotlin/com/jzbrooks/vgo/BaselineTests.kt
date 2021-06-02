@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo
 
 import assertk.assertThat
+import assertk.assertions.hasText
 import assertk.assertions.isEqualTo
 import assertk.assertions.isLessThanOrEqualTo
 import org.junit.jupiter.params.ParameterizedTest
@@ -37,9 +38,9 @@ class BaselineTests {
 
         Application().run(arguments)
 
-        val content = File(outputFilePath).readText()
-        val baselineContent = baselineAsset.toFile().readText()
-        assertThat(content).isEqualTo(baselineContent)
+        val content = File(outputFilePath)
+        val baselineContent = baselineAsset.toFile()
+        assertThat(content, "optimized asset").hasText(baselineContent.readText())
     }
 
     @ParameterizedTest
@@ -55,7 +56,7 @@ class BaselineTests {
         val optimizedAssetSize = File(outputFilePath).length()
         val baselineAssetSize = baselineAsset.toFile().length()
 
-        assertThat(optimizedAssetSize).isLessThanOrEqualTo(baselineAssetSize)
+        assertThat(optimizedAssetSize, "optimized size").isLessThanOrEqualTo(baselineAssetSize)
     }
 
     @ParameterizedTest
@@ -71,7 +72,7 @@ class BaselineTests {
         val optimizedAssetSize = File(outputFilePath).length()
         val unoptimizedAssetSize = unoptimizedAsset.toFile().length()
 
-        assertThat(optimizedAssetSize).isLessThanOrEqualTo(unoptimizedAssetSize)
+        assertThat(optimizedAssetSize, "optimized asset").isLessThanOrEqualTo(unoptimizedAssetSize)
     }
 
     companion object {
