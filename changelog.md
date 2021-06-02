@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 2.0.1
+_06.01.2021_
+
+* Fixed: Groups that wrap clip paths are no longer removed
+
 ## 2.0.0
 _05.29.2021_
 
