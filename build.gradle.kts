@@ -9,7 +9,7 @@ buildscript {
 
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.10")
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.0.0")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.1.0")
         classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0")
     }
 }
