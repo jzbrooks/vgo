@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+## 2.0.2
+_06.02.2021_
+
+* Fixed: Vector Drawable shorthand hex colors (like #FFF) are properly handled
+
 ## 2.0.1
 _06.01.2021_
 
