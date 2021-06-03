@@ -237,4 +237,80 @@ class VectorDrawableReaderTests {
         assertThat(path::commands).isEmpty()
         assertThat(path::foreign).contains("android:pathData", "@string/path_data")
     }
+
+    @Test
+    fun testFullColorParsed() {
+        val vectorText = """
+            |<vector>
+            |  <path android:fillColor="#88ff9988" android:pathData="@string/path_data" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val path = parse(unknownElementDocument.firstChild).elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0x88FF9988u))
+    }
+
+    @Test
+    fun testColorWithoutSpecifiedAlphaParsed() {
+        val vectorText = """
+            |<vector>
+            |  <path android:fillColor="#ff9988" android:pathData="@string/path_data" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val path = parse(unknownElementDocument.firstChild).elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0xFFFF9988u))
+    }
+
+    @Test
+    fun testShortenedColorParsed() {
+        val vectorText = """
+            |<vector>
+            |  <path android:fillColor="#fff" android:pathData="@string/path_data" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val path = parse(unknownElementDocument.firstChild).elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0xFFFFFFFFu))
+    }
+
+    @Test
+    fun testLesserSpecifiedAlphaIsTaken() {
+        val vectorText = """
+            |<vector>
+            |  <path android:fillColor="#88ff9988" android:fillAlpha="0.1" android:pathData="@string/path_data" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val path = parse(unknownElementDocument.firstChild).elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0x1AFF9988u))
+    }
 }

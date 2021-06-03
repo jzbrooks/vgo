@@ -220,10 +220,10 @@ private fun NamedNodeMap.extractColor(key: String, alphaKey: String, default: Co
         (alpha * 255).roundToInt().toUInt()
     }
 
-    var colorInt = if (value.length == 9) {
-        value.trimStart('#').toUInt(radix = 16)
-    } else {
-        value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
+    var colorInt = when (value.length) {
+        9 -> value.trimStart('#').toUInt(radix = 16)
+        4 -> ("${value[1]}" + value[1] + value[2] + value[2] + value[3] + value[3]).toUInt(radix = 16) or 0xFF000000u
+        else -> value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
     }
 
     // Alpha is determined by min(color MSB, alpha attribute)
