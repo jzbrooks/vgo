@@ -11,6 +11,10 @@ vgo is built on vgo-core, a library and intermediate representation for vector g
 
 ## Installation
 
+#### Homebrew
+`brew install jzbrooks/repo/vgo`
+
+#### Manually
 Download the distribution from the releases page and ensure it has execute permission. On macOS & Linux run `chmod u+x vgo`.
 
 vgo requires Java 11.
