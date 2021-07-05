@@ -15,6 +15,8 @@ data class Path(
     val strokeLineJoin: LineJoin,
     val strokeMiterLimit: Float,
 ) : PathElement {
+    override fun accept(visitor: ElementVisitor) = visitor.visit(this)
+
     override fun hasSameAttributes(other: PathElement): Boolean {
         return other is Path &&
             id == other.id &&
