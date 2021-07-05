@@ -28,6 +28,7 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
 
     private val formatter = DecimalFormat().apply {
         maximumFractionDigits = 2 // todo: parameterize?
+        minimumIntegerDigits = 0
         isDecimalSeparatorAlwaysShown = false
         roundingMode = RoundingMode.HALF_UP
     }
@@ -184,7 +185,7 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         }
 
         val scaleY = hypot(b, d)
-        if (abs(scaleY) != 1.01f) {
+        if (abs(scaleY) >= 1.01f) {
             node.setAttribute("android:scaleY", formatter.format(scaleY))
         }
 
