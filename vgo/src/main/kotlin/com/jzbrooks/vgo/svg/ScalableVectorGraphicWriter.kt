@@ -28,6 +28,7 @@ class ScalableVectorGraphicWriter(
 
     private val formatter = DecimalFormat().apply {
         maximumFractionDigits = 2 // todo: parameterize?
+        minimumIntegerDigits = 0
         isDecimalSeparatorAlwaysShown = false
         roundingMode = RoundingMode.HALF_UP
     }
