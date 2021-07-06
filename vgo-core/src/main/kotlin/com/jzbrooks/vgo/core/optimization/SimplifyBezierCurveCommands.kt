@@ -1,6 +1,10 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
@@ -17,15 +21,19 @@ import kotlin.math.sqrt
 /**
  * Convert curves into shorter commands where possible
  */
-class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimization, PathElementVisitor {
+class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimization {
     private var skipAnother = false
 
-    override fun visit(pathElement: PathElement) {
-        val commandCount = pathElement.commands.size
+    override fun visit(graphic: Graphic) {}
+    override fun visit(clipPath: ClipPath) {}
+    override fun visit(group: Group) {}
+    override fun visit(extra: Extra) {}
+    override fun visit(path: Path) {
+        val commandCount = path.commands.size
 
         if (commandCount > 0) {
-            val commands = mutableListOf<Command>((pathElement.commands.first() as MoveTo).copy())
-            val existingCommands = pathElement.commands.drop(1)
+            val commands = mutableListOf<Command>((path.commands.first() as MoveTo).copy())
+            val existingCommands = path.commands.drop(1)
 
             loop@ for ((index, current) in existingCommands.withIndex()) {
                 if (skipAnother) {
@@ -181,7 +189,7 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                 commands.add(current)
             }
 
-            pathElement.commands = commands
+            path.commands = commands
         }
     }
 

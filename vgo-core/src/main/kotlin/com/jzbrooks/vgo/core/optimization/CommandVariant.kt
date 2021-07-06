@@ -1,6 +1,10 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -22,7 +26,7 @@ import java.util.Stack
  * or the shortest representation of coordinates
  * @param mode determines the operating mode of the command
  */
-class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementVisitor {
+class CommandVariant(private val mode: Mode) : TopDownOptimization {
     private val pathStart = Stack<Point>()
 
     // Updated once per process call when computing
@@ -31,11 +35,19 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
     // of their absolute or relative nature.
     private lateinit var currentPoint: Point
 
-    override fun visit(pathElement: PathElement) {
+    override fun visit(graphic: Graphic) {}
+    override fun visit(clipPath: ClipPath) {}
+    override fun visit(group: Group) {}
+    override fun visit(extra: Extra) {}
+    override fun visit(path: Path) {
+        shortenCommands(path)
+    }
+
+    private fun shortenCommands(path: Path) {
         pathStart.clear()
         currentPoint = Point(0f, 0f)
 
-        val firstMoveTo = pathElement.commands.take(1).map {
+        val firstMoveTo = path.commands.take(1).map {
             val moveTo = it as MoveTo
             // The first M/m is always treated as absolute.
             // This is accomplished by initializing the current point
@@ -47,7 +59,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
             moveTo
         }
 
-        val commands = pathElement.commands.drop(1).map { command ->
+        val commands = path.commands.drop(1).map { command ->
             when (command) {
                 is MoveTo -> process(command)
                 is LineTo -> process(command)
@@ -63,7 +75,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization, PathElementV
             }
         }
 
-        pathElement.commands = firstMoveTo + commands
+        path.commands = firstMoveTo + commands
     }
 
     private fun process(command: MoveTo): MoveTo {

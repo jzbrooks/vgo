@@ -1,6 +1,10 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -18,12 +22,16 @@ import com.jzbrooks.vgo.core.util.math.toCubicBezierCurve
 /**
  * Converts cubic bezier curves to arcs, when they are shorter.
  */
-class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimization, PathElementVisitor {
+class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimization {
 
-    override fun visit(pathElement: PathElement) {
-        val multiCurvePass = collapseMultipleCurves(pathElement.commands)
+    override fun visit(graphic: Graphic) {}
+    override fun visit(clipPath: ClipPath) {}
+    override fun visit(group: Group) {}
+    override fun visit(extra: Extra) {}
+    override fun visit(path: Path) {
+        val multiCurvePass = collapseMultipleCurves(path.commands)
         val singleCurvePass = convertSingleArcs(multiCurvePass)
-        pathElement.commands = singleCurvePass
+        path.commands = singleCurvePass
     }
 
     private fun collapseMultipleCurves(commands: List<Command>): List<Command> {

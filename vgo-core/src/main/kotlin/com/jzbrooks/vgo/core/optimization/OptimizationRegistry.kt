@@ -1,9 +1,6 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Graphic
-import com.jzbrooks.vgo.core.graphic.Group
-import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.core.util.element.traverseBottomUp
 import com.jzbrooks.vgo.core.util.element.traverseTopDown
 
@@ -17,11 +14,7 @@ abstract class OptimizationRegistry(
         if (bottomUpOptimizations.isNotEmpty()) {
             traverseBottomUp(graphic) { element ->
                 for (optimization in bottomUpOptimizations) {
-                    when {
-                        element is PathElement && optimization is PathElementVisitor -> optimization.visit(element)
-                        element is Group && optimization is GroupVisitor -> optimization.visit(element)
-                        element is ContainerElement && optimization is ContainerElementVisitor -> optimization.visit(element)
-                    }
+                    element.accept(optimization)
                 }
             }
         }
@@ -29,17 +22,13 @@ abstract class OptimizationRegistry(
         if (topDownOptimizations.isNotEmpty()) {
             traverseTopDown(graphic) { element ->
                 for (optimization in topDownOptimizations) {
-                    when {
-                        element is PathElement && optimization is PathElementVisitor -> optimization.visit(element)
-                        element is Group && optimization is GroupVisitor -> optimization.visit(element)
-                        element is ContainerElement && optimization is ContainerElementVisitor -> optimization.visit(element)
-                    }
+                    element.accept(optimization)
                 }
             }
         }
 
         for (optimization in wholeGraphic) {
-            optimization.optimize(graphic)
+            graphic.accept(optimization)
         }
     }
 }

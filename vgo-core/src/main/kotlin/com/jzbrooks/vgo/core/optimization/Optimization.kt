@@ -1,7 +1,5 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.ElementVisitor
 
-interface Optimization {
-    fun optimize(graphic: Graphic)
-}
+interface Optimization : ElementVisitor

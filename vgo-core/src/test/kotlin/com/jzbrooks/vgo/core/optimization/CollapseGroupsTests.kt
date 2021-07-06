@@ -4,11 +4,10 @@ import assertk.assertThat
 import assertk.assertions.containsExactly
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
-import com.jzbrooks.vgo.core.graphic.Element
-import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.element.traverseBottomUp
 import com.jzbrooks.vgo.core.util.math.Matrix3
@@ -21,15 +20,11 @@ class CollapseGroupsTests {
         val innerPath = createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
         val group = Group(listOf(innerPath))
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(group)
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
+        val graphic = createGraphic(listOf(group))
 
         val groupCollapser = CollapseGroups()
         traverseBottomUp(graphic) {
-            if (it is ContainerElement) groupCollapser.visit(it)
+            if (it is ContainerElement) it.accept(groupCollapser)
         }
 
         assertThat(graphic::elements).containsExactly(innerPath)
@@ -39,15 +34,11 @@ class CollapseGroupsTests {
     fun testCollapseSingleUnnecessaryNestedGroups() {
         val innerPath = createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
         val group = Group(listOf(Group(listOf(innerPath))))
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(group)
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
+        val graphic = createGraphic(listOf(group))
 
         val groupCollapser = CollapseGroups()
         traverseBottomUp(graphic) {
-            if (it is ContainerElement) groupCollapser.visit(it)
+            if (it is ContainerElement) it.accept(groupCollapser)
         }
 
         assertThat(graphic::elements).containsExactly(innerPath)
@@ -61,15 +52,11 @@ class CollapseGroupsTests {
         val innerGroupWithAttributes = Group(listOf(innerPath), null, mutableMapOf(), scale)
         val group = Group(listOf(innerGroupWithAttributes))
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(group)
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
+        val graphic = createGraphic(listOf(group))
 
         val groupCollapser = CollapseGroups()
         traverseBottomUp(graphic) {
-            if (it is ContainerElement) groupCollapser.visit(it)
+            if (it is ContainerElement) it.accept(groupCollapser)
         }
 
         assertThat(graphic::elements).containsExactly(innerGroupWithAttributes)
@@ -87,15 +74,11 @@ class CollapseGroupsTests {
             )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(group)
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
+        val graphic = createGraphic(listOf(group))
 
         val groupCollapser = CollapseGroups()
         traverseBottomUp(graphic) {
-            if (it is ContainerElement) groupCollapser.visit(it)
+            if (it is ContainerElement) it.accept(groupCollapser)
         }
 
         assertThat(graphic::elements).containsExactly(group)

@@ -1,14 +1,29 @@
 package com.jzbrooks.vgo.core.optimization
 
+import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.util.math.Matrix3
 
 /**
  * Remove unnecessary groups
  */
-class RemoveEmptyGroups : BottomUpOptimization, ContainerElementVisitor {
-    override fun visit(containerElement: ContainerElement) {
+class RemoveEmptyGroups : BottomUpOptimization {
+    override fun visit(graphic: Graphic) {
+        removeEmptyGroups(graphic)
+    }
+    override fun visit(group: Group) {
+        removeEmptyGroups(group)
+    }
+
+    override fun visit(clipPath: ClipPath) {}
+    override fun visit(extra: Extra) {}
+    override fun visit(path: Path) {}
+
+    private fun removeEmptyGroups(containerElement: ContainerElement) {
         containerElement.elements = containerElement.elements.dropWhile { element ->
             element is Group && isEmpty(element)
         }

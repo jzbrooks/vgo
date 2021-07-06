@@ -2,13 +2,11 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.hasSize
-import com.jzbrooks.vgo.core.graphic.ContainerElement
-import com.jzbrooks.vgo.core.graphic.Element
-import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.element.traverseBottomUp
 import com.jzbrooks.vgo.core.util.math.Matrix3
@@ -20,16 +18,12 @@ class RemoveEmptyGroupsTests {
     fun testCollapseNestedEmptyGroup() {
         val nestedEmptyGroups = listOf(Group(listOf(Group(listOf(Group(listOf()))))))
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = nestedEmptyGroups
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
+        val graphic = createGraphic(nestedEmptyGroups)
 
         val groupRemover = RemoveEmptyGroups()
 
         traverseBottomUp(graphic) {
-            if (it is ContainerElement) groupRemover.visit(it)
+            it.accept(groupRemover)
         }
 
         assertThat(graphic::elements).hasSize(0)
@@ -53,16 +47,12 @@ class RemoveEmptyGroupsTests {
             )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = nestedEmptyGroups
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
+        val graphic = createGraphic(nestedEmptyGroups)
 
         val groupRemover = RemoveEmptyGroups()
 
         traverseBottomUp(graphic) {
-            if (it is ContainerElement) groupRemover.visit(it)
+            it.accept(groupRemover)
         }
 
         assertThat(graphic::elements).hasSize(1)
@@ -72,16 +62,12 @@ class RemoveEmptyGroupsTests {
     fun testAvoidCollapsingNestedGroupWithAttributes() {
         val nestedEmptyGroups = listOf(Group(listOf(Group(listOf(Group(emptyList(), "base", mutableMapOf(), Matrix3.IDENTITY))))))
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = nestedEmptyGroups
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
+        val graphic = createGraphic(nestedEmptyGroups)
 
         val groupRemover = RemoveEmptyGroups()
 
         traverseBottomUp(graphic) {
-            if (it is ContainerElement) groupRemover.visit(it)
+            it.accept(groupRemover)
         }
 
         assertThat(graphic::elements).hasSize(1)
@@ -94,16 +80,12 @@ class RemoveEmptyGroupsTests {
             createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f))))),
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = nestedEmptyGroups
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
+        val graphic = createGraphic(nestedEmptyGroups)
 
         val groupRemover = RemoveEmptyGroups()
 
         traverseBottomUp(graphic) {
-            if (it is ContainerElement) groupRemover.visit(it)
+            it.accept(groupRemover)
         }
 
         assertThat(graphic.elements.filterIsInstance<Path>()).hasSize(1)

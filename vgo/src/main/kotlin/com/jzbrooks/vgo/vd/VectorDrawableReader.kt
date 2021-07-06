@@ -77,9 +77,9 @@ private fun parsePath(node: Node): Path {
 
     return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
         Path(
-            emptyList(),
             id,
             node.attributes.toMutableMap(),
+            emptyList(),
             fill,
             fillRule,
             stroke,
@@ -92,9 +92,9 @@ private fun parsePath(node: Node): Path {
         node.attributes.removeNamedItem("android:pathData")
 
         Path(
-            CommandString(pathDataString).toCommandList(),
             id,
             node.attributes.toMutableMap(),
+            CommandString(pathDataString).toCommandList(),
             fill,
             fillRule,
             stroke,
@@ -113,9 +113,9 @@ private fun parseClipPath(node: Node): ClipPath {
         ClipPath(
             listOf(
                 Path(
-                    emptyList(),
                     null,
                     mutableMapOf(),
+                    emptyList(),
                     Colors.TRANSPARENT,
                     Path.FillRule.NON_ZERO,
                     Colors.TRANSPARENT,
@@ -134,9 +134,9 @@ private fun parseClipPath(node: Node): ClipPath {
         ClipPath(
             listOf(
                 Path(
-                    CommandString(pathDataString).toCommandList(),
                     null,
                     mutableMapOf(),
+                    CommandString(pathDataString).toCommandList(),
                     Colors.TRANSPARENT,
                     Path.FillRule.NON_ZERO,
                     Colors.TRANSPARENT,

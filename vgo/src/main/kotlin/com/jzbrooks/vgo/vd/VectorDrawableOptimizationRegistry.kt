@@ -1,7 +1,6 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.optimization.BakeTransformations
-import com.jzbrooks.vgo.core.optimization.BottomUpOptimization
 import com.jzbrooks.vgo.core.optimization.BreakoutImplicitCommands
 import com.jzbrooks.vgo.core.optimization.CollapseGroups
 import com.jzbrooks.vgo.core.optimization.CommandVariant
@@ -13,18 +12,17 @@ import com.jzbrooks.vgo.core.optimization.RemoveEmptyGroups
 import com.jzbrooks.vgo.core.optimization.RemoveRedundantCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyLineCommands
-import com.jzbrooks.vgo.core.optimization.TopDownOptimization
 
 class VectorDrawableOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN, WHOLE_GRAPHIC) {
 
     companion object {
-        private val BOTTOM_UP = listOf<BottomUpOptimization>(
+        private val BOTTOM_UP = listOf(
             BakeTransformations(),
             CollapseGroups(),
             RemoveEmptyGroups(),
         )
 
-        private val TOP_DOWN: List<TopDownOptimization> = listOf(
+        private val TOP_DOWN = listOf(
             BreakoutImplicitCommands(),
             CommandVariant(CommandVariant.Mode.Relative),
             SimplifyLineCommands(1e-3f),

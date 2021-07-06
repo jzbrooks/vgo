@@ -1,6 +1,10 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -22,14 +26,17 @@ import kotlin.math.absoluteValue
 /**
  * Elide commands that don't contribute to the overall graphic
  */
-class RemoveRedundantCommands : TopDownOptimization, PathElementVisitor {
-    override fun visit(pathElement: PathElement) {
-
-        if (pathElement.commands.isNotEmpty()) {
-            val firstCommand = pathElement.commands.first() as MoveTo
+class RemoveRedundantCommands : TopDownOptimization {
+    override fun visit(graphic: Graphic) {}
+    override fun visit(clipPath: ClipPath) {}
+    override fun visit(group: Group) {}
+    override fun visit(extra: Extra) {}
+    override fun visit(path: Path) {
+        if (path.commands.isNotEmpty()) {
+            val firstCommand = path.commands.first() as MoveTo
 
             val commands = mutableListOf<Command>(firstCommand)
-            for (current in pathElement.commands.drop(1)) {
+            for (current in path.commands.drop(1)) {
                 assert((current as? ParameterizedCommand<*>)?.variant != CommandVariant.ABSOLUTE)
 
                 when (current) {
@@ -57,7 +64,7 @@ class RemoveRedundantCommands : TopDownOptimization, PathElementVisitor {
                 }
             }
 
-            pathElement.commands = commands
+            path.commands = commands
         }
     }
 }

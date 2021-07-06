@@ -1,6 +1,10 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
@@ -21,13 +25,18 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
  * number, you can omit the separator between it and the preceeding
  * pair. It becomes 10,0-1,1.
  */
-class Polycommands : TopDownOptimization, PathElementVisitor {
-    override fun visit(pathElement: PathElement) {
-        val commandCount = pathElement.commands.size
+class Polycommands : TopDownOptimization {
+    override fun visit(graphic: Graphic) {}
+    override fun visit(clipPath: ClipPath) {}
+    override fun visit(group: Group) {}
+    override fun visit(extra: Extra) {}
+
+    override fun visit(path: Path) {
+        val commandCount = path.commands.size
 
         if (commandCount > 0) {
-            val commands = mutableListOf<Command>((pathElement.commands.first() as MoveTo).copy())
-            loop@ for (current in pathElement.commands.drop(1)) {
+            val commands = mutableListOf<Command>((path.commands.first() as MoveTo).copy())
+            loop@ for (current in path.commands.drop(1)) {
                 val currentParam = current as? ParameterizedCommand<*>
                 val lastAdded = commands.last() as? ParameterizedCommand<*>
                 if (lastAdded?.variant == currentParam?.variant) {
@@ -69,7 +78,7 @@ class Polycommands : TopDownOptimization, PathElementVisitor {
                 commands.add(current)
             }
 
-            pathElement.commands = commands
+            path.commands = commands
         }
     }
 }
