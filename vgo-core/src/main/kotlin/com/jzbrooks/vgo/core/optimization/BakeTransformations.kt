@@ -19,10 +19,6 @@ class BakeTransformations : ElementVisitor, BottomUpOptimization {
     override fun visit(path: Path) {}
 
     override fun visit(group: Group) {
-        bakeGroups(group)
-    }
-
-    private fun bakeGroups(group: Group) {
         group.elements = group.elements.flatMap {
             if (it is Group && areElementsRelocatable(it)) it.elements
             else listOf(it)

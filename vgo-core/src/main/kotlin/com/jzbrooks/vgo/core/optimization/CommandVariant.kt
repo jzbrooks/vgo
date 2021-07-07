@@ -40,10 +40,6 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
     override fun visit(group: Group) {}
     override fun visit(extra: Extra) {}
     override fun visit(path: Path) {
-        shortenCommands(path)
-    }
-
-    private fun shortenCommands(path: Path) {
         pathStart.clear()
         currentPoint = Point(0f, 0f)
 

@@ -32,39 +32,39 @@ class RemoveRedundantCommands : TopDownOptimization {
     override fun visit(group: Group) {}
     override fun visit(extra: Extra) {}
     override fun visit(path: Path) {
-        if (path.commands.isNotEmpty()) {
-            val firstCommand = path.commands.first() as MoveTo
+        if (path.commands.isEmpty()) return
 
-            val commands = mutableListOf<Command>(firstCommand)
-            for (current in path.commands.drop(1)) {
-                assert((current as? ParameterizedCommand<*>)?.variant != CommandVariant.ABSOLUTE)
+        val firstCommand = path.commands.first() as MoveTo
 
-                when (current) {
-                    is MoveTo -> if (current.parameters.reduce(Point::plus).isApproximately(Point.ZERO)) continue
-                    is LineTo -> if (current.parameters.all { it.isApproximately(Point.ZERO) }) continue
-                    is VerticalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue
-                    is HorizontalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue
-                    is CubicBezierCurve -> if (current.parameters.map(CubicBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
-                    is SmoothCubicBezierCurve -> if (current.parameters.map(SmoothCubicBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
-                    is QuadraticBezierCurve -> if (current.parameters.map(QuadraticBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
-                    is SmoothQuadraticBezierCurve -> if (current.parameters.all { it.isApproximately(Point.ZERO) }) continue
-                    is EllipticalArcCurve -> if (current.parameters.all { (abs(it.radiusX) < 1e-3f && abs(it.radiusY) < 1e-3f) || it.end.isApproximately(Point.ZERO) }) continue
-                }
+        val commands = mutableListOf<Command>(firstCommand)
+        for (current in path.commands.drop(1)) {
+            assert((current as? ParameterizedCommand<*>)?.variant != CommandVariant.ABSOLUTE)
 
-                commands.add(current)
+            when (current) {
+                is MoveTo -> if (current.parameters.reduce(Point::plus).isApproximately(Point.ZERO)) continue
+                is LineTo -> if (current.parameters.all { it.isApproximately(Point.ZERO) }) continue
+                is VerticalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue
+                is HorizontalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue
+                is CubicBezierCurve -> if (current.parameters.map(CubicBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
+                is SmoothCubicBezierCurve -> if (current.parameters.map(SmoothCubicBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
+                is QuadraticBezierCurve -> if (current.parameters.map(QuadraticBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
+                is SmoothQuadraticBezierCurve -> if (current.parameters.all { it.isApproximately(Point.ZERO) }) continue
+                is EllipticalArcCurve -> if (current.parameters.all { (abs(it.radiusX) < 1e-3f && abs(it.radiusY) < 1e-3f) || it.end.isApproximately(Point.ZERO) }) continue
             }
 
-            if (commands.last() is ClosePath) {
-                val commandsWithoutFinalClosePath = commands.dropLast(1)
-                val current = computeAbsoluteCoordinates(commandsWithoutFinalClosePath)
-                val firstCurrentPoint = firstCommand.parameters.last()
-
-                if (current == firstCurrentPoint) {
-                    commands.removeLast()
-                }
-            }
-
-            path.commands = commands
+            commands.add(current)
         }
+
+        if (commands.last() is ClosePath) {
+            val commandsWithoutFinalClosePath = commands.dropLast(1)
+            val current = computeAbsoluteCoordinates(commandsWithoutFinalClosePath)
+            val firstCurrentPoint = firstCommand.parameters.last()
+
+            if (current == firstCurrentPoint) {
+                commands.removeLast()
+            }
+        }
+
+        path.commands = commands
     }
 }
