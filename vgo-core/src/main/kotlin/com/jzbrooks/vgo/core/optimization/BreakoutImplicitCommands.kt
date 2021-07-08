@@ -1,6 +1,10 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.PathElement
+import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
@@ -18,11 +22,16 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
  * Enables more resolution in the the other command
  * related optimizations like [CommandVariant] and [RemoveRedundantCommands]
  */
-class BreakoutImplicitCommands : TopDownOptimization, PathElementVisitor {
-    override fun visit(pathElement: PathElement) {
+class BreakoutImplicitCommands : TopDownOptimization {
+    override fun visit(graphic: Graphic) {}
+    override fun visit(clipPath: ClipPath) {}
+    override fun visit(group: Group) {}
+    override fun visit(extra: Extra) {}
+
+    override fun visit(path: Path) {
         val commands = mutableListOf<Command>()
 
-        for (current in pathElement.commands) {
+        for (current in path.commands) {
             if (current is ParameterizedCommand<*> && current.parameters.size > 1) {
                 val splitCommands = divideParameters(current)
                 commands.addAll(splitCommands)
@@ -31,7 +40,7 @@ class BreakoutImplicitCommands : TopDownOptimization, PathElementVisitor {
             }
         }
 
-        pathElement.commands = commands
+        path.commands = commands
     }
 
     private fun divideParameters(first: ParameterizedCommand<*>): List<Command> {

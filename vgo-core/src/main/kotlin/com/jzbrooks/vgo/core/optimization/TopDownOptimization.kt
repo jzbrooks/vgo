@@ -1,3 +1,5 @@
 package com.jzbrooks.vgo.core.optimization
 
-interface TopDownOptimization
+import com.jzbrooks.vgo.core.graphic.ElementVisitor
+
+interface TopDownOptimization : ElementVisitor

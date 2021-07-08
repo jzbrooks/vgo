@@ -17,9 +17,9 @@ fun createPath(
     strokeLineJoin: Path.LineJoin = Path.LineJoin.MITER,
     strokeMiterLimit: Float = 4f,
 ) = Path(
-    commands,
     id,
     foreign,
+    commands,
     fill,
     fillRule,
     stroke,

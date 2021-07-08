@@ -9,4 +9,6 @@ data class Extra(
     override var elements: List<Element>,
     override val id: String?,
     override val foreign: MutableMap<String, String>,
-) : ContainerElement
+) : ContainerElement {
+    override fun accept(visitor: ElementVisitor) = visitor.visit(this)
+}

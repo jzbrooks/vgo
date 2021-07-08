@@ -5,16 +5,15 @@ import assertk.assertions.containsExactly
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.Color
-import com.jzbrooks.vgo.core.graphic.Element
-import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
-import com.jzbrooks.vgo.core.graphic.PathElement
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
+import com.jzbrooks.vgo.core.util.element.traverseBottomUp
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
@@ -37,14 +36,10 @@ class MergePathsTests {
             )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = paths
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
-
+        val graphic = createGraphic(paths)
         val optimization = MergePaths()
-        optimization.optimize(graphic)
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).index(0).isEqualTo(
             createPath(
@@ -87,15 +82,10 @@ class MergePathsTests {
         )
 
         val group = Group(paths)
-
-        val graphic = object : Graphic {
-            override var elements: List<Element> = listOf(group)
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
-
+        val graphic = createGraphic(listOf(group))
         val optimization = MergePaths()
-        optimization.optimize(graphic)
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).containsExactly(
             Group(
@@ -153,14 +143,10 @@ class MergePathsTests {
             )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = paths
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
-
+        val graphic = createGraphic(paths)
         val optimization = MergePaths()
-        optimization.optimize(graphic)
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).containsExactly(
             createPath(
@@ -214,14 +200,10 @@ class MergePathsTests {
             )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = paths
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
-
+        val graphic = createGraphic(paths)
         val optimization = MergePaths()
-        optimization.optimize(graphic)
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).containsExactly(
             createPath(
@@ -249,7 +231,7 @@ class MergePathsTests {
     }
 
     @Test
-    fun testMergePathsWithMixedPathElements() {
+    fun testOnlyMergeAppropriateGroups() {
         val paths = listOf(
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))
@@ -257,8 +239,14 @@ class MergePathsTests {
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
             ),
-            PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))))),
-            PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))),
+            createPath(
+                listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f)))),
+                fill = Color(0xffaabbccu),
+            ),
+            createPath(
+                listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))),
+                fill = Color(0xffaabbccu),
+            ),
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))
             ),
@@ -267,14 +255,10 @@ class MergePathsTests {
             )
         )
 
-        val graphic = object : Graphic {
-            override var elements: List<Element> = paths
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
-
+        val graphic = createGraphic(paths)
         val optimization = MergePaths()
-        optimization.optimize(graphic)
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).containsExactly(
             createPath(
@@ -283,11 +267,12 @@ class MergePathsTests {
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
                 )
             ),
-            PseudoPath(
+            createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
-                )
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))),
+                ),
+                fill = Color(0xffaabbccu),
             ),
             createPath(
                 listOf(
@@ -296,67 +281,5 @@ class MergePathsTests {
                 )
             ),
         )
-    }
-
-    @Test
-    fun testMergePathsWithAttributesAfterMergedPathElement() {
-        val paths = listOf(
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
-            ),
-            PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))))),
-            PseudoPath(listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f))))),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
-                fill = Color(0xFF0011FFu),
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))))
-            )
-        )
-
-        val graphic = object : Graphic {
-            override var elements: List<Element> = paths
-            override val id: String? = null
-            override val foreign: MutableMap<String, String> = mutableMapOf()
-        }
-
-        val optimization = MergePaths()
-        optimization.optimize(graphic)
-
-        assertThat(graphic::elements).containsExactly(
-            createPath(
-                listOf(
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
-            ),
-            PseudoPath(
-                listOf(
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))
-                )
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
-                fill = Color(0xFF0011FFu),
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))))
-            )
-        )
-    }
-
-    data class PseudoPath(
-        override var commands: List<Command>,
-        override val id: String? = null,
-        override val foreign: MutableMap<String, String> = mutableMapOf(),
-    ) : PathElement {
-        override fun hasSameAttributes(other: PathElement): Boolean {
-            return other is PseudoPath && id == other.id && foreign == other.foreign
-        }
     }
 }

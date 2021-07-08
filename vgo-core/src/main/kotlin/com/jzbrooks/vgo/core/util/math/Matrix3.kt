@@ -51,7 +51,7 @@ interface MutableMatrix3 : Matrix3 {
 }
 
 @JvmInline
-value class ArrayMatrix3(private val data: FloatArray) : MutableMatrix3 {
+private value class ArrayMatrix3(private val data: FloatArray) : MutableMatrix3 {
 
     override operator fun get(row: Int, column: Int) = data[row * 3 + column]
 

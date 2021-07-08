@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+## Unreleased
+
+* New: Simplified optimization machinery with `ElementVisitor`
+* Improvement: `MergePaths` no longer requires its own tree traversal
+* Improvement: Attribute values omit leading zeros where possible
+* Upgrade: Build tools
+
 ## 2.0.2
 _06.02.2021_
 

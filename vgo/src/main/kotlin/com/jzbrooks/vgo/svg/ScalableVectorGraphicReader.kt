@@ -82,9 +82,9 @@ private fun parsePathElement(node: Node): Path {
     val strokeMiterLimit = node.attributes.removeFloatOrNull("stroke-miterlimit") ?: 4f
 
     return Path(
-        commands,
         id,
         node.attributes.toMutableMap(),
+        commands,
         fill,
         fillRule,
         stroke,
