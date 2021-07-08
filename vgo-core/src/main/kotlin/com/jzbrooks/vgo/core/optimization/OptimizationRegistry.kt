@@ -7,7 +7,6 @@ import com.jzbrooks.vgo.core.util.element.traverseTopDown
 abstract class OptimizationRegistry(
     private val bottomUpOptimizations: List<BottomUpOptimization>,
     private val topDownOptimizations: List<TopDownOptimization>,
-    private val wholeGraphic: List<Optimization>
 ) {
 
     fun apply(graphic: Graphic) {
@@ -25,10 +24,6 @@ abstract class OptimizationRegistry(
                     element.accept(optimization)
                 }
             }
-        }
-
-        for (optimization in wholeGraphic) {
-            graphic.accept(optimization)
         }
     }
 }

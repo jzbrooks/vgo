@@ -12,28 +12,15 @@ import java.util.Stack
 /**
  * Merges multiple paths into a single path where possible
  */
-class MergePaths : Optimization {
-    override fun visit(graphic: Graphic) {
-        topDownVisit(graphic)
-    }
+class MergePaths : BottomUpOptimization {
+    override fun visit(graphic: Graphic) = merge(graphic)
+    override fun visit(group: Group) = merge(group)
+    override fun visit(clipPath: ClipPath) = merge(clipPath)
 
-    override fun visit(clipPath: ClipPath) {}
-    override fun visit(group: Group) {}
     override fun visit(extra: Extra) {}
     override fun visit(path: Path) {}
 
-    private fun topDownVisit(element: Element): Element {
-        return if (element is ContainerElement) {
-            for (child in element.elements) {
-                topDownVisit(child)
-            }
-            merge(element)
-        } else {
-            element
-        }
-    }
-
-    private fun merge(element: ContainerElement): Element {
+    private fun merge(element: ContainerElement) {
         // merge consecutive path elements of the same type
         val elements = mutableListOf<Element>()
         val currentChunk = mutableListOf<Path>()
@@ -56,7 +43,7 @@ class MergePaths : Optimization {
             elements.addAll(merge(currentChunk))
         }
 
-        return element.apply { this.elements = elements }
+        element.elements = elements
     }
 
     private fun merge(paths: List<Path>): List<Path> {

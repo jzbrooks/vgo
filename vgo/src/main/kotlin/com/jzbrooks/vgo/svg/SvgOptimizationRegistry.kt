@@ -13,13 +13,14 @@ import com.jzbrooks.vgo.core.optimization.RemoveRedundantCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyLineCommands
 
-class SvgOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN, WHOLE_GRAPHIC) {
+class SvgOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN) {
 
     companion object {
         private val BOTTOM_UP = listOf(
             BakeTransformations(),
             CollapseGroups(),
             RemoveEmptyGroups(),
+            MergePaths(),
         )
 
         private val TOP_DOWN = listOf(
@@ -31,10 +32,6 @@ class SvgOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN, WHOLE_
             RemoveRedundantCommands(),
             CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3))),
             Polycommands(),
-        )
-
-        private val WHOLE_GRAPHIC = listOf(
-            MergePaths(),
         )
     }
 }

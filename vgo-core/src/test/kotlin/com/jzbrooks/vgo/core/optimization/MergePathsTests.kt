@@ -13,6 +13,7 @@ import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
+import com.jzbrooks.vgo.core.util.element.traverseBottomUp
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
@@ -36,8 +37,9 @@ class MergePathsTests {
         )
 
         val graphic = createGraphic(paths)
+        val optimization = MergePaths()
 
-        graphic.accept(MergePaths())
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).index(0).isEqualTo(
             createPath(
@@ -80,10 +82,10 @@ class MergePathsTests {
         )
 
         val group = Group(paths)
-
         val graphic = createGraphic(listOf(group))
+        val optimization = MergePaths()
 
-        graphic.accept(MergePaths())
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).containsExactly(
             Group(
@@ -142,8 +144,9 @@ class MergePathsTests {
         )
 
         val graphic = createGraphic(paths)
+        val optimization = MergePaths()
 
-        graphic.accept(MergePaths())
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).containsExactly(
             createPath(
@@ -198,8 +201,9 @@ class MergePathsTests {
         )
 
         val graphic = createGraphic(paths)
+        val optimization = MergePaths()
 
-        graphic.accept(MergePaths())
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).containsExactly(
             createPath(
@@ -252,8 +256,9 @@ class MergePathsTests {
         )
 
         val graphic = createGraphic(paths)
+        val optimization = MergePaths()
 
-        graphic.accept(MergePaths())
+        traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).containsExactly(
             createPath(
