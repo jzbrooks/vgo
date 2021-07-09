@@ -52,16 +52,28 @@ class MergePaths : BottomUpOptimization {
         val mergedPaths = Stack<Path>()
         mergedPaths.add(paths.first())
 
-        for (item in paths.drop(1)) {
+        for (current in paths.drop(1)) {
             val previous = mergedPaths.peek()
 
-            if (!item.hasSameAttributes(previous)) {
-                mergedPaths.push(item)
+            if (!haveSameAttributes(current, previous)) {
+                mergedPaths.push(current)
             } else {
-                previous.commands += item.commands
+                previous.commands += current.commands
             }
         }
 
         return mergedPaths
+    }
+
+    private fun haveSameAttributes(first: Path, second: Path): Boolean {
+        return first.id == second.id &&
+            first.foreign == second.foreign &&
+            first.fill == second.fill &&
+            first.fillRule == second.fillRule &&
+            first.stroke == second.stroke &&
+            first.strokeWidth == second.strokeWidth &&
+            first.strokeLineCap == second.strokeLineCap &&
+            first.strokeLineJoin == second.strokeLineJoin &&
+            first.strokeMiterLimit == second.strokeMiterLimit
     }
 }
