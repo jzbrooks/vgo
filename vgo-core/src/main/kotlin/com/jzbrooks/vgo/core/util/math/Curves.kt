@@ -54,7 +54,6 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
     val (startControl, endControl, end) = when (this) {
         is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
         is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
-        else -> throw IllegalStateException("Control points must be provided for interpolation.")
     }
 
     val square = t * t
@@ -79,7 +78,6 @@ fun CubicCurve<*>.isConvex(tolerance: Float = 1e-3f): Boolean {
     val (startControl, endControl, end) = when (this) {
         is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
         is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
-        else -> throw IllegalStateException("Control points must be provided for interpolation.")
     }
 
     val firstDiagonal = LineSegment(Point.ZERO, endControl)

@@ -39,7 +39,6 @@ fun computeAbsoluteCoordinates(commands: List<Command>): Point {
             is SmoothQuadraticBezierCurve -> command.parameters[0]
             is EllipticalArcCurve -> command.parameters[0].end
             is ClosePath -> pathStart.pop()
-            else -> throw IllegalStateException("Unsupported command encountered: $command")
         }
 
         if (command !is ClosePath) {

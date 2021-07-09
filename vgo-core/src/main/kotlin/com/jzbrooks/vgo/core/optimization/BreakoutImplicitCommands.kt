@@ -56,7 +56,6 @@ class BreakoutImplicitCommands : TopDownOptimization {
             is CubicBezierCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
             is SmoothCubicBezierCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
             is EllipticalArcCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
-            else -> throw IllegalArgumentException("Cannot divide parameters for command type ${first::class}")
         }
     }
 }

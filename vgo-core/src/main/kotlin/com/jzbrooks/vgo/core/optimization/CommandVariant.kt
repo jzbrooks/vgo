@@ -67,7 +67,6 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 is SmoothQuadraticBezierCurve -> process(command)
                 is EllipticalArcCurve -> process(command)
                 is ClosePath -> process(command)
-                else -> throw IllegalStateException("Unsupported command encountered: $command")
             }
         }
 

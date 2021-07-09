@@ -1,3 +1,3 @@
 package com.jzbrooks.vgo.core.graphic.command
 
-interface Command
+sealed interface Command

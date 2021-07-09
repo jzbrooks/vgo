@@ -307,7 +307,6 @@ class BakeTransformations : ElementVisitor, BottomUpOptimization {
 
                     command
                 }
-                else -> throw IllegalStateException("Unexpected command: $command")
             }
         }
     }
