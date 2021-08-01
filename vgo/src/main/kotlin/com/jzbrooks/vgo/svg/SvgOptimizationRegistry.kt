@@ -10,6 +10,7 @@ import com.jzbrooks.vgo.core.optimization.OptimizationRegistry
 import com.jzbrooks.vgo.core.optimization.Polycommands
 import com.jzbrooks.vgo.core.optimization.RemoveEmptyGroups
 import com.jzbrooks.vgo.core.optimization.RemoveRedundantCommands
+import com.jzbrooks.vgo.core.optimization.RemoveTransparentPaths
 import com.jzbrooks.vgo.core.optimization.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyLineCommands
 
@@ -24,6 +25,7 @@ class SvgOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN) {
         )
 
         private val TOP_DOWN = listOf(
+            RemoveTransparentPaths(),
             BreakoutImplicitCommands(),
             CommandVariant(CommandVariant.Mode.Relative),
             SimplifyLineCommands(1e-3f),
