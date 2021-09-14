@@ -8,8 +8,8 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21")
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.1.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.30")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.2.0")
         classpath("io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.22.0")
     }
 }
@@ -17,7 +17,7 @@ buildscript {
 subprojects {
     plugins.apply("org.jlleitschuh.gradle.ktlint")
     extensions.configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
-        version.set("0.41.0")
+        version.set("0.42.1")
     }
 
     group = "com.jzbrooks"
