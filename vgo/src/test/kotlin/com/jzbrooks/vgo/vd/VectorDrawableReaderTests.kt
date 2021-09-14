@@ -2,16 +2,7 @@ package com.jzbrooks.vgo.vd
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.contains
-import assertk.assertions.containsExactly
-import assertk.assertions.containsNone
-import assertk.assertions.hasSize
-import assertk.assertions.index
-import assertk.assertions.isEmpty
-import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
-import assertk.assertions.isNotNull
-import assertk.assertions.prop
+import assertk.assertions.*
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -312,5 +303,25 @@ class VectorDrawableReaderTests {
         val path = parse(unknownElementDocument.firstChild).elements.first() as Path
 
         assertThat(path::fill).isEqualTo(Color(0x1AFF9988u))
+    }
+
+    @Test
+    fun testThemeReferencedColorIgnored() {
+        val vectorText = """
+            |<vector>
+            |  <path android:fillColor="?attrs/dark" android:fillAlpha="0.1" android:pathData="@string/path_data" />
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val path = parse(unknownElementDocument.firstChild).elements.first() as Path
+
+        assertThat(path::foreign).key("android:fillColor").isEqualTo("?attrs/dark")
+        assertThat(path::foreign).key("android:fillAlpha").isEqualTo("0.1")
     }
 }

@@ -211,7 +211,9 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
 private fun NamedNodeMap.extractColor(key: String, alphaKey: String, default: Color): Color {
     // This will be overwritten at the end of path writing as a foreign property
     if (getNamedItem(key)?.nodeValue?.startsWith('@') == true ||
-        getNamedItem(alphaKey)?.nodeValue?.startsWith('@') == true
+        getNamedItem(alphaKey)?.nodeValue?.startsWith('@') == true ||
+        getNamedItem(key)?.nodeValue?.startsWith('?') == true ||
+        getNamedItem(alphaKey)?.nodeValue?.startsWith('?') == true
     ) return default
 
     val value = removeOrNull(key)?.nodeValue ?: return default
