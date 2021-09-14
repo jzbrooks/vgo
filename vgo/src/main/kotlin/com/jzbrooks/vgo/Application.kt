@@ -35,7 +35,7 @@ class Application {
         }
 
         if (argReader.readFlag("version|v")) {
-            println(BuildConstants.VERSION)
+            println(BuildConstants.VERSION_NAME)
             return 0
         }
 

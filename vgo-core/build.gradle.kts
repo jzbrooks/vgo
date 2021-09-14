@@ -1,7 +1,7 @@
 plugins {
+    id("org.jlleitschuh.gradle.ktlint")
     id("org.jetbrains.kotlin.jvm")
-    id("maven-publish")
-    id("signing")
+    id("com.vanniktech.maven.publish")
 }
 
 dependencies {
@@ -21,59 +21,4 @@ tasks {
         archiveClassifier.set("javadoc")
         from(this@tasks["javadoc"])
     }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("release") {
-            artifactId = "vgo-core"
-
-            artifact(tasks["sourcesJar"])
-            artifact(tasks["javadocJar"])
-            from(components["kotlin"])
-
-            @Suppress("UnstableApiUsage")
-            pom {
-                name.set("vgo-core")
-                description.set("vgo-core is a library for optimizing vector artwork files.")
-                url.set("https://github.com/jzbrooks/vgo/")
-
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://github.com/jzbrooks/vgo/blob/master/LICENSE")
-                    }
-                }
-
-                developers {
-                    developer {
-                        id.set("jzbrooks")
-                        name.set("Justin Brooks")
-                        email.set("justin@jzbrooks.com")
-                    }
-                }
-
-                scm {
-                    connection.set("scm:git:github.com/jzbrooks/vgo.git")
-                    developerConnection.set("scm:git:ssh://github.com/jzbrooks/vgo.git")
-                    url.set("https://github.com/jzbrooks/vgo/tree/master")
-                }
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            name = "sonatype"
-            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
-            }
-        }
-    }
-}
-
-signing {
-    sign(publishing.publications)
 }

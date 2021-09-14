@@ -4,9 +4,9 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 plugins {
+    id("org.jlleitschuh.gradle.ktlint")
     id("org.jetbrains.kotlin.jvm")
-    id("maven-publish")
-    id("signing")
+    id("com.vanniktech.maven.publish")
 }
 
 sourceSets {
@@ -33,10 +33,9 @@ tasks {
 
     jar {
         dependsOn(configurations.runtimeClasspath)
-
         manifest {
             attributes["Main-Class"] = "com.jzbrooks.vgo.Application"
-            attributes["Bundle-Version"] = project.version
+            attributes["Bundle-Version"] = project.properties["VERSION_NAME"]
         }
 
         val sourceClasses = sourceSets.main.get().output.classesDirs
@@ -59,6 +58,8 @@ tasks {
     }
 
     val generateConstants by registering {
+        finalizedBy("compileKotlin")
+
         outputs.files("$projectDir/src/generated/kotlin/com/jzbrooks/BuildConstants.kt")
 
         doLast {
@@ -72,13 +73,12 @@ tasks {
                         """
                                |package com.jzbrooks
                                |
-                               |object BuildConstants {
+                               |internal object BuildConstants {
                                """.trimMargin()
                     )
 
                     val vgoProperties = project.properties
-                        .filter { it.key.startsWith("vgo_") }
-                        .mapKeys { it.key.removePrefix("vgo_") }
+                        .filterKeys { it == "VERSION_NAME" }
 
                     for (property in vgoProperties) {
                         append("    const val ")
@@ -158,59 +158,4 @@ tasks {
         archiveClassifier.set("javadoc")
         from(this@tasks["javadoc"])
     }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("release") {
-            artifactId = "vgo"
-
-            artifact(tasks["sourcesJar"])
-            artifact(tasks["javadocJar"])
-            from(components["kotlin"])
-
-            @Suppress("UnstableApiUsage")
-            pom {
-                name.set("vgo")
-                description.set("vgo is a tool for optimizing vector artwork files that helps ensure your vector artwork is represented compactly without compromising quality.")
-                url.set("https://github.com/jzbrooks/vgo/")
-
-                licenses {
-                    license {
-                        name.set("MIT License")
-                        url.set("https://github.com/jzbrooks/vgo/blob/master/LICENSE")
-                    }
-                }
-
-                developers {
-                    developer {
-                        id.set("jzbrooks")
-                        name.set("Justin Brooks")
-                        email.set("justin@jzbrooks.com")
-                    }
-                }
-
-                scm {
-                    connection.set("scm:git:github.com/jzbrooks/vgo.git")
-                    developerConnection.set("scm:git:ssh://github.com/jzbrooks/vgo.git")
-                    url.set("https://github.com/jzbrooks/vgo/tree/master")
-                }
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            name = "sonatype"
-            url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-            credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
-            }
-        }
-    }
-}
-
-signing {
-    sign(publishing.publications)
 }

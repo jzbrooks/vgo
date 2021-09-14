@@ -27,11 +27,8 @@ jobs:
           sudo bash -c "echo '$GPG_KEY_CONTENTS' | base64 -d > '$SIGNING_KEY_RING_FILE'"
 
       - name: Publish to MavenCentral
-        run: ./gradlew --max-workers 1 --no-daemon publishReleasePublicationToSonatypeRepository closeAndReleaseRepository
+        run: ./gradlew -Psigning.keyId=${{ secrets.SIGNING_KEY_ID}} -Psigning.password=${{ secrets.SIGNING_PASSWORD }} -P-Psigning.secretKeyRingFile=${{ secrets.SIGNING_KEY_FILE_PATH }} --no-parallel --no-daemon publishAllPublicationsToMavenCentralRepository closeAndReleaseRepository
         env:
-          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
-          SIGNING_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-          SIGNING_KEY_FILE_PATH: ${{ secrets.SIGNING_KEY_FILE_PATH }}
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
           SONATYPE_PROFILE_ID: ${{ secrets.SONATYPE_PROFILE_ID }}
