@@ -15,10 +15,13 @@ class RemoveTransparentPaths : TopDownOptimization {
     override fun visit(path: Path) {}
 
     private fun removeTransparentPaths(containerElement: ContainerElement) {
-        // If a path has an id, it might be used in an animation
-        // or otherwise referenced elsewhere
         containerElement.elements = containerElement.elements.filter { element ->
-            element !is Path || element.id != null ||
+            element !is Path ||
+                // If a path has an id, it might be used in an animation or otherwise referenced elsewhere
+                element.id != null ||
+                // Colors that aren't able to be parsed may remain in the foreign map
+                element.foreign.keys.any { it.contains("color", ignoreCase = true) } ||
+                // If a path isn't transparent, allow it
                 (element.fill.alpha != 0.toUByte() || element.stroke.alpha != 0.toUByte())
         }
     }

@@ -6,6 +6,7 @@ Change Log
 * New: Simplified optimization machinery with `ElementVisitor`
 * Improvement: `MergePaths` no longer requires its own tree traversal
 * Improvement: Attribute values omit leading zeros where possible
+* Fix: theme referenced colors like `?attrs/dark` no longer cause crashes
 * Upgrade: Build tools
 
 ## 2.0.2

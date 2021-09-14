@@ -45,4 +45,23 @@ class RemoveTransparentPathsTests {
 
         assertThat(graphic::elements, "graphic elements").hasSize(3)
     }
+
+    @Test
+    fun testTransparentPathsWithForeignColorsAreNotRemoved() {
+        val graphic = createGraphic(
+            listOf(
+                createPath(
+                    fill = Colors.TRANSPARENT,
+                    stroke = Colors.TRANSPARENT,
+                    foreign = mutableMapOf("android:strokeColor" to "?attrs/dark")
+                ),
+                createPath(),
+                createPath(),
+            )
+        )
+
+        RemoveTransparentPaths().visit(graphic)
+
+        assertThat(graphic::elements, "graphic elements").hasSize(3)
+    }
 }

@@ -2,7 +2,17 @@ package com.jzbrooks.vgo.vd
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.contains
+import assertk.assertions.containsExactly
+import assertk.assertions.containsNone
+import assertk.assertions.hasSize
+import assertk.assertions.index
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
+import assertk.assertions.key
+import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Extra
