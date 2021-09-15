@@ -1,7 +1,8 @@
 Change Log
 ==========
 
-## Unreleased
+## 2.1.0
+_09.14.2021_
 
 * New: Simplified optimization machinery with `ElementVisitor`
 * Improvement: `MergePaths` no longer requires its own tree traversal
