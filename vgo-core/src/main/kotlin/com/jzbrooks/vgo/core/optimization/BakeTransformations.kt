@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.core.optimization
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ElementVisitor
 import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Gradient
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
@@ -31,6 +32,8 @@ class BakeTransformations : ElementVisitor, BottomUpOptimization {
     override fun visit(clipPath: ClipPath) {}
     override fun visit(extra: Extra) {}
     override fun visit(path: Path) {}
+    override fun visit(linearGradient: Gradient.Linear) {}
+    override fun visit(radialGradient: Gradient.Radial) {}
 
     override fun visit(group: Group) {
         group.elements = group.elements.flatMap {

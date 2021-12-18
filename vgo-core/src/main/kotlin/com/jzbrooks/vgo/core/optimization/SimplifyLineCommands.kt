@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.core.optimization
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Gradient
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
@@ -24,6 +25,9 @@ class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization {
     override fun visit(clipPath: ClipPath) {}
     override fun visit(group: Group) {}
     override fun visit(extra: Extra) {}
+    override fun visit(linearGradient: Gradient.Linear) {}
+    override fun visit(radialGradient: Gradient.Radial) {}
+
     override fun visit(path: Path) {
         commands = mutableListOf()
 
@@ -32,8 +36,8 @@ class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization {
             for (command in path.commands.drop(1)) {
 
                 assert((command as? ParameterizedCommand<*>)?.variant != CommandVariant.ABSOLUTE)
-                assert((command as? HorizontalLineTo)?.parameters?.size ?: 0 < 2)
-                assert((command as? VerticalLineTo)?.parameters?.size ?: 0 < 2)
+                assert(((command as? HorizontalLineTo)?.parameters?.size ?: 0) < 2)
+                assert(((command as? VerticalLineTo)?.parameters?.size ?: 0) < 2)
 
                 val processedCommand = process(command)
                 if (processedCommand != null) {

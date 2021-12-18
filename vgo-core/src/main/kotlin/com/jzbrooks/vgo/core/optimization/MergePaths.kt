@@ -4,6 +4,7 @@ import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Gradient
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
@@ -19,6 +20,8 @@ class MergePaths : BottomUpOptimization {
 
     override fun visit(extra: Extra) {}
     override fun visit(path: Path) {}
+    override fun visit(linearGradient: Gradient.Linear) {}
+    override fun visit(radialGradient: Gradient.Radial) {}
 
     private fun merge(element: ContainerElement) {
         // merge consecutive path elements of the same type

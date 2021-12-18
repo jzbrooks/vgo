@@ -6,4 +6,6 @@ interface ElementVisitor {
     fun visit(group: Group)
     fun visit(extra: Extra)
     fun visit(path: Path)
+    fun visit(linearGradient: Gradient.Linear)
+    fun visit(radialGradient: Gradient.Radial)
 }

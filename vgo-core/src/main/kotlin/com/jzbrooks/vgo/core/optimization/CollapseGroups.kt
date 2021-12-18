@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.core.optimization
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Gradient
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
@@ -31,6 +32,8 @@ class CollapseGroups : BottomUpOptimization {
     override fun visit(clipPath: ClipPath) {}
     override fun visit(extra: Extra) {}
     override fun visit(path: Path) {}
+    override fun visit(linearGradient: Gradient.Linear) {}
+    override fun visit(radialGradient: Gradient.Radial) {}
 
     private fun mergeChildGroups(containerElement: ContainerElement) {
         containerElement.elements = containerElement.elements.flatMap {
