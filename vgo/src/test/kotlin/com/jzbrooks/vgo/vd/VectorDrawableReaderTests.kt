@@ -334,4 +334,24 @@ class VectorDrawableReaderTests {
         assertThat(path::foreign).key("android:fillColor").isEqualTo("?attrs/dark")
         assertThat(path::foreign).key("android:fillAlpha").isEqualTo("0.1")
     }
+
+    @Test
+    fun linearGradientIsParsed() {
+        val vectorText = """
+            |<vector>
+            |  <gradient android:
+            |</vector>
+            |""".trimMargin().toByteArray()
+
+        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
+            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                documentElement.normalize()
+            }
+        }
+
+        val path = parse(unknownElementDocument.firstChild).elements.first() as Path
+
+        assertThat(path::foreign).key("android:fillColor").isEqualTo("?attrs/dark")
+        assertThat(path::foreign).key("android:fillAlpha").isEqualTo("0.1")
+    }
 }

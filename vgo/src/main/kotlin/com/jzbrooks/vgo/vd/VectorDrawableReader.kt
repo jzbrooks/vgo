@@ -2,11 +2,7 @@ package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
-import com.jzbrooks.vgo.core.graphic.ClipPath
-import com.jzbrooks.vgo.core.graphic.Element
-import com.jzbrooks.vgo.core.graphic.Extra
-import com.jzbrooks.vgo.core.graphic.Group
-import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.*
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.util.xml.asSequence
@@ -44,6 +40,7 @@ private fun parseElement(node: Node): Element? {
         "group" -> parseGroup(node)
         "path" -> parsePath(node)
         "clip-path" -> parseClipPath(node)
+        "gradient" -> parseGradient(node)
         else -> parseExtraElement(node)
     }
 }
@@ -67,9 +64,9 @@ private fun parsePath(node: Node): Path {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
 
     val id = node.attributes.removeOrNull("android:name")?.nodeValue
-    val fill = node.attributes.extractColor("android:fillColor", "android:fillAlpha", Colors.TRANSPARENT)
+    val fill = node.attributes.extractColorWithAlpha("android:fillColor", "android:fillAlpha", Colors.TRANSPARENT)
     val fillRule = node.attributes.extractFillRule("android:fillType")
-    val stroke = node.attributes.extractColor("android:strokeColor", "android:strokeAlpha", Colors.TRANSPARENT)
+    val stroke = node.attributes.extractColorWithAlpha("android:strokeColor", "android:strokeAlpha", Colors.TRANSPARENT)
     val strokeWidth = node.attributes.removeFloatOrNull("android:strokeWidth") ?: 0f
     val strokeLineCap = node.attributes.extractLineCap("android:strokeLineCap")
     val strokeLineJoin = node.attributes.extractLineJoin("android:strokeLineJoin")
@@ -152,6 +149,33 @@ private fun parseClipPath(node: Node): ClipPath {
     }
 }
 
+private fun parseGradient(node: Node): Element {
+    val gradientType = node.attributes.getNamedItem("android:type")!!.textContent
+
+    if (gradientType != "linear" && gradientType != "radial")
+        return parseExtraElement(node) // sweeps are unsupported for now
+
+    node.attributes.removeNamedItem("android:type")
+
+    val id = node.attributes.removeOrNull("android:name")?.nodeValue
+
+    val startColor = node.attributes.extractColor("android:startColor", Colors.TRANSPARENT)
+    val centerColor = node.attributes.extractColor("android:centerColor", Colors.TRANSPARENT)
+    val endColor = node.attributes.extractColor("android:endColor", Colors.TRANSPARENT)
+
+    val tileMode = when (node.attributes.removeOrNull("android:tileMode")?.nodeValue?.lowercase()) {
+        "mirror" -> Gradient.TileMode.MIRROR
+        "repeat" -> Gradient.TileMode.REPEAT
+        else -> Gradient.TileMode.CLAMP
+    }
+
+    return if (gradientType == "linear") {
+        Gradient.Linear(id, node.attributes.toMutableMap(), startColor, centerColor, endColor, tileMode)
+    } else {
+        Gradient.Radial(id, node.attributes.toMutableMap(), startColor, centerColor, endColor, tileMode)
+    }
+}
+
 private fun parseExtraElement(node: Node): Extra {
     val containedElements = node.childNodes.asSequence()
         .mapNotNull(::parseElement)
@@ -208,7 +232,7 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
     return pivot * translation * rotate * scale * pivotInverse
 }
 
-private fun NamedNodeMap.extractColor(key: String, alphaKey: String, default: Color): Color {
+private fun NamedNodeMap.extractColorWithAlpha(key: String, alphaKey: String, default: Color): Color {
     // This will be overwritten at the end of path writing as a foreign property
     if (getNamedItem(key)?.nodeValue?.startsWith('@') == true ||
         getNamedItem(alphaKey)?.nodeValue?.startsWith('@') == true ||
@@ -231,6 +255,23 @@ private fun NamedNodeMap.extractColor(key: String, alphaKey: String, default: Co
     // Alpha is determined by min(color MSB, alpha attribute)
     if (alpha != null && alpha < (colorInt shr 24)) {
         colorInt = colorInt and 0x00FFFFFFu or (alpha shl 24)
+    }
+
+    return Color(colorInt)
+}
+
+private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
+    // This will be overwritten at the end of path writing as a foreign property
+    if (getNamedItem(key)?.nodeValue?.startsWith('@') == true ||
+        getNamedItem(key)?.nodeValue?.startsWith('?') == true
+    ) return default
+
+    val value = removeOrNull(key)?.nodeValue ?: return default
+
+    var colorInt = when (value.length) {
+        9 -> value.trimStart('#').toUInt(radix = 16)
+        4 -> ("${value[1]}" + value[1] + value[2] + value[2] + value[3] + value[3]).toUInt(radix = 16) or 0xFF000000u
+        else -> value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
     }
 
     return Color(colorInt)
