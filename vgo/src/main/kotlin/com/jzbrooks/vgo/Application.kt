@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo
 
+import com.android.ide.common.vectordrawable.Svg2Vector
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
@@ -13,7 +14,11 @@ import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter
 import com.jzbrooks.vgo.vd.toSvg
 import org.w3c.dom.Document
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.OutputStream
+import java.io.PipedInputStream
+import java.io.PipedOutputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -139,36 +144,43 @@ class Application {
         input.inputStream().use { inputStream ->
             val sizeBefore = inputStream.channel.size()
 
-            val document =
-                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
-                    documentElement.normalize()
-                }
+            val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
+            document.documentElement.normalize()
 
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
-            var graphic =
-                when {
-                    rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> parse(rootNodes.first())
-                    rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } ->
-                        com.jzbrooks.vgo.vd.parse(
-                            rootNodes.first(),
-                        )
-                    else -> if (input == output) return else null
+
+            var graphic = when {
+                rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> {
+                    if (outputFormat == "vd") {
+                        PipedOutputStream().use { stream ->
+                            val errors = Svg2Vector.parseSvgToXml(input, stream)
+                            if (errors != "") System.err.println(errors)
+
+                            val inputPipe = PipedInputStream(stream)
+                            val document2 = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputPipe)
+                            document2.documentElement.normalize()
+
+                            parse(document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.first())
+                        }
+                    } else {
+                        parse(rootNodes.first())
+                    }
                 }
+                rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } -> {
+                    com.jzbrooks.vgo.vd.parse(rootNodes.first())
+                }
+                else -> if (input == output) return else null
+            }
 
             if (graphic is VectorDrawable && outputFormat == "svg") {
                 graphic = graphic.toSvg()
             }
 
-            if (graphic is ScalableVectorGraphic && outputFormat == "vd") {
-                graphic = graphic.toVectorDrawable()
+            val optimizationRegistry = when (graphic) {
+                is VectorDrawable -> VectorDrawableOptimizationRegistry()
+                is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                else -> null
             }
-
-            val optimizationRegistry =
-                when (graphic) {
-                    is VectorDrawable -> VectorDrawableOptimizationRegistry()
-                    is ScalableVectorGraphic -> SvgOptimizationRegistry()
-                    else -> null
-                }
 
             if (graphic != null) {
                 optimizationRegistry?.apply(graphic)
