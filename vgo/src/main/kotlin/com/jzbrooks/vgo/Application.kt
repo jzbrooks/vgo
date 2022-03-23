@@ -7,16 +7,15 @@ import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
 import com.jzbrooks.vgo.svg.parse
-import com.jzbrooks.vgo.svg.toVectorDrawable
 import com.jzbrooks.vgo.util.xml.asSequence
 import com.jzbrooks.vgo.vd.VectorDrawable
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter
 import com.jzbrooks.vgo.vd.toSvg
 import org.w3c.dom.Document
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.OutputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
 import javax.xml.parsers.DocumentBuilderFactory
@@ -144,7 +143,7 @@ class Application {
         input.inputStream().use { inputStream ->
             val sizeBefore = inputStream.channel.size()
 
-            val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input)
+            val document = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(input)
             document.documentElement.normalize()
 
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
@@ -152,15 +151,19 @@ class Application {
             var graphic = when {
                 rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> {
                     if (outputFormat == "vd") {
-                        PipedOutputStream().use { stream ->
-                            val errors = Svg2Vector.parseSvgToXml(input, stream)
-                            if (errors != "") System.err.println(errors)
+                        ByteArrayOutputStream().use { pipeOrigin ->
+                            val errors = Svg2Vector.parseSvgToXml(input, pipeOrigin)
+                            if (errors != "") {
+                                System.err.println(errors)
+//                                return
+                            }
 
-                            val inputPipe = PipedInputStream(stream)
-                            val document2 = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputPipe)
-                            document2.documentElement.normalize()
+                            val pipeTerminal = ByteArrayInputStream(pipeOrigin.toByteArray())
+                            val convertedDocument = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(pipeTerminal)
+                            convertedDocument.documentElement.normalize()
 
-                            parse(document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.first())
+                            val documentNodes = convertedDocument.childNodes.asSequence()
+                            com.jzbrooks.vgo.vd.parse(documentNodes.first { it.nodeType == Document.ELEMENT_NODE })
                         }
                     } else {
                         parse(rootNodes.first())
@@ -229,9 +232,10 @@ class Application {
         assert(input.isDirectory)
         assert(output.isDirectory || !output.exists())
 
-        input.listFiles { file -> !file.isHidden }?.forEach { file ->
+        for (file in input.walkTopDown().filter { file -> !file.isHidden }) {
             handleFile(file, File(output, file.name), options)
         }
+
         if (printStats) {
             val message = "| Total bytes saved: ${(totalBytesBefore - totalBytesAfter).roundToInt()} |"
             val border = "-".repeat(message.length)
@@ -274,6 +278,7 @@ class Application {
         get() = key.isDirectory && (value.isDirectory || !value.exists())
 
     companion object {
+        private val DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance()
         private const val HELP_MESSAGE = """
 > vgo [options] [file/directory]
 
