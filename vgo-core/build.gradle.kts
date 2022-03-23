@@ -1,5 +1,4 @@
 plugins {
-    id("org.jlleitschuh.gradle.ktlint")
     id("org.jetbrains.kotlin.jvm")
     id("com.vanniktech.maven.publish")
 }

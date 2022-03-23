@@ -4,7 +4,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 plugins {
-    id("org.jlleitschuh.gradle.ktlint")
     id("org.jetbrains.kotlin.jvm")
     id("com.vanniktech.maven.publish")
 }
@@ -74,7 +73,7 @@ tasks {
                                |package com.jzbrooks
                                |
                                |internal object BuildConstants {
-                               """.trimMargin()
+                        """.trimMargin()
                     )
 
                     val vgoProperties = project.properties

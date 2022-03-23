@@ -146,7 +146,8 @@ class ScalableVectorGraphicReaderTests {
             |    <path d="M0,0l2,3Z" />
             |  </bicycle>
             |</svg>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val expectedChild = createPath(
             listOf(

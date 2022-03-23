@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jlleitschuh.gradle.ktlint.KtlintPlugin
 
 buildscript {
     repositories {
@@ -8,7 +10,7 @@ buildscript {
 
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.2.0")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.2.1")
         classpath("com.vanniktech:gradle-maven-publish-plugin:0.18.0")
     }
 }
@@ -17,6 +19,11 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+    }
+
+    apply<KtlintPlugin>()
+    configure<KtlintExtension> {
+        version.set("0.45.1")
     }
 
     tasks.withType<KotlinCompile> {

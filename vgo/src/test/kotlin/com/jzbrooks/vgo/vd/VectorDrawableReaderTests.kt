@@ -147,7 +147,8 @@ class VectorDrawableReaderTests {
             |<vector>
             |  <path android:pathData="M0,0l2,3Z" android:fillColor="#FF00FF00" android:fillAlpha="0.5" />
             |</vector>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
@@ -168,7 +169,8 @@ class VectorDrawableReaderTests {
             |<vector>
             |  <path android:pathData="M0,0l2,3Z" android:strokeColor="#FF00FF00" android:strokeAlpha="0.5" />
             |</vector>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
@@ -191,7 +193,8 @@ class VectorDrawableReaderTests {
             |    <path android:pathData="M0,0l2,3Z" />
             |  </bicycle>
             |</vector>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val expectedChild = createPath(
             listOf(
@@ -223,7 +226,8 @@ class VectorDrawableReaderTests {
             |<vector>
             |  <path android:pathData="@string/path_data" />
             |</vector>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
@@ -245,7 +249,8 @@ class VectorDrawableReaderTests {
             |<vector>
             |  <path android:fillColor="#88ff9988" android:pathData="@string/path_data" />
             |</vector>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
@@ -264,7 +269,8 @@ class VectorDrawableReaderTests {
             |<vector>
             |  <path android:fillColor="#ff9988" android:pathData="@string/path_data" />
             |</vector>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
@@ -283,7 +289,8 @@ class VectorDrawableReaderTests {
             |<vector>
             |  <path android:fillColor="#fff" android:pathData="@string/path_data" />
             |</vector>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
@@ -302,7 +309,8 @@ class VectorDrawableReaderTests {
             |<vector>
             |  <path android:fillColor="#88ff9988" android:fillAlpha="0.1" android:pathData="@string/path_data" />
             |</vector>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
@@ -321,7 +329,8 @@ class VectorDrawableReaderTests {
             |<vector>
             |  <path android:fillColor="?attrs/dark" android:fillAlpha="0.1" android:pathData="@string/path_data" />
             |</vector>
-            |""".trimMargin().toByteArray()
+            |
+        """.trimMargin().toByteArray()
 
         val unknownElementDocument = ByteArrayInputStream(vectorText).use {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
