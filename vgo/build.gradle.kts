@@ -49,9 +49,7 @@ tasks {
                 "META-INF/*.version",
 
                 // todo: maybe these should be included the jar?
-                "META-INF/LICENSE",
-                "META-INF/LICENSE.txt",
-                "META-INF/LICENSE.md",
+                "META-INF/LICENSE*",
                 "META-INF/DEPENDENCIES",
                 "META-INF/BCKEY.DSA",
                 "META-INF/BCKEY.SF",
