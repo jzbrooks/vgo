@@ -16,8 +16,6 @@ import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.PipedInputStream
-import java.io.PipedOutputStream
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
