@@ -11,7 +11,7 @@ kotlin.sourceSets.getByName("main").kotlin.srcDir("src/generated/kotlin")
 
 dependencies {
     implementation(project(":vgo-core"))
-    implementation("com.android.tools:sdk-common:27.2.0-alpha16")
+    implementation("com.android.tools:sdk-common:30.2.2")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
@@ -49,11 +49,14 @@ tasks {
 
                 // todo: maybe these should be included the jar?
                 "META-INF/LICENSE*",
+                "META-INF/LGPL2.1",
                 "META-INF/DEPENDENCIES",
+                "META-INF/AL2.0",
                 "META-INF/BCKEY.DSA",
                 "META-INF/BCKEY.SF",
                 "**/NOTICE*",
-                "javax/activation/**"
+                "javax/activation/**",
+                "xsd/catalog.xml",
             )
         }
     }
