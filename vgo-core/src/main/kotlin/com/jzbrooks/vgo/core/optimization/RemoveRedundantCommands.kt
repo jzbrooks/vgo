@@ -50,6 +50,7 @@ class RemoveRedundantCommands : TopDownOptimization {
                 is QuadraticBezierCurve -> if (current.parameters.map(QuadraticBezierCurve.Parameter::end).all { it.isApproximately(Point.ZERO) }) continue
                 is SmoothQuadraticBezierCurve -> if (current.parameters.all { it.isApproximately(Point.ZERO) }) continue
                 is EllipticalArcCurve -> if (current.parameters.all { (abs(it.radiusX) < 1e-3f && abs(it.radiusY) < 1e-3f) || it.end.isApproximately(Point.ZERO) }) continue
+                ClosePath -> {} // nothing to do
             }
 
             commands.add(current)
