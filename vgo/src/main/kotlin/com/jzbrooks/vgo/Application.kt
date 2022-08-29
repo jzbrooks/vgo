@@ -230,7 +230,7 @@ class Application {
         assert(input.isDirectory)
         assert(output.isDirectory || !output.exists())
 
-        for (file in input.walkTopDown().filter { file -> !file.isHidden }) {
+        for (file in input.walkTopDown().filter { file -> !file.isHidden && !file.isDirectory }) {
             handleFile(file, File(output, file.name), options)
         }
 
