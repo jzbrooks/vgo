@@ -15,7 +15,7 @@ val r8: Configuration by configurations.creating
 
 dependencies {
     implementation(project(":vgo-core"))
-    implementation("com.android.tools:sdk-common:27.2.0-alpha16")
+    implementation("com.android.tools:sdk-common:30.2.2")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
@@ -52,14 +52,15 @@ tasks {
                 "**/module-info.class",
                 "META-INF/maven/**",
                 "META-INF/*.version",
-                "META-INF/LICENSE",
-                "META-INF/LICENSE.txt",
-                "META-INF/LICENSE.md",
+                "META-INF/LICENSE*",
+                "META-INF/LGPL2.1",
                 "META-INF/DEPENDENCIES",
+                "META-INF/AL2.0",
                 "META-INF/BCKEY.DSA",
                 "META-INF/BCKEY.SF",
                 "**/NOTICE*",
-                "javax/activation/**"
+                "javax/activation/**",
+                "xsd/catalog.xml",
             )
         }
     }
