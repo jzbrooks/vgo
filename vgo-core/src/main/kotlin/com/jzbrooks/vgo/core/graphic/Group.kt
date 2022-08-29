@@ -1,12 +1,12 @@
 package com.jzbrooks.vgo.core.graphic
 
-import com.jzbrooks.vgo.core.util.math.Matrix3
+import dev.romainguy.kotlin.math.Mat3
 
 data class Group(
     override var elements: List<Element>,
     override val id: String? = null,
     override val foreign: MutableMap<String, String> = mutableMapOf(),
-    var transform: Matrix3 = Matrix3.IDENTITY,
+    var transform: Mat3 = Mat3.identity()
 ) : ContainerElement {
     override fun accept(visitor: ElementVisitor) = visitor.visit(this)
 }

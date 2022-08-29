@@ -17,9 +17,11 @@ import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
-import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.Vector3
+import dev.romainguy.kotlin.math.Float2
+import dev.romainguy.kotlin.math.Float3
+import dev.romainguy.kotlin.math.Mat3
 import java.util.Stack
 
 /**
@@ -40,7 +42,7 @@ class BakeTransformations : ElementVisitor, BottomUpOptimization {
 
         val groupTransform = group.transform
 
-        if (group.elements.any { it !is Path } || groupTransform.contentsEqual(Matrix3.IDENTITY))
+        if (group.elements.any { it !is Path } || groupTransform == Mat3.identity())
             return
 
         for (child in group.elements) {
@@ -48,17 +50,17 @@ class BakeTransformations : ElementVisitor, BottomUpOptimization {
         }
 
         // Transform is baked. We don't want to apply it twice.
-        group.transform = Matrix3.IDENTITY
+        group.transform = Mat3.identity()
     }
 
     private fun areElementsRelocatable(group: Group): Boolean {
         return group.id == null &&
-            group.transform.contentsEqual(Matrix3.IDENTITY) &&
+            group.transform == Mat3.identity() &&
             group.foreign.isEmpty() &&
             group.elements.all { it is Path }
     }
 
-    private fun applyTransform(path: Path, transform: Matrix3) {
+    private fun applyTransform(path: Path, transform: Mat3) {
         if (path.commands.isEmpty()) return
 
         val subPathStart = Stack<Point>()
@@ -66,7 +68,7 @@ class BakeTransformations : ElementVisitor, BottomUpOptimization {
         val initialMoveTo = path.commands.first() as MoveTo
         var currentPoint = initialMoveTo.parameters.last().copy()
         val transformedMoveTo = initialMoveTo.apply {
-            parameters = parameters.map { (transform * Vector3(it)).toPoint() }
+            parameters = parameters.map { val t = (transform * Float3(it.x, it.y, 1f)); Float2(t.x, t.y) }
         }
 
         path.commands = listOf(transformedMoveTo) + path.commands.asSequence().drop(1).map { command ->

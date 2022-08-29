@@ -4,6 +4,8 @@ plugins {
 }
 
 dependencies {
+    api("dev.romainguy:kotlin-math:1.5.1")
+
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
