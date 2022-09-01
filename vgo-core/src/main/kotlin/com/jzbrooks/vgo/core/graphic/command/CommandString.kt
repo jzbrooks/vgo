@@ -1,6 +1,6 @@
 package com.jzbrooks.vgo.core.graphic.command
 
-import com.jzbrooks.vgo.core.util.math.Point
+import dev.romainguy.kotlin.math.Float2
 
 @JvmInline
 value class CommandString(val data: String) {
@@ -16,7 +16,7 @@ value class CommandString(val data: String) {
                             .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(2)
-                            .map(::mapPoint)
+                            .map(::mapFloat2)
                             .toList()
 
                         MoveTo(variant, parameters)
@@ -26,7 +26,7 @@ value class CommandString(val data: String) {
                             .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(2)
-                            .map(::mapPoint)
+                            .map(::mapFloat2)
                             .toList()
 
                         LineTo(variant, parameters)
@@ -60,7 +60,7 @@ value class CommandString(val data: String) {
                             .map(MatchResult::value)
                             .map(String::toFloat)
                             .chunked(2)
-                            .map(::mapPoint)
+                            .map(::mapFloat2)
                             .toList()
 
                         SmoothQuadraticBezierCurve(variant, parameters)
@@ -101,28 +101,28 @@ value class CommandString(val data: String) {
             }.toList()
     }
 
-    private fun mapPoint(components: List<Float>): Point {
-        return Point(components[0], components[1])
+    private fun mapFloat2(components: List<Float>): Float2 {
+        return Float2(components[0], components[1])
     }
 
     private fun mapQuadraticBezierCurveParameter(components: List<Float>): QuadraticBezierCurve.Parameter {
-        val control = Point(components[0], components[1])
-        val end = Point(components[2], components[3])
+        val control = Float2(components[0], components[1])
+        val end = Float2(components[2], components[3])
 
         return QuadraticBezierCurve.Parameter(control, end)
     }
 
     private fun mapCubicBezierCurveParameter(components: List<Float>): CubicBezierCurve.Parameter {
-        val startControl = Point(components[0], components[1])
-        val endControl = Point(components[2], components[3])
-        val end = Point(components[4], components[5])
+        val startControl = Float2(components[0], components[1])
+        val endControl = Float2(components[2], components[3])
+        val end = Float2(components[4], components[5])
 
         return CubicBezierCurve.Parameter(startControl, endControl, end)
     }
 
     private fun mapShortcutCubicBezierCurveParameter(components: List<Float>): SmoothCubicBezierCurve.Parameter {
-        val endControl = Point(components[0], components[1])
-        val end = Point(components[2], components[3])
+        val endControl = Float2(components[0], components[1])
+        val end = Float2(components[2], components[3])
 
         return SmoothCubicBezierCurve.Parameter(endControl, end)
     }
@@ -141,7 +141,7 @@ value class CommandString(val data: String) {
             0f -> EllipticalArcCurve.SweepFlag.ANTICLOCKWISE
             else -> throw IllegalArgumentException("Unexpected elliptical curve sweep flag value: ${components[4]}\nExpected 0 or 1.")
         }
-        val end = Point(components[5], components[6])
+        val end = Float2(components[5], components[6])
 
         return EllipticalArcCurve.Parameter(radiusX, radiusY, angle, arcFlag, sweepFlag, end)
     }

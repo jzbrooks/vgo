@@ -1,8 +1,8 @@
 package com.jzbrooks.vgo.core.graphic.command
 
-import com.jzbrooks.vgo.core.util.math.Point
+import dev.romainguy.kotlin.math.Float2
 
 data class SmoothQuadraticBezierCurve(
     override var variant: CommandVariant,
-    override var parameters: List<Point>
-) : ParameterizedCommand<Point>
+    override var parameters: List<Float2>
+) : ParameterizedCommand<Float2>

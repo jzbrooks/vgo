@@ -4,6 +4,7 @@ import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.CubicCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import dev.romainguy.kotlin.math.Float2
 import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.hypot
@@ -47,13 +48,13 @@ fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
  * Requires that the curve only has a single parameter
  * Requires that the curve use relative coordinates
  */
-fun CubicCurve<*>.interpolate(t: Float): Point {
+fun CubicCurve<*>.interpolate(t: Float): Float2 {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
     val (startControl, endControl, end) = when (this) {
         is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-        is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
+        is SmoothCubicBezierCurve -> Triple(Float2(), parameters[0].endControl, parameters[0].end)
     }
 
     val square = t * t
@@ -61,7 +62,7 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
     val param = 1 - t
     val paramSquare = param * param
 
-    return Point(
+    return Float2(
         3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
         3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y
     )

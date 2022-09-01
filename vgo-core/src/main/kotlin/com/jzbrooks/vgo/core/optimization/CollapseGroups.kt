@@ -7,6 +7,7 @@ import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.util.math.Matrix3
+import dev.romainguy.kotlin.math.Mat3
 
 /**
  * Collapse unnecessary nested groups into a single group
@@ -16,7 +17,7 @@ class CollapseGroups : BottomUpOptimization {
     private val Group.isMergeable: Boolean
         get() {
             val hasValidClipPath = elements.any { it is ClipPath }
-            val hasAttributes = id != null || !transform.contentsEqual(Matrix3.IDENTITY) || foreign.isNotEmpty()
+            val hasAttributes = id != null || transform != Mat3.identity() || foreign.isNotEmpty()
             return !hasValidClipPath && elements.isNotEmpty() && !hasAttributes
         }
 

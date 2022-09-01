@@ -1,25 +1,10 @@
 package com.jzbrooks.vgo.core.optimization
 
-import com.jzbrooks.vgo.core.graphic.ClipPath
-import com.jzbrooks.vgo.core.graphic.Extra
-import com.jzbrooks.vgo.core.graphic.Graphic
-import com.jzbrooks.vgo.core.graphic.Group
-import com.jzbrooks.vgo.core.graphic.Path
-import com.jzbrooks.vgo.core.graphic.command.ClosePath
-import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
+import com.jzbrooks.vgo.core.graphic.*
+import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
-import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
-import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
-import com.jzbrooks.vgo.core.graphic.command.LineTo
-import com.jzbrooks.vgo.core.graphic.command.MoveTo
-import com.jzbrooks.vgo.core.graphic.command.ParameterizedCommand
-import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
-import com.jzbrooks.vgo.core.util.math.Point
-import java.util.Stack
+import dev.romainguy.kotlin.math.Float2
+import java.util.*
 
 /**
  * Converts commands to use relative, absolute,
@@ -27,13 +12,13 @@ import java.util.Stack
  * @param mode determines the operating mode of the command
  */
 class CommandVariant(private val mode: Mode) : TopDownOptimization {
-    private val pathStart = Stack<Point>()
+    private val pathStart = Stack<Float2>()
 
     // Updated once per process call when computing
     // the other variant of the command. This works
     // because the coordinates are accurate regardless
     // of their absolute or relative nature.
-    private lateinit var currentPoint: Point
+    private lateinit var currentPoint: Float2
 
     override fun visit(graphic: Graphic) {}
     override fun visit(clipPath: ClipPath) {}
@@ -41,7 +26,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
     override fun visit(extra: Extra) {}
     override fun visit(path: Path) {
         pathStart.clear()
-        currentPoint = Point(0f, 0f)
+        currentPoint = Float2()
 
         val firstMoveTo = path.commands.take(1).map {
             val moveTo = it as MoveTo

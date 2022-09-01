@@ -20,6 +20,8 @@ import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.computeAbsoluteCoordinates
+import dev.romainguy.kotlin.math.Float2
+import dev.romainguy.kotlin.math.eq
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
@@ -41,7 +43,7 @@ class RemoveRedundantCommands : TopDownOptimization {
             assert((current as? ParameterizedCommand<*>)?.variant != CommandVariant.ABSOLUTE)
 
             when (current) {
-                is MoveTo -> if (current.parameters.reduce(Point::plus).isApproximately(Point.ZERO)) continue
+                is MoveTo -> if (current.parameters.reduce(Float2::plus) == Float2()) continue
                 is LineTo -> if (current.parameters.all { it.isApproximately(Point.ZERO) }) continue
                 is VerticalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue
                 is HorizontalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue

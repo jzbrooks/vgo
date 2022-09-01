@@ -1,3 +1,5 @@
 package com.jzbrooks.vgo.core.util.math
 
-data class Circle(var center: Point, val radius: Float)
+import dev.romainguy.kotlin.math.Float2
+
+data class Circle(var center: Float2, val radius: Float)
