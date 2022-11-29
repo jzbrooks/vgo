@@ -19,6 +19,7 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
+        google()
     }
 
     apply<KtlintPlugin>()
