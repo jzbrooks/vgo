@@ -2,14 +2,14 @@ plugins {
     id("org.jetbrains.kotlin.jvm")
     id("java-gradle-plugin")
     id("com.vanniktech.maven.publish")
-    id("org.gradle.kotlin.kotlin-dsl") version "2.1.7"
+    id("org.gradle.kotlin.kotlin-dsl") version "4.3.0"
 }
 
 dependencies {
     implementation(project(":vgo"))
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
