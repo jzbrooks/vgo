@@ -10,17 +10,15 @@ plugins {
 
 sourceSets {
     main {
-        withConvention(KotlinSourceSet::class) {
-            kotlin.srcDir("src/generated/kotlin")
-        }
+        java.srcDirs("src/generated/kotlin")
     }
 }
 
 dependencies {
     implementation(project(":vgo-core"))
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
@@ -39,7 +37,7 @@ tasks {
 
         val sourceClasses = sourceSets.main.get().output.classesDirs
         inputs.files(sourceClasses)
-        destinationDirectory.set(file("$buildDir/libs/debug"))
+        destinationDirectory.set(layout.buildDirectory.dir("libs/debug"))
 
         doFirst {
             from(files(sourceClasses))
@@ -68,7 +66,7 @@ tasks {
 
             PrintWriter(generatedFile.toFile()).use { output ->
                 val buildConstantsClass = buildString {
-                    appendln(
+                    appendLine(
                         """
                                |package com.jzbrooks
                                |
@@ -81,25 +79,27 @@ tasks {
 
                     for (property in vgoProperties) {
                         append("    const val ")
-                        append(property.key.toUpperCase())
+                        append(property.key.uppercase())
                         append(" = \"")
                         append(property.value)
-                        appendln('"')
+                        appendLine('"')
                     }
 
-                    appendln("}")
+                    appendLine("}")
                 }
                 output.write(buildConstantsClass)
             }
         }
     }
 
+    val buildDir = layout.buildDirectory
     val optimizedJar = file("$buildDir/libs/vgo.jar")
+
     val optimize by registering(JavaExec::class) {
         description = "Runs proguard on the jar application."
         group = "build"
 
-        inputs.file("$buildDir/libs/debug/vgo-$version.jar")
+        inputs.file(buildDir.dir("libs/debug/vgo-$version.jar"))
         outputs.file(optimizedJar)
 
         val javaHome = System.getProperty("java.home")
@@ -111,7 +111,7 @@ tasks {
             "--lib", javaHome,
             "--output", "$buildDir/libs/vgo.jar",
             "--pg-conf", "$rootDir/optimize.pro",
-            "$buildDir/libs/debug/vgo-$version.jar"
+            "$buildDir/libs/debug/vgo-$version.jar",
         )
 
         dependsOn(getByName("jar"))

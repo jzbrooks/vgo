@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.KtlintPlugin
@@ -9,8 +11,8 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10")
-        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.2.1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:12.1.0")
         classpath("com.vanniktech:gradle-maven-publish-plugin:0.18.0")
     }
 }
@@ -26,9 +28,9 @@ subprojects {
         version.set("0.45.1")
     }
 
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_11.toString()
+    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
+        configure<KotlinProjectExtension> {
+            jvmToolchain(21)
         }
     }
 

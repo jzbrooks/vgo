@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.core.graphic.command
 
 import assertk.all
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
@@ -234,8 +235,8 @@ class ParserTests {
     fun testInvalidCommandParsing() {
         val commandString = CommandString("G 3 2")
 
-        assertThat {
+        assertFailure {
             commandString.toCommandList()
-        }.isFailure().hasClass(IllegalStateException::class)
+        }.hasClass(IllegalStateException::class)
     }
 }
