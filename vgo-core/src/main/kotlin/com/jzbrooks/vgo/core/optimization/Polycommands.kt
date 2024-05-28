@@ -27,8 +27,11 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
  */
 class Polycommands : TopDownOptimization {
     override fun visit(graphic: Graphic) {}
+
     override fun visit(clipPath: ClipPath) {}
+
     override fun visit(group: Group) {}
+
     override fun visit(extra: Extra) {}
 
     override fun visit(path: Path) {

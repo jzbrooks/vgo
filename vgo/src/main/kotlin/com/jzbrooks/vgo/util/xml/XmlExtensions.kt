@@ -17,9 +17,10 @@ fun NamedNodeMap.asSequence(): Sequence<Node> {
     return generateSequence { item(i++) }
 }
 
-fun NamedNodeMap.toMutableMap() = asSequence()
-    .associate { it.nodeName to it.nodeValue }
-    .toMutableMap()
+fun NamedNodeMap.toMutableMap() =
+    asSequence()
+        .associate { it.nodeName to it.nodeValue }
+        .toMutableMap()
 
 fun NamedNodeMap.removeOrNull(key: String): Node? {
     val value = getNamedItem(key)
@@ -41,16 +42,18 @@ fun NamedNodeMap.removeFloatOrNull(key: String): Float? {
     return value
 }
 
-fun NamedNodeMap.extractLineCap(key: String) = when (removeOrNull(key)?.nodeValue) {
-    "round" -> Path.LineCap.ROUND
-    "square" -> Path.LineCap.SQUARE
-    else -> Path.LineCap.BUTT
-}
+fun NamedNodeMap.extractLineCap(key: String) =
+    when (removeOrNull(key)?.nodeValue) {
+        "round" -> Path.LineCap.ROUND
+        "square" -> Path.LineCap.SQUARE
+        else -> Path.LineCap.BUTT
+    }
 
-fun NamedNodeMap.extractLineJoin(key: String) = when (removeOrNull(key)?.nodeValue) {
-    "round" -> Path.LineJoin.ROUND
-    "bevel" -> Path.LineJoin.BEVEL
-    "arcs" -> Path.LineJoin.ARCS
-    "miter-clip" -> Path.LineJoin.MITER_CLIP
-    else -> Path.LineJoin.MITER
-}
+fun NamedNodeMap.extractLineJoin(key: String) =
+    when (removeOrNull(key)?.nodeValue) {
+        "round" -> Path.LineJoin.ROUND
+        "bevel" -> Path.LineJoin.BEVEL
+        "arcs" -> Path.LineJoin.ARCS
+        "miter-clip" -> Path.LineJoin.MITER_CLIP
+        else -> Path.LineJoin.MITER
+    }

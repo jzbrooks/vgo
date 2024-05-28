@@ -4,5 +4,5 @@ import com.jzbrooks.vgo.core.util.math.Point
 
 data class MoveTo(
     override var variant: CommandVariant,
-    override var parameters: List<Point>
+    override var parameters: List<Point>,
 ) : ParameterizedCommand<Point>

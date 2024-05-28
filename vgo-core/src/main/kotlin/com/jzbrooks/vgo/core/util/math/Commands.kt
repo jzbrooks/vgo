@@ -28,18 +28,19 @@ fun computeAbsoluteCoordinates(commands: List<Command>): Point {
 
     for (i in commands.indices) {
         val command = commands[i]
-        val newCurrentPoint = when (command) {
-            is MoveTo -> command.parameters[0]
-            is LineTo -> command.parameters[0]
-            is HorizontalLineTo -> Point(command.parameters[0], 0f)
-            is VerticalLineTo -> Point(0f, command.parameters[0])
-            is CubicBezierCurve -> command.parameters[0].end
-            is SmoothCubicBezierCurve -> command.parameters[0].end
-            is QuadraticBezierCurve -> command.parameters[0].end
-            is SmoothQuadraticBezierCurve -> command.parameters[0]
-            is EllipticalArcCurve -> command.parameters[0].end
-            is ClosePath -> pathStart.pop()
-        }
+        val newCurrentPoint =
+            when (command) {
+                is MoveTo -> command.parameters[0]
+                is LineTo -> command.parameters[0]
+                is HorizontalLineTo -> Point(command.parameters[0], 0f)
+                is VerticalLineTo -> Point(0f, command.parameters[0])
+                is CubicBezierCurve -> command.parameters[0].end
+                is SmoothCubicBezierCurve -> command.parameters[0].end
+                is QuadraticBezierCurve -> command.parameters[0].end
+                is SmoothQuadraticBezierCurve -> command.parameters[0]
+                is EllipticalArcCurve -> command.parameters[0].end
+                is ClosePath -> pathStart.pop()
+            }
 
         if (command !is ClosePath) {
             currentPoint += newCurrentPoint

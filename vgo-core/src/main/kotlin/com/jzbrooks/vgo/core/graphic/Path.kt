@@ -15,7 +15,6 @@ data class Path(
     val strokeLineJoin: LineJoin,
     val strokeMiterLimit: Float,
 ) : Element {
-
     override fun accept(visitor: ElementVisitor) = visitor.visit(this)
 
     enum class FillRule {

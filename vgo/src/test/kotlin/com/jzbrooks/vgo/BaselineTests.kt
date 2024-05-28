@@ -14,7 +14,6 @@ import java.nio.file.Paths
 import kotlin.streams.asSequence
 
 class BaselineTests {
-
     @ParameterizedTest
     @MethodSource("provideUnoptimizedAssets")
     fun testOptimizationFinishes(unoptimizedAsset: Path) {
@@ -30,7 +29,10 @@ class BaselineTests {
 
     @ParameterizedTest
     @MethodSource("provideUnoptimizedAndOptimizedAssets")
-    fun testOptimizedAssetIsEquivalentToBaseline(unoptimizedAsset: Path, baselineAsset: Path) {
+    fun testOptimizedAssetIsEquivalentToBaseline(
+        unoptimizedAsset: Path,
+        baselineAsset: Path,
+    ) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsEquivalentToBaseline.${inputFile.extension}"
@@ -45,7 +47,10 @@ class BaselineTests {
 
     @ParameterizedTest
     @MethodSource("provideUnoptimizedAndOptimizedAssets")
-    fun testOptimizedAssetIsNotLargerThanBaseline(unoptimizedAsset: Path, baselineAsset: Path) {
+    fun testOptimizedAssetIsNotLargerThanBaseline(
+        unoptimizedAsset: Path,
+        baselineAsset: Path,
+    ) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsNotLargerThanBaseline.${inputFile.extension}"
@@ -76,22 +81,22 @@ class BaselineTests {
     }
 
     companion object {
-
         // Loads the files based on the convention that optimized files
         // live in src/test/resources/baseline and are suffixed with _optimized
-        private val assets: List<Pair<Path, Path>> = try {
-            Files.list(Paths.get("src/test/resources"))
-                .asSequence()
-                .filterNot { Files.isDirectory(it) }
-                .map { unoptimizedFile ->
-                    val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
-                    val optimizedDirectory = unoptimizedFile.parent.resolve("baseline")
-                    unoptimizedFile to optimizedDirectory.resolve("${fileName}_optimized.$fileExtension")
-                }.toList()
-        } catch (e: Throwable) {
-            System.err.println(e)
-            throw e
-        }
+        private val assets: List<Pair<Path, Path>> =
+            try {
+                Files.list(Paths.get("src/test/resources"))
+                    .asSequence()
+                    .filterNot { Files.isDirectory(it) }
+                    .map { unoptimizedFile ->
+                        val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
+                        val optimizedDirectory = unoptimizedFile.parent.resolve("baseline")
+                        unoptimizedFile to optimizedDirectory.resolve("${fileName}_optimized.$fileExtension")
+                    }.toList()
+            } catch (e: Throwable) {
+                System.err.println(e)
+                throw e
+            }
 
         @JvmStatic
         fun provideUnoptimizedAssets(): List<Arguments> {

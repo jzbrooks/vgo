@@ -21,9 +21,10 @@ import org.w3c.dom.Node
 import org.w3c.dom.Text
 
 fun parse(root: Node): ScalableVectorGraphic {
-    val elements = root.childNodes.asSequence()
-        .mapNotNull(::parseElement)
-        .toList()
+    val elements =
+        root.childNodes.asSequence()
+            .mapNotNull(::parseElement)
+            .toList()
 
     return ScalableVectorGraphic(
         elements,
@@ -44,9 +45,10 @@ private fun parseElement(node: Node): Element? {
 }
 
 private fun parseClipPath(node: Node): ClipPath {
-    val childElements = node.childNodes.asSequence()
-        .mapNotNull(::parseElement)
-        .toList()
+    val childElements =
+        node.childNodes.asSequence()
+            .mapNotNull(::parseElement)
+            .toList()
 
     return ClipPath(
         childElements,
@@ -56,9 +58,10 @@ private fun parseClipPath(node: Node): ClipPath {
 }
 
 private fun parseGroupElement(node: Node): Group {
-    val childElements = node.childNodes.asSequence()
-        .mapNotNull(::parseElement)
-        .toList()
+    val childElements =
+        node.childNodes.asSequence()
+            .mapNotNull(::parseElement)
+            .toList()
 
     // This has to happen before foreign property collection
     val transform = node.attributes.extractTransformMatrix()
@@ -96,9 +99,10 @@ private fun parsePathElement(node: Node): Path {
 }
 
 private fun parseExtraElement(node: Node): Extra {
-    val containedElements = node.childNodes.asSequence()
-        .mapNotNull(::parseElement)
-        .toList()
+    val containedElements =
+        node.childNodes.asSequence()
+            .mapNotNull(::parseElement)
+            .toList()
 
     return Extra(
         node.nodeValue ?: node.nodeName,
@@ -111,39 +115,46 @@ private fun parseExtraElement(node: Node): Extra {
 private fun NamedNodeMap.extractTransformMatrix(): Matrix3 {
     val transform = removeOrNull("transform")?.nodeValue ?: return Matrix3.IDENTITY
 
-    val entries = transform.removePrefix("matrix(")
-        .trimEnd(')')
-        .split(',')
-        .map(String::toFloat)
+    val entries =
+        transform.removePrefix("matrix(")
+            .trimEnd(')')
+            .split(',')
+            .map(String::toFloat)
 
     return Matrix3.from(
-        floatArrayOf(entries[0], entries[2], entries[4], entries[1], entries[3], entries[5], 0f, 0f, 1f)
+        floatArrayOf(entries[0], entries[2], entries[4], entries[1], entries[3], entries[5], 0f, 0f, 1f),
     )
 }
 
-private fun NamedNodeMap.extractColor(key: String, default: Color): Color {
+private fun NamedNodeMap.extractColor(
+    key: String,
+    default: Color,
+): Color {
     val value = removeOrNull(key)?.nodeValue ?: return default
 
     if (value == "none") return Color(0x00000000u)
 
-    val hex = if (value.startsWith("rgb")) {
-        val (r, g, b) = value.removePrefix("rgb(")
-            .trimEnd(')')
-            .split(',')
-            .map { it.trim().toShort() }
+    val hex =
+        if (value.startsWith("rgb")) {
+            val (r, g, b) =
+                value.removePrefix("rgb(")
+                    .trimEnd(')')
+                    .split(',')
+                    .map { it.trim().toShort() }
 
-        "%02x%02x%02x".format(r, g, b)
-    } else if (value.startsWith("#")) {
-        val hex = value.trim('#')
-        if (hex.length != 3) hex else ("${hex[0]}" + hex[0] + hex[1] + hex[1] + hex[2] + hex[2])
-    } else {
-        return Colors.COLORS_BY_NAMES[value] ?: default
-    }
+            "%02x%02x%02x".format(r, g, b)
+        } else if (value.startsWith("#")) {
+            val hex = value.trim('#')
+            if (hex.length != 3) hex else ("${hex[0]}" + hex[0] + hex[1] + hex[1] + hex[2] + hex[2])
+        } else {
+            return Colors.COLORS_BY_NAMES[value] ?: default
+        }
 
     return Color(hex.toUInt(radix = 16) or 0xFF000000u)
 }
 
-private fun NamedNodeMap.extractFillRule(key: String) = when (removeOrNull(key)?.nodeValue) {
-    "evenodd" -> Path.FillRule.EVEN_ODD
-    else -> Path.FillRule.NON_ZERO
-}
+private fun NamedNodeMap.extractFillRule(key: String) =
+    when (removeOrNull(key)?.nodeValue) {
+        "evenodd" -> Path.FillRule.EVEN_ODD
+        else -> Path.FillRule.NON_ZERO
+    }

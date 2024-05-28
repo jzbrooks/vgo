@@ -46,15 +46,16 @@ class Application {
 
         printStats = argReader.readFlag("stats|s")
 
-        val outputs = run {
-            val outputPaths = mutableListOf<String>()
-            var output = argReader.readOption("output|o")
-            while (output != null) {
-                outputPaths.add(output)
-                output = argReader.readOption("output|o")
+        val outputs =
+            run {
+                val outputPaths = mutableListOf<String>()
+                var output = argReader.readOption("output|o")
+                while (output != null) {
+                    outputPaths.add(output)
+                    output = argReader.readOption("output|o")
+                }
+                outputPaths.toList()
             }
-            outputPaths.toList()
-        }
 
         outputFormat = argReader.readOption("format")
 
@@ -72,15 +73,16 @@ class Application {
             inputs = standardInPaths
         }
 
-        val inputOutputMap = if (outputs.isNotEmpty()) {
-            inputs.zip(outputs) { a, b ->
-                Pair(File(a), File(b))
-            }
-        } else {
-            inputs.zip(inputs) { a, b ->
-                Pair(File(a), File(b))
-            }
-        }.toMap()
+        val inputOutputMap =
+            if (outputs.isNotEmpty()) {
+                inputs.zip(outputs) { a, b ->
+                    Pair(File(a), File(b))
+                }
+            } else {
+                inputs.zip(inputs) { a, b ->
+                    Pair(File(a), File(b))
+                }
+            }.toMap()
 
         val files = inputOutputMap.count { (input, _) -> input.isFile }
         val containsDirectory = inputOutputMap.any { (input, _) -> input.isDirectory }
@@ -89,7 +91,10 @@ class Application {
         return handleFiles(inputOutputMap, writerOptions)
     }
 
-    private fun handleFiles(inputOutputMap: Map<File, File>, writerOptions: Set<Writer.Option>): Int {
+    private fun handleFiles(
+        inputOutputMap: Map<File, File>,
+        writerOptions: Set<Writer.Option>,
+    ): Int {
         for (entry in inputOutputMap) {
             val (input, output) = entry
 
@@ -103,19 +108,19 @@ class Application {
                 else -> {
                     System.err.println(
                         """
-                    A given input and output pair (grouped positionally)
-                    must be either files or directories.
-                    Input is a ${if (input.isFile) "file" else "directory"}
-                        path: ${input.absolutePath}
-                        exists: ${input.exists()}
-                        isWritable: ${input.canWrite()}
-                    Output is a ${if (output.isFile) "file" else "directory"}
-                        path: ${output.absolutePath}
-                        exists: ${input.exists()}
-                        isWritable: ${input.canWrite()}
+                        A given input and output pair (grouped positionally)
+                        must be either files or directories.
+                        Input is a ${if (input.isFile) "file" else "directory"}
+                            path: ${input.absolutePath}
+                            exists: ${input.exists()}
+                            isWritable: ${input.canWrite()}
+                        Output is a ${if (output.isFile) "file" else "directory"}
+                            path: ${output.absolutePath}
+                            exists: ${input.exists()}
+                            isWritable: ${input.canWrite()}
 
-                    Storage: ${output.usableSpace} / ${output.totalSpace} is usable.
-                        """.trimIndent()
+                        Storage: ${output.usableSpace} / ${output.totalSpace} is usable.
+                        """.trimIndent(),
                     )
 
                     return 65
@@ -126,22 +131,29 @@ class Application {
         return 0
     }
 
-    private fun handleFile(input: File, output: File, options: Set<Writer.Option>) {
+    private fun handleFile(
+        input: File,
+        output: File,
+        options: Set<Writer.Option>,
+    ) {
         input.inputStream().use { inputStream ->
             val sizeBefore = inputStream.channel.size()
 
-            val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
-                documentElement.normalize()
-            }
+            val document =
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
+                    documentElement.normalize()
+                }
 
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
-            var graphic = when {
-                rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> parse(rootNodes.first())
-                rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } -> com.jzbrooks.vgo.vd.parse(
-                    rootNodes.first()
-                )
-                else -> if (input == output) return else null
-            }
+            var graphic =
+                when {
+                    rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> parse(rootNodes.first())
+                    rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } ->
+                        com.jzbrooks.vgo.vd.parse(
+                            rootNodes.first(),
+                        )
+                    else -> if (input == output) return else null
+                }
 
             if (graphic is VectorDrawable && outputFormat == "svg") {
                 graphic = graphic.toSvg()
@@ -151,11 +163,12 @@ class Application {
                 graphic = graphic.toVectorDrawable()
             }
 
-            val optimizationRegistry = when (graphic) {
-                is VectorDrawable -> VectorDrawableOptimizationRegistry()
-                is ScalableVectorGraphic -> SvgOptimizationRegistry()
-                else -> null
-            }
+            val optimizationRegistry =
+                when (graphic) {
+                    is VectorDrawable -> VectorDrawableOptimizationRegistry()
+                    is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                    else -> null
+                }
 
             if (graphic != null) {
                 optimizationRegistry?.apply(graphic)
@@ -196,7 +209,11 @@ class Application {
         }
     }
 
-    private fun handleDirectory(input: File, output: File, options: Set<Writer.Option>) {
+    private fun handleDirectory(
+        input: File,
+        output: File,
+        options: Set<Writer.Option>,
+    ) {
         assert(input.isDirectory)
         assert(output.isDirectory || !output.exists())
 
@@ -208,11 +225,11 @@ class Application {
             val border = "-".repeat(message.length)
             println(
                 """
-                        
-                        $border
-                        $message
-                        $border
-                """.trimIndent()
+                
+                $border
+                $message
+                $border
+                """.trimIndent(),
             )
         }
     }

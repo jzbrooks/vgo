@@ -21,16 +21,19 @@ class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization {
     lateinit var commands: MutableList<Command>
 
     override fun visit(graphic: Graphic) {}
+
     override fun visit(clipPath: ClipPath) {}
+
     override fun visit(group: Group) {}
+
     override fun visit(extra: Extra) {}
+
     override fun visit(path: Path) {
         commands = mutableListOf()
 
         if (path.commands.isNotEmpty()) {
             commands.add((path.commands.first() as MoveTo).copy())
             for (command in path.commands.drop(1)) {
-
                 assert((command as? ParameterizedCommand<*>)?.variant != CommandVariant.ABSOLUTE)
                 assert((command as? HorizontalLineTo)?.parameters?.size ?: 0 < 2)
                 assert((command as? VerticalLineTo)?.parameters?.size ?: 0 < 2)

@@ -24,8 +24,11 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
  */
 class BreakoutImplicitCommands : TopDownOptimization {
     override fun visit(graphic: Graphic) {}
+
     override fun visit(clipPath: ClipPath) {}
+
     override fun visit(group: Group) {}
+
     override fun visit(extra: Extra) {}
 
     override fun visit(path: Path) {
@@ -45,9 +48,10 @@ class BreakoutImplicitCommands : TopDownOptimization {
 
     private fun divideParameters(first: ParameterizedCommand<*>): List<Command> {
         return when (first) {
-            is MoveTo -> first.parameters.mapIndexed { i, it ->
-                if (i == 0) first.copy(parameters = listOf(it)) else LineTo(first.variant, listOf(it))
-            }
+            is MoveTo ->
+                first.parameters.mapIndexed { i, it ->
+                    if (i == 0) first.copy(parameters = listOf(it)) else LineTo(first.variant, listOf(it))
+                }
             is LineTo -> first.parameters.map { first.copy(parameters = listOf(it)) }
             is SmoothQuadraticBezierCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
             is HorizontalLineTo -> first.parameters.map { first.copy(parameters = listOf(it)) }

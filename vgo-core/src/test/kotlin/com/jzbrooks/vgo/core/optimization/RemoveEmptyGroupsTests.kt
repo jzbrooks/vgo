@@ -31,21 +31,22 @@ class RemoveEmptyGroupsTests {
 
     @Test
     fun testAvoidCollapsingNestedGroupWithPath() {
-        val nestedEmptyGroups = listOf(
-            Group(
-                listOf(
-                    Group(
-                        listOf(
-                            Group(
-                                listOf(
-                                    createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f)))))
-                                )
-                            )
-                        )
-                    )
-                )
+        val nestedEmptyGroups =
+            listOf(
+                Group(
+                    listOf(
+                        Group(
+                            listOf(
+                                Group(
+                                    listOf(
+                                        createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f))))),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
             )
-        )
 
         val graphic = createGraphic(nestedEmptyGroups)
 
@@ -75,10 +76,11 @@ class RemoveEmptyGroupsTests {
 
     @Test
     fun testCollapseEmptyGroupAndAvoidAdjacentElements() {
-        val nestedEmptyGroups = listOf(
-            Group(emptyList()),
-            createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f))))),
-        )
+        val nestedEmptyGroups =
+            listOf(
+                Group(emptyList()),
+                createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 2f))))),
+            )
 
         val graphic = createGraphic(nestedEmptyGroups)
 

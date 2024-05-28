@@ -16,21 +16,22 @@ import org.junit.jupiter.api.Test
 class ConvertCurvesToArcsTest {
     @Test
     fun `Convert curves to arcs`() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 30f))),
-                CubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        CubicBezierCurve.Parameter(
-                            Point(0f, -5.302f),
-                            Point(2.109f, -10.393f),
-                            Point(5.858f, -14.142f)
-                        )
-                    )
-                )
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 30f))),
+                    CubicBezierCurve(
+                        CommandVariant.RELATIVE,
+                        listOf(
+                            CubicBezierCurve.Parameter(
+                                Point(0f, -5.302f),
+                                Point(2.109f, -10.393f),
+                                Point(5.858f, -14.142f),
+                            ),
+                        ),
+                    ),
+                ),
+            )
 
         ConvertCurvesToArcs(FakeCommandPrinter()).visit(path)
 
@@ -44,10 +45,10 @@ class ConvertCurvesToArcsTest {
                         0f,
                         EllipticalArcCurve.ArcFlag.SMALL,
                         EllipticalArcCurve.SweepFlag.CLOCKWISE,
-                        Point(5.858f, -14.142f)
-                    )
-                )
-            )
+                        Point(5.858f, -14.142f),
+                    ),
+                ),
+            ),
         )
     }
 
@@ -57,31 +58,32 @@ class ConvertCurvesToArcsTest {
         // in visibility_strike.xml. It presented tolerance challenges
         // w.r.t. over-smoothing sharp edges into ellipses.
 
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(12f, 4.5f))),
-                CubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        CubicBezierCurve.Parameter(
-                            Point(5f, 0f),
-                            Point(9.27f, -3.11f),
-                            Point(11f, -7.5f) // 1, 12
-                        )
-                    )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(12f, 4.5f))),
+                    CubicBezierCurve(
+                        CommandVariant.RELATIVE,
+                        listOf(
+                            CubicBezierCurve.Parameter(
+                                Point(5f, 0f),
+                                Point(9.27f, -3.11f),
+                                Point(11f, -7.5f), // 1, 12
+                            ),
+                        ),
+                    ),
+                    CubicBezierCurve(
+                        CommandVariant.RELATIVE,
+                        listOf(
+                            CubicBezierCurve.Parameter(
+                                Point(1.73f, 4.39f),
+                                Point(6f, 7.5f),
+                                Point(11f, 7.5f),
+                            ),
+                        ),
+                    ),
                 ),
-                CubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        CubicBezierCurve.Parameter(
-                            Point(1.73f, 4.39f),
-                            Point(6f, 7.5f),
-                            Point(11f, 7.5f)
-                        )
-                    )
-                )
-            ),
-        )
+            )
 
         val before = path.copy()
 
@@ -98,51 +100,52 @@ class ConvertCurvesToArcsTest {
         // c2.5,0,4.526,2.026,4.526,4.525
         // c0,2.5-2.026,4.526-4.526,4.526
         // z
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(45.4f, 27.726f))),
-                CubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        CubicBezierCurve.Parameter(
-                            Point(-2.499f, 0f),
-                            Point(-4.525f, -2.026f),
-                            Point(-4.525f, -4.526f)
-                        )
-                    )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(45.4f, 27.726f))),
+                    CubicBezierCurve(
+                        CommandVariant.RELATIVE,
+                        listOf(
+                            CubicBezierCurve.Parameter(
+                                Point(-2.499f, 0f),
+                                Point(-4.525f, -2.026f),
+                                Point(-4.525f, -4.526f),
+                            ),
+                        ),
+                    ),
+                    CubicBezierCurve(
+                        CommandVariant.RELATIVE,
+                        listOf(
+                            CubicBezierCurve.Parameter(
+                                Point(0f, -2.499f),
+                                Point(2.026f, -4.525f),
+                                Point(4.525f, -4.525f),
+                            ),
+                        ),
+                    ),
+                    CubicBezierCurve(
+                        CommandVariant.RELATIVE,
+                        listOf(
+                            CubicBezierCurve.Parameter(
+                                Point(2.5f, 0f),
+                                Point(4.526f, 2.026f),
+                                Point(4.526f, 4.525f),
+                            ),
+                        ),
+                    ),
+                    CubicBezierCurve(
+                        CommandVariant.RELATIVE,
+                        listOf(
+                            CubicBezierCurve.Parameter(
+                                Point(0f, 2.5f),
+                                Point(-2.026f, 4.526f),
+                                Point(-4.526f, 4.526f),
+                            ),
+                        ),
+                    ),
                 ),
-                CubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        CubicBezierCurve.Parameter(
-                            Point(0f, -2.499f),
-                            Point(2.026f, -4.525f),
-                            Point(4.525f, -4.525f)
-                        )
-                    )
-                ),
-                CubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        CubicBezierCurve.Parameter(
-                            Point(2.5f, 0f),
-                            Point(4.526f, 2.026f),
-                            Point(4.526f, 4.525f)
-                        )
-                    )
-                ),
-                CubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        CubicBezierCurve.Parameter(
-                            Point(0f, 2.5f),
-                            Point(-2.026f, 4.526f),
-                            Point(-4.526f, 4.526f)
-                        )
-                    )
-                )
-            ),
-        )
+            )
 
         ConvertCurvesToArcs(FakeCommandPrinter()).visit(path)
 

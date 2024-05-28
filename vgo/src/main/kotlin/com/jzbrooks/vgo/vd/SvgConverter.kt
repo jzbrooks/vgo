@@ -8,12 +8,13 @@ fun VectorDrawable.toSvg(): ScalableVectorGraphic {
     val viewportHeight = foreign.remove("android:viewportHeight") ?: "24"
     val viewportWidth = foreign.remove("android:viewportWidth") ?: "24"
 
-    val svgElementAttributes = mutableMapOf(
-        "xmlns" to "http://www.w3.org/2000/svg",
-        "viewPort" to "0 0 $viewportWidth $viewportHeight",
-        "width" to "100%",
-        "height" to "100%",
-    )
+    val svgElementAttributes =
+        mutableMapOf(
+            "xmlns" to "http://www.w3.org/2000/svg",
+            "viewPort" to "0 0 $viewportWidth $viewportHeight",
+            "width" to "100%",
+            "height" to "100%",
+        )
 
     traverse(this)
     foreign.clear()

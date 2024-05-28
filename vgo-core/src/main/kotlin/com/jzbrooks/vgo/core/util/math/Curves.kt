@@ -35,10 +35,12 @@ fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
     @Suppress("NAME_SHADOWING")
     val tolerance = ARC_THRESHOLD * tolerance
 
-    val withinTolerance = radius < 1e7 && floatArrayOf(0.25f, 0.75f).all {
-        val curveValue = interpolate(it)
-        abs(curveValue.distanceTo(center) - radius) <= tolerance
-    }
+    val withinTolerance =
+        radius < 1e7 &&
+            floatArrayOf(0.25f, 0.75f).all {
+                val curveValue = interpolate(it)
+                abs(curveValue.distanceTo(center) - radius) <= tolerance
+            }
 
     return if (withinTolerance) Circle(center, radius) else null
 }
@@ -51,10 +53,11 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
-    val (startControl, endControl, end) = when (this) {
-        is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-        is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
-    }
+    val (startControl, endControl, end) =
+        when (this) {
+            is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
+            is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
+        }
 
     val square = t * t
     val cube = square * t
@@ -63,7 +66,7 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
 
     return Point(
         3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
-        3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y
+        3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y,
     )
 }
 
@@ -75,10 +78,11 @@ fun CubicCurve<*>.isConvex(tolerance: Float = 1e-3f): Boolean {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
-    val (startControl, endControl, end) = when (this) {
-        is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-        is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
-    }
+    val (startControl, endControl, end) =
+        when (this) {
+            is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
+            is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
+        }
 
     val firstDiagonal = LineSegment(Point.ZERO, endControl)
     val secondDiagonal = LineSegment(startControl, end)
@@ -102,21 +106,25 @@ fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBez
     assert(parameters.size == 1)
     assert(previous.parameters.size == 1)
 
-    val (prevEndControl, prevEnd) = when (val previousParam = previous.parameters[0]) {
-        is CubicBezierCurve.Parameter -> previousParam.endControl to previousParam.end
-        is SmoothCubicBezierCurve.Parameter -> previousParam.endControl to previousParam.end
-        else -> throw IllegalStateException("A destructuring of control points is required for ${previous::class.simpleName}.")
-    }
+    val (prevEndControl, prevEnd) =
+        when (val previousParam = previous.parameters[0]) {
+            is CubicBezierCurve.Parameter -> previousParam.endControl to previousParam.end
+            is SmoothCubicBezierCurve.Parameter -> previousParam.endControl to previousParam.end
+            else -> throw IllegalStateException("A destructuring of control points is required for ${previous::class.simpleName}.")
+        }
 
     return CubicBezierCurve(
         variant,
         parameters.map { (endControl, end) ->
             CubicBezierCurve.Parameter(prevEnd - prevEndControl, endControl, end)
-        }
+        },
     )
 }
 
-fun CubicCurve<*>.liesOnCircle(circle: Circle, tolerance: Float = 1e-3f): Boolean {
+fun CubicCurve<*>.liesOnCircle(
+    circle: Circle,
+    tolerance: Float = 1e-3f,
+): Boolean {
     @Suppress("NAME_SHADOWING")
     val tolerance = min(ARC_THRESHOLD * tolerance, ARC_TOLERANCE * circle.radius / 100)
 

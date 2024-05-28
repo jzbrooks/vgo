@@ -14,10 +14,13 @@ import java.util.Stack
  */
 class MergePaths : BottomUpOptimization {
     override fun visit(graphic: Graphic) = merge(graphic)
+
     override fun visit(group: Group) = merge(group)
+
     override fun visit(clipPath: ClipPath) = merge(clipPath)
 
     override fun visit(extra: Extra) {}
+
     override fun visit(path: Path) {}
 
     private fun merge(element: ContainerElement) {
@@ -65,7 +68,10 @@ class MergePaths : BottomUpOptimization {
         return mergedPaths
     }
 
-    private fun haveSameAttributes(first: Path, second: Path): Boolean {
+    private fun haveSameAttributes(
+        first: Path,
+        second: Path,
+    ): Boolean {
         return first.id == second.id &&
             first.foreign == second.foreign &&
             first.fill == second.fill &&

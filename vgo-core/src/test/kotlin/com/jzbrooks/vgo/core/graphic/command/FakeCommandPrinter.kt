@@ -5,11 +5,12 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 
 class FakeCommandPrinter : CommandPrinter {
-    private val formatter = DecimalFormat().apply {
-        maximumFractionDigits = 2
-        isDecimalSeparatorAlwaysShown = false
-        roundingMode = RoundingMode.HALF_UP
-    }
+    private val formatter =
+        DecimalFormat().apply {
+            maximumFractionDigits = 2
+            isDecimalSeparatorAlwaysShown = false
+            roundingMode = RoundingMode.HALF_UP
+        }
 
     override fun print(command: Command): String {
         return when (command) {
@@ -28,10 +29,11 @@ class FakeCommandPrinter : CommandPrinter {
     }
 
     private fun print(moveTo: MoveTo): String {
-        val command = when (moveTo.variant) {
-            CommandVariant.ABSOLUTE -> 'M'
-            CommandVariant.RELATIVE -> 'm'
-        }
+        val command =
+            when (moveTo.variant) {
+                CommandVariant.ABSOLUTE -> 'M'
+                CommandVariant.RELATIVE -> 'm'
+            }
 
         return buildString {
             append(command)
@@ -48,10 +50,11 @@ class FakeCommandPrinter : CommandPrinter {
     }
 
     private fun print(lineTo: LineTo): String {
-        val command = when (lineTo.variant) {
-            CommandVariant.ABSOLUTE -> 'L'
-            CommandVariant.RELATIVE -> 'l'
-        }
+        val command =
+            when (lineTo.variant) {
+                CommandVariant.ABSOLUTE -> 'L'
+                CommandVariant.RELATIVE -> 'l'
+            }
 
         return buildString {
             append(command)
@@ -68,10 +71,11 @@ class FakeCommandPrinter : CommandPrinter {
     }
 
     private fun print(verticalLineTo: VerticalLineTo): String {
-        val command = when (verticalLineTo.variant) {
-            CommandVariant.ABSOLUTE -> 'V'
-            CommandVariant.RELATIVE -> 'v'
-        }
+        val command =
+            when (verticalLineTo.variant) {
+                CommandVariant.ABSOLUTE -> 'V'
+                CommandVariant.RELATIVE -> 'v'
+            }
 
         return buildString {
             append(command)
@@ -88,10 +92,11 @@ class FakeCommandPrinter : CommandPrinter {
     }
 
     private fun print(horizontalLineTo: HorizontalLineTo): String {
-        val command = when (horizontalLineTo.variant) {
-            CommandVariant.ABSOLUTE -> 'H'
-            CommandVariant.RELATIVE -> 'h'
-        }
+        val command =
+            when (horizontalLineTo.variant) {
+                CommandVariant.ABSOLUTE -> 'H'
+                CommandVariant.RELATIVE -> 'h'
+            }
 
         return buildString {
             append(command)
@@ -108,10 +113,11 @@ class FakeCommandPrinter : CommandPrinter {
     }
 
     private fun print(cubicBezierCurve: CubicBezierCurve): String {
-        val command = when (cubicBezierCurve.variant) {
-            CommandVariant.ABSOLUTE -> 'C'
-            CommandVariant.RELATIVE -> 'c'
-        }
+        val command =
+            when (cubicBezierCurve.variant) {
+                CommandVariant.ABSOLUTE -> 'C'
+                CommandVariant.RELATIVE -> 'c'
+            }
 
         return buildString {
             append(command)
@@ -128,10 +134,11 @@ class FakeCommandPrinter : CommandPrinter {
     }
 
     private fun print(smoothCubicBezierCurve: SmoothCubicBezierCurve): String {
-        val command = when (smoothCubicBezierCurve.variant) {
-            CommandVariant.ABSOLUTE -> 'S'
-            CommandVariant.RELATIVE -> 's'
-        }
+        val command =
+            when (smoothCubicBezierCurve.variant) {
+                CommandVariant.ABSOLUTE -> 'S'
+                CommandVariant.RELATIVE -> 's'
+            }
 
         return buildString {
             append(command)
@@ -148,10 +155,11 @@ class FakeCommandPrinter : CommandPrinter {
     }
 
     private fun print(quadraticBezierCurve: QuadraticBezierCurve): String {
-        val command = when (quadraticBezierCurve.variant) {
-            CommandVariant.ABSOLUTE -> 'Q'
-            CommandVariant.RELATIVE -> 'q'
-        }
+        val command =
+            when (quadraticBezierCurve.variant) {
+                CommandVariant.ABSOLUTE -> 'Q'
+                CommandVariant.RELATIVE -> 'q'
+            }
 
         return buildString {
             append(command)
@@ -168,10 +176,11 @@ class FakeCommandPrinter : CommandPrinter {
     }
 
     private fun print(smoothQuadraticBezierCurve: SmoothQuadraticBezierCurve): String {
-        val command = when (smoothQuadraticBezierCurve.variant) {
-            CommandVariant.ABSOLUTE -> 'T'
-            CommandVariant.RELATIVE -> 't'
-        }
+        val command =
+            when (smoothQuadraticBezierCurve.variant) {
+                CommandVariant.ABSOLUTE -> 'T'
+                CommandVariant.RELATIVE -> 't'
+            }
 
         return buildString {
             append(command)
@@ -188,10 +197,11 @@ class FakeCommandPrinter : CommandPrinter {
     }
 
     private fun print(ellipticalArcCurve: EllipticalArcCurve): String {
-        val command = when (ellipticalArcCurve.variant) {
-            CommandVariant.ABSOLUTE -> 'A'
-            CommandVariant.RELATIVE -> 'a'
-        }
+        val command =
+            when (ellipticalArcCurve.variant) {
+                CommandVariant.ABSOLUTE -> 'A'
+                CommandVariant.RELATIVE -> 'a'
+            }
 
         return buildString {
             append(command)
@@ -209,11 +219,12 @@ class FakeCommandPrinter : CommandPrinter {
 
     private fun print(float: Float) = formatter.format(float)
 
-    private fun print(point: Point) = buildString {
-        append(print(point.x))
-        append(',')
-        append(print(point.y))
-    }
+    private fun print(point: Point) =
+        buildString {
+            append(print(point.x))
+            append(',')
+            append(print(point.y))
+        }
 
     private fun print(parameter: CubicBezierCurve.Parameter): String {
         return parameter.run {

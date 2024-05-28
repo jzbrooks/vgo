@@ -14,14 +14,15 @@ import org.junit.jupiter.api.Test
 class RemoveRedundantCommandsTests {
     @Test
     fun testRedundantLineToIsRemoved() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 0f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(103f, 6f))),
-                ClosePath,
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 0f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(103f, 6f))),
+                    ClosePath,
+                ),
             )
-        )
 
         RemoveRedundantCommands().visit(path)
 
@@ -31,14 +32,15 @@ class RemoveRedundantCommandsTests {
 
     @Test
     fun testUniqueCommandsAreNotModified() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(103f, 6f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(106f, 7f), Point(93f, 10f))),
-                ClosePath,
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.RELATIVE, listOf(Point(100f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(103f, 6f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(106f, 7f), Point(93f, 10f))),
+                    ClosePath,
+                ),
             )
-        )
 
         RemoveRedundantCommands().visit(path)
 
@@ -47,15 +49,16 @@ class RemoveRedundantCommandsTests {
 
     @Test
     fun testRedundantClosePathsAreRemoved() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(-3f, -2f))),
-                ClosePath,
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(-3f, -2f))),
+                    ClosePath,
+                ),
             )
-        )
 
         RemoveRedundantCommands().visit(path)
 

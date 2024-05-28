@@ -8,19 +8,19 @@ import com.jzbrooks.vgo.core.util.element.createPath
 import org.junit.jupiter.api.Test
 
 class RemoveTransparentPathsTests {
-
     @Test
     fun testTransparentPathsAreRemoved() {
-        val graphic = createGraphic(
-            listOf(
-                createPath(
-                    fill = Colors.TRANSPARENT,
-                    stroke = Colors.TRANSPARENT,
+        val graphic =
+            createGraphic(
+                listOf(
+                    createPath(
+                        fill = Colors.TRANSPARENT,
+                        stroke = Colors.TRANSPARENT,
+                    ),
+                    createPath(),
+                    createPath(),
                 ),
-                createPath(),
-                createPath(),
             )
-        )
 
         RemoveTransparentPaths().visit(graphic)
 
@@ -29,17 +29,18 @@ class RemoveTransparentPathsTests {
 
     @Test
     fun testTransparentPathsWithIdsAreNotRemoved() {
-        val graphic = createGraphic(
-            listOf(
-                createPath(
-                    id = "animatable",
-                    fill = Colors.TRANSPARENT,
-                    stroke = Colors.TRANSPARENT,
+        val graphic =
+            createGraphic(
+                listOf(
+                    createPath(
+                        id = "animatable",
+                        fill = Colors.TRANSPARENT,
+                        stroke = Colors.TRANSPARENT,
+                    ),
+                    createPath(),
+                    createPath(),
                 ),
-                createPath(),
-                createPath(),
             )
-        )
 
         RemoveTransparentPaths().visit(graphic)
 
@@ -48,17 +49,18 @@ class RemoveTransparentPathsTests {
 
     @Test
     fun testTransparentPathsWithForeignColorsAreNotRemoved() {
-        val graphic = createGraphic(
-            listOf(
-                createPath(
-                    fill = Colors.TRANSPARENT,
-                    stroke = Colors.TRANSPARENT,
-                    foreign = mutableMapOf("android:strokeColor" to "?attrs/dark")
+        val graphic =
+            createGraphic(
+                listOf(
+                    createPath(
+                        fill = Colors.TRANSPARENT,
+                        stroke = Colors.TRANSPARENT,
+                        foreign = mutableMapOf("android:strokeColor" to "?attrs/dark"),
+                    ),
+                    createPath(),
+                    createPath(),
                 ),
-                createPath(),
-                createPath(),
             )
-        )
 
         RemoveTransparentPaths().visit(graphic)
 

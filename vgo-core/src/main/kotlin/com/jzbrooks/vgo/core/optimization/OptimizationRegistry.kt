@@ -8,7 +8,6 @@ abstract class OptimizationRegistry(
     private val bottomUpOptimizations: List<BottomUpOptimization>,
     private val topDownOptimizations: List<TopDownOptimization>,
 ) {
-
     fun apply(graphic: Graphic) {
         if (bottomUpOptimizations.isNotEmpty()) {
             traverseBottomUp(graphic) { element ->

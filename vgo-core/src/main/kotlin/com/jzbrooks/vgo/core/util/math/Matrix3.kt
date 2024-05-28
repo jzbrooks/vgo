@@ -3,32 +3,51 @@ package com.jzbrooks.vgo.core.util.math
 import kotlin.math.absoluteValue
 
 interface Matrix3 {
-    operator fun get(row: Int, column: Int): Float
+    operator fun get(
+        row: Int,
+        column: Int,
+    ): Float
+
     operator fun times(other: Matrix3): Matrix3
+
     operator fun times(other: Vector3): Vector3
 
     fun clone(): Matrix3
 
-    fun contentsEqual(other: Matrix3, delta: Float = 0.001f): Boolean
+    fun contentsEqual(
+        other: Matrix3,
+        delta: Float = 0.001f,
+    ): Boolean
 
     companion object {
-        val IDENTITY = object : Matrix3 {
-            override fun get(row: Int, column: Int) = if (row == column) 1f else 0f
+        val IDENTITY =
+            object : Matrix3 {
+                override fun get(
+                    row: Int,
+                    column: Int,
+                ) = if (row == column) 1f else 0f
 
-            override fun times(other: Matrix3) = other.clone()
+                override fun times(other: Matrix3) = other.clone()
 
-            override fun times(other: Vector3): Vector3 = other.copy()
+                override fun times(other: Vector3): Vector3 = other.copy()
 
-            override fun clone(): Matrix3 = this
+                override fun clone(): Matrix3 = this
 
-            override fun contentsEqual(other: Matrix3, delta: Float) = contentsEqual(this, other, delta)
-        }
+                override fun contentsEqual(
+                    other: Matrix3,
+                    delta: Float,
+                ) = contentsEqual(this, other, delta)
+            }
 
         @JvmStatic
         fun from(data: FloatArray): Matrix3 = ArrayMatrix3(data)
 
         @JvmStatic
-        fun contentsEqual(first: Matrix3, second: Matrix3, delta: Float): Boolean {
+        fun contentsEqual(
+            first: Matrix3,
+            second: Matrix3,
+            delta: Float,
+        ): Boolean {
             for (i in 0..2) {
                 for (j in 0..2) {
                     val difference = first[i, j] - second[i, j]
@@ -41,10 +60,16 @@ interface Matrix3 {
 }
 
 interface MutableMatrix3 : Matrix3 {
-    operator fun set(row: Int, column: Int, value: Float)
+    operator fun set(
+        row: Int,
+        column: Int,
+        value: Float,
+    )
+
     companion object {
         @JvmStatic
         fun identity(): MutableMatrix3 = ArrayMatrix3(floatArrayOf(1f, 0f, 0f, 1f, 1f, 0f, 1f, 0f, 1f))
+
         @JvmStatic
         fun from(data: FloatArray): MutableMatrix3 = ArrayMatrix3(data)
     }
@@ -52,10 +77,16 @@ interface MutableMatrix3 : Matrix3 {
 
 @JvmInline
 private value class ArrayMatrix3(private val data: FloatArray) : MutableMatrix3 {
+    override operator fun get(
+        row: Int,
+        column: Int,
+    ) = data[row * 3 + column]
 
-    override operator fun get(row: Int, column: Int) = data[row * 3 + column]
-
-    override operator fun set(row: Int, column: Int, value: Float) {
+    override operator fun set(
+        row: Int,
+        column: Int,
+        value: Float,
+    ) {
         data[row * 3 + column] = value
     }
 
@@ -79,7 +110,7 @@ private value class ArrayMatrix3(private val data: FloatArray) : MutableMatrix3 
         return Vector3(
             this[0, 0] * other.i + this[0, 1] * other.j + this[0, 2] * other.k,
             this[1, 0] * other.i + this[1, 1] * other.j + this[1, 2] * other.k,
-            this[2, 0] * other.i + this[2, 1] * other.j + this[2, 2] * other.k
+            this[2, 0] * other.i + this[2, 1] * other.j + this[2, 2] * other.k,
         )
     }
 
@@ -87,5 +118,8 @@ private value class ArrayMatrix3(private val data: FloatArray) : MutableMatrix3 
 
     // @Cleanup: There's some room for improvement here,
     // it would be nice to override equals, but that isn't possible yet
-    override fun contentsEqual(other: Matrix3, delta: Float) = Matrix3.contentsEqual(this, other, delta)
+    override fun contentsEqual(
+        other: Matrix3,
+        delta: Float,
+    ) = Matrix3.contentsEqual(this, other, delta)
 }

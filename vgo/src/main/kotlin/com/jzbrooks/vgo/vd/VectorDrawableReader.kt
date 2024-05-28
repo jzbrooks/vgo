@@ -25,10 +25,10 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 fun parse(root: Node): VectorDrawable {
-
-    val elements = root.childNodes.asSequence()
-        .mapNotNull(::parseElement)
-        .toList()
+    val elements =
+        root.childNodes.asSequence()
+            .mapNotNull(::parseElement)
+            .toList()
 
     return VectorDrawable(
         elements,
@@ -49,9 +49,10 @@ private fun parseElement(node: Node): Element? {
 }
 
 private fun parseGroup(node: Node): Group {
-    val groupChildElements = node.childNodes.asSequence()
-        .mapNotNull(::parseElement)
-        .toList()
+    val groupChildElements =
+        node.childNodes.asSequence()
+            .mapNotNull(::parseElement)
+            .toList()
 
     // This has to happen before foreign property collection
     val transform = node.attributes.computeTransformationMatrix()
@@ -122,7 +123,7 @@ private fun parseClipPath(node: Node): ClipPath {
                     0f,
                     Path.LineCap.BUTT,
                     Path.LineJoin.MITER,
-                    4f
+                    4f,
                 ),
             ),
             node.attributes.removeOrNull("android:name")?.nodeValue,
@@ -143,7 +144,7 @@ private fun parseClipPath(node: Node): ClipPath {
                     0f,
                     Path.LineCap.BUTT,
                     Path.LineJoin.MITER,
-                    4f
+                    4f,
                 ),
             ),
             node.attributes.removeOrNull("android:name")?.nodeValue,
@@ -153,9 +154,10 @@ private fun parseClipPath(node: Node): ClipPath {
 }
 
 private fun parseExtraElement(node: Node): Extra {
-    val containedElements = node.childNodes.asSequence()
-        .mapNotNull(::parseElement)
-        .toList()
+    val containedElements =
+        node.childNodes.asSequence()
+            .mapNotNull(::parseElement)
+            .toList()
 
     return Extra(
         node.nodeValue ?: node.nodeName,
@@ -180,53 +182,68 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
     if (scaleX == null && scaleY == null &&
         translationX == null && translationY == null &&
         pivotX == null && pivotY == null && rotation == null
-    ) return Matrix3.IDENTITY
-
-    val scale = Matrix3.from(
-        floatArrayOf(scaleX ?: 1f, 0f, 0f, 0f, scaleY ?: 1f, 0f, 0f, 0f, 1f),
-    )
-
-    val translation = Matrix3.from(
-        floatArrayOf(1f, 0f, translationX ?: 0f, 0f, 1f, translationY ?: 0f, 0f, 0f, 1f),
-    )
-
-    val pivot = Matrix3.from(
-        floatArrayOf(1f, 0f, pivotX ?: 0f, 0f, 1f, pivotY ?: 0f, 0f, 0f, 1f),
-    )
-
-    val pivotInverse = Matrix3.from(
-        floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1, 0f, 1f, (pivotY ?: 0f) * -1, 0f, 0f, 1f),
-    )
-
-    val rotate = if (rotation != null) {
-        val radians = rotation * PI.toFloat() / 180f
-        Matrix3.from(floatArrayOf(cos(radians), -sin(radians), 0f, sin(radians), cos(radians), 0f, 0f, 0f, 1f))
-    } else {
-        Matrix3.IDENTITY
+    ) {
+        return Matrix3.IDENTITY
     }
+
+    val scale =
+        Matrix3.from(
+            floatArrayOf(scaleX ?: 1f, 0f, 0f, 0f, scaleY ?: 1f, 0f, 0f, 0f, 1f),
+        )
+
+    val translation =
+        Matrix3.from(
+            floatArrayOf(1f, 0f, translationX ?: 0f, 0f, 1f, translationY ?: 0f, 0f, 0f, 1f),
+        )
+
+    val pivot =
+        Matrix3.from(
+            floatArrayOf(1f, 0f, pivotX ?: 0f, 0f, 1f, pivotY ?: 0f, 0f, 0f, 1f),
+        )
+
+    val pivotInverse =
+        Matrix3.from(
+            floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1, 0f, 1f, (pivotY ?: 0f) * -1, 0f, 0f, 1f),
+        )
+
+    val rotate =
+        if (rotation != null) {
+            val radians = rotation * PI.toFloat() / 180f
+            Matrix3.from(floatArrayOf(cos(radians), -sin(radians), 0f, sin(radians), cos(radians), 0f, 0f, 0f, 1f))
+        } else {
+            Matrix3.IDENTITY
+        }
 
     return pivot * translation * rotate * scale * pivotInverse
 }
 
-private fun NamedNodeMap.extractColor(key: String, alphaKey: String, default: Color): Color {
+private fun NamedNodeMap.extractColor(
+    key: String,
+    alphaKey: String,
+    default: Color,
+): Color {
     // This will be overwritten at the end of path writing as a foreign property
     if (getNamedItem(key)?.nodeValue?.startsWith('@') == true ||
         getNamedItem(alphaKey)?.nodeValue?.startsWith('@') == true ||
         getNamedItem(key)?.nodeValue?.startsWith('?') == true ||
         getNamedItem(alphaKey)?.nodeValue?.startsWith('?') == true
-    ) return default
+    ) {
+        return default
+    }
 
     val value = removeOrNull(key)?.nodeValue ?: return default
 
-    val alpha = removeFloatOrNull(alphaKey)?.let { alpha ->
-        (alpha * 255).roundToInt().toUInt()
-    }
+    val alpha =
+        removeFloatOrNull(alphaKey)?.let { alpha ->
+            (alpha * 255).roundToInt().toUInt()
+        }
 
-    var colorInt = when (value.length) {
-        9 -> value.trimStart('#').toUInt(radix = 16)
-        4 -> ("${value[1]}" + value[1] + value[2] + value[2] + value[3] + value[3]).toUInt(radix = 16) or 0xFF000000u
-        else -> value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
-    }
+    var colorInt =
+        when (value.length) {
+            9 -> value.trimStart('#').toUInt(radix = 16)
+            4 -> ("${value[1]}" + value[1] + value[2] + value[2] + value[3] + value[3]).toUInt(radix = 16) or 0xFF000000u
+            else -> value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
+        }
 
     // Alpha is determined by min(color MSB, alpha attribute)
     if (alpha != null && alpha < (colorInt shr 24)) {
@@ -236,7 +253,8 @@ private fun NamedNodeMap.extractColor(key: String, alphaKey: String, default: Co
     return Color(colorInt)
 }
 
-fun NamedNodeMap.extractFillRule(key: String) = when (removeOrNull(key)?.nodeValue) {
-    "evenOdd" -> Path.FillRule.EVEN_ODD
-    else -> Path.FillRule.NON_ZERO
-}
+fun NamedNodeMap.extractFillRule(key: String) =
+    when (removeOrNull(key)?.nodeValue) {
+        "evenOdd" -> Path.FillRule.EVEN_ODD
+        else -> Path.FillRule.NON_ZERO
+    }

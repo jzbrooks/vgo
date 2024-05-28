@@ -13,7 +13,6 @@ import java.io.PrintStream
 import java.nio.file.Paths
 
 class InPlaceModificationTest {
-
     private lateinit var systemOutput: ByteArrayOutputStream
 
     @BeforeEach

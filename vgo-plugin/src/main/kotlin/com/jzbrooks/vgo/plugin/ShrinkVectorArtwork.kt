@@ -10,9 +10,10 @@ import java.io.File
 open class ShrinkVectorArtwork : DefaultTask() {
     private val extension = project.extensions.getByType<VgoPluginExtension>()
 
-    private val defaultTree = project.fileTree(project.projectDir) {
-        include("**/res/drawable*/*.xml")
-    }
+    private val defaultTree =
+        project.fileTree(project.projectDir) {
+            include("**/res/drawable*/*.xml")
+        }
 
     init {
         group = "resource"
@@ -24,8 +25,10 @@ open class ShrinkVectorArtwork : DefaultTask() {
 
     @get:Input
     val showStatistics = extension.showStatistics
+
     @get:Input
     val outputFormat = extension.format
+
     @get:Input
     val indent = extension.indent
 

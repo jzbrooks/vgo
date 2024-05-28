@@ -81,8 +81,8 @@ class VectorDrawableReaderTests {
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(3.27f, 3f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(3.27f, 3f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 4.27f))),
-                ClosePath
-            )
+                ClosePath,
+            ),
         )
         assertThat(graphic::elements).hasSize(3)
     }
@@ -98,11 +98,12 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testIgnoreComment() {
-        val commentDocument = ByteArrayInputStream("<vector><!-- test comment --></vector>".toByteArray()).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val commentDocument =
+            ByteArrayInputStream("<vector><!-- test comment --></vector>".toByteArray()).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val graphic: Graphic = parse(commentDocument.firstChild)
 
@@ -111,11 +112,12 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testParseSelfClosedUnknownElementWithoutChildren() {
-        val unknownElementDocument = ByteArrayInputStream("<vector><bicycle /></vector>".toByteArray()).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream("<vector><bicycle /></vector>".toByteArray()).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
@@ -127,11 +129,12 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testParseUnknownElementWithoutChildren() {
-        val unknownElementDocument = ByteArrayInputStream("<vector><bicycle></bicycle></vector>".toByteArray()).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream("<vector><bicycle></bicycle></vector>".toByteArray()).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
@@ -143,18 +146,20 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testMinimumFillAlphaIsPreferred() {
-        val vectorText = """
+        val vectorText =
+            """
             |<vector>
             |  <path android:pathData="M0,0l2,3Z" android:fillColor="#FF00FF00" android:fillAlpha="0.5" />
             |</vector>
             |
-        """.trimMargin().toByteArray()
+            """.trimMargin().toByteArray()
 
-        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
@@ -165,18 +170,20 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testMinimumStrokeAlphaIsPreferred() {
-        val vectorText = """
+        val vectorText =
+            """
             |<vector>
             |  <path android:pathData="M0,0l2,3Z" android:strokeColor="#FF00FF00" android:strokeAlpha="0.5" />
             |</vector>
             |
-        """.trimMargin().toByteArray()
+            """.trimMargin().toByteArray()
 
-        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
@@ -187,30 +194,33 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testParseUnknownElementWithChildren() {
-        val vectorText = """
+        val vectorText =
+            """
             |<vector>
             |  <bicycle>
             |    <path android:pathData="M0,0l2,3Z" />
             |  </bicycle>
             |</vector>
             |
-        """.trimMargin().toByteArray()
+            """.trimMargin().toByteArray()
 
-        val expectedChild = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))),
-                ClosePath,
-            ),
-            fill = Colors.TRANSPARENT,
-            strokeWidth = 0f,
-        )
+        val expectedChild =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(2f, 3f))),
+                    ClosePath,
+                ),
+                fill = Colors.TRANSPARENT,
+                strokeWidth = 0f,
+            )
 
-        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
@@ -222,18 +232,20 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testPathDataSpecifiedWithResourceIsUntouched() {
-        val vectorText = """
+        val vectorText =
+            """
             |<vector>
             |  <path android:pathData="@string/path_data" />
             |</vector>
             |
-        """.trimMargin().toByteArray()
+            """.trimMargin().toByteArray()
 
-        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val graphic: Graphic = parse(unknownElementDocument.firstChild)
 
@@ -245,18 +257,20 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testFullColorParsed() {
-        val vectorText = """
+        val vectorText =
+            """
             |<vector>
             |  <path android:fillColor="#88ff9988" android:pathData="@string/path_data" />
             |</vector>
             |
-        """.trimMargin().toByteArray()
+            """.trimMargin().toByteArray()
 
-        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val path = parse(unknownElementDocument.firstChild).elements.first() as Path
 
@@ -265,18 +279,20 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testColorWithoutSpecifiedAlphaParsed() {
-        val vectorText = """
+        val vectorText =
+            """
             |<vector>
             |  <path android:fillColor="#ff9988" android:pathData="@string/path_data" />
             |</vector>
             |
-        """.trimMargin().toByteArray()
+            """.trimMargin().toByteArray()
 
-        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val path = parse(unknownElementDocument.firstChild).elements.first() as Path
 
@@ -285,18 +301,20 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testShortenedColorParsed() {
-        val vectorText = """
+        val vectorText =
+            """
             |<vector>
             |  <path android:fillColor="#fff" android:pathData="@string/path_data" />
             |</vector>
             |
-        """.trimMargin().toByteArray()
+            """.trimMargin().toByteArray()
 
-        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val path = parse(unknownElementDocument.firstChild).elements.first() as Path
 
@@ -305,18 +323,20 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testLesserSpecifiedAlphaIsTaken() {
-        val vectorText = """
+        val vectorText =
+            """
             |<vector>
             |  <path android:fillColor="#88ff9988" android:fillAlpha="0.1" android:pathData="@string/path_data" />
             |</vector>
             |
-        """.trimMargin().toByteArray()
+            """.trimMargin().toByteArray()
 
-        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val path = parse(unknownElementDocument.firstChild).elements.first() as Path
 
@@ -325,18 +345,20 @@ class VectorDrawableReaderTests {
 
     @Test
     fun testThemeReferencedColorIgnored() {
-        val vectorText = """
+        val vectorText =
+            """
             |<vector>
             |  <path android:fillColor="?attrs/dark" android:fillAlpha="0.1" android:pathData="@string/path_data" />
             |</vector>
             |
-        """.trimMargin().toByteArray()
+            """.trimMargin().toByteArray()
 
-        val unknownElementDocument = ByteArrayInputStream(vectorText).use {
-            DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
-                documentElement.normalize()
+        val unknownElementDocument =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
             }
-        }
 
         val path = parse(unknownElementDocument.firstChild).elements.first() as Path
 

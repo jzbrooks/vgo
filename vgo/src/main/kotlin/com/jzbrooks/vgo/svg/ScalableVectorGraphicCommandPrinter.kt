@@ -19,12 +19,13 @@ import java.text.DecimalFormat
 import kotlin.math.sign
 
 class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : CommandPrinter {
-    private val formatter = DecimalFormat().apply {
-        maximumFractionDigits = decimalDigits
-        isDecimalSeparatorAlwaysShown = false
-        roundingMode = RoundingMode.HALF_UP
-        minimumIntegerDigits = 0
-    }
+    private val formatter =
+        DecimalFormat().apply {
+            maximumFractionDigits = decimalDigits
+            isDecimalSeparatorAlwaysShown = false
+            roundingMode = RoundingMode.HALF_UP
+            minimumIntegerDigits = 0
+        }
 
     override fun print(command: Command): String {
         return when (command) {
@@ -43,12 +44,13 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     }
 
     private fun print(moveTo: MoveTo): String {
-        val builder = StringBuilder(
-            when (moveTo.variant) {
-                CommandVariant.ABSOLUTE -> "M"
-                CommandVariant.RELATIVE -> "m"
-            }
-        )
+        val builder =
+            StringBuilder(
+                when (moveTo.variant) {
+                    CommandVariant.ABSOLUTE -> "M"
+                    CommandVariant.RELATIVE -> "m"
+                },
+            )
 
         for ((index, parameter) in moveTo.parameters.withIndex()) {
             builder.append(print(parameter))
@@ -61,12 +63,13 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     }
 
     private fun print(lineTo: LineTo): String {
-        val builder = StringBuilder(
-            when (lineTo.variant) {
-                CommandVariant.ABSOLUTE -> "L"
-                CommandVariant.RELATIVE -> "l"
-            }
-        )
+        val builder =
+            StringBuilder(
+                when (lineTo.variant) {
+                    CommandVariant.ABSOLUTE -> "L"
+                    CommandVariant.RELATIVE -> "l"
+                },
+            )
 
         for ((index, parameter) in lineTo.parameters.withIndex()) {
             builder.append(print(parameter))
@@ -79,12 +82,13 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     }
 
     private fun print(verticalLineTo: VerticalLineTo): String {
-        val builder = StringBuilder(
-            when (verticalLineTo.variant) {
-                CommandVariant.ABSOLUTE -> "V"
-                CommandVariant.RELATIVE -> "v"
-            }
-        )
+        val builder =
+            StringBuilder(
+                when (verticalLineTo.variant) {
+                    CommandVariant.ABSOLUTE -> "V"
+                    CommandVariant.RELATIVE -> "v"
+                },
+            )
 
         for ((index, parameter) in verticalLineTo.parameters.withIndex()) {
             builder.append(print(parameter))
@@ -97,12 +101,13 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     }
 
     private fun print(horizontalLineTo: HorizontalLineTo): String {
-        val builder = StringBuilder(
-            when (horizontalLineTo.variant) {
-                CommandVariant.ABSOLUTE -> "H"
-                CommandVariant.RELATIVE -> "h"
-            }
-        )
+        val builder =
+            StringBuilder(
+                when (horizontalLineTo.variant) {
+                    CommandVariant.ABSOLUTE -> "H"
+                    CommandVariant.RELATIVE -> "h"
+                },
+            )
 
         for ((index, parameter) in horizontalLineTo.parameters.withIndex()) {
             builder.append(print(parameter))
@@ -115,12 +120,13 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     }
 
     private fun print(cubicBezierCurve: CubicBezierCurve): String {
-        val builder = StringBuilder(
-            when (cubicBezierCurve.variant) {
-                CommandVariant.ABSOLUTE -> "C"
-                CommandVariant.RELATIVE -> "c"
-            }
-        )
+        val builder =
+            StringBuilder(
+                when (cubicBezierCurve.variant) {
+                    CommandVariant.ABSOLUTE -> "C"
+                    CommandVariant.RELATIVE -> "c"
+                },
+            )
 
         for ((index, parameter) in cubicBezierCurve.parameters.withIndex()) {
             builder.append(print(parameter))
@@ -133,12 +139,13 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     }
 
     private fun print(smoothCubicBezierCurve: SmoothCubicBezierCurve): String {
-        val builder = StringBuilder(
-            when (smoothCubicBezierCurve.variant) {
-                CommandVariant.ABSOLUTE -> "S"
-                CommandVariant.RELATIVE -> "s"
-            }
-        )
+        val builder =
+            StringBuilder(
+                when (smoothCubicBezierCurve.variant) {
+                    CommandVariant.ABSOLUTE -> "S"
+                    CommandVariant.RELATIVE -> "s"
+                },
+            )
 
         for ((index, parameter) in smoothCubicBezierCurve.parameters.withIndex()) {
             builder.append(print(parameter))
@@ -151,12 +158,13 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     }
 
     private fun print(quadraticBezierCurve: QuadraticBezierCurve): String {
-        val builder = StringBuilder(
-            when (quadraticBezierCurve.variant) {
-                CommandVariant.ABSOLUTE -> "Q"
-                CommandVariant.RELATIVE -> "q"
-            }
-        )
+        val builder =
+            StringBuilder(
+                when (quadraticBezierCurve.variant) {
+                    CommandVariant.ABSOLUTE -> "Q"
+                    CommandVariant.RELATIVE -> "q"
+                },
+            )
 
         for ((index, parameter) in quadraticBezierCurve.parameters.withIndex()) {
             builder.append(print(parameter))
@@ -169,12 +177,13 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     }
 
     private fun print(smoothQuadraticBezierCurve: SmoothQuadraticBezierCurve): String {
-        val builder = StringBuilder(
-            when (smoothQuadraticBezierCurve.variant) {
-                CommandVariant.ABSOLUTE -> "T"
-                CommandVariant.RELATIVE -> "t"
-            }
-        )
+        val builder =
+            StringBuilder(
+                when (smoothQuadraticBezierCurve.variant) {
+                    CommandVariant.ABSOLUTE -> "T"
+                    CommandVariant.RELATIVE -> "t"
+                },
+            )
 
         for ((index, parameter) in smoothQuadraticBezierCurve.parameters.withIndex()) {
             builder.append(print(parameter))
@@ -187,12 +196,13 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     }
 
     private fun print(ellipticalArcCurve: EllipticalArcCurve): String {
-        val builder = StringBuilder(
-            when (ellipticalArcCurve.variant) {
-                CommandVariant.ABSOLUTE -> "A"
-                CommandVariant.RELATIVE -> "a"
-            }
-        )
+        val builder =
+            StringBuilder(
+                when (ellipticalArcCurve.variant) {
+                    CommandVariant.ABSOLUTE -> "A"
+                    CommandVariant.RELATIVE -> "a"
+                },
+            )
 
         for ((index, parameter) in ellipticalArcCurve.parameters.withIndex()) {
             builder.append(print(parameter))
@@ -206,16 +216,17 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
 
     private fun print(float: Float) = formatter.format(float)
 
-    private fun print(point: Point) = buildString {
-        append(print(point.x))
+    private fun print(point: Point) =
+        buildString {
+            append(print(point.x))
 
-        if (point.y.sign < 0f) {
-            append(print(point.y))
-        } else {
-            append(',')
-            append(print(point.y))
+            if (point.y.sign < 0f) {
+                append(print(point.y))
+            } else {
+                append(',')
+                append(print(point.y))
+            }
         }
-    }
 
     private fun print(parameter: CubicBezierCurve.Parameter): String {
         return parameter.run {

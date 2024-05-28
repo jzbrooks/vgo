@@ -15,18 +15,22 @@ class RemoveEmptyGroups : BottomUpOptimization {
     override fun visit(graphic: Graphic) {
         removeEmptyGroups(graphic)
     }
+
     override fun visit(group: Group) {
         removeEmptyGroups(group)
     }
 
     override fun visit(clipPath: ClipPath) {}
+
     override fun visit(extra: Extra) {}
+
     override fun visit(path: Path) {}
 
     private fun removeEmptyGroups(containerElement: ContainerElement) {
-        containerElement.elements = containerElement.elements.dropWhile { element ->
-            element is Group && isEmpty(element)
-        }
+        containerElement.elements =
+            containerElement.elements.dropWhile { element ->
+                element is Group && isEmpty(element)
+            }
     }
 
     private fun isEmpty(group: Group): Boolean {
@@ -34,7 +38,9 @@ class RemoveEmptyGroups : BottomUpOptimization {
             group.id == null &&
             group.transform.contentsEqual(Matrix3.IDENTITY) &&
             group.foreign.isEmpty()
-        ) return true
+        ) {
+            return true
+        }
 
         return group.elements.filterIsInstance<Group>().any(::isEmpty)
     }
