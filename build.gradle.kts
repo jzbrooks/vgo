@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0")
         classpath("org.jlleitschuh.gradle:ktlint-gradle:12.1.0")
         classpath("com.vanniktech:gradle-maven-publish-plugin:0.18.0")
     }
@@ -25,7 +25,7 @@ subprojects {
 
     apply<KtlintPlugin>()
     configure<KtlintExtension> {
-        version.set("0.45.1")
+        version.set("1.2.1")
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
@@ -51,7 +51,7 @@ subprojects {
                     println("""
                         $border
                         $output
-                        $border                        
+                        $border
                     """.trimIndent()
                     )
                 }
