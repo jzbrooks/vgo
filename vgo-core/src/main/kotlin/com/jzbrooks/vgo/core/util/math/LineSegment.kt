@@ -3,7 +3,10 @@ package com.jzbrooks.vgo.core.util.math
 import kotlin.math.abs
 
 data class LineSegment(val first: Point, val second: Point) {
-    fun intersection(other: LineSegment, tolerance: Float = 1e-3f): Point? {
+    fun intersection(
+        other: LineSegment,
+        tolerance: Float = 1e-3f,
+    ): Point? {
         // this represented as a1x + b1y = c1
         val a1 = this.second.y - this.first.y
         val b1 = this.first.x - this.second.x

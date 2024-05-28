@@ -11,7 +11,7 @@ import com.jzbrooks.vgo.core.graphic.command.Command
 fun createGraphic(
     elements: List<Element> = emptyList(),
     id: String? = null,
-    foreign: MutableMap<String, String> = mutableMapOf()
+    foreign: MutableMap<String, String> = mutableMapOf(),
 ) = object : Graphic {
     override var elements: List<Element> = elements
     override val id: String? = id

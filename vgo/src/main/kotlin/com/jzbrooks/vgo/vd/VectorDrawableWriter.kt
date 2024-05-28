@@ -23,17 +23,20 @@ import kotlin.math.atan
 import kotlin.math.hypot
 
 class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()) : Writer<VectorDrawable> {
-
     private val commandPrinter = VectorDrawableCommandPrinter(3)
 
-    private val formatter = DecimalFormat().apply {
-        maximumFractionDigits = 2 // todo: parameterize?
-        minimumIntegerDigits = 0
-        isDecimalSeparatorAlwaysShown = false
-        roundingMode = RoundingMode.HALF_UP
-    }
+    private val formatter =
+        DecimalFormat().apply {
+            maximumFractionDigits = 2 // todo: parameterize?
+            minimumIntegerDigits = 0
+            isDecimalSeparatorAlwaysShown = false
+            roundingMode = RoundingMode.HALF_UP
+        }
 
-    override fun write(graphic: VectorDrawable, stream: OutputStream) {
+    override fun write(
+        graphic: VectorDrawable,
+        stream: OutputStream,
+    ) {
         val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
         val document = builder.newDocument()
 
@@ -56,98 +59,107 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         write(document, stream)
     }
 
-    private fun write(parent: org.w3c.dom.Element, element: Element, document: Document) {
-        val node = when (element) {
-            is Path -> {
-                document.createElement("path").apply {
-                    val data = element.commands.joinToString(separator = "", transform = commandPrinter::print)
-                    setAttribute("android:pathData", data)
+    private fun write(
+        parent: org.w3c.dom.Element,
+        element: Element,
+        document: Document,
+    ) {
+        val node =
+            when (element) {
+                is Path -> {
+                    document.createElement("path").apply {
+                        val data = element.commands.joinToString(separator = "", transform = commandPrinter::print)
+                        setAttribute("android:pathData", data)
 
-                    if (element.fill.alpha != 0.toUByte()) {
-                        val color = element.fill.toHexString(Color.HexFormat.ARGB)
-                        setAttribute("android:fillColor", color)
-                    }
-
-                    if (element.fillRule != Path.FillRule.NON_ZERO) {
-                        val fillType = when (element.fillRule) {
-                            Path.FillRule.EVEN_ODD -> "evenOdd"
-                            Path.FillRule.NON_ZERO -> throw IllegalStateException(
-                                "Default fill type ('nonZero') should never be written"
-                            )
+                        if (element.fill.alpha != 0.toUByte()) {
+                            val color = element.fill.toHexString(Color.HexFormat.ARGB)
+                            setAttribute("android:fillColor", color)
                         }
-                        setAttribute("android:fillType", fillType)
-                    }
 
-                    if (element.stroke.alpha != 0.toUByte()) {
-                        val color = element.stroke.toHexString(Color.HexFormat.ARGB)
-                        setAttribute("android:strokeColor", color)
-                    }
-
-                    if (element.strokeWidth != 0f) {
-                        setAttribute("android:strokeWidth", formatter.format(element.strokeWidth))
-                    }
-
-                    if (element.strokeLineCap != Path.LineCap.BUTT) {
-                        val lineCap = when (element.strokeLineCap) {
-                            Path.LineCap.SQUARE -> "square"
-                            Path.LineCap.ROUND -> "round"
-                            Path.LineCap.BUTT -> throw IllegalStateException(
-                                "Default linecap ('butt') shouldn't ever be written."
-                            )
+                        if (element.fillRule != Path.FillRule.NON_ZERO) {
+                            val fillType =
+                                when (element.fillRule) {
+                                    Path.FillRule.EVEN_ODD -> "evenOdd"
+                                    Path.FillRule.NON_ZERO -> throw IllegalStateException(
+                                        "Default fill type ('nonZero') should never be written",
+                                    )
+                                }
+                            setAttribute("android:fillType", fillType)
                         }
-                        setAttribute("android:strokeLineCap", lineCap)
-                    }
 
-                    if (element.strokeLineJoin != Path.LineJoin.MITER) {
-                        val lineJoin = when (val lineJoin = element.strokeLineJoin) {
-                            Path.LineJoin.ROUND -> "round"
-                            Path.LineJoin.BEVEL -> "bevel"
-                            Path.LineJoin.MITER -> throw IllegalStateException(
-                                "Default linejoin ('miter') shouldn't ever be written."
-                            )
-                            Path.LineJoin.MITER_CLIP, Path.LineJoin.ARCS -> throw IllegalStateException(
-                                "VectorDrawable does not support line join: $lineJoin"
-                            )
+                        if (element.stroke.alpha != 0.toUByte()) {
+                            val color = element.stroke.toHexString(Color.HexFormat.ARGB)
+                            setAttribute("android:strokeColor", color)
                         }
-                        setAttribute("android:strokeLineJoin", lineJoin)
-                    }
 
-                    if (element.strokeMiterLimit != 4f) {
-                        setAttribute("android:strokeLineJoin", formatter.format(element.strokeMiterLimit))
-                    }
-                }
-            }
-            is Group -> {
-                document.createElement("group").also { node ->
-                    // There's no reason to output the transforms if the
-                    // value of the transform is referentially equal to the
-                    // identity matrix constant
-                    if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
-                        writeTransforms(element, node)
-                    }
+                        if (element.strokeWidth != 0f) {
+                            setAttribute("android:strokeWidth", formatter.format(element.strokeWidth))
+                        }
 
-                    for (child in element.elements) {
-                        write(node, child, document)
-                    }
-                }
-            }
-            is ClipPath -> {
-                document.createElement("clip-path").apply {
-                    val data = (element.elements[0] as Path).commands
-                        .joinToString(separator = "", transform = commandPrinter::print)
+                        if (element.strokeLineCap != Path.LineCap.BUTT) {
+                            val lineCap =
+                                when (element.strokeLineCap) {
+                                    Path.LineCap.SQUARE -> "square"
+                                    Path.LineCap.ROUND -> "round"
+                                    Path.LineCap.BUTT -> throw IllegalStateException(
+                                        "Default linecap ('butt') shouldn't ever be written.",
+                                    )
+                                }
+                            setAttribute("android:strokeLineCap", lineCap)
+                        }
 
-                    setAttribute("android:pathData", data)
-                }
-            }
-            is Extra -> {
-                document.createElement(element.name).also {
-                    for (child in element.elements) {
-                        write(it, child, document)
+                        if (element.strokeLineJoin != Path.LineJoin.MITER) {
+                            val lineJoin =
+                                when (val lineJoin = element.strokeLineJoin) {
+                                    Path.LineJoin.ROUND -> "round"
+                                    Path.LineJoin.BEVEL -> "bevel"
+                                    Path.LineJoin.MITER -> throw IllegalStateException(
+                                        "Default linejoin ('miter') shouldn't ever be written.",
+                                    )
+                                    Path.LineJoin.MITER_CLIP, Path.LineJoin.ARCS -> throw IllegalStateException(
+                                        "VectorDrawable does not support line join: $lineJoin",
+                                    )
+                                }
+                            setAttribute("android:strokeLineJoin", lineJoin)
+                        }
+
+                        if (element.strokeMiterLimit != 4f) {
+                            setAttribute("android:strokeLineJoin", formatter.format(element.strokeMiterLimit))
+                        }
                     }
                 }
+                is Group -> {
+                    document.createElement("group").also { node ->
+                        // There's no reason to output the transforms if the
+                        // value of the transform is referentially equal to the
+                        // identity matrix constant
+                        if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
+                            writeTransforms(element, node)
+                        }
+
+                        for (child in element.elements) {
+                            write(node, child, document)
+                        }
+                    }
+                }
+                is ClipPath -> {
+                    document.createElement("clip-path").apply {
+                        val data =
+                            (element.elements[0] as Path).commands
+                                .joinToString(separator = "", transform = commandPrinter::print)
+
+                        setAttribute("android:pathData", data)
+                    }
+                }
+                is Extra -> {
+                    document.createElement(element.name).also {
+                        for (child in element.elements) {
+                            write(it, child, document)
+                        }
+                    }
+                }
+                else -> null
             }
-            else -> null
-        }
 
         if (node != null) {
             val elementName = element.id
@@ -163,7 +175,10 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         }
     }
 
-    private fun writeTransforms(group: Group, node: org.w3c.dom.Element) {
+    private fun writeTransforms(
+        group: Group,
+        node: org.w3c.dom.Element,
+    ) {
         val a = group.transform[0, 0]
         val b = group.transform[0, 1]
         val c = group.transform[1, 0]
@@ -195,7 +210,10 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
         }
     }
 
-    private fun write(document: Document, outputStream: OutputStream) {
+    private fun write(
+        document: Document,
+        outputStream: OutputStream,
+    ) {
         val transformer = TransformerFactory.newInstance().newTransformer()
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
 
@@ -211,16 +229,18 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
     }
 
     companion object {
-        private val DEFAULT_ROOT_ATTRIBUTES = mapOf(
-            "android:alpha" to "1.0",
-            "android:autoMirrored" to "false",
-            "android:tintMode" to "src_in",
-        )
+        private val DEFAULT_ROOT_ATTRIBUTES =
+            mapOf(
+                "android:alpha" to "1.0",
+                "android:autoMirrored" to "false",
+                "android:tintMode" to "src_in",
+            )
 
-        private val DEFAULT_PATH_ATTRIBUTES = mapOf(
-            "android:trimPathStart" to "0",
-            "android:trimPathEnd" to "1",
-            "android:trimPathOffset" to "0",
-        )
+        private val DEFAULT_PATH_ATTRIBUTES =
+            mapOf(
+                "android:trimPathStart" to "0",
+                "android:trimPathEnd" to "1",
+                "android:trimPathOffset" to "0",
+            )
     }
 }

@@ -18,23 +18,23 @@ import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
 class MergePathsTests {
-
     @Test
     fun testMergeSeveralPathsIntoOne() {
-        val paths = listOf(
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))))
+        val paths =
+            listOf(
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                ),
             )
-        )
 
         val graphic = createGraphic(paths)
         val optimization = MergePaths()
@@ -47,39 +47,43 @@ class MergePathsTests {
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                )
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
+                ),
             ),
         )
     }
 
     @Test
     fun testMergeGroupPaths() {
-        val paths = listOf(
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
-            ),
-            createPath(
-                listOf(
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
-                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                strokeWidth = 5f,
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))))
+        val paths =
+            listOf(
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                ),
+                createPath(
+                    listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
+                        SmoothCubicBezierCurve(
+                            CommandVariant.RELATIVE,
+                            listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f))),
+                        ),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                    ),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                    strokeWidth = 5f,
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                ),
             )
-        )
 
         val group = Group(paths)
         val graphic = createGraphic(listOf(group))
@@ -95,7 +99,10 @@ class MergePathsTests {
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                            SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
+                            SmoothCubicBezierCurve(
+                                CommandVariant.RELATIVE,
+                                listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f))),
+                            ),
                             LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                         ),
                     ),
@@ -106,42 +113,45 @@ class MergePathsTests {
                     createPath(
                         listOf(
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                         ),
-
-                    )
-                )
-            )
+                    ),
+                ),
+            ),
         )
     }
 
     @Test
     fun testMergePaths() {
-        val paths = listOf(
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
-            ),
-            createPath(
-                listOf(
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
-                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                strokeWidth = 5f,
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))))
+        val paths =
+            listOf(
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                ),
+                createPath(
+                    listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
+                        SmoothCubicBezierCurve(
+                            CommandVariant.RELATIVE,
+                            listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f))),
+                        ),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                    ),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                    strokeWidth = 5f,
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                ),
             )
-        )
 
         val graphic = createGraphic(paths)
         val optimization = MergePaths()
@@ -154,9 +164,12 @@ class MergePathsTests {
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
-                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
+                    SmoothCubicBezierCurve(
+                        CommandVariant.RELATIVE,
+                        listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f))),
+                    ),
+                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                ),
             ),
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
@@ -165,40 +178,44 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                )
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
+                ),
             ),
         )
     }
 
     @Test
     fun testMergePathsWithMixedElements() {
-        val paths = listOf(
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
-            ),
-            createPath(
-                listOf(
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
-                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
-                strokeWidth = 5f,
-            ),
-            Group(emptyList()),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))))
+        val paths =
+            listOf(
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                ),
+                createPath(
+                    listOf(
+                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
+                        SmoothCubicBezierCurve(
+                            CommandVariant.RELATIVE,
+                            listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f))),
+                        ),
+                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                    ),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
+                    strokeWidth = 5f,
+                ),
+                Group(emptyList()),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                ),
             )
-        )
 
         val graphic = createGraphic(paths)
         val optimization = MergePaths()
@@ -211,9 +228,12 @@ class MergePathsTests {
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
-                    SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f)))),
-                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
+                    SmoothCubicBezierCurve(
+                        CommandVariant.RELATIVE,
+                        listOf(SmoothCubicBezierCurve.Parameter(Point(20f, 10f), Point(20f, 20f))),
+                    ),
+                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                ),
             ),
             createPath(
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 30f)))),
@@ -223,37 +243,37 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                )
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
+                ),
             ),
-
         )
     }
 
     @Test
     fun testOnlyMergeAppropriateGroups() {
-        val paths = listOf(
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
-            ),
-            createPath(
-                listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f)))),
-                fill = Color(0xffaabbccu),
-            ),
-            createPath(
-                listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))),
-                fill = Color(0xffaabbccu),
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))))
-            ),
-            createPath(
-                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))))
+        val paths =
+            listOf(
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                ),
+                createPath(
+                    listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f)))),
+                    fill = Color(0xffaabbccu),
+                ),
+                createPath(
+                    listOf<Command>(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(30f, 40f)))),
+                    fill = Color(0xffaabbccu),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                ),
             )
-        )
 
         val graphic = createGraphic(paths)
         val optimization = MergePaths()
@@ -264,8 +284,8 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))
-                )
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                ),
             ),
             createPath(
                 listOf(
@@ -277,8 +297,8 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))
-                )
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
+                ),
             ),
         )
     }

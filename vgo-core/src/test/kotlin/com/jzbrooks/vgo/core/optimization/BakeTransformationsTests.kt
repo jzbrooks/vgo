@@ -34,12 +34,13 @@ class BakeTransformationsTests {
     @Test
     fun testAvoidCrashIfParsedPathDataDoesNotExist() {
         val transform = Matrix3.from(floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f))
-        val group = Group(
-            listOf(createPath()),
-            null,
-            mutableMapOf(),
-            transform,
-        )
+        val group =
+            Group(
+                listOf(createPath()),
+                null,
+                mutableMapOf(),
+                transform,
+            )
 
         bake.visit(group)
 
@@ -48,19 +49,20 @@ class BakeTransformationsTests {
 
     @Test
     fun testAvoidCrashIfTransformsAreSpecifiedByResources() {
-        val group = Group(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f))),
+                        ),
                     ),
-                )
-            ),
-            null,
-            mutableMapOf("android:translateX" to "@integer/translating_thing"),
-            Matrix3.IDENTITY,
-        )
+                ),
+                null,
+                mutableMapOf("android:translateX" to "@integer/translating_thing"),
+                Matrix3.IDENTITY,
+            )
 
         bake.visit(group)
 
@@ -71,26 +73,27 @@ class BakeTransformationsTests {
     fun `Resource valued transforms prevent group elision`() {
         val transform = Matrix3.from(floatArrayOf(1f, 0f, 15f, 0f, 1f, 0f, 0f, 0f, 1f))
 
-        val group = Group(
-            listOf(
-                Group(
-                    listOf(
-                        createPath(
-                            listOf(
-                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
+        val group =
+            Group(
+                listOf(
+                    Group(
+                        listOf(
+                            createPath(
+                                listOf(
+                                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f))),
+                                ),
                             ),
-                        )
+                        ),
+                        null,
+                        mutableMapOf("android:translateX" to "@integer/translating_thing"),
+                        Matrix3.IDENTITY,
                     ),
-                    null,
-                    mutableMapOf("android:translateX" to "@integer/translating_thing"),
-                    Matrix3.IDENTITY,
-                )
-            ),
-            null,
-            mutableMapOf(),
-            transform,
-        )
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
 
         bake.visit(group.elements.first() as Group)
         bake.visit(group)
@@ -105,19 +108,20 @@ class BakeTransformationsTests {
     fun testTransformationAttributesRemoved() {
         val transform = Matrix3.from(floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f))
 
-        val group = Group(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f)))
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f))),
+                        ),
                     ),
-                )
-            ),
-            null,
-            mutableMapOf(),
-            transform,
-        )
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
 
         bake.visit(group)
 
@@ -126,23 +130,25 @@ class BakeTransformationsTests {
 
     @Test
     fun testAncestorGroupTransformationAppliedToPathElements() {
-        val transform = Matrix3.from(
-            floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f)
-        )
+        val transform =
+            Matrix3.from(
+                floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f),
+            )
 
-        val group = Group(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f))),
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 4f))),
+                        ),
                     ),
-                )
-            ),
-            null,
-            mutableMapOf(),
-            transform,
-        )
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
 
         bake.visit(group)
 
@@ -157,25 +163,27 @@ class BakeTransformationsTests {
 
     @Test
     fun testBakeHandlesRelativeCommands() {
-        val transform = Matrix3.from(
-            floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f)
-        )
+        val transform =
+            Matrix3.from(
+                floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f),
+            )
 
-        val group = Group(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                        LineTo(CommandVariant.RELATIVE, listOf(Point(4f, 4f))),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
-                        ClosePath,
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            LineTo(CommandVariant.RELATIVE, listOf(Point(4f, 4f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
+                            ClosePath,
+                        ),
                     ),
-                )
-            ),
-            null,
-            mutableMapOf(),
-            transform,
-        )
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
 
         bake.visit(group)
 
@@ -195,19 +203,20 @@ class BakeTransformationsTests {
         val rad = (90.0 * PI / 180.0).toFloat()
         val rotationMatrix = Matrix3.from(floatArrayOf(cos(rad), -sin(rad), 0f, sin(rad), cos(rad), 0f, 0f, 0f, 1f))
 
-        val group = Group(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                        LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f)))
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            LineTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f))),
+                        ),
                     ),
                 ),
-            ),
-            null,
-            mutableMapOf(),
-            rotationMatrix,
-        )
+                null,
+                mutableMapOf(),
+                rotationMatrix,
+            )
 
         bake.visit(group)
 
@@ -236,22 +245,23 @@ class BakeTransformationsTests {
 
         val transform = pivot * rotationMatrix * pivotInverse
 
-        val group = Group(
-            listOf(
-                createPath(
-                    listOf(
-                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                        HorizontalLineTo(CommandVariant.RELATIVE, listOf(4f)),
-                        VerticalLineTo(CommandVariant.RELATIVE, listOf(4f)),
-                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 14f))),
-                        ClosePath,
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            HorizontalLineTo(CommandVariant.RELATIVE, listOf(4f)),
+                            VerticalLineTo(CommandVariant.RELATIVE, listOf(4f)),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 14f))),
+                            ClosePath,
+                        ),
                     ),
                 ),
-            ),
-            null,
-            mutableMapOf(),
-            transform,
-        )
+                null,
+                mutableMapOf(),
+                transform,
+            )
 
         bake.visit(group)
 

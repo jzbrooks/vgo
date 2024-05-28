@@ -14,13 +14,14 @@ import org.junit.jupiter.api.Test
 class CommandsTest {
     @Test
     fun `Absolute coordinates are correctly computed from relative commands`() {
-        val commands = listOf<Command>(
-            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 1f))),
-            LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
-            LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
-            HorizontalLineTo(CommandVariant.RELATIVE, listOf(10f)),
-            VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f))
-        )
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 1f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
+                HorizontalLineTo(CommandVariant.RELATIVE, listOf(10f)),
+                VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f)),
+            )
 
         val absoluteCoordinates = computeAbsoluteCoordinates(commands)
 
@@ -29,14 +30,15 @@ class CommandsTest {
 
     @Test
     fun `Closed paths in relative commands compute absolute coordinates correctly`() {
-        val commands = listOf(
-            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 1f))),
-            LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
-            LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
-            HorizontalLineTo(CommandVariant.RELATIVE, listOf(10f)),
-            VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f)),
-            ClosePath
-        )
+        val commands =
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 1f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
+                HorizontalLineTo(CommandVariant.RELATIVE, listOf(10f)),
+                VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f)),
+                ClosePath,
+            )
 
         val absoluteCoordinates = computeAbsoluteCoordinates(commands)
 
@@ -45,16 +47,17 @@ class CommandsTest {
 
     @Test
     fun `Subpaths before relative commands compute absolute coordinates correctly`() {
-        val commands = listOf(
-            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 1f))),
-            LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
-            MoveTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f))),
-            LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
-            ClosePath,
-            HorizontalLineTo(CommandVariant.RELATIVE, listOf(10f)),
-            VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f)),
-            ClosePath
-        )
+        val commands =
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 1f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
+                MoveTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
+                ClosePath,
+                HorizontalLineTo(CommandVariant.RELATIVE, listOf(10f)),
+                VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f)),
+                ClosePath,
+            )
 
         val absoluteCoordinates = computeAbsoluteCoordinates(commands.take(6))
 

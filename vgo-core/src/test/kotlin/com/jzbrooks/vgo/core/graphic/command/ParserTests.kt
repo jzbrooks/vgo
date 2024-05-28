@@ -8,7 +8,6 @@ import assertk.assertions.containsOnly
 import assertk.assertions.hasClass
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFailure
 import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.util.math.Point
@@ -26,12 +25,13 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        val expected = QuadraticBezierCurve(
-            CommandVariant.ABSOLUTE,
-            listOf(
-                QuadraticBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f))
+        val expected =
+            QuadraticBezierCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    QuadraticBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f)),
+                ),
             )
-        )
 
         assertThat(commands).index(0).isEqualTo(expected)
     }
@@ -53,12 +53,13 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        val expected = CubicBezierCurve(
-            CommandVariant.ABSOLUTE,
-            listOf(
-                CubicBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f), Point(4f, 3f))
+        val expected =
+            CubicBezierCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    CubicBezierCurve.Parameter(Point(1f, 3f), Point(3f, 3f), Point(4f, 3f)),
+                ),
             )
-        )
 
         assertThat(commands).index(0).isEqualTo(expected)
     }
@@ -83,19 +84,20 @@ class ParserTests {
 
         val commands = CommandString(pathCommandString).toCommandList()
 
-        val expected = EllipticalArcCurve(
-            CommandVariant.ABSOLUTE,
-            listOf(
-                EllipticalArcCurve.Parameter(
-                    1f,
-                    3f,
-                    97f,
-                    EllipticalArcCurve.ArcFlag.LARGE,
-                    EllipticalArcCurve.SweepFlag.ANTICLOCKWISE,
-                    Point(10f, 10f)
-                )
+        val expected =
+            EllipticalArcCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    EllipticalArcCurve.Parameter(
+                        1f,
+                        3f,
+                        97f,
+                        EllipticalArcCurve.ArcFlag.LARGE,
+                        EllipticalArcCurve.SweepFlag.ANTICLOCKWISE,
+                        Point(10f, 10f),
+                    ),
+                ),
             )
-        )
 
         assertThat(commands).index(0).isEqualTo(expected)
     }

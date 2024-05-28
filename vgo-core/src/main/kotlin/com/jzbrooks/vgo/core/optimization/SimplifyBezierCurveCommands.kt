@@ -25,9 +25,13 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
     private var skipAnother = false
 
     override fun visit(graphic: Graphic) {}
+
     override fun visit(clipPath: ClipPath) {}
+
     override fun visit(group: Group) {}
+
     override fun visit(extra: Extra) {}
+
     override fun visit(path: Path) {
         if (path.commands.isEmpty()) return
 
@@ -56,9 +60,13 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                             CubicBezierCurve(
                                 next.variant,
                                 next.parameters.map {
-                                    CubicBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.endControl, it.endControl, it.end)
-                                }
-                            )
+                                    CubicBezierCurve.Parameter(
+                                        currentFinalParameter.end - currentFinalParameter.endControl,
+                                        it.endControl,
+                                        it.end,
+                                    )
+                                },
+                            ),
                         )
                         skipAnother = true
                     }
@@ -73,8 +81,8 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                             current.variant,
                             current.parameters.map {
                                 SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
-                            }
-                        )
+                            },
+                        ),
                     )
                     continue@loop
                 }
@@ -86,8 +94,8 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                             current.variant,
                             current.parameters.map {
                                 SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
-                            }
-                        )
+                            },
+                        ),
                     )
                     continue@loop
                 }
@@ -99,8 +107,8 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                             current.variant,
                             current.parameters.map {
                                 SmoothCubicBezierCurve.Parameter(it.endControl, it.end)
-                            }
-                        )
+                            },
+                        ),
                     )
                     continue@loop
                 }
@@ -117,9 +125,13 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                         CubicBezierCurve(
                             next.variant,
                             next.parameters.map {
-                                CubicBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.endControl, it.endControl, it.end)
-                            }
-                        )
+                                CubicBezierCurve.Parameter(
+                                    currentFinalParameter.end - currentFinalParameter.endControl,
+                                    it.endControl,
+                                    it.end,
+                                )
+                            },
+                        ),
                     )
                     skipAnother = true
                 }
@@ -139,8 +151,8 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                                 next.variant,
                                 next.parameters.map {
                                     QuadraticBezierCurve.Parameter(currentFinalParameter.end - currentFinalParameter.control, it)
-                                }
-                            )
+                                },
+                            ),
                         )
                         skipAnother = true
                     }
@@ -156,8 +168,8 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                             current.variant,
                             current.parameters.map {
                                 it.end
-                            }
-                        )
+                            },
+                        ),
                     )
                     continue@loop
                 }
@@ -170,8 +182,8 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                             current.variant,
                             current.parameters.map {
                                 it.end
-                            }
-                        )
+                            },
+                        ),
                     )
                     continue@loop
                 }
@@ -205,7 +217,10 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
             return false
         }
 
-        if (sqrt((a * parameters.last().startControl.x.toDouble() + b * parameters.last().startControl.y.toDouble()).pow(2) * d) > tolerance) {
+        if (sqrt(
+                (a * parameters.last().startControl.x.toDouble() + b * parameters.last().startControl.y.toDouble()).pow(2) * d,
+            ) > tolerance
+        ) {
             return false
         }
 

@@ -22,9 +22,10 @@ class VgoPluginTest {
 
     @Test
     fun testConfiguration() {
-        val project: Project = ProjectBuilder.builder()
-            .withProjectDir(File("src/test"))
-            .build()
+        val project: Project =
+            ProjectBuilder.builder()
+                .withProjectDir(File("src/test"))
+                .build()
 
         val input = File(project.projectDir, "kotlin/com/jzbrooks/vgo/plugin/VgoPluginTest.kt")
 

@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -49,7 +48,7 @@ tasks {
                 "**/*.kotlin_builtins",
                 "**/module-info.class",
                 "META-INF/maven/**",
-                "META-INF/*.version"
+                "META-INF/*.version",
             )
         }
     }
@@ -65,28 +64,30 @@ tasks {
             val generatedFile = generatedDirectory.resolve("BuildConstants.kt")
 
             PrintWriter(generatedFile.toFile()).use { output ->
-                val buildConstantsClass = buildString {
-                    appendLine(
-                        """
+                val buildConstantsClass =
+                    buildString {
+                        appendLine(
+                            """
                                |package com.jzbrooks
                                |
                                |internal object BuildConstants {
-                        """.trimMargin()
-                    )
+                            """.trimMargin(),
+                        )
 
-                    val vgoProperties = project.properties
-                        .filterKeys { it == "VERSION_NAME" }
+                        val vgoProperties =
+                            project.properties
+                                .filterKeys { it == "VERSION_NAME" }
 
-                    for (property in vgoProperties) {
-                        append("    const val ")
-                        append(property.key.uppercase())
-                        append(" = \"")
-                        append(property.value)
-                        appendLine('"')
+                        for (property in vgoProperties) {
+                            append("    const val ")
+                            append(property.key.uppercase())
+                            append(" = \"")
+                            append(property.value)
+                            appendLine('"')
+                        }
+
+                        appendLine("}")
                     }
-
-                    appendLine("}")
-                }
                 output.write(buildConstantsClass)
             }
         }
@@ -105,14 +106,18 @@ tasks {
         val javaHome = System.getProperty("java.home")
 
         classpath = files("$rootDir/tools/r8.jar")
-        args = listOf(
-            "--release",
-            "--classfile",
-            "--lib", javaHome,
-            "--output", "$buildDir/libs/vgo.jar",
-            "--pg-conf", "$rootDir/optimize.pro",
-            "$buildDir/libs/debug/vgo-$version.jar",
-        )
+        args =
+            listOf(
+                "--release",
+                "--classfile",
+                "--lib",
+                javaHome,
+                "--output",
+                "$buildDir/libs/vgo.jar",
+                "--pg-conf",
+                "$rootDir/optimize.pro",
+                "$buildDir/libs/debug/vgo-$version.jar",
+            )
 
         dependsOn(getByName("jar"))
     }

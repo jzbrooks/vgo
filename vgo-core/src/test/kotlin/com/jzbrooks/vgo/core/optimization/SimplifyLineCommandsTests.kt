@@ -16,13 +16,14 @@ import org.junit.jupiter.api.Test
 class SimplifyLineCommandsTests {
     @Test
     fun testSimplifyLineToAsVerticalLineTo() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 6f))),
-                ClosePath
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 6f))),
+                    ClosePath,
+                ),
+            )
 
         SimplifyLineCommands(0f).visit(path)
 
@@ -32,13 +33,14 @@ class SimplifyLineCommandsTests {
 
     @Test
     fun testSimplifyLineToAsHorizontalLineTo() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(6f, 0f))),
-                ClosePath
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(6f, 0f))),
+                    ClosePath,
+                ),
+            )
 
         SimplifyLineCommands(0f).visit(path)
 
@@ -48,13 +50,14 @@ class SimplifyLineCommandsTests {
 
     @Test
     fun testSimplifyLineToAsVerticalLineToInTolerance() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(0.0000000000001f, 6f))),
-                ClosePath,
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(0.0000000000001f, 6f))),
+                    ClosePath,
+                ),
+            )
 
         SimplifyLineCommands(0.0001f).visit(path)
 
@@ -64,13 +67,14 @@ class SimplifyLineCommandsTests {
 
     @Test
     fun testSimplifyLineToAsHorizontalLineToInTolerance() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(6f, 0.0000000000001f))),
-                ClosePath,
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(6f, 0.0000000000001f))),
+                    ClosePath,
+                ),
+            )
 
         SimplifyLineCommands(0.0001f).visit(path)
 
@@ -80,13 +84,14 @@ class SimplifyLineCommandsTests {
 
     @Test
     fun testDoesNotSimplifyLineToWithMultipleParameters() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 6f), Point(10f, 0f))),
-                ClosePath,
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    LineTo(CommandVariant.RELATIVE, listOf(Point(0f, 6f), Point(10f, 0f))),
+                    ClosePath,
+                ),
+            )
 
         SimplifyLineCommands(0f).visit(path)
 
@@ -97,14 +102,15 @@ class SimplifyLineCommandsTests {
 
     @Test
     fun testCollapseSequentialPositiveHorizontalLineTo() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                HorizontalLineTo(CommandVariant.RELATIVE, listOf(12f)),
-                HorizontalLineTo(CommandVariant.RELATIVE, listOf(15f)),
-                ClosePath,
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    HorizontalLineTo(CommandVariant.RELATIVE, listOf(12f)),
+                    HorizontalLineTo(CommandVariant.RELATIVE, listOf(15f)),
+                    ClosePath,
+                ),
+            )
 
         SimplifyLineCommands(0f).visit(path)
 
@@ -114,14 +120,15 @@ class SimplifyLineCommandsTests {
 
     @Test
     fun testDoNotCollapseSequentialHorizontalLineToWithOppositeSign() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                HorizontalLineTo(CommandVariant.RELATIVE, listOf(12f)),
-                HorizontalLineTo(CommandVariant.RELATIVE, listOf(-15f)),
-                ClosePath,
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    HorizontalLineTo(CommandVariant.RELATIVE, listOf(12f)),
+                    HorizontalLineTo(CommandVariant.RELATIVE, listOf(-15f)),
+                    ClosePath,
+                ),
+            )
 
         SimplifyLineCommands(0f).visit(path)
 
@@ -132,14 +139,15 @@ class SimplifyLineCommandsTests {
 
     @Test
     fun testCollapseSequentialPositiveVerticalLineTo() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                VerticalLineTo(CommandVariant.RELATIVE, listOf(5f)),
-                VerticalLineTo(CommandVariant.RELATIVE, listOf(15f)),
-                ClosePath,
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    VerticalLineTo(CommandVariant.RELATIVE, listOf(5f)),
+                    VerticalLineTo(CommandVariant.RELATIVE, listOf(15f)),
+                    ClosePath,
+                ),
+            )
 
         SimplifyLineCommands(0f).visit(path)
 
@@ -149,14 +157,15 @@ class SimplifyLineCommandsTests {
 
     @Test
     fun testDoNotCollapseSequentialVerticalLineToWithOppositeSign() {
-        val path = createPath(
-            listOf(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
-                VerticalLineTo(CommandVariant.RELATIVE, listOf(12f)),
-                VerticalLineTo(CommandVariant.RELATIVE, listOf(-5f)),
-                ClosePath,
-            ),
-        )
+        val path =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 1f))),
+                    VerticalLineTo(CommandVariant.RELATIVE, listOf(12f)),
+                    VerticalLineTo(CommandVariant.RELATIVE, listOf(-5f)),
+                    ClosePath,
+                ),
+            )
 
         SimplifyLineCommands(0f).visit(path)
 

@@ -65,14 +65,15 @@ class CollapseGroupsTests {
     @Test
     fun testAvoidCollapsingGroupsWithClipPaths() {
         val clip = createPath(listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 15f)))))
-        val group = Group(
-            listOf(
-                ClipPath(listOf(clip), null, mutableMapOf()),
-                Group(
-                    listOf(ClipPath(listOf(clip), null, mutableMapOf()))
-                )
+        val group =
+            Group(
+                listOf(
+                    ClipPath(listOf(clip), null, mutableMapOf()),
+                    Group(
+                        listOf(ClipPath(listOf(clip), null, mutableMapOf())),
+                    ),
+                ),
             )
-        )
 
         val graphic = createGraphic(listOf(group))
 

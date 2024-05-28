@@ -5,7 +5,12 @@ import java.io.OutputStream
 
 interface Writer<in T : Graphic> {
     val options: Set<Option>
-    fun write(graphic: T, stream: OutputStream)
+
+    fun write(
+        graphic: T,
+        stream: OutputStream,
+    )
+
     sealed class Option {
         class Indent(val columns: Int) : Option()
     }

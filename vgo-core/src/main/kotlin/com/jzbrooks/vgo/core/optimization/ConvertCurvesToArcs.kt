@@ -23,11 +23,14 @@ import com.jzbrooks.vgo.core.util.math.toCubicBezierCurve
  * Converts cubic bezier curves to arcs, when they are shorter.
  */
 class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimization {
-
     override fun visit(graphic: Graphic) {}
+
     override fun visit(clipPath: ClipPath) {}
+
     override fun visit(group: Group) {}
+
     override fun visit(extra: Extra) {}
+
     override fun visit(path: Path) {
         val multiCurvePass = collapseMultipleCurves(path.commands)
         val singleCurvePass = convertSingleArcs(multiCurvePass)
@@ -46,13 +49,14 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimiza
 
             val previousCommand = commands.getOrNull(i - 1)
             val originalCommand = commands[i]
-            val currentCommand = originalCommand.let { command ->
-                if (command is SmoothCubicBezierCurve && previousCommand is CubicCurve<*>) {
-                    command.toCubicBezierCurve(previousCommand)
-                } else {
-                    command
+            val currentCommand =
+                originalCommand.let { command ->
+                    if (command is SmoothCubicBezierCurve && previousCommand is CubicCurve<*>) {
+                        command.toCubicBezierCurve(previousCommand)
+                    } else {
+                        command
+                    }
                 }
-            }
 
             if (currentCommand is CubicBezierCurve) {
                 assert(currentCommand.parameters.size == 1)
@@ -61,26 +65,28 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimiza
                 val circle = currentCommand.fitCircle()
                 if (circle != null && currentCommand.isConvex()) {
                     val radius = circle.radius
-                    val sweep = if (currentParameter.end.y * currentParameter.startControl.x -
-                        currentParameter.end.x * currentParameter.startControl.y > 0
-                    ) {
-                        EllipticalArcCurve.SweepFlag.CLOCKWISE
-                    } else {
-                        EllipticalArcCurve.SweepFlag.ANTICLOCKWISE
-                    }
-                    val arc = EllipticalArcCurve(
-                        currentCommand.variant,
-                        listOf(
-                            EllipticalArcCurve.Parameter(
-                                radius,
-                                radius,
-                                0f,
-                                EllipticalArcCurve.ArcFlag.SMALL,
-                                sweep,
-                                currentParameter.end
-                            )
+                    val sweep =
+                        if (currentParameter.end.y * currentParameter.startControl.x -
+                            currentParameter.end.x * currentParameter.startControl.y > 0
+                        ) {
+                            EllipticalArcCurve.SweepFlag.CLOCKWISE
+                        } else {
+                            EllipticalArcCurve.SweepFlag.ANTICLOCKWISE
+                        }
+                    val arc =
+                        EllipticalArcCurve(
+                            currentCommand.variant,
+                            listOf(
+                                EllipticalArcCurve.Parameter(
+                                    radius,
+                                    radius,
+                                    0f,
+                                    EllipticalArcCurve.ArcFlag.SMALL,
+                                    sweep,
+                                    currentParameter.end,
+                                ),
+                            ),
                         )
-                    )
 
                     val pendingCurves = mutableListOf(originalCommand as CubicCurve<*>)
                     val ellipticalArcs = mutableListOf<Command>(arc)
@@ -94,11 +100,12 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimiza
                     val previous = computeAbsoluteCoordinates(commands.take(i))
 
                     while (nextCommand is CubicCurve<*> && nextCommand.isConvex() && nextCommand.liesOnCircle(relativeCircle)) {
-                        val normalizedNext = if (nextCommand is SmoothCubicBezierCurve) {
-                            nextCommand.toCubicBezierCurve(pendingCurves.last())
-                        } else {
-                            nextCommand
-                        }
+                        val normalizedNext =
+                            if (nextCommand is SmoothCubicBezierCurve) {
+                                nextCommand.toCubicBezierCurve(pendingCurves.last())
+                            } else {
+                                nextCommand
+                            }
 
                         check(normalizedNext is CubicBezierCurve)
 
@@ -128,10 +135,10 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimiza
                                             0f,
                                             EllipticalArcCurve.ArcFlag.SMALL,
                                             sweep,
-                                            next - (previous + arc.parameters[0].end)
-                                        )
-                                    )
-                                )
+                                            next - (previous + arc.parameters[0].end),
+                                        ),
+                                    ),
+                                ),
                             )
                             break
                         }
@@ -187,33 +194,36 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimiza
                 val circle = command.fitCircle(1e-2f)
                 if (circle != null && command.isConvex()) {
                     val radius = circle.radius
-                    val sweep = if (currentParameter.end.y * currentParameter.startControl.x -
-                        currentParameter.end.x * currentParameter.startControl.y > 0
-                    ) {
-                        EllipticalArcCurve.SweepFlag.CLOCKWISE
-                    } else {
-                        EllipticalArcCurve.SweepFlag.ANTICLOCKWISE
-                    }
-                    val arc = EllipticalArcCurve(
-                        command.variant,
-                        listOf(
-                            EllipticalArcCurve.Parameter(
-                                radius,
-                                radius,
-                                0f,
-                                EllipticalArcCurve.ArcFlag.SMALL,
-                                sweep,
-                                currentParameter.end
-                            )
+                    val sweep =
+                        if (currentParameter.end.y * currentParameter.startControl.x -
+                            currentParameter.end.x * currentParameter.startControl.y > 0
+                        ) {
+                            EllipticalArcCurve.SweepFlag.CLOCKWISE
+                        } else {
+                            EllipticalArcCurve.SweepFlag.ANTICLOCKWISE
+                        }
+                    val arc =
+                        EllipticalArcCurve(
+                            command.variant,
+                            listOf(
+                                EllipticalArcCurve.Parameter(
+                                    radius,
+                                    radius,
+                                    0f,
+                                    EllipticalArcCurve.ArcFlag.SMALL,
+                                    sweep,
+                                    currentParameter.end,
+                                ),
+                            ),
                         )
-                    )
 
                     val next = commands.getOrNull(i + 1)
-                    val arcOutput = if (next is SmoothCubicBezierCurve) {
-                        listOf(arc, next.toCubicBezierCurve(command))
-                    } else {
-                        listOf(arc)
-                    }
+                    val arcOutput =
+                        if (next is SmoothCubicBezierCurve) {
+                            listOf(arc, next.toCubicBezierCurve(command))
+                        } else {
+                            listOf(arc)
+                        }
 
                     val originalSize = printer.print(command).length
                     val alternativeSize = arcOutput.joinToString(separator = "", transform = printer::print).length

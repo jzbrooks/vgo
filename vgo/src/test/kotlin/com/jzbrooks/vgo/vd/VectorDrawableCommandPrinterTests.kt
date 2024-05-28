@@ -47,46 +47,49 @@ class VectorDrawableCommandPrinterTests {
 
     @Test
     fun testPrintCubicBezierCurve() {
-        val command = CubicBezierCurve(
-            CommandVariant.ABSOLUTE,
-            listOf(
-                CubicBezierCurve.Parameter(
-                    Point(1.03424f, 2.0f),
-                    Point(1.3924f, 1.0f),
-                    Point(1.99424f, 12.3f)
-                )
+        val command =
+            CubicBezierCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    CubicBezierCurve.Parameter(
+                        Point(1.03424f, 2.0f),
+                        Point(1.3924f, 1.0f),
+                        Point(1.99424f, 12.3f),
+                    ),
+                ),
             )
-        )
         val result = VectorDrawableCommandPrinter(3).print(command)
         assertThat(result).isEqualTo("C1.034,2 1.392,1 1.994,12.3")
     }
 
     @Test
     fun testPrintShortcutCubicBezierCurve() {
-        val command = SmoothCubicBezierCurve(
-            CommandVariant.ABSOLUTE,
-            listOf(
-                SmoothCubicBezierCurve.Parameter(
-                    Point(1.03424f, 2.0f),
-                    Point(1.3924f, 1.0f)
-                )
+        val command =
+            SmoothCubicBezierCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    SmoothCubicBezierCurve.Parameter(
+                        Point(1.03424f, 2.0f),
+                        Point(1.3924f, 1.0f),
+                    ),
+                ),
             )
-        )
         val result = VectorDrawableCommandPrinter(3).print(command)
         assertThat(result).isEqualTo("S1.034,2 1.392,1")
     }
 
     @Test
     fun testPrintQuadraticBezierCurve() {
-        val command = QuadraticBezierCurve(
-            CommandVariant.ABSOLUTE,
-            listOf(
-                QuadraticBezierCurve.Parameter(
-                    Point(1.03424f, 2.0f),
-                    Point(1.3924f, 1.0f)
-                )
+        val command =
+            QuadraticBezierCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    QuadraticBezierCurve.Parameter(
+                        Point(1.03424f, 2.0f),
+                        Point(1.3924f, 1.0f),
+                    ),
+                ),
             )
-        )
         val result = VectorDrawableCommandPrinter(3).print(command)
         assertThat(result).isEqualTo("Q1.034,2 1.392,1")
     }
@@ -100,19 +103,20 @@ class VectorDrawableCommandPrinterTests {
 
     @Test
     fun testPrintEllipticalArcCurve() {
-        val command = EllipticalArcCurve(
-            CommandVariant.ABSOLUTE,
-            listOf(
-                EllipticalArcCurve.Parameter(
-                    12f,
-                    10.5f,
-                    30f,
-                    EllipticalArcCurve.ArcFlag.SMALL,
-                    EllipticalArcCurve.SweepFlag.CLOCKWISE,
-                    Point(59f, 12.0124f)
-                )
+        val command =
+            EllipticalArcCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    EllipticalArcCurve.Parameter(
+                        12f,
+                        10.5f,
+                        30f,
+                        EllipticalArcCurve.ArcFlag.SMALL,
+                        EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                        Point(59f, 12.0124f),
+                    ),
+                ),
             )
-        )
         val result = VectorDrawableCommandPrinter(3).print(command)
         assertThat(result).isEqualTo("A12,10.5,30,0,1,59,12.012")
     }

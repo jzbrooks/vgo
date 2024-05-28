@@ -4,7 +4,7 @@ import com.jzbrooks.vgo.core.util.math.Point
 
 data class QuadraticBezierCurve(
     override var variant: CommandVariant,
-    override var parameters: List<Parameter>
+    override var parameters: List<Parameter>,
 ) : ParameterizedCommand<QuadraticBezierCurve.Parameter> {
     data class Parameter(var control: Point, override var end: Point) : CommandParameter
 }
