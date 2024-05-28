@@ -93,31 +93,29 @@ tasks {
         }
     }
 
-    val buildDir = layout.buildDirectory
-    val optimizedJar = file("$buildDir/libs/vgo.jar")
-
     val optimize by registering(JavaExec::class) {
         description = "Runs proguard on the jar application."
         group = "build"
 
-        inputs.file(buildDir.dir("libs/debug/vgo-$version.jar"))
-        outputs.file(optimizedJar)
+        inputs.file("build/libs/debug/vgo-$version.jar")
+        outputs.file("build/libs/vgo.jar")
 
         val javaHome = System.getProperty("java.home")
 
-        classpath = files("$rootDir/tools/r8.jar")
-        args =
-            listOf(
-                "--release",
-                "--classfile",
-                "--lib",
-                javaHome,
-                "--output",
-                "$buildDir/libs/vgo.jar",
-                "--pg-conf",
-                "$rootDir/optimize.pro",
-                "$buildDir/libs/debug/vgo-$version.jar",
-            )
+        classpath("$rootDir/tools/r8.jar")
+        mainClass = "com.android.tools.r8.R8"
+
+        args(
+            "--release",
+            "--classfile",
+            "--lib",
+            javaHome,
+            "--output",
+            "build/libs/vgo.jar",
+            "--pg-conf",
+            "$rootDir/optimize.pro",
+            "build/libs/debug/vgo-$version.jar",
+        )
 
         dependsOn(getByName("jar"))
     }
@@ -129,14 +127,14 @@ tasks {
 
         dependsOn(optimize)
 
-        inputs.file(optimizedJar)
+        inputs.file("build/libs/vgo.jar")
         outputs.file(binaryFile)
 
         doLast {
             binaryFile.parentFile.mkdirs()
             binaryFile.delete()
             binaryFile.appendText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
-            optimizedJar.inputStream().use { binaryFile.appendBytes(it.readBytes()) }
+            file("build/libs/vgo.jar").inputStream().use { binaryFile.appendBytes(it.readBytes()) }
             binaryFile.setExecutable(true, false)
         }
     }
