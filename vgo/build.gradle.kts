@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -8,16 +7,11 @@ plugins {
     id("com.vanniktech.maven.publish")
 }
 
-sourceSets {
-    main {
-        withConvention(KotlinSourceSet::class) {
-            kotlin.srcDir("src/generated/kotlin")
-        }
-    }
-}
+kotlin.sourceSets.getByName("main").kotlin.srcDir("src/generated/kotlin")
 
 dependencies {
     implementation(project(":vgo-core"))
+    implementation("com.android.tools:sdk-common:30.2.2")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.25")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
@@ -51,7 +45,18 @@ tasks {
                 "**/*.kotlin_builtins",
                 "**/module-info.class",
                 "META-INF/maven/**",
-                "META-INF/*.version"
+                "META-INF/*.version",
+
+                // todo: maybe these should be included the jar?
+                "META-INF/LICENSE*",
+                "META-INF/LGPL2.1",
+                "META-INF/DEPENDENCIES",
+                "META-INF/AL2.0",
+                "META-INF/BCKEY.DSA",
+                "META-INF/BCKEY.SF",
+                "**/NOTICE*",
+                "javax/activation/**",
+                "xsd/catalog.xml",
             )
         }
     }
