@@ -120,7 +120,7 @@ tasks {
         dependsOn(getByName("jar"))
     }
 
-    val binaryFile = file("$buildDir/libs/vgo")
+    val binaryFileProp = layout.buildDirectory.file("libs/vgo")
     val binary by registering {
         description = "Prepends shell script in the jar to improve CLI"
         group = "build"
@@ -128,9 +128,10 @@ tasks {
         dependsOn(optimize)
 
         inputs.file("build/libs/vgo.jar")
-        outputs.file(binaryFile)
+        outputs.file(binaryFileProp)
 
         doLast {
+            val binaryFile = binaryFileProp.get().asFile
             binaryFile.parentFile.mkdirs()
             binaryFile.delete()
             binaryFile.appendText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
@@ -143,7 +144,8 @@ tasks {
         description = "Updates baseline assets with the latest integration test outputs."
         group = "Build Setup"
 
-        from("$buildDir/test-results/") {
+        val source = layout.buildDirectory.dir("test-results")
+        from(source) {
             include("*testOptimizationFinishes.xml")
             include("*testOptimizationFinishes.svg")
         }
