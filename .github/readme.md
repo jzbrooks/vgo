@@ -22,15 +22,12 @@ vgo requires Java 11.
 ## Gradle Plugin
 The plugin adds the `shrinkVectorArtwork` task to your project.
 
-To incorporate the plugin in your build, add it to your buildscript classpath.
+To incorporate the plugin in your build, configure maven central plugin resolution:
 ```groovy
-buildscript {
+pluginManagement {
     repositories {
         mavenCentral()
-    }
-
-    dependencies {
-        classpath "com.jzbrooks:vgo-plugin:<version>"
+        gradlePluginPortal()
     }
 }
 ```
