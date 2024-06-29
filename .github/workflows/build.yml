@@ -21,29 +21,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
-    - name: set up JDK
-      id: setup-jdk
-      uses: actions/setup-java@v1
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-java@v3
       with:
         java-version: 21
         distribution: zulu
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+
     - name: build
       run: ./gradlew build
+
     - name: archive vgo test results
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: vgo_test_results
         path: vgo/build/reports/tests/test/
+
     - name: archive vgo core test results
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: vgo_core_test_results
         path: vgo-core/build/reports/tests/test/
+
     - name: release binary
       run: ./gradlew binary
+
     - name: archive vgo
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: vgo
         path: vgo/build/libs/vgo
