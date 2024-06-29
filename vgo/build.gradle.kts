@@ -107,7 +107,7 @@ tasks {
         description = "Runs proguard on the jar application."
         group = "build"
 
-        inputs.file("build/libs/debug/vgo-$version.jar")
+        inputs.file("build/libs/debug/vgo.jar")
         outputs.file("build/libs/vgo.jar")
 
         val javaHome = System.getProperty("java.home")
@@ -124,7 +124,7 @@ tasks {
             "build/libs/vgo.jar",
             "--pg-conf",
             "$rootDir/optimize.pro",
-            "build/libs/debug/vgo-$version.jar",
+            "build/libs/debug/vgo.jar",
         )
 
         dependsOn(getByName("jar"))
