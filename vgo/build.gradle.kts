@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
+import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
 import java.io.PrintWriter
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -91,6 +93,14 @@ tasks {
                 output.write(buildConstantsClass)
             }
         }
+    }
+
+    withType<KtLintCheckTask>().configureEach {
+        mustRunAfter(generateConstants)
+    }
+
+    withType<KtLintFormatTask>().configureEach {
+        mustRunAfter(generateConstants)
     }
 
     val optimize by registering(JavaExec::class) {
