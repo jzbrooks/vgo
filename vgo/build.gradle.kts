@@ -15,6 +15,8 @@ sourceSets {
     }
 }
 
+val r8: Configuration by configurations.creating
+
 dependencies {
     implementation(project(":vgo-core"))
 
@@ -22,6 +24,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    r8("com.android.tools:r8:8.3.37")
 }
 
 tasks {
@@ -112,7 +116,7 @@ tasks {
 
         val javaHome = System.getProperty("java.home")
 
-        classpath("$rootDir/tools/r8.jar")
+        classpath(r8)
         mainClass = "com.android.tools.r8.R8"
 
         args(
