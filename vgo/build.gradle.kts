@@ -21,7 +21,7 @@ dependencies {
     implementation(project(":vgo-core"))
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
