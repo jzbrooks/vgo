@@ -20,7 +20,7 @@ val r8: Configuration by configurations.creating
 dependencies {
     implementation(project(":vgo-core"))
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.0")
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
