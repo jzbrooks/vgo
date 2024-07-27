@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Added
-
-- More robust SVG → vector conversions by Android Studio tools
-
 ## 2.1.0 - 09-14-2021 
 
 - New: Simplified optimization machinery with `ElementVisitor`
