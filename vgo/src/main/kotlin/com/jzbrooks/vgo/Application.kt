@@ -146,42 +146,44 @@ class Application {
 
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
 
-            var graphic = when {
-                rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> {
-                    if (outputFormat == "vd") {
-                        ByteArrayOutputStream().use { pipeOrigin ->
-                            val errors = Svg2Vector.parseSvgToXml(input.toPath(), pipeOrigin)
-                            if (errors != "") {
-                                System.err.println(errors)
+            var graphic =
+                when {
+                    rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> {
+                        if (outputFormat == "vd") {
+                            ByteArrayOutputStream().use { pipeOrigin ->
+                                val errors = Svg2Vector.parseSvgToXml(input.toPath(), pipeOrigin)
+                                if (errors != "") {
+                                    System.err.println(errors)
 //                                return
+                                }
+
+                                val pipeTerminal = ByteArrayInputStream(pipeOrigin.toByteArray())
+                                val convertedDocument = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(pipeTerminal)
+                                convertedDocument.documentElement.normalize()
+
+                                val documentNodes = convertedDocument.childNodes.asSequence()
+                                com.jzbrooks.vgo.vd.parse(documentNodes.first { it.nodeType == Document.ELEMENT_NODE })
                             }
-
-                            val pipeTerminal = ByteArrayInputStream(pipeOrigin.toByteArray())
-                            val convertedDocument = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(pipeTerminal)
-                            convertedDocument.documentElement.normalize()
-
-                            val documentNodes = convertedDocument.childNodes.asSequence()
-                            com.jzbrooks.vgo.vd.parse(documentNodes.first { it.nodeType == Document.ELEMENT_NODE })
+                        } else {
+                            parse(rootNodes.first())
                         }
-                    } else {
-                        parse(rootNodes.first())
                     }
+                    rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } -> {
+                        com.jzbrooks.vgo.vd.parse(rootNodes.first())
+                    }
+                    else -> if (input == output) return else null
                 }
-                rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } -> {
-                    com.jzbrooks.vgo.vd.parse(rootNodes.first())
-                }
-                else -> if (input == output) return else null
-            }
 
             if (graphic is VectorDrawable && outputFormat == "svg") {
                 graphic = graphic.toSvg()
             }
 
-            val optimizationRegistry = when (graphic) {
-                is VectorDrawable -> VectorDrawableOptimizationRegistry()
-                is ScalableVectorGraphic -> SvgOptimizationRegistry()
-                else -> null
-            }
+            val optimizationRegistry =
+                when (graphic) {
+                    is VectorDrawable -> VectorDrawableOptimizationRegistry()
+                    is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                    else -> null
+                }
 
             if (graphic != null) {
                 optimizationRegistry?.apply(graphic)
