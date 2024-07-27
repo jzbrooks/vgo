@@ -1,14 +1,23 @@
 # Changelog
 
-## [Unreleased]
+## Unreleased - 07-27-2024
+
+### Added
+
+- More robust SVG → vector conversions by Android Studio tools
 
 ## 2.1.0 - 09-14-2021 
 
-- New: Simplified optimization machinery with `ElementVisitor`
-- Improvement: `MergePaths` no longer requires its own tree traversal
-- Improvement: Attribute values omit leading zeros where possible
-- Fix: theme referenced colors like `?attrs/dark` no longer cause crashes
-- Upgrade: Build tools
+### Added
+- Simplified optimization machinery with `ElementVisitor`
+
+### Changed
+- `MergePaths` no longer requires its own tree traversal
+- Attribute values omit leading zeros where possible
+- Upgrade build tools
+
+### Fixed
+- Theme referenced colors like `?attrs/dark` no longer cause crashes
 
 ## 2.0.2 - 06.02.2021
 
