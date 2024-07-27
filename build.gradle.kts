@@ -14,6 +14,8 @@ plugins {
 
 version = property("VERSION_NAME").toString()
 
+changelog.path.set("changelog.md")
+
 subprojects {
     apply<KtlintPlugin>()
     configure<KtlintExtension> {
