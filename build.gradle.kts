@@ -84,8 +84,3 @@ subprojects {
         )
     }
 }
-
-changelog {
-    header.set(provider { "${version.get()}\n_${date()}_\n" })
-    groups.set(listOf("New", "Improvement", "Fix", "Upgrade"))
-}

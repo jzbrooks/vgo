@@ -2,14 +2,9 @@
 
 ## Unreleased
 
-### New
-- Use Android Studio conversion tools are used for SVG → vector drawable conversions
+### Added
 
-### Improvement
-
-### Fix
-
-### Upgrade
+- More robust SVG → vector conversions by Android Studio tools
 
 ## 2.1.0
 
