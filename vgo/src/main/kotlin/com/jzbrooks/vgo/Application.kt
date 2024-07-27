@@ -155,10 +155,10 @@ class Application {
                                 if (errors != "") {
                                     System.err.println(
                                         """
-                                            Skipping ${input.path}
+                                        Skipping ${input.path}
 
-                                              $errors
-                                        """.trimIndent()
+                                          $errors
+                                        """.trimIndent(),
                                     )
                                     null
                                 } else {
@@ -167,9 +167,10 @@ class Application {
                                         DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(pipeTerminal)
                                     convertedDocument.documentElement.normalize()
 
-                                    val documentRoot = convertedDocument.childNodes.asSequence().first {
-                                        it.nodeType == Document.ELEMENT_NODE
-                                    }
+                                    val documentRoot =
+                                        convertedDocument.childNodes.asSequence().first {
+                                            it.nodeType == Document.ELEMENT_NODE
+                                        }
 
                                     com.jzbrooks.vgo.vd.parse(documentRoot)
                                 }
