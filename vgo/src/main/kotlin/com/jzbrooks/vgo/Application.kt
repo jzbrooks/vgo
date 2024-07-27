@@ -65,11 +65,11 @@ class Application {
         if (inputs.isEmpty()) {
             require(outputs.isEmpty())
 
-            var path = readLine()
+            var path = readlnOrNull()
             val standardInPaths = mutableListOf<String>()
             while (path != null) {
                 standardInPaths.add(path)
-                path = readLine()
+                path = readlnOrNull()
             }
 
             inputs = standardInPaths
@@ -150,7 +150,7 @@ class Application {
                 rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> {
                     if (outputFormat == "vd") {
                         ByteArrayOutputStream().use { pipeOrigin ->
-                            val errors = Svg2Vector.parseSvgToXml(input, pipeOrigin)
+                            val errors = Svg2Vector.parseSvgToXml(input.toPath(), pipeOrigin)
                             if (errors != "") {
                                 System.err.println(errors)
 //                                return
