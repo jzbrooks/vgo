@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## [Unreleased]
 
 ### New
 - Use Android Studio conversion tools are used for SVG → vector drawable conversions
