@@ -8,9 +8,15 @@ jobs:
   publish:
     name: Release build and publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
     steps:
-      - name: Check out code
+      - name: Fetch Sources
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Set up a JDK
         id: setup-jdk
@@ -35,3 +41,26 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
           SONATYPE_PROFILE_ID: ${{ secrets.SONATYPE_PROFILE_ID }}
         run: ./gradlew -Psigning.keyId=${{ secrets.SIGNING_KEY_ID}} -Psigning.password=${{ secrets.SIGNING_KEY_PASSWORD }} -Psigning.secretKeyRingFile=${{ secrets.SIGNING_KEY_FILE_PATH }} --no-configuration-cache publishAndReleaseToMavenCentral
+
+      - name: Patch Changelog
+        run: |
+          ./gradlew patchChangelog --release-note="`cat << EOM
+          ${{ github.event.release.body }}
+          EOM`"
+
+      - name: Open PR for Changelog Update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          BRANCH="changelog-update-$VERSION"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -b $BRANCH
+          git commit -am "Changelog update - $VERSION"
+          git push --set-upstream origin $BRANCH
+          gh pr create \
+            --title "Changelog update - \`$VERSION\`" \
+            --body "Current pull request contains patched \`changelog.md\` file for the \`$VERSION\` version." \
+            --base master \
+            --head $BRANCH
