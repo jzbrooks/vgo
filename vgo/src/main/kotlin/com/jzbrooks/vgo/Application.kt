@@ -153,16 +153,26 @@ class Application {
                             ByteArrayOutputStream().use { pipeOrigin ->
                                 val errors = Svg2Vector.parseSvgToXml(input.toPath(), pipeOrigin)
                                 if (errors != "") {
-                                    System.err.println(errors)
-//                                return
+                                    System.err.println(
+                                        """
+                                            Skipping ${input.path}
+
+                                              $errors
+                                        """.trimIndent()
+                                    )
+                                    null
+                                } else {
+                                    val pipeTerminal = ByteArrayInputStream(pipeOrigin.toByteArray())
+                                    val convertedDocument =
+                                        DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(pipeTerminal)
+                                    convertedDocument.documentElement.normalize()
+
+                                    val documentRoot = convertedDocument.childNodes.asSequence().first {
+                                        it.nodeType == Document.ELEMENT_NODE
+                                    }
+
+                                    com.jzbrooks.vgo.vd.parse(documentRoot)
                                 }
-
-                                val pipeTerminal = ByteArrayInputStream(pipeOrigin.toByteArray())
-                                val convertedDocument = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(pipeTerminal)
-                                convertedDocument.documentElement.normalize()
-
-                                val documentNodes = convertedDocument.childNodes.asSequence()
-                                com.jzbrooks.vgo.vd.parse(documentNodes.first { it.nodeType == Document.ELEMENT_NODE })
                             }
                         } else {
                             parse(rootNodes.first())
