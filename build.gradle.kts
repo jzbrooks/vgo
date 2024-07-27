@@ -58,7 +58,7 @@ subprojects {
                                 append(" skipped)  |")
                             }
                         val border = "-".repeat(output.length)
-                        println(
+                        logger.lifecycle(
                             """
                             $border
                             $output
