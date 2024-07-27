@@ -2,18 +2,11 @@
 
 ## Unreleased
 
-### New
-- Use Android Studio conversion tools are used for SVG → vector drawable conversions
+### Added
 
-### Improvement
+- More robust SVG → vector conversions by Android Studio tools
 
-### Fix
-
-### Upgrade
-
-## 2.1.0
-
-_09-14-2021_
+## 2.1.0 - 09-14-2021 
 
 - New: Simplified optimization machinery with `ElementVisitor`
 - Improvement: `MergePaths` no longer requires its own tree traversal
@@ -21,21 +14,15 @@ _09-14-2021_
 - Fix: theme referenced colors like `?attrs/dark` no longer cause crashes
 - Upgrade: Build tools
 
-## 2.0.2
-
-_06.02.2021_
+## 2.0.2 - 06.02.2021
 
 - Fixed: Vector Drawable shorthand hex colors (like #FFF) are properly handled
 
-## 2.0.1
-
-_06.01.2021_
+## 2.0.1 - 06.01.2021
 
 - Fixed: Groups that wrap clip paths are no longer removed
 
-## 2.0.0
-
-_05.29.2021_
+## 2.0.0 - 05.29.2021
 
 - New, breaking(vgo-core): Structured graphic element attributes. 
   * This greatly simplifies the conversions between formats
@@ -48,59 +35,43 @@ _05.29.2021_
 - Fixed: Test failures on Windows due to path handling
 - Upgrade: Build with Kotlin 1.5.10
 
-## 1.4.1
-
-_02.16.2021_
+## 1.4.1 - 02.16.2021
 
 - Added: A new type for the `shrinkVectorArtwork` task
 
-## 1.4.0
-
-_02.15.2021_
+## 1.4.0 - 02.15.2021
 
 - Added: Gradle plugin
 - Improved: Reworked the gradle modules to better be published as a library (vgo-core) and thin application wrapper (vgo).
 - Added: Sonatype publishing
 
-## 1.3.0
-
-_01.18.2021_
+## 1.3.0 - 01.18.2021
 
 - Added: Collapse multiple Bézier curves into elliptical arcs when possible
 - Improvement: Target JVM 11
 
-## 1.2.2
-
-_10.20.2020_
+## 1.2.2 - 10.20.2020
 
 - Improvement: Show filenames with statistics with multiple file inputs and `--stats`
 - Improvement: Remove Kotlin metadata from the output jar
 - Fixed: Temporarily removed an optimization that distorted some images
 
-## 1.2.1
-
-_10.01.2020_
+## 1.2.1 - 10.01.2020
 
 - Fixed: Some images with curves that lie on a circle omit any representation of that circle in the output
 - Fixed: Modifying files in-place sometimes results in destroying non-vector files.
 
-## 1.2.0
-
-_09.28.2020_
+## 1.2.0 - 09.28.2020
 
 - Improvement: Resort to distribution via a fat jar. Requires managing fewer files and results in a smaller installation since R8 can operate on classes from dependencies as well.
 - Improvement: Use R8 for optimization. R8 produces a slightly smaller jar and in some cases faster code as well.
 
-## 1.1.1
-
-_07.13.2020_
+## 1.1.1 - 07.13.2020
 
 - Fixed: A crash when running on a file in the current directory
 - Improvement: Report an error when an input file doesn't exist
 
-## 1.1.0
-
-_06.20.2020_
+## 1.1.0 - 06.20.2020
 
 - New: Remove redundant close path commands
 - Improvement: Use the Gradle Application Plugin to build application distrobutions, simplifying installation and making running the tool a little simpler.

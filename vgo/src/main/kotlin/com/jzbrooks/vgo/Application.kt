@@ -1,18 +1,20 @@
 package com.jzbrooks.vgo
 
+import com.android.ide.common.vectordrawable.Svg2Vector
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
 import com.jzbrooks.vgo.svg.parse
-import com.jzbrooks.vgo.svg.toVectorDrawable
 import com.jzbrooks.vgo.util.xml.asSequence
 import com.jzbrooks.vgo.vd.VectorDrawable
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter
 import com.jzbrooks.vgo.vd.toSvg
 import org.w3c.dom.Document
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.absoluteValue
@@ -63,11 +65,11 @@ class Application {
         if (inputs.isEmpty()) {
             require(outputs.isEmpty())
 
-            var path = readLine()
+            var path = readlnOrNull()
             val standardInPaths = mutableListOf<String>()
             while (path != null) {
                 standardInPaths.add(path)
-                path = readLine()
+                path = readlnOrNull()
             }
 
             inputs = standardInPaths
@@ -139,28 +141,52 @@ class Application {
         input.inputStream().use { inputStream ->
             val sizeBefore = inputStream.channel.size()
 
-            val document =
-                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
-                    documentElement.normalize()
-                }
+            val document = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(input)
+            document.documentElement.normalize()
 
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
+
             var graphic =
                 when {
-                    rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> parse(rootNodes.first())
-                    rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } ->
-                        com.jzbrooks.vgo.vd.parse(
-                            rootNodes.first(),
-                        )
+                    rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> {
+                        if (outputFormat == "vd") {
+                            ByteArrayOutputStream().use { pipeOrigin ->
+                                val errors = Svg2Vector.parseSvgToXml(input.toPath(), pipeOrigin)
+                                if (errors != "") {
+                                    System.err.println(
+                                        """
+                                        Skipping ${input.path}
+
+                                          $errors
+                                        """.trimIndent(),
+                                    )
+                                    null
+                                } else {
+                                    val pipeTerminal = ByteArrayInputStream(pipeOrigin.toByteArray())
+                                    val convertedDocument =
+                                        DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(pipeTerminal)
+                                    convertedDocument.documentElement.normalize()
+
+                                    val documentRoot =
+                                        convertedDocument.childNodes.asSequence().first {
+                                            it.nodeType == Document.ELEMENT_NODE
+                                        }
+
+                                    com.jzbrooks.vgo.vd.parse(documentRoot)
+                                }
+                            }
+                        } else {
+                            parse(rootNodes.first())
+                        }
+                    }
+                    rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } -> {
+                        com.jzbrooks.vgo.vd.parse(rootNodes.first())
+                    }
                     else -> if (input == output) return else null
                 }
 
             if (graphic is VectorDrawable && outputFormat == "svg") {
                 graphic = graphic.toSvg()
-            }
-
-            if (graphic is ScalableVectorGraphic && outputFormat == "vd") {
-                graphic = graphic.toVectorDrawable()
             }
 
             val optimizationRegistry =
@@ -217,9 +243,10 @@ class Application {
         assert(input.isDirectory)
         assert(output.isDirectory || !output.exists())
 
-        input.listFiles { file -> !file.isHidden }?.forEach { file ->
+        for (file in input.walkTopDown().filter { file -> !file.isHidden && !file.isDirectory }) {
             handleFile(file, File(output, file.name), options)
         }
+
         if (printStats) {
             val message = "| Total bytes saved: ${(totalBytesBefore - totalBytesAfter).roundToInt()} |"
             val border = "-".repeat(message.length)
@@ -262,6 +289,7 @@ class Application {
         get() = key.isDirectory && (value.isDirectory || !value.exists())
 
     companion object {
+        private val DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance()
         private const val HELP_MESSAGE = """
 > vgo [options] [file/directory]
 

@@ -1,5 +1,4 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.changelog.date
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
@@ -13,6 +12,8 @@ plugins {
 }
 
 version = property("VERSION_NAME").toString()
+
+changelog.path.set("changelog.md")
 
 subprojects {
     apply<KtlintPlugin>()
@@ -83,9 +84,4 @@ subprojects {
             },
         )
     }
-}
-
-changelog {
-    header.set(provider { "${version.get()}\n_${date()}_\n" })
-    groups.set(listOf("New", "Improvement", "Fix", "Upgrade"))
 }
