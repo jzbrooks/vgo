@@ -83,10 +83,6 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 is ClosePath -> process(command)
             }
 
-            if (previousCommand is ClosePath && command is MoveTo) {
-                pathStart.addFirst(currentPoint.copy())
-            }
-
             modifiedCommands.add(modifiedCommand)
         }
 
@@ -112,6 +108,8 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                         }.also { currentPoint += it.last() },
                 )
             }
+
+        pathStart.addFirst(currentPoint.copy())
 
         return choose(convertedCommand, command)
     }
@@ -293,7 +291,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
                         command.parameters.map { commandPoint ->
-                            (commandPoint + currentPoint)
+                            commandPoint + currentPoint
                         }.also { currentPoint = it.last().copy() },
                 )
             } else {
@@ -301,7 +299,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                     variant = CommandVariant.RELATIVE,
                     parameters =
                         command.parameters.map { commandPoint ->
-                            (commandPoint - currentPoint)
+                            commandPoint - currentPoint
                         }.also {
                             currentPoint += it.last()
                         },
