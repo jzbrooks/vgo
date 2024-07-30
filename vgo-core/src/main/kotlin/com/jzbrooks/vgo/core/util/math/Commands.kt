@@ -18,16 +18,22 @@ import java.util.Stack
 /**
  * Computes absolute coordinates for a given command in the sequence.
  * By default, the absolute coordinate of the last command is returned.
- * @param commands: The complete list of **relative** commands for a given path. The initial moveto can be absolute.
+ * @param commands The complete list of **relative** commands for a given path. The initial moveto can be absolute.
  */
 fun computeAbsoluteCoordinates(commands: List<Command>): Point {
     assert(commands.drop(1).filterIsInstance<ParameterizedCommand<*>>().all { it.variant == CommandVariant.RELATIVE })
 
-    val pathStart = Stack<Point>()
     var currentPoint = Point(0f, 0f)
+    val pathStart = ArrayDeque<Point>()
 
     for (i in commands.indices) {
         val command = commands[i]
+        val previousCommand = commands.getOrNull(i - 1)
+
+        if (previousCommand is ClosePath && command !is MoveTo) {
+            pathStart.addFirst(currentPoint.copy())
+        }
+
         val newCurrentPoint =
             when (command) {
                 is MoveTo -> command.parameters[0]
@@ -39,7 +45,7 @@ fun computeAbsoluteCoordinates(commands: List<Command>): Point {
                 is QuadraticBezierCurve -> command.parameters[0].end
                 is SmoothQuadraticBezierCurve -> command.parameters[0]
                 is EllipticalArcCurve -> command.parameters[0].end
-                is ClosePath -> pathStart.pop()
+                is ClosePath -> pathStart.removeFirst()
             }
 
         if (command !is ClosePath) {
@@ -48,8 +54,8 @@ fun computeAbsoluteCoordinates(commands: List<Command>): Point {
             currentPoint = newCurrentPoint
         }
 
-        if (command is MoveTo) {
-            pathStart.push(currentPoint.copy())
+        if (i == 0 || (previousCommand is ClosePath && command is MoveTo)) {
+            pathStart.addFirst(currentPoint.copy())
         }
     }
 

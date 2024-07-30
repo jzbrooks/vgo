@@ -19,7 +19,7 @@ import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 
 /**
- * Enables more resolution in the the other command
+ * Enables more resolution in the other command
  * related optimizations like [CommandVariant] and [RemoveRedundantCommands]
  */
 class BreakoutImplicitCommands : TopDownOptimization {

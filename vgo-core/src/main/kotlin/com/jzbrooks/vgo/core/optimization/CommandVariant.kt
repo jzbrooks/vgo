@@ -5,6 +5,7 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -19,7 +20,7 @@ import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
-import java.util.Stack
+
 
 /**
  * Converts commands to use relative, absolute,
@@ -27,7 +28,7 @@ import java.util.Stack
  * @param mode determines the operating mode of the command
  */
 class CommandVariant(private val mode: Mode) : TopDownOptimization {
-    private val pathStart = Stack<Point>()
+    private val pathStart = ArrayDeque<Point>()
 
     // Updated once per process call when computing
     // the other variant of the command. This works
@@ -56,27 +57,40 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 // Absolute values are relative to the origin, so += means
                 // the same thing here.
                 currentPoint += moveTo.parameters.last()
-                pathStart.push(currentPoint.copy())
+                pathStart.addFirst(currentPoint.copy())
                 moveTo
             }
 
-        val commands =
-            path.commands.drop(1).map { command ->
-                when (command) {
-                    is MoveTo -> process(command)
-                    is LineTo -> process(command)
-                    is HorizontalLineTo -> process(command)
-                    is VerticalLineTo -> process(command)
-                    is CubicBezierCurve -> process(command)
-                    is SmoothCubicBezierCurve -> process(command)
-                    is QuadraticBezierCurve -> process(command)
-                    is SmoothQuadraticBezierCurve -> process(command)
-                    is EllipticalArcCurve -> process(command)
-                    is ClosePath -> process(command)
-                }
+        val modifiedCommands = mutableListOf<Command>()
+        for (i in path.commands.indices.drop(1)) {
+            val command = path.commands[i]
+            val previousCommand = path.commands.getOrNull(i - 1)
+
+            if (previousCommand is ClosePath && command !is MoveTo) {
+                pathStart.addFirst(currentPoint.copy())
             }
 
-        path.commands = firstMoveTo + commands
+            val modifiedCommand = when (command) {
+                is MoveTo -> process(command)
+                is LineTo -> process(command)
+                is HorizontalLineTo -> process(command)
+                is VerticalLineTo -> process(command)
+                is CubicBezierCurve -> process(command)
+                is SmoothCubicBezierCurve -> process(command)
+                is QuadraticBezierCurve -> process(command)
+                is SmoothQuadraticBezierCurve -> process(command)
+                is EllipticalArcCurve -> process(command)
+                is ClosePath -> process(command)
+            }
+
+            if (previousCommand is ClosePath && command is MoveTo) {
+                pathStart.addFirst(currentPoint.copy())
+            }
+
+            modifiedCommands.add(modifiedCommand)
+        }
+
+        path.commands = firstMoveTo + modifiedCommands
     }
 
     private fun process(command: MoveTo): MoveTo {
@@ -98,8 +112,6 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                         }.also { currentPoint += it.last() },
                 )
             }
-
-        pathStart.push(currentPoint.copy())
 
         return choose(convertedCommand, command)
     }
@@ -328,7 +340,7 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
 
     private fun process(command: ClosePath): ClosePath {
         // If there is a close path, there should be a corresponding path start entry on the stack
-        currentPoint = pathStart.pop()
+        currentPoint = pathStart.removeFirst()
         return command
     }
 
@@ -362,9 +374,9 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
     }
 
     sealed class Mode {
-        object Absolute : Mode()
+        data object Absolute : Mode()
 
-        object Relative : Mode()
+        data object Relative : Mode()
 
         data class Compact(val printer: CommandPrinter) : Mode()
     }
