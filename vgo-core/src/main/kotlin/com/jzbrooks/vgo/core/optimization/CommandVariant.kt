@@ -5,8 +5,8 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
-import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
+import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
@@ -20,7 +20,6 @@ import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
-
 
 /**
  * Converts commands to use relative, absolute,
@@ -70,18 +69,19 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 pathStart.addFirst(currentPoint.copy())
             }
 
-            val modifiedCommand = when (command) {
-                is MoveTo -> process(command)
-                is LineTo -> process(command)
-                is HorizontalLineTo -> process(command)
-                is VerticalLineTo -> process(command)
-                is CubicBezierCurve -> process(command)
-                is SmoothCubicBezierCurve -> process(command)
-                is QuadraticBezierCurve -> process(command)
-                is SmoothQuadraticBezierCurve -> process(command)
-                is EllipticalArcCurve -> process(command)
-                is ClosePath -> process(command)
-            }
+            val modifiedCommand =
+                when (command) {
+                    is MoveTo -> process(command)
+                    is LineTo -> process(command)
+                    is HorizontalLineTo -> process(command)
+                    is VerticalLineTo -> process(command)
+                    is CubicBezierCurve -> process(command)
+                    is SmoothCubicBezierCurve -> process(command)
+                    is QuadraticBezierCurve -> process(command)
+                    is SmoothQuadraticBezierCurve -> process(command)
+                    is EllipticalArcCurve -> process(command)
+                    is ClosePath -> process(command)
+                }
 
             modifiedCommands.add(modifiedCommand)
         }
