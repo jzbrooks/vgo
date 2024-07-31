@@ -4,7 +4,11 @@
 
 ### Added
 
-- More robust SVG → vector conversions by Android Studio tools
+- More robust SVG → vector conversions by Android Studio tools (#47)
+
+### Fixed
+
+- In rare cases, subpath start points were tracked incorrectly which resulted in a crash (#57)
 
 ## 2.1.0 - 09-14-2021 
 

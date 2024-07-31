@@ -61,6 +61,25 @@ class CommandsTest {
 
         val absoluteCoordinates = computeAbsoluteCoordinates(commands.take(6))
 
-        assertThat(absoluteCoordinates).isEqualTo(Point(12f, 8f))
+        assertThat(absoluteCoordinates).isEqualTo(Point(20f, 1f))
+    }
+
+    @Test
+    fun `Closing a subpath after a non-moveto command returns to previous coordinate`() {
+        val commands =
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 1f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(-9f, 6f))),
+                MoveTo(CommandVariant.RELATIVE, listOf(Point(1f, 1f))),
+                LineTo(CommandVariant.RELATIVE, listOf(Point(3f, 7f))),
+                ClosePath,
+                HorizontalLineTo(CommandVariant.RELATIVE, listOf(10f)),
+                VerticalLineTo(CommandVariant.RELATIVE, listOf(-4f)),
+                ClosePath,
+            )
+
+        val absoluteCoordinates = computeAbsoluteCoordinates(commands)
+
+        assertThat(absoluteCoordinates).isEqualTo(Point(10f, 1f))
     }
 }
