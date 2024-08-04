@@ -52,14 +52,16 @@ class MergePaths : BottomUpOptimization {
     private fun merge(paths: List<Path>): List<Path> {
         if (paths.isEmpty()) return emptyList()
 
-        val mergedPaths = Stack<Path>()
-        mergedPaths.add(paths.first())
+        val mergedPaths = ArrayDeque<Path>()
+        mergedPaths.addFirst(paths.first())
 
         for (current in paths.drop(1)) {
-            val previous = mergedPaths.peek()
+            val previous = mergedPaths.first()
 
-            if (!haveSameAttributes(current, previous)) {
-                mergedPaths.push(current)
+            // Merging even odd paths could cause some paths to not be drawn
+            // since the initial path might be considered interior under even-odd rules.
+            if (!haveSameAttributes(current, previous) || current.fillRule == Path.FillRule.EVEN_ODD) {
+                mergedPaths.addFirst(current)
             } else {
                 previous.commands += current.commands
             }
