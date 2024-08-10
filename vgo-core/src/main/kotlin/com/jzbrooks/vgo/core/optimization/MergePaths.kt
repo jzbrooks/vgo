@@ -7,7 +7,6 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
-import java.util.Stack
 
 /**
  * Merges multiple paths into a single path where possible
@@ -52,14 +51,21 @@ class MergePaths : BottomUpOptimization {
     private fun merge(paths: List<Path>): List<Path> {
         if (paths.isEmpty()) return emptyList()
 
-        val mergedPaths = Stack<Path>()
+        val mergedPaths = ArrayList<Path>(paths.size)
         mergedPaths.add(paths.first())
 
         for (current in paths.drop(1)) {
-            val previous = mergedPaths.peek()
+            val previous = mergedPaths.last()
 
-            if (!haveSameAttributes(current, previous)) {
-                mergedPaths.push(current)
+            // Avoid merging paths with even odd fill rule, because
+            // the merge might cause some paths to be considered 'interior'
+            // according to those rules when they were previously exterior
+            // in their own paths.
+            //
+            // There might be a reasonable way to deduce that situation more
+            // specifically, which could enable merging of some even odd paths.
+            if (!haveSameAttributes(current, previous) || current.fillRule == Path.FillRule.EVEN_ODD) {
+                mergedPaths.add(current)
             } else {
                 previous.commands += current.commands
             }
