@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.util.math
+ package com.jzbrooks.vgo.core.util.math
 
 import kotlin.math.absoluteValue
 
@@ -27,24 +27,21 @@ data class LineSegment(val first: Point, val second: Point) {
 
         val intersectionPoint = Point(x, y)
 
-        if (contains(intersectionPoint, tolerance) &&
-            other.contains(intersectionPoint, tolerance)) {
+        if (contains(intersectionPoint) && other.contains(intersectionPoint)) {
             return intersectionPoint
         }
 
         return null
     }
 
-    private fun contains(point: Point, tolerance: Float): Boolean {
-        // If the cross product is non-zero, then the lines are not collinear
-        val cross = (point.y - first.y) * (second.x - first.x) -
-                (point.x - first.x) * (second.y - first.y)
-
-        if (cross.absoluteValue > tolerance) return false
-
-        // If the dot product is less than zero or greater than
-        // the squared length of the segment, then the point is
-        // collinear _but_ does not lie on the line segment
+    // If the dot product is less than zero or greater than
+    // the squared length of the segment, then the point is
+    // collinear _but_ does not lie on the line segment
+    //
+    // Collinearity checks are skipped since we already know
+    // the intersection point lies on the line segments
+    // because they intersect each other
+    private fun contains(point: Point): Boolean {
         val dot = (point.x - first.x) * (second.x - first.x) +
                 (point.y - first.y) * (second.y - first.y)
 
