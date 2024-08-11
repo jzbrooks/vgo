@@ -1,8 +1,8 @@
 package com.jzbrooks.vgo.core.util.math
 
+import assertk.all
 import assertk.assertThat
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNull
+import assertk.assertions.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
@@ -14,7 +14,10 @@ class LineSegmentTests {
 
         val actual = first.intersection(second)
 
-        assertThat(actual).isEqualTo(result)
+        assertThat(actual).isNotNull().all {
+            prop(Point::x).isCloseTo(result.x, 1e-3f)
+            prop(Point::y).isCloseTo(result.y, 1e-3f)
+        }
     }
 
     @MethodSource
@@ -27,7 +30,17 @@ class LineSegmentTests {
         assertThat(actual).isNull()
     }
 
-    data class Intersection(val first: LineSegment, val second: LineSegment, val result: Point?)
+    @MethodSource
+    @ParameterizedTest
+    fun testNonParallelDisjointSegmentsReturnsNull(pair: Pair<LineSegment, LineSegment>) {
+        val (first, second) = pair
+
+        val actual = first.intersection(second)
+
+        assertThat(actual).isNull()
+    }
+
+    data class Intersection(val first: LineSegment, val second: LineSegment, val result: Point)
 
     companion object {
         @JvmStatic
@@ -39,9 +52,9 @@ class LineSegmentTests {
                     Point.ZERO,
                 ),
                 Intersection(
-                    LineSegment(Point(1f, 1f), Point(4f, 4f)),
-                    LineSegment(Point(1f, 8f), Point(2f, 4f)),
-                    Point(2.4f, 2.4f),
+                    LineSegment(Point(-1f, 2f), Point(2f, -2f)),
+                    LineSegment(Point(-1f, -2f), Point(2f, 2f)),
+                    Point(0.5f, 0f),
                 ),
             )
         }
@@ -50,6 +63,13 @@ class LineSegmentTests {
         fun testParallelLinesReturnsNull(): List<Pair<LineSegment, LineSegment>> {
             return listOf(
                 LineSegment(Point(0f, 3f), Point(0f, 3f)) to LineSegment(Point(1f, 3f), Point(1f, 3f)),
+            )
+        }
+
+        @JvmStatic
+        fun testNonParallelDisjointSegmentsReturnsNull(): List<Pair<LineSegment, LineSegment>> {
+            return listOf(
+                LineSegment(Point(1f, 1f), Point(4f, 4f)) to LineSegment(Point(1f, 8f), Point(2f, 4f))
             )
         }
     }
