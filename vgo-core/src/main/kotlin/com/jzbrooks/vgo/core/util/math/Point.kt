@@ -26,7 +26,7 @@ data class Point(val x: Float, val y: Float) {
 
     fun isApproximately(
         other: Point,
-        error: Float = 0.001f,
+        error: Float = 1e-3f,
     ): Boolean {
         return (x - other.x).absoluteValue < error && (y - other.y).absoluteValue < error
     }

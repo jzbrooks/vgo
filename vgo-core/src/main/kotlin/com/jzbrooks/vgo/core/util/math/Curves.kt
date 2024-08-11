@@ -90,10 +90,10 @@ fun CubicCurve<*>.isConvex(tolerance: Float = 1e-3f): Boolean {
     val intersection = secondDiagonal.intersection(firstDiagonal, tolerance)
 
     return intersection != null &&
-        endControl.x < intersection.x == intersection.x < 0 &&
-        endControl.y < intersection.y == intersection.y < 0 &&
-        end.x < intersection.x == intersection.x < startControl.x &&
-        end.y < intersection.y == intersection.y < startControl.y
+            endControl.x < intersection.x && intersection.x < 0 &&
+            endControl.y < intersection.y && intersection.y < 0 &&
+            end.x < intersection.x && intersection.x < startControl.x &&
+            end.y < intersection.y && intersection.y < startControl.y
 }
 
 /**
@@ -125,11 +125,10 @@ fun CubicCurve<*>.liesOnCircle(
     circle: Circle,
     tolerance: Float = 1e-3f,
 ): Boolean {
-    @Suppress("NAME_SHADOWING")
-    val tolerance = min(ARC_THRESHOLD * tolerance, ARC_TOLERANCE * circle.radius / 100)
+    val finalTolerance = min(ARC_THRESHOLD * tolerance, ARC_TOLERANCE * circle.radius / 100)
 
     return floatArrayOf(0f, 0.25f, 0.5f, 0.75f, 1f).all { t ->
-        abs(interpolate(t).distanceTo(circle.center) - circle.radius) <= tolerance
+        abs(interpolate(t).distanceTo(circle.center) - circle.radius) <= finalTolerance
     }
 }
 
