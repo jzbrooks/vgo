@@ -4,7 +4,6 @@ import com.jzbrooks.vgo.core.optimization.BakeTransformations
 import com.jzbrooks.vgo.core.optimization.BreakoutImplicitCommands
 import com.jzbrooks.vgo.core.optimization.CollapseGroups
 import com.jzbrooks.vgo.core.optimization.CommandVariant
-import com.jzbrooks.vgo.core.optimization.ConvertCurvesToArcs
 import com.jzbrooks.vgo.core.optimization.MergePaths
 import com.jzbrooks.vgo.core.optimization.OptimizationRegistry
 import com.jzbrooks.vgo.core.optimization.Polycommands
