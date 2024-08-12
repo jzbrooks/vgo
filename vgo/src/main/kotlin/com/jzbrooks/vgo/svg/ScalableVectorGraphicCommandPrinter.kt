@@ -219,13 +219,8 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
     private fun print(point: Point) =
         buildString {
             append(print(point.x))
-
-            if (point.y.sign < 0f) {
-                append(print(point.y))
-            } else {
-                append(',')
-                append(print(point.y))
-            }
+            if (point.y.sign >= 0f) append(',')
+            append(print(point.y))
         }
 
     private fun print(parameter: CubicBezierCurve.Parameter): String {
