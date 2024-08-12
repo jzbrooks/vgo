@@ -16,6 +16,7 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import kotlin.math.sign
 
 class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrinter {
     private val formatter =
@@ -235,7 +236,7 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrin
     private fun print(point: Point) =
         buildString {
             append(print(point.x))
-            append(',')
+            if (point.y.sign >= 0f) append(',')
             append(print(point.y))
         }
 
