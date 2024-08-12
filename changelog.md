@@ -9,6 +9,7 @@
 ### Fixed
 
 - In rare cases, subpath start points were tracked incorrectly which resulted in a crash (#57)
+- Disabled `ConvertCurvesToArcs` until some edge cases can be worked out (#65)
 
 ## 2.1.0 - 09-14-2021 
 
