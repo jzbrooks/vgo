@@ -5,6 +5,7 @@
 ### Added
 
 - More robust SVG → vector conversions by Android Studio tools (#47)
+- More compact printing of 2D coordinates when y < 0 for vector drawables
 
 ### Fixed
 
