@@ -176,11 +176,15 @@ tasks {
     }
 
     val sourcesJar by creating(Jar::class) {
+        dependsOn(generateConstants)
+
         archiveClassifier.set("sources")
         from(sourceSets["main"].allSource)
     }
 
     val javadocJar by creating(Jar::class) {
+        dependsOn(generateConstants)
+
         archiveClassifier.set("javadoc")
         from(this@tasks["javadoc"])
     }
