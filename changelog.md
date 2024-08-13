@@ -4,6 +4,20 @@
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 2.2.0 - 2024-08-13
+
+### Added
+
 - More robust SVG → vector conversions by Android Studio tools (#47)
 - More compact printing of 2D coordinates when y < 0 for vector drawables
 
@@ -12,7 +26,7 @@
 - In rare cases, subpath start points were tracked incorrectly which resulted in a crash (#57)
 - Disabled `ConvertCurvesToArcs` until some edge cases can be worked out (#65)
 
-## 2.1.0 - 09-14-2021 
+## 2.1.0 - 09-14-2021
 
 - New: Simplified optimization machinery with `ElementVisitor`
 - Improvement: `MergePaths` no longer requires its own tree traversal
