@@ -22,7 +22,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    r8("com.android.tools:r8:8.3.37")
+    r8("com.android.tools:r8:8.5.35")
 }
 
 tasks {
