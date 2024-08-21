@@ -34,9 +34,12 @@ open class ShrinkVectorArtwork : DefaultTask() {
 
     @TaskAction
     fun shrink() {
-        val argList = mutableListOf<String>()
+        val argList = files.toMutableList()
 
-        argList.addAll(files)
+        if (argList.isEmpty()) {
+            logger.info("No files to shrink")
+            return
+        }
 
         if (indent != 0.toByte()) {
             argList.addAll(arrayOf("--indent", indent.toString()))
