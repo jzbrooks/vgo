@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 2.2.1 - 2024-08-21
+
 ### Fixed
 
 - Gradle plugin hangs for projects with no vector drawables
