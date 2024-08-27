@@ -173,6 +173,7 @@ class CommandLineInterfaceTests {
     }
 
     companion object {
+        @JvmStatic
         @BeforeAll
         fun createTempDir() {
             File("build/integrationTest").apply {
