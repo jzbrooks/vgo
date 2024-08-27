@@ -141,7 +141,9 @@ class Application {
         input.inputStream().use { inputStream ->
             val sizeBefore = inputStream.channel.size()
 
-            val document = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(input)
+            val documentBuilderFactory = DocumentBuilderFactory.newInstance()
+
+            val document = documentBuilderFactory.newDocumentBuilder().parse(input)
             document.documentElement.normalize()
 
             val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
@@ -164,7 +166,7 @@ class Application {
                                 } else {
                                     val pipeTerminal = ByteArrayInputStream(pipeOrigin.toByteArray())
                                     val convertedDocument =
-                                        DOCUMENT_BUILDER_FACTORY.newDocumentBuilder().parse(pipeTerminal)
+                                        documentBuilderFactory.newDocumentBuilder().parse(pipeTerminal)
                                     convertedDocument.documentElement.normalize()
 
                                     val documentRoot =
@@ -289,7 +291,6 @@ class Application {
         get() = key.isDirectory && (value.isDirectory || !value.exists())
 
     companion object {
-        private val DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance()
         private const val HELP_MESSAGE = """
 > vgo [options] [file/directory]
 
