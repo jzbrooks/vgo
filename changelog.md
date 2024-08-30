@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 2.2.2 - 2024-08-30
+
 ### Fixed
 
 - A crash when running `shrinkVectorArtwork` in a highly-modularized parallel Gradle build
