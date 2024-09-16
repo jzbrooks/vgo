@@ -20,7 +20,7 @@ import com.jzbrooks.vgo.core.util.math.liesOnCircle
 import com.jzbrooks.vgo.core.util.math.toCubicBezierCurve
 
 /**
- * Converts cubic bezier curves to arcs, when they are shorter.
+ * Converts cubic Bézier curves to arcs, when they are shorter.
  */
 class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimization {
     override fun visit(graphic: Graphic) {}
@@ -148,7 +148,7 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimiza
                     }
 
                     // If the next curve is a shorthand, it must be converted
-                    // to longhand if it the previous curve is replaced with an
+                    // to longhand if it is the previous curve is replaced with an
                     // elliptical arc.
                     if (nextCommand is SmoothCubicBezierCurve) {
                         ellipticalArcs.add(nextCommand.toCubicBezierCurve(pendingCurves.last()))
@@ -191,7 +191,7 @@ class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimiza
                 assert(command.parameters.size == 1)
 
                 val currentParameter = command.parameters[0]
-                val circle = command.fitCircle(1e-2f)
+                val circle = command.fitCircle()
                 if (circle != null && command.isConvex()) {
                     val radius = circle.radius
                     val sweep =
