@@ -23,6 +23,7 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrin
         DecimalFormat().apply {
             maximumFractionDigits = decimalDigits
             isDecimalSeparatorAlwaysShown = false
+            isGroupingUsed = false
             roundingMode = RoundingMode.HALF_UP
         }
 

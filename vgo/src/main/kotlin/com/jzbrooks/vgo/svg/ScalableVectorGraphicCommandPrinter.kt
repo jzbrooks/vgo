@@ -23,6 +23,7 @@ class ScalableVectorGraphicCommandPrinter(private val decimalDigits: Int) : Comm
         DecimalFormat().apply {
             maximumFractionDigits = decimalDigits
             isDecimalSeparatorAlwaysShown = false
+            isGroupingUsed = false
             roundingMode = RoundingMode.HALF_UP
             minimumIntegerDigits = 0
         }
