@@ -5,6 +5,7 @@
 ### Fixed
 
 - A bug that would sometimes introduce a grouping comma into a large number, breaking path data. This most often occurred in the convert curves to arcs optimization when an arc with a large radius was more compact than the corresponding Bézier curve. 
+- Thread safety issues that prevented the `shrinkVectorArtwork` task from being executed in parallel in a highly-modularized parallel Gradle build.
 
 ## 2.2.2 - 2024-08-30
 
