@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 2.2.3 - 2024-09-16
+
 ### Fixed
 
 - A bug that would sometimes introduce a grouping comma into a large number, breaking path data. This most often occurred in the convert curves to arcs optimization when an arc with a large radius was more compact than the corresponding Bézier curve. 
