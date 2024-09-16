@@ -14,27 +14,24 @@ import com.jzbrooks.vgo.core.optimization.RemoveTransparentPaths
 import com.jzbrooks.vgo.core.optimization.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.optimization.SimplifyLineCommands
 
-class SvgOptimizationRegistry : OptimizationRegistry(BOTTOM_UP, TOP_DOWN) {
-    companion object {
-        private val BOTTOM_UP =
-            listOf(
-                BakeTransformations(),
-                CollapseGroups(),
-                RemoveEmptyGroups(),
-                MergePaths(),
-            )
-
-        private val TOP_DOWN =
-            listOf(
-                RemoveTransparentPaths(),
-                BreakoutImplicitCommands(),
-                CommandVariant(CommandVariant.Mode.Relative),
-                SimplifyLineCommands(1e-3f),
-                ConvertCurvesToArcs(ScalableVectorGraphicCommandPrinter(3)),
-                SimplifyBezierCurveCommands(1e-3f),
-                RemoveRedundantCommands(),
-                CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3))),
-                Polycommands(),
-            )
-    }
-}
+class SvgOptimizationRegistry : OptimizationRegistry(
+    bottomUpOptimizations =
+        listOf(
+            BakeTransformations(),
+            CollapseGroups(),
+            RemoveEmptyGroups(),
+            MergePaths(),
+        ),
+    topDownOptimizations =
+        listOf(
+            RemoveTransparentPaths(),
+            BreakoutImplicitCommands(),
+            CommandVariant(CommandVariant.Mode.Relative),
+            SimplifyLineCommands(1e-3f),
+            ConvertCurvesToArcs(ScalableVectorGraphicCommandPrinter(3)),
+            SimplifyBezierCurveCommands(1e-3f),
+            RemoveRedundantCommands(),
+            CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3))),
+            Polycommands(),
+        ),
+)
