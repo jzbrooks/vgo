@@ -4,6 +4,20 @@
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 2.3.0 - 2024-09-21
+
+### Added
+
 - Validate binary compatibility of vgo-core's API
 
 ### Changed
