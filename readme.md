@@ -1,6 +1,6 @@
 ## vgo
 
-vgo is a tool for optimizing and converting vector artwork formats to ensure it's represented compactly without compromising quality.
+vgo is a tool for optimizing and converting between vector artwork representations.
 
 vgo is built on vgo-core, a library and intermediate representation for vector graphics.
 
