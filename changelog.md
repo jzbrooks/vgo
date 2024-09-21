@@ -4,6 +4,8 @@
 
 ### Added
 
+- Binary compatibility validation for vgo-core
+
 ### Changed
 
 - Rolled back the JVM requirement to 17

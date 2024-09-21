@@ -1,0 +1,748 @@
+public final class com/jzbrooks/vgo/core/Color {
+	public static final synthetic fun box-impl (I)Lcom/jzbrooks/vgo/core/Color;
+	public static final fun component1-w2LRezQ (I)B
+	public static final fun component2-w2LRezQ (I)B
+	public static final fun component3-w2LRezQ (I)B
+	public static final fun component4-w2LRezQ (I)B
+	public static fun constructor-impl (I)I
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (ILjava/lang/Object;)Z
+	public static final fun equals-impl0 (II)Z
+	public static final fun getAlpha-w2LRezQ (I)B
+	public static final fun getBlue-w2LRezQ (I)B
+	public static final fun getGreen-w2LRezQ (I)B
+	public static final fun getRed-w2LRezQ (I)B
+	public fun hashCode ()I
+	public static fun hashCode-impl (I)I
+	public static final fun toHexString-impl (ILcom/jzbrooks/vgo/core/Color$HexFormat;)Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (I)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()I
+}
+
+public final class com/jzbrooks/vgo/core/Color$HexFormat : java/lang/Enum {
+	public static final field ARGB Lcom/jzbrooks/vgo/core/Color$HexFormat;
+	public static final field RGBA Lcom/jzbrooks/vgo/core/Color$HexFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/Color$HexFormat;
+	public static fun values ()[Lcom/jzbrooks/vgo/core/Color$HexFormat;
+}
+
+public final class com/jzbrooks/vgo/core/Colors {
+	public static final field INSTANCE Lcom/jzbrooks/vgo/core/Colors;
+	public final fun getBLACK-3SA-Bs8 ()I
+	public final fun getCOLORS_BY_NAMES ()Ljava/util/Map;
+	public final fun getNAMES_BY_COLORS ()Ljava/util/Map;
+	public final fun getTRANSPARENT-3SA-Bs8 ()I
+}
+
+public abstract interface class com/jzbrooks/vgo/core/Writer {
+	public abstract fun getOptions ()Ljava/util/Set;
+	public abstract fun write (Lcom/jzbrooks/vgo/core/graphic/Graphic;Ljava/io/OutputStream;)V
+}
+
+public abstract class com/jzbrooks/vgo/core/Writer$Option {
+}
+
+public final class com/jzbrooks/vgo/core/Writer$Option$Indent : com/jzbrooks/vgo/core/Writer$Option {
+	public fun <init> (I)V
+	public final fun getColumns ()I
+}
+
+public final class com/jzbrooks/vgo/core/graphic/ClipPath : com/jzbrooks/vgo/core/graphic/ContainerElement {
+	public fun <init> (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;)V
+	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/Map;
+	public final fun copy (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;)Lcom/jzbrooks/vgo/core/graphic/ClipPath;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/ClipPath;Ljava/util/List;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/ClipPath;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getElements ()Ljava/util/List;
+	public fun getForeign ()Ljava/util/Map;
+	public fun getId ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun setElements (Ljava/util/List;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/jzbrooks/vgo/core/graphic/ContainerElement : com/jzbrooks/vgo/core/graphic/Element {
+	public abstract fun getElements ()Ljava/util/List;
+	public abstract fun setElements (Ljava/util/List;)V
+}
+
+public abstract interface class com/jzbrooks/vgo/core/graphic/Element {
+	public abstract fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
+	public abstract fun getForeign ()Ljava/util/Map;
+	public abstract fun getId ()Ljava/lang/String;
+}
+
+public abstract interface class com/jzbrooks/vgo/core/graphic/ElementVisitor {
+	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public final class com/jzbrooks/vgo/core/graphic/Extra : com/jzbrooks/vgo/core/graphic/ContainerElement {
+	public fun <init> (Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Ljava/util/Map;)V
+	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/util/Map;
+	public final fun copy (Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Ljava/util/Map;)Lcom/jzbrooks/vgo/core/graphic/Extra;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Extra;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Extra;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getElements ()Ljava/util/List;
+	public fun getForeign ()Ljava/util/Map;
+	public fun getId ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun setElements (Ljava/util/List;)V
+	public final fun setName (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/jzbrooks/vgo/core/graphic/Graphic : com/jzbrooks/vgo/core/graphic/ContainerElement {
+}
+
+public final class com/jzbrooks/vgo/core/graphic/Group : com/jzbrooks/vgo/core/graphic/ContainerElement {
+	public fun <init> (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/util/Map;
+	public final fun component4 ()Lcom/jzbrooks/vgo/core/util/math/Matrix3;
+	public final fun copy (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)Lcom/jzbrooks/vgo/core/graphic/Group;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Group;Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Group;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getElements ()Ljava/util/List;
+	public fun getForeign ()Ljava/util/Map;
+	public fun getId ()Ljava/lang/String;
+	public final fun getTransform ()Lcom/jzbrooks/vgo/core/util/math/Matrix3;
+	public fun hashCode ()I
+	public fun setElements (Ljava/util/List;)V
+	public final fun setTransform (Lcom/jzbrooks/vgo/core/util/math/Matrix3;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/Path : com/jzbrooks/vgo/core/graphic/Element {
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()F
+	public final fun component2 ()Ljava/util/Map;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4-3SA-Bs8 ()I
+	public final fun component5 ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
+	public final fun component6-3SA-Bs8 ()I
+	public final fun component7 ()F
+	public final fun component8 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
+	public final fun component9 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
+	public final fun copy-Bc2dgtw (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Path;
+	public static synthetic fun copy-Bc2dgtw$default (Lcom/jzbrooks/vgo/core/graphic/Path;Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Path;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCommands ()Ljava/util/List;
+	public final fun getFill-3SA-Bs8 ()I
+	public final fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
+	public fun getForeign ()Ljava/util/Map;
+	public fun getId ()Ljava/lang/String;
+	public final fun getStroke-3SA-Bs8 ()I
+	public final fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
+	public final fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
+	public final fun getStrokeMiterLimit ()F
+	public final fun getStrokeWidth ()F
+	public fun hashCode ()I
+	public final fun setCommands (Ljava/util/List;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/Path$FillRule : java/lang/Enum {
+	public static final field EVEN_ODD Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
+	public static final field NON_ZERO Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
+	public static fun values ()[Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/Path$LineCap : java/lang/Enum {
+	public static final field BUTT Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
+	public static final field ROUND Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
+	public static final field SQUARE Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
+	public static fun values ()[Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/Path$LineJoin : java/lang/Enum {
+	public static final field ARCS Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
+	public static final field BEVEL Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
+	public static final field MITER Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
+	public static final field MITER_CLIP Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
+	public static final field ROUND Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
+	public static fun values ()[Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/ClosePath : com/jzbrooks/vgo/core/graphic/command/Command {
+	public static final field INSTANCE Lcom/jzbrooks/vgo/core/graphic/command/ClosePath;
+}
+
+public abstract interface class com/jzbrooks/vgo/core/graphic/command/Command {
+}
+
+public abstract interface class com/jzbrooks/vgo/core/graphic/command/CommandParameter {
+	public abstract fun getEnd ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public abstract fun setEnd (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+}
+
+public abstract interface class com/jzbrooks/vgo/core/graphic/command/CommandPrinter {
+	public abstract fun print (Lcom/jzbrooks/vgo/core/graphic/command/Command;)Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/CommandString {
+	public static final field Companion Lcom/jzbrooks/vgo/core/graphic/command/CommandString$Companion;
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/graphic/command/CommandString;
+	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getData ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public static final fun toCommandList-impl (Ljava/lang/String;)Ljava/util/List;
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/CommandString$Companion {
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/CommandVariant : java/lang/Enum {
+	public static final field ABSOLUTE Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public static final field RELATIVE Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public static fun values ()[Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/CubicBezierCurve : com/jzbrooks/vgo/core/graphic/command/CubicCurve {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getParameters ()Ljava/util/List;
+	public fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public fun hashCode ()I
+	public fun setParameters (Ljava/util/List;)V
+	public fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/CubicBezierCurve$Parameter : com/jzbrooks/vgo/core/graphic/command/CommandParameter {
+	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun component2 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun component3 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun copy (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve$Parameter;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve$Parameter;Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve$Parameter;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getEnd ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun getEndControl ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun getStartControl ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public fun hashCode ()I
+	public fun setEnd (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun setEndControl (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun setStartControl (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/jzbrooks/vgo/core/graphic/command/CubicCurve : com/jzbrooks/vgo/core/graphic/command/ParameterizedCommand {
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve : com/jzbrooks/vgo/core/graphic/command/ParameterizedCommand {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getParameters ()Ljava/util/List;
+	public fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public fun hashCode ()I
+	public fun setParameters (Ljava/util/List;)V
+	public fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag : java/lang/Enum {
+	public static final field LARGE Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;
+	public static final field SMALL Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;
+	public static fun values ()[Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$Parameter : com/jzbrooks/vgo/core/graphic/command/CommandParameter {
+	public fun <init> (FFFLcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun component3 ()F
+	public final fun component4 ()Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;
+	public final fun component5 ()Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;
+	public final fun component6 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun copy (FFFLcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$Parameter;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$Parameter;FFFLcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;Lcom/jzbrooks/vgo/core/util/math/Point;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$Parameter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAngle ()F
+	public final fun getArc ()Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;
+	public fun getEnd ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun getRadiusX ()F
+	public final fun getRadiusY ()F
+	public final fun getSweep ()Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;
+	public fun hashCode ()I
+	public final fun setAngle (F)V
+	public final fun setArc (Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$ArcFlag;)V
+	public fun setEnd (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun setRadiusX (F)V
+	public final fun setRadiusY (F)V
+	public final fun setSweep (Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag : java/lang/Enum {
+	public static final field ANTICLOCKWISE Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;
+	public static final field CLOCKWISE Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;
+	public static fun values ()[Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$SweepFlag;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/HorizontalLineTo : com/jzbrooks/vgo/core/graphic/command/ParameterizedCommand {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/command/HorizontalLineTo;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/HorizontalLineTo;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/HorizontalLineTo;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getParameters ()Ljava/util/List;
+	public fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public fun hashCode ()I
+	public fun setParameters (Ljava/util/List;)V
+	public fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/LineTo : com/jzbrooks/vgo/core/graphic/command/ParameterizedCommand {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/command/LineTo;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/LineTo;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/LineTo;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getParameters ()Ljava/util/List;
+	public fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public fun hashCode ()I
+	public fun setParameters (Ljava/util/List;)V
+	public fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/MoveTo : com/jzbrooks/vgo/core/graphic/command/ParameterizedCommand {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/command/MoveTo;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/MoveTo;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/MoveTo;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getParameters ()Ljava/util/List;
+	public fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public fun hashCode ()I
+	public fun setParameters (Ljava/util/List;)V
+	public fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/jzbrooks/vgo/core/graphic/command/ParameterizedCommand : com/jzbrooks/vgo/core/graphic/command/Command {
+	public abstract fun getParameters ()Ljava/util/List;
+	public abstract fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public abstract fun setParameters (Ljava/util/List;)V
+	public abstract fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/QuadraticBezierCurve : com/jzbrooks/vgo/core/graphic/command/ParameterizedCommand {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/command/QuadraticBezierCurve;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/QuadraticBezierCurve;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/QuadraticBezierCurve;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getParameters ()Ljava/util/List;
+	public fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public fun hashCode ()I
+	public fun setParameters (Ljava/util/List;)V
+	public fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/QuadraticBezierCurve$Parameter : com/jzbrooks/vgo/core/graphic/command/CommandParameter {
+	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun component2 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun copy (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/graphic/command/QuadraticBezierCurve$Parameter;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/QuadraticBezierCurve$Parameter;Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/QuadraticBezierCurve$Parameter;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getControl ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public fun getEnd ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public fun hashCode ()I
+	public final fun setControl (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public fun setEnd (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve : com/jzbrooks/vgo/core/graphic/command/CubicCurve {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getParameters ()Ljava/util/List;
+	public fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public fun hashCode ()I
+	public fun setParameters (Ljava/util/List;)V
+	public fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve$Parameter : com/jzbrooks/vgo/core/graphic/command/CommandParameter {
+	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun component2 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun copy (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve$Parameter;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve$Parameter;Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve$Parameter;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getEnd ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun getEndControl ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public fun hashCode ()I
+	public fun setEnd (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun setEndControl (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/SmoothQuadraticBezierCurve : com/jzbrooks/vgo/core/graphic/command/ParameterizedCommand {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/command/SmoothQuadraticBezierCurve;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/SmoothQuadraticBezierCurve;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/SmoothQuadraticBezierCurve;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getParameters ()Ljava/util/List;
+	public fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public fun hashCode ()I
+	public fun setParameters (Ljava/util/List;)V
+	public fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/graphic/command/VerticalLineTo : com/jzbrooks/vgo/core/graphic/command/ParameterizedCommand {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public final fun component2 ()Ljava/util/List;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/command/VerticalLineTo;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/command/VerticalLineTo;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/command/VerticalLineTo;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getParameters ()Ljava/util/List;
+	public fun getVariant ()Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;
+	public fun hashCode ()I
+	public fun setParameters (Ljava/util/List;)V
+	public fun setVariant (Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/optimization/BakeTransformations : com/jzbrooks/vgo/core/graphic/ElementVisitor, com/jzbrooks/vgo/core/optimization/BottomUpOptimization {
+	public fun <init> ()V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public abstract interface class com/jzbrooks/vgo/core/optimization/BottomUpOptimization : com/jzbrooks/vgo/core/graphic/ElementVisitor {
+}
+
+public final class com/jzbrooks/vgo/core/optimization/BreakoutImplicitCommands : com/jzbrooks/vgo/core/optimization/TopDownOptimization {
+	public fun <init> ()V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public final class com/jzbrooks/vgo/core/optimization/CollapseGroups : com/jzbrooks/vgo/core/optimization/BottomUpOptimization {
+	public fun <init> ()V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public final class com/jzbrooks/vgo/core/optimization/CommandVariant : com/jzbrooks/vgo/core/optimization/TopDownOptimization {
+	public fun <init> (Lcom/jzbrooks/vgo/core/optimization/CommandVariant$Mode;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public abstract class com/jzbrooks/vgo/core/optimization/CommandVariant$Mode {
+}
+
+public final class com/jzbrooks/vgo/core/optimization/CommandVariant$Mode$Absolute : com/jzbrooks/vgo/core/optimization/CommandVariant$Mode {
+	public static final field INSTANCE Lcom/jzbrooks/vgo/core/optimization/CommandVariant$Mode$Absolute;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/optimization/CommandVariant$Mode$Compact : com/jzbrooks/vgo/core/optimization/CommandVariant$Mode {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;)Lcom/jzbrooks/vgo/core/optimization/CommandVariant$Mode$Compact;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/optimization/CommandVariant$Mode$Compact;Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/optimization/CommandVariant$Mode$Compact;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPrinter ()Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/optimization/CommandVariant$Mode$Relative : com/jzbrooks/vgo/core/optimization/CommandVariant$Mode {
+	public static final field INSTANCE Lcom/jzbrooks/vgo/core/optimization/CommandVariant$Mode$Relative;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/optimization/ConvertCurvesToArcs : com/jzbrooks/vgo/core/optimization/TopDownOptimization {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public final class com/jzbrooks/vgo/core/optimization/MergePaths : com/jzbrooks/vgo/core/optimization/BottomUpOptimization {
+	public fun <init> ()V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public abstract interface class com/jzbrooks/vgo/core/optimization/Optimization {
+	public abstract fun optimize (Lcom/jzbrooks/vgo/core/graphic/Element;)V
+}
+
+public abstract class com/jzbrooks/vgo/core/optimization/OptimizationRegistry {
+	public fun <init> (Ljava/util/List;Ljava/util/List;)V
+	public final fun apply (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+}
+
+public final class com/jzbrooks/vgo/core/optimization/Polycommands : com/jzbrooks/vgo/core/optimization/TopDownOptimization {
+	public fun <init> ()V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public final class com/jzbrooks/vgo/core/optimization/RemoveEmptyGroups : com/jzbrooks/vgo/core/optimization/BottomUpOptimization {
+	public fun <init> ()V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public final class com/jzbrooks/vgo/core/optimization/RemoveRedundantCommands : com/jzbrooks/vgo/core/optimization/TopDownOptimization {
+	public fun <init> ()V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public final class com/jzbrooks/vgo/core/optimization/RemoveTransparentPaths : com/jzbrooks/vgo/core/optimization/TopDownOptimization {
+	public fun <init> ()V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public final class com/jzbrooks/vgo/core/optimization/SimplifyBezierCurveCommands : com/jzbrooks/vgo/core/optimization/TopDownOptimization {
+	public fun <init> (F)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public final class com/jzbrooks/vgo/core/optimization/SimplifyLineCommands : com/jzbrooks/vgo/core/optimization/TopDownOptimization {
+	public field commands Ljava/util/List;
+	public fun <init> (F)V
+	public final fun getCommands ()Ljava/util/List;
+	public final fun setCommands (Ljava/util/List;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public abstract interface class com/jzbrooks/vgo/core/optimization/TopDownOptimization : com/jzbrooks/vgo/core/graphic/ElementVisitor {
+}
+
+public final class com/jzbrooks/vgo/core/util/element/TraverseKt {
+	public static final fun traverseBottomUp (Lcom/jzbrooks/vgo/core/graphic/Element;Lkotlin/jvm/functions/Function1;)Lcom/jzbrooks/vgo/core/graphic/Element;
+	public static final fun traverseTopDown (Lcom/jzbrooks/vgo/core/graphic/Element;Lkotlin/jvm/functions/Function1;)Lcom/jzbrooks/vgo/core/graphic/Element;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/Circle {
+	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;F)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun component2 ()F
+	public final fun copy (Lcom/jzbrooks/vgo/core/util/math/Point;F)Lcom/jzbrooks/vgo/core/util/math/Circle;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/util/math/Circle;Lcom/jzbrooks/vgo/core/util/math/Point;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Circle;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCenter ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun getRadius ()F
+	public fun hashCode ()I
+	public final fun setCenter (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/CommandsKt {
+	public static final fun computeAbsoluteCoordinates (Ljava/util/List;)Lcom/jzbrooks/vgo/core/util/math/Point;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/CurvesKt {
+	public static final fun findArcAngle (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;Lcom/jzbrooks/vgo/core/util/math/Circle;)F
+	public static final fun fitCircle (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;F)Lcom/jzbrooks/vgo/core/util/math/Circle;
+	public static synthetic fun fitCircle$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Circle;
+	public static final fun interpolate (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;F)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public static final fun isConvex (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;F)Z
+	public static synthetic fun isConvex$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;FILjava/lang/Object;)Z
+	public static final fun liesOnCircle (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;Lcom/jzbrooks/vgo/core/util/math/Circle;F)Z
+	public static synthetic fun liesOnCircle$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;Lcom/jzbrooks/vgo/core/util/math/Circle;FILjava/lang/Object;)Z
+	public static final fun toCubicBezierCurve (Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve;Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;)Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/LineSegment {
+	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun component2 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun copy (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/util/math/LineSegment;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/util/math/LineSegment;Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/LineSegment;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFirst ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun getSecond ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public fun hashCode ()I
+	public final fun intersection (Lcom/jzbrooks/vgo/core/util/math/LineSegment;F)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public static synthetic fun intersection$default (Lcom/jzbrooks/vgo/core/util/math/LineSegment;Lcom/jzbrooks/vgo/core/util/math/LineSegment;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/jzbrooks/vgo/core/util/math/Matrix3 {
+	public static final field Companion Lcom/jzbrooks/vgo/core/util/math/Matrix3$Companion;
+	public abstract fun clone ()Lcom/jzbrooks/vgo/core/util/math/Matrix3;
+	public abstract fun contentsEqual (Lcom/jzbrooks/vgo/core/util/math/Matrix3;F)Z
+	public static fun contentsEqual (Lcom/jzbrooks/vgo/core/util/math/Matrix3;Lcom/jzbrooks/vgo/core/util/math/Matrix3;F)Z
+	public static fun from ([F)Lcom/jzbrooks/vgo/core/util/math/Matrix3;
+	public abstract fun get (II)F
+	public abstract fun times (Lcom/jzbrooks/vgo/core/util/math/Matrix3;)Lcom/jzbrooks/vgo/core/util/math/Matrix3;
+	public abstract fun times (Lcom/jzbrooks/vgo/core/util/math/Vector3;)Lcom/jzbrooks/vgo/core/util/math/Vector3;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/Matrix3$Companion {
+	public final fun contentsEqual (Lcom/jzbrooks/vgo/core/util/math/Matrix3;Lcom/jzbrooks/vgo/core/util/math/Matrix3;F)Z
+	public final fun from ([F)Lcom/jzbrooks/vgo/core/util/math/Matrix3;
+	public final fun getIDENTITY ()Lcom/jzbrooks/vgo/core/util/math/Matrix3;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/Matrix3$DefaultImpls {
+	public static synthetic fun contentsEqual$default (Lcom/jzbrooks/vgo/core/util/math/Matrix3;Lcom/jzbrooks/vgo/core/util/math/Matrix3;FILjava/lang/Object;)Z
+}
+
+public abstract interface class com/jzbrooks/vgo/core/util/math/MutableMatrix3 : com/jzbrooks/vgo/core/util/math/Matrix3 {
+	public static final field Companion Lcom/jzbrooks/vgo/core/util/math/MutableMatrix3$Companion;
+	public static fun from ([F)Lcom/jzbrooks/vgo/core/util/math/MutableMatrix3;
+	public static fun identity ()Lcom/jzbrooks/vgo/core/util/math/MutableMatrix3;
+	public abstract fun set (IIF)V
+}
+
+public final class com/jzbrooks/vgo/core/util/math/MutableMatrix3$Companion {
+	public final fun from ([F)Lcom/jzbrooks/vgo/core/util/math/MutableMatrix3;
+	public final fun identity ()Lcom/jzbrooks/vgo/core/util/math/MutableMatrix3;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/Point {
+	public static final field Companion Lcom/jzbrooks/vgo/core/util/math/Point$Companion;
+	public fun <init> (FF)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun copy (FF)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/util/math/Point;FFILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun distanceTo (Lcom/jzbrooks/vgo/core/util/math/Point;)F
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getX ()F
+	public final fun getY ()F
+	public fun hashCode ()I
+	public final fun isApproximately (Lcom/jzbrooks/vgo/core/util/math/Point;F)Z
+	public static synthetic fun isApproximately$default (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;FILjava/lang/Object;)Z
+	public final fun minus (Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun plus (Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun times (F)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun times (Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/Point$Companion {
+	public final fun getZERO ()Lcom/jzbrooks/vgo/core/util/math/Point;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/Vector3 {
+	public fun <init> (FFF)V
+	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun component3 ()F
+	public final fun copy (FFF)Lcom/jzbrooks/vgo/core/util/math/Vector3;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/util/math/Vector3;FFFILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Vector3;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getI ()F
+	public final fun getJ ()F
+	public final fun getK ()F
+	public fun hashCode ()I
+	public final fun toPoint ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public fun toString ()Ljava/lang/String;
+}
+
