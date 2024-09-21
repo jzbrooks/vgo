@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Rolled back the JVM requirement to 17
+
 ### Deprecated
 
 ### Removed

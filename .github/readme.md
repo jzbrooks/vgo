@@ -1,6 +1,6 @@
 ## vgo
 
-vgo is a tool for converting vector artwork formats and optimizing your artwork to ensure it's represented compactly without compromising quality.
+vgo is a tool for optimizing and converting vector artwork formats to ensure it's represented compactly without compromising quality.
 
 vgo is built on vgo-core, a library and intermediate representation for vector graphics.
 
@@ -17,7 +17,7 @@ vgo is built on vgo-core, a library and intermediate representation for vector g
 #### Manually
 Download the distribution from the releases page and ensure it has execute permission. On macOS & Linux run `chmod u+x vgo`.
 
-vgo requires Java 11.
+vgo requires Java 17.
 
 ## Gradle Plugin
 The plugin adds the `shrinkVectorArtwork` task to your project.
@@ -88,7 +88,7 @@ Options:
 
 This project uses the Gradle build system.
 
-To build the binary: `/.gradlew binary`
+To build the binary: `./gradlew binary`
 
 To run the tests: `./gradlew check`
 
