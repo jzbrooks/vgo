@@ -4,19 +4,11 @@
 
 ### Added
 
-- Binary compatibility validation for vgo-core
+- Validate binary compatibility of vgo-core's API
 
 ### Changed
 
 - Rolled back the JVM requirement to 17
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 2.2.3 - 2024-09-16
 
