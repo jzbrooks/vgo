@@ -15,7 +15,7 @@ val r8: Configuration by configurations.creating
 
 dependencies {
     implementation(project(":vgo-core"))
-    implementation("com.android.tools:sdk-common:31.6.0")
+    implementation("com.android.tools:sdk-common:31.7.0")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.1")
