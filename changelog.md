@@ -5,14 +5,7 @@
 ### Added
 
 ### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
+- Support AGP 8.7.0. This is a stop-gap solution which will be improved in #89.
 
 ## 2.3.0 - 2024-09-21
 
