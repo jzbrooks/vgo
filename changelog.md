@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-### Added
-
 ### Changed
 - Support AGP 8.7.0. This is a stop-gap solution which will be improved in #89.
 
