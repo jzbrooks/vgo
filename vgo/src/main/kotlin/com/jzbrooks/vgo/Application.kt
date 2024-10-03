@@ -59,7 +59,7 @@ class Application {
                 outputPaths.toList()
             }
 
-        outputFormat = argReader.readOption("format")
+        outputFormat = argReader.readOption("format|f")
 
         var inputs = argReader.readArguments()
         if (inputs.isEmpty()) {
@@ -295,12 +295,12 @@ class Application {
 > vgo [options] [file/directory]
 
 Options:
-  -h --help       print this message
-  -o --output     file or directory, if not provided the input will be overwritten
-  -s --stats      print statistics on processed files to standard out
-  -v --version    print the version number
-  --indent value  write files with value columns of indentation
-  --format value  output format (svg, vd, etc)
+  -h --help          print this message
+  -o --output        file or directory, if not provided the input will be overwritten
+  -s --stats         print statistics on processed files to standard out
+  -v --version       print the version number
+  --indent value     write files with value columns of indentation
+  -f --format value  output format (svg, vd, etc)
         """
 
         @JvmStatic
