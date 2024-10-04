@@ -1,4 +1,14 @@
-package com.jzbrooks.vgo
+package com.jzbrooks.vgo.cli
+
+import kotlin.collections.any
+import kotlin.collections.first
+import kotlin.collections.firstOrNull
+import kotlin.collections.getOrElse
+import kotlin.collections.indexOfFirst
+import kotlin.collections.isNotEmpty
+import kotlin.collections.map
+import kotlin.text.isNotBlank
+import kotlin.text.split
 
 class ArgReader(private val args: MutableList<String>) {
     private val hasArguments
@@ -41,7 +51,7 @@ class ArgReader(private val args: MutableList<String>) {
     }
 
     fun readArguments(): List<String> {
-        val arguments = mutableListOf<String>()
+        val arguments = kotlin.collections.mutableListOf<String>()
         while (hasArguments) {
             arguments.add(readArgument())
         }
