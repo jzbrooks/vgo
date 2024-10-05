@@ -12,6 +12,8 @@ interface Writer<in T : Graphic> {
     )
 
     sealed class Option {
-        class Indent(val columns: Int) : Option()
+        class Indent(
+            val columns: Int,
+        ) : Option()
     }
 }

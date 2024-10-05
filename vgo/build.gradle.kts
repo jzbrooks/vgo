@@ -9,7 +9,10 @@ plugins {
     id("com.vanniktech.maven.publish")
 }
 
-kotlin.sourceSets.getByName("main").kotlin.srcDir("src/generated/kotlin")
+kotlin.sourceSets
+    .getByName("main")
+    .kotlin
+    .srcDir("src/generated/kotlin")
 
 dependencies {
     implementation(project(":vgo-core"))
@@ -20,7 +23,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.1")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
-
 }
 
 tasks {

@@ -20,13 +20,14 @@ import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-class Application(private val options: Options) {
+class Vgo(
+    private val options: Options,
+) {
     private var printFileNames = false
     private var totalBytesBefore = 0.0
     private var totalBytesAfter = 0.0
 
     fun run(): Int {
-
         if (options.printHelp) {
             println(HELP_MESSAGE)
             return 0
@@ -127,7 +128,11 @@ class Application(private val options: Options) {
             val document = documentBuilderFactory.newDocumentBuilder().parse(input)
             document.documentElement.normalize()
 
-            val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
+            val rootNodes =
+                document.childNodes
+                    .asSequence()
+                    .filter { it.nodeType == Document.ELEMENT_NODE }
+                    .toList()
 
             var graphic =
                 when {
@@ -155,7 +160,8 @@ class Application(private val options: Options) {
                                             it.nodeType == Document.ELEMENT_NODE
                                         }
 
-                                    com.jzbrooks.vgo.vd.parse(documentRoot)
+                                    com.jzbrooks.vgo.vd
+                                        .parse(documentRoot)
                                 }
                             }
                         } else {
@@ -163,7 +169,8 @@ class Application(private val options: Options) {
                         }
                     }
                     rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } -> {
-                        com.jzbrooks.vgo.vd.parse(rootNodes.first())
+                        com.jzbrooks.vgo.vd
+                            .parse(rootNodes.first())
                     }
                     else -> if (input == output) return else null
                 }
@@ -244,8 +251,8 @@ class Application(private val options: Options) {
         }
     }
 
-    private fun formatByteDescription(bytes: Long): String {
-        return when {
+    private fun formatByteDescription(bytes: Long): String =
+        when {
             bytes >= 1024 * 1024 * 1024 -> {
                 val gigabytes = bytes / (1024.0 * 1024.0 * 1024.0)
                 "%.2f GiB".format(gigabytes)
@@ -260,7 +267,6 @@ class Application(private val options: Options) {
             }
             else -> "$bytes B"
         }
-    }
 
     private val Map.Entry<File, File>.inputExists
         get() = key.exists()

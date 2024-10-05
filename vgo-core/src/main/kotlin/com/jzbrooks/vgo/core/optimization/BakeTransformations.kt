@@ -25,7 +25,9 @@ import java.util.Stack
 /**
  * Apply transformations to paths command coordinates in a group
  */
-class BakeTransformations : ElementVisitor, BottomUpOptimization {
+class BakeTransformations :
+    ElementVisitor,
+    BottomUpOptimization {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}
@@ -58,12 +60,11 @@ class BakeTransformations : ElementVisitor, BottomUpOptimization {
         group.transform = Matrix3.IDENTITY
     }
 
-    private fun areElementsRelocatable(group: Group): Boolean {
-        return group.id == null &&
+    private fun areElementsRelocatable(group: Group): Boolean =
+        group.id == null &&
             group.transform.contentsEqual(Matrix3.IDENTITY) &&
             group.foreign.isEmpty() &&
             group.elements.all { it is Path }
-    }
 
     private fun applyTransform(
         path: Path,

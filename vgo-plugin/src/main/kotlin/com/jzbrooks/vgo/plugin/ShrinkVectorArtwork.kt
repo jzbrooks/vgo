@@ -1,6 +1,6 @@
 package com.jzbrooks.vgo.plugin
 
-import com.jzbrooks.vgo.Application
+import com.jzbrooks.vgo.Vgo
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
@@ -34,16 +34,17 @@ open class ShrinkVectorArtwork : DefaultTask() {
 
     @TaskAction
     fun shrink() {
-        val options = Application.Options(
-            printHelp = false,
-            printVersion = false,
-            printStats = showStatistics,
-            indent = indent.takeIf { it > 0 }?.toInt(),
-            output = emptyList(),
-            format = outputFormat.cliName,
-            input = files
-        )
+        val options =
+            Vgo.Options(
+                printHelp = false,
+                printVersion = false,
+                printStats = showStatistics,
+                indent = indent.takeIf { it > 0 }?.toInt(),
+                output = emptyList(),
+                format = outputFormat.cliName,
+                input = files,
+            )
 
-        Application(options).run()
+        Vgo(options).run()
     }
 }

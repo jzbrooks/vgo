@@ -22,7 +22,9 @@ import com.jzbrooks.vgo.core.util.math.toCubicBezierCurve
 /**
  * Converts cubic Bézier curves to arcs, when they are shorter.
  */
-class ConvertCurvesToArcs(private val printer: CommandPrinter) : TopDownOptimization {
+class ConvertCurvesToArcs(
+    private val printer: CommandPrinter,
+) : TopDownOptimization {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}

@@ -17,7 +17,9 @@ import kotlin.math.sign
 /**
  * Convert lines into shorter commands where possible
  */
-class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization {
+class SimplifyLineCommands(
+    private val tolerance: Float,
+) : TopDownOptimization {
     lateinit var commands: MutableList<Command>
 
     override fun visit(graphic: Graphic) {}
@@ -48,8 +50,8 @@ class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization {
         path.commands = commands
     }
 
-    private fun process(command: Command): Command? {
-        return when (command) {
+    private fun process(command: Command): Command? =
+        when (command) {
             is LineTo -> {
                 val firstParameter = command.parameters.first()
                 when {
@@ -81,5 +83,4 @@ class SimplifyLineCommands(private val tolerance: Float) : TopDownOptimization {
             }
             else -> command
         }
-    }
 }

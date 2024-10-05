@@ -5,6 +5,6 @@
 -mergeinterfacesaggressively
 -verbose
 
--keep class com.jzbrooks.vgo.cli.MainKt {
+-keep class com.jzbrooks.vgo.cli.ApplicationKt {
   public static void main(java.lang.String[]);
 }

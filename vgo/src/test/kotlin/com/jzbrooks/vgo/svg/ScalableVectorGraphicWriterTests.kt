@@ -107,7 +107,9 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
 
             val output = memoryStream.toDocument()
-            val groupChildren = output.firstChild.firstChild.childNodes.toList()
+            val groupChildren =
+                output.firstChild.firstChild.childNodes
+                    .toList()
 
             assertThat(groupChildren).hasSameSizeAs(graphic.elements)
         }
@@ -141,18 +143,21 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val extraChildren = output.firstChild.childNodes.item(1).childNodes.toList()
+            val extraChildren =
+                output.firstChild.childNodes
+                    .item(1)
+                    .childNodes
+                    .toList()
 
             assertThat(extraChildren).index(0).hasName("g")
         }
     }
 
-    private fun ByteArrayOutputStream.toDocument(): Document {
-        return DocumentBuilderFactory
+    private fun ByteArrayOutputStream.toDocument(): Document =
+        DocumentBuilderFactory
             .newInstance()
             .newDocumentBuilder()
             .parse(ByteArrayInputStream(toByteArray()))
-    }
 
     companion object {
         val graphic =

@@ -115,7 +115,12 @@ class SimplifyLineCommandsTests {
         SimplifyLineCommands(0f).visit(path)
 
         assertThat(path.commands.filterIsInstance<HorizontalLineTo>()).hasSize(1)
-        assertThat(path.commands.filterIsInstance<HorizontalLineTo>().single().parameters).containsOnly(27f)
+        assertThat(
+            path.commands
+                .filterIsInstance<HorizontalLineTo>()
+                .single()
+                .parameters,
+        ).containsOnly(27f)
     }
 
     @Test
@@ -152,7 +157,12 @@ class SimplifyLineCommandsTests {
         SimplifyLineCommands(0f).visit(path)
 
         assertThat(path.commands.filterIsInstance<VerticalLineTo>()).hasSize(1)
-        assertThat(path.commands.filterIsInstance<VerticalLineTo>().single().parameters).containsOnly(20f)
+        assertThat(
+            path.commands
+                .filterIsInstance<VerticalLineTo>()
+                .single()
+                .parameters,
+        ).containsOnly(20f)
     }
 
     @Test

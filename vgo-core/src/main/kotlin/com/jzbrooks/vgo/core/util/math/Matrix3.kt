@@ -76,7 +76,9 @@ interface MutableMatrix3 : Matrix3 {
 }
 
 @JvmInline
-private value class ArrayMatrix3(private val data: FloatArray) : MutableMatrix3 {
+private value class ArrayMatrix3(
+    private val data: FloatArray,
+) : MutableMatrix3 {
     override operator fun get(
         row: Int,
         column: Int,
@@ -106,13 +108,12 @@ private value class ArrayMatrix3(private val data: FloatArray) : MutableMatrix3 
         return ArrayMatrix3(data)
     }
 
-    override operator fun times(other: Vector3): Vector3 {
-        return Vector3(
+    override operator fun times(other: Vector3): Vector3 =
+        Vector3(
             this[0, 0] * other.i + this[0, 1] * other.j + this[0, 2] * other.k,
             this[1, 0] * other.i + this[1, 1] * other.j + this[1, 2] * other.k,
             this[2, 0] * other.i + this[2, 1] * other.j + this[2, 2] * other.k,
         )
-    }
 
     override fun clone(): Matrix3 = ArrayMatrix3(data.clone())
 

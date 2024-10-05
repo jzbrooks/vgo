@@ -7,17 +7,25 @@ tasks {
     jar {
         dependsOn(configurations.runtimeClasspath)
         manifest {
-            attributes["Main-Class"] = "com.jzbrooks.vgo.cli.MainKt"
+            attributes["Main-Class"] = "com.jzbrooks.vgo.cli.ApplicationKt"
             attributes["Bundle-Version"] = project.properties["VERSION_NAME"]
         }
 
-        val sourceClasses = sourceSets.main.get().output.classesDirs
+        val sourceClasses =
+            sourceSets.main
+                .get()
+                .output.classesDirs
         inputs.files(sourceClasses)
         destinationDirectory.set(layout.buildDirectory.dir("libs/debug"))
 
         doFirst {
             from(files(sourceClasses))
-            from(configurations.runtimeClasspath.get().asFileTree.files.map(::zipTree))
+            from(
+                configurations.runtimeClasspath
+                    .get()
+                    .asFileTree.files
+                    .map(::zipTree),
+            )
 
             exclude(
                 "**/*.kotlin_metadata",
@@ -40,7 +48,6 @@ tasks {
             )
         }
     }
-
 
     val optimize by registering(JavaExec::class) {
         description = "Runs r8 on the jar application."

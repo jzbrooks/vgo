@@ -142,18 +142,32 @@ class CurvesTests {
         assertThat(curve.isConvex()).isFalse()
     }
 
-    data class FitCircle(val curve: CubicBezierCurve, val expectedCircle: Circle)
+    data class FitCircle(
+        val curve: CubicBezierCurve,
+        val expectedCircle: Circle,
+    )
 
-    data class ShortcutFitCircle(val curve: SmoothCubicBezierCurve, val expectedCircle: Circle?)
+    data class ShortcutFitCircle(
+        val curve: SmoothCubicBezierCurve,
+        val expectedCircle: Circle?,
+    )
 
-    data class ParameterizedCurve(val curve: CubicBezierCurve, val t: Float, val expected: Point)
+    data class ParameterizedCurve(
+        val curve: CubicBezierCurve,
+        val t: Float,
+        val expected: Point,
+    )
 
-    data class ShortcutParameterizedCurve(val curve: SmoothCubicBezierCurve, val t: Float, val expected: Point)
+    data class ShortcutParameterizedCurve(
+        val curve: SmoothCubicBezierCurve,
+        val t: Float,
+        val expected: Point,
+    )
 
     companion object {
         @JvmStatic
-        fun `Curve fits to circle`(): List<FitCircle> {
-            return listOf(
+        fun `Curve fits to circle`(): List<FitCircle> =
+            listOf(
                 FitCircle(
                     CubicBezierCurve(
                         CommandVariant.RELATIVE,
@@ -164,11 +178,10 @@ class CurvesTests {
                     Circle(Point(-0.0005425225f, 5.0005436f), 5.0005436f),
                 ),
             )
-        }
 
         @JvmStatic
-        fun `Shortcut curve does not fit to circle`(): List<SmoothCubicBezierCurve> {
-            return listOf(
+        fun `Shortcut curve does not fit to circle`(): List<SmoothCubicBezierCurve> =
+            listOf(
                 SmoothCubicBezierCurve(
                     CommandVariant.RELATIVE,
                     listOf(
@@ -176,11 +189,10 @@ class CurvesTests {
                     ),
                 ),
             )
-        }
 
         @JvmStatic
-        fun `Point along a curve is computed correctly`(): List<ParameterizedCurve> {
-            return listOf(
+        fun `Point along a curve is computed correctly`(): List<ParameterizedCurve> =
+            listOf(
                 ParameterizedCurve(
                     CubicBezierCurve(
                         CommandVariant.RELATIVE,
@@ -192,11 +204,10 @@ class CurvesTests {
                     Point(-1.8822453f, 7.0387707f),
                 ),
             )
-        }
 
         @JvmStatic
-        fun `Point along a shortcut curve is computed correctly`(): List<ShortcutParameterizedCurve> {
-            return listOf(
+        fun `Point along a shortcut curve is computed correctly`(): List<ShortcutParameterizedCurve> =
+            listOf(
                 ShortcutParameterizedCurve(
                     SmoothCubicBezierCurve(
                         CommandVariant.RELATIVE,
@@ -208,11 +219,10 @@ class CurvesTests {
                     Point(-0.099726915f, 7.381562f),
                 ),
             )
-        }
 
         @JvmStatic
-        fun `Convex curves are convex`(): List<CubicBezierCurve> {
-            return listOf(
+        fun `Convex curves are convex`(): List<CubicBezierCurve> =
+            listOf(
                 CubicBezierCurve(
                     CommandVariant.RELATIVE,
                     listOf(
@@ -226,11 +236,10 @@ class CurvesTests {
                     ),
                 ),
             )
-        }
 
         @JvmStatic
-        fun `Concave curves are not convex`(): List<CubicBezierCurve> {
-            return listOf(
+        fun `Concave curves are not convex`(): List<CubicBezierCurve> =
+            listOf(
                 CubicBezierCurve(
                     CommandVariant.RELATIVE,
                     listOf(
@@ -244,11 +253,10 @@ class CurvesTests {
                     ),
                 ),
             )
-        }
 
         @JvmStatic
-        fun `Convex shortcut curves are convex`(): List<SmoothCubicBezierCurve> {
-            return listOf(
+        fun `Convex shortcut curves are convex`(): List<SmoothCubicBezierCurve> =
+            listOf(
                 SmoothCubicBezierCurve(
                     CommandVariant.RELATIVE,
                     listOf(
@@ -268,11 +276,10 @@ class CurvesTests {
                     ),
                 ),
             )
-        }
 
         @JvmStatic
-        fun `Concave shortcut curves are not convex`(): List<SmoothCubicBezierCurve> {
-            return listOf(
+        fun `Concave shortcut curves are not convex`(): List<SmoothCubicBezierCurve> =
+            listOf(
                 SmoothCubicBezierCurve(
                     CommandVariant.RELATIVE,
                     listOf(
@@ -280,6 +287,5 @@ class CurvesTests {
                     ),
                 ),
             )
-        }
     }
 }

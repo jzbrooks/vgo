@@ -10,7 +10,9 @@ import kotlin.collections.map
 import kotlin.text.isNotBlank
 import kotlin.text.split
 
-class ArgReader(private val args: MutableList<String>) {
+class ArgReader(
+    private val args: MutableList<String>,
+) {
     private val hasArguments
         get() = args.isNotEmpty()
 
@@ -73,12 +75,11 @@ class ArgReader(private val args: MutableList<String>) {
         private fun isOptionArgument(
             name: String,
             argument: String,
-        ): Boolean {
-            return if (name.length == 1) {
+        ): Boolean =
+            if (name.length == 1) {
                 "-$name" == argument
             } else {
                 "--$name" == argument
             }
-        }
     }
 }

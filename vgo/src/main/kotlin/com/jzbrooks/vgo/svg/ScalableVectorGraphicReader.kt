@@ -22,7 +22,8 @@ import org.w3c.dom.Text
 
 fun parse(root: Node): ScalableVectorGraphic {
     val elements =
-        root.childNodes.asSequence()
+        root.childNodes
+            .asSequence()
             .mapNotNull(::parseElement)
             .toList()
 
@@ -46,7 +47,8 @@ private fun parseElement(node: Node): Element? {
 
 private fun parseClipPath(node: Node): ClipPath {
     val childElements =
-        node.childNodes.asSequence()
+        node.childNodes
+            .asSequence()
             .mapNotNull(::parseElement)
             .toList()
 
@@ -59,7 +61,8 @@ private fun parseClipPath(node: Node): ClipPath {
 
 private fun parseGroupElement(node: Node): Group {
     val childElements =
-        node.childNodes.asSequence()
+        node.childNodes
+            .asSequence()
             .mapNotNull(::parseElement)
             .toList()
 
@@ -74,7 +77,13 @@ private fun parseGroupElement(node: Node): Group {
 }
 
 private fun parsePathElement(node: Node): Path {
-    val commands = CommandString(node.attributes.removeNamedItem("d").nodeValue.toString()).toCommandList()
+    val commands =
+        CommandString(
+            node.attributes
+                .removeNamedItem("d")
+                .nodeValue
+                .toString(),
+        ).toCommandList()
     val id = node.attributes.removeOrNull("id")?.nodeValue
     val fill = node.attributes.extractColor("fill", Colors.BLACK)
     val fillRule = node.attributes.extractFillRule("fill-rule")
@@ -100,7 +109,8 @@ private fun parsePathElement(node: Node): Path {
 
 private fun parseExtraElement(node: Node): Extra {
     val containedElements =
-        node.childNodes.asSequence()
+        node.childNodes
+            .asSequence()
             .mapNotNull(::parseElement)
             .toList()
 
@@ -116,7 +126,8 @@ private fun NamedNodeMap.extractTransformMatrix(): Matrix3 {
     val transform = removeOrNull("transform")?.nodeValue ?: return Matrix3.IDENTITY
 
     val entries =
-        transform.removePrefix("matrix(")
+        transform
+            .removePrefix("matrix(")
             .trimEnd(')')
             .split(',')
             .map(String::toFloat)
@@ -137,7 +148,8 @@ private fun NamedNodeMap.extractColor(
     val hex =
         if (value.startsWith("rgb")) {
             val (r, g, b) =
-                value.removePrefix("rgb(")
+                value
+                    .removePrefix("rgb(")
                     .trimEnd(')')
                     .split(',')
                     .map { it.trim().toShort() }

@@ -26,7 +26,9 @@ import com.jzbrooks.vgo.core.util.math.Point
  * or the shortest representation of coordinates
  * @param mode determines the operating mode of the command
  */
-class CommandVariant(private val mode: Mode) : TopDownOptimization {
+class CommandVariant(
+    private val mode: Mode,
+) : TopDownOptimization {
     private val pathStart = ArrayDeque<Point>()
 
     // Updated once per process call when computing
@@ -95,17 +97,19 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
-                        command.parameters.map { commandPoint ->
-                            (commandPoint + currentPoint)
-                        }.also { currentPoint = it.last().copy() },
+                        command.parameters
+                            .map { commandPoint ->
+                                (commandPoint + currentPoint)
+                            }.also { currentPoint = it.last().copy() },
                 )
             } else {
                 command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters =
-                        command.parameters.map { commandPoint ->
-                            (commandPoint - currentPoint)
-                        }.also { currentPoint += it.last() },
+                        command.parameters
+                            .map { commandPoint ->
+                                (commandPoint - currentPoint)
+                            }.also { currentPoint += it.last() },
                 )
             }
 
@@ -120,17 +124,19 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
-                        command.parameters.map { commandPoint ->
-                            (commandPoint + currentPoint)
-                        }.also { currentPoint = it.last().copy() },
+                        command.parameters
+                            .map { commandPoint ->
+                                (commandPoint + currentPoint)
+                            }.also { currentPoint = it.last().copy() },
                 )
             } else {
                 command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters =
-                        command.parameters.map { commandPoint ->
-                            (commandPoint - currentPoint)
-                        }.also { currentPoint += it.last() },
+                        command.parameters
+                            .map { commandPoint ->
+                                (commandPoint - currentPoint)
+                            }.also { currentPoint += it.last() },
                 )
             }
 
@@ -143,17 +149,19 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
-                        command.parameters.map { x ->
-                            (x + currentPoint.x)
-                        }.also { currentPoint = currentPoint.copy(x = it.last()) },
+                        command.parameters
+                            .map { x ->
+                                (x + currentPoint.x)
+                            }.also { currentPoint = currentPoint.copy(x = it.last()) },
                 )
             } else {
                 command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters =
-                        command.parameters.map { x ->
-                            (x - currentPoint.x)
-                        }.also { currentPoint = currentPoint.copy(x = currentPoint.x + it.last()) },
+                        command.parameters
+                            .map { x ->
+                                (x - currentPoint.x)
+                            }.also { currentPoint = currentPoint.copy(x = currentPoint.x + it.last()) },
                 )
             }
 
@@ -166,17 +174,19 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
-                        command.parameters.map { y ->
-                            (y + currentPoint.y)
-                        }.also { currentPoint = currentPoint.copy(y = it.last()) },
+                        command.parameters
+                            .map { y ->
+                                (y + currentPoint.y)
+                            }.also { currentPoint = currentPoint.copy(y = it.last()) },
                 )
             } else {
                 command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters =
-                        command.parameters.map { y ->
-                            (y - currentPoint.y)
-                        }.also { currentPoint = currentPoint.copy(y = currentPoint.y + it.last()) },
+                        command.parameters
+                            .map { y ->
+                                (y - currentPoint.y)
+                            }.also { currentPoint = currentPoint.copy(y = currentPoint.y + it.last()) },
                 )
             }
 
@@ -189,29 +199,31 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
-                        command.parameters.map {
-                            it.copy(
-                                startControl = it.startControl + currentPoint,
-                                endControl = it.endControl + currentPoint,
-                                end = it.end + currentPoint,
-                            )
-                        }.also {
-                            currentPoint = it.last().end.copy()
-                        },
+                        command.parameters
+                            .map {
+                                it.copy(
+                                    startControl = it.startControl + currentPoint,
+                                    endControl = it.endControl + currentPoint,
+                                    end = it.end + currentPoint,
+                                )
+                            }.also {
+                                currentPoint = it.last().end.copy()
+                            },
                 )
             } else {
                 command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters =
-                        command.parameters.map {
-                            it.copy(
-                                startControl = it.startControl - currentPoint,
-                                endControl = it.endControl - currentPoint,
-                                end = it.end - currentPoint,
-                            )
-                        }.also {
-                            currentPoint += it.last().end
-                        },
+                        command.parameters
+                            .map {
+                                it.copy(
+                                    startControl = it.startControl - currentPoint,
+                                    endControl = it.endControl - currentPoint,
+                                    end = it.end - currentPoint,
+                                )
+                            }.also {
+                                currentPoint += it.last().end
+                            },
                 )
             }
 
@@ -224,27 +236,29 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
-                        command.parameters.map {
-                            it.copy(
-                                endControl = it.endControl + currentPoint,
-                                end = it.end + currentPoint,
-                            )
-                        }.also {
-                            currentPoint = it.last().end.copy()
-                        },
+                        command.parameters
+                            .map {
+                                it.copy(
+                                    endControl = it.endControl + currentPoint,
+                                    end = it.end + currentPoint,
+                                )
+                            }.also {
+                                currentPoint = it.last().end.copy()
+                            },
                 )
             } else {
                 command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters =
-                        command.parameters.map {
-                            it.copy(
-                                endControl = it.endControl - currentPoint,
-                                end = it.end - currentPoint,
-                            )
-                        }.also {
-                            currentPoint += it.last().end
-                        },
+                        command.parameters
+                            .map {
+                                it.copy(
+                                    endControl = it.endControl - currentPoint,
+                                    end = it.end - currentPoint,
+                                )
+                            }.also {
+                                currentPoint += it.last().end
+                            },
                 )
             }
 
@@ -257,27 +271,29 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
-                        command.parameters.map {
-                            it.copy(
-                                control = it.control + currentPoint,
-                                end = it.end + currentPoint,
-                            )
-                        }.also {
-                            currentPoint = it.last().end.copy()
-                        },
+                        command.parameters
+                            .map {
+                                it.copy(
+                                    control = it.control + currentPoint,
+                                    end = it.end + currentPoint,
+                                )
+                            }.also {
+                                currentPoint = it.last().end.copy()
+                            },
                 )
             } else {
                 command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters =
-                        command.parameters.map {
-                            it.copy(
-                                control = it.control - currentPoint,
-                                end = it.end - currentPoint,
-                            )
-                        }.also {
-                            currentPoint += it.last().end
-                        },
+                        command.parameters
+                            .map {
+                                it.copy(
+                                    control = it.control - currentPoint,
+                                    end = it.end - currentPoint,
+                                )
+                            }.also {
+                                currentPoint += it.last().end
+                            },
                 )
             }
 
@@ -290,19 +306,21 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
-                        command.parameters.map { commandPoint ->
-                            commandPoint + currentPoint
-                        }.also { currentPoint = it.last().copy() },
+                        command.parameters
+                            .map { commandPoint ->
+                                commandPoint + currentPoint
+                            }.also { currentPoint = it.last().copy() },
                 )
             } else {
                 command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters =
-                        command.parameters.map { commandPoint ->
-                            commandPoint - currentPoint
-                        }.also {
-                            currentPoint += it.last()
-                        },
+                        command.parameters
+                            .map { commandPoint ->
+                                commandPoint - currentPoint
+                            }.also {
+                                currentPoint += it.last()
+                            },
                 )
             }
 
@@ -315,21 +333,23 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
                 command.copy(
                     variant = CommandVariant.ABSOLUTE,
                     parameters =
-                        command.parameters.map {
-                            it.copy(end = it.end + currentPoint)
-                        }.also {
-                            currentPoint = it.last().end.copy()
-                        },
+                        command.parameters
+                            .map {
+                                it.copy(end = it.end + currentPoint)
+                            }.also {
+                                currentPoint = it.last().end.copy()
+                            },
                 )
             } else {
                 command.copy(
                     variant = CommandVariant.RELATIVE,
                     parameters =
-                        command.parameters.map {
-                            it.copy(end = it.end - currentPoint)
-                        }.also {
-                            currentPoint += it.last().end
-                        },
+                        command.parameters
+                            .map {
+                                it.copy(end = it.end - currentPoint)
+                            }.also {
+                                currentPoint += it.last().end
+                            },
                 )
             }
 
@@ -376,6 +396,8 @@ class CommandVariant(private val mode: Mode) : TopDownOptimization {
 
         data object Relative : Mode()
 
-        data class Compact(val printer: CommandPrinter) : Mode()
+        data class Compact(
+            val printer: CommandPrinter,
+        ) : Mode()
     }
 }

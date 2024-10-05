@@ -46,8 +46,8 @@ class BreakoutImplicitCommands : TopDownOptimization {
         path.commands = commands
     }
 
-    private fun divideParameters(first: ParameterizedCommand<*>): List<Command> {
-        return when (first) {
+    private fun divideParameters(first: ParameterizedCommand<*>): List<Command> =
+        when (first) {
             is MoveTo ->
                 first.parameters.mapIndexed { i, it ->
                     if (i == 0) first.copy(parameters = listOf(it)) else LineTo(first.variant, listOf(it))
@@ -61,5 +61,4 @@ class BreakoutImplicitCommands : TopDownOptimization {
             is SmoothCubicBezierCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
             is EllipticalArcCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
         }
-    }
 }

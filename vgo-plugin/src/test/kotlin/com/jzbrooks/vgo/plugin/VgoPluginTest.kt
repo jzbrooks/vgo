@@ -23,7 +23,8 @@ class VgoPluginTest {
     @Test
     fun testConfiguration() {
         val project: Project =
-            ProjectBuilder.builder()
+            ProjectBuilder
+                .builder()
                 .withProjectDir(File("src/test"))
                 .build()
 

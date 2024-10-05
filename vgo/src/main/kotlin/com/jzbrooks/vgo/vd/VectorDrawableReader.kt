@@ -26,7 +26,8 @@ import kotlin.math.sin
 
 fun parse(root: Node): VectorDrawable {
     val elements =
-        root.childNodes.asSequence()
+        root.childNodes
+            .asSequence()
             .mapNotNull(::parseElement)
             .toList()
 
@@ -50,7 +51,8 @@ private fun parseElement(node: Node): Element? {
 
 private fun parseGroup(node: Node): Group {
     val groupChildElements =
-        node.childNodes.asSequence()
+        node.childNodes
+            .asSequence()
             .mapNotNull(::parseElement)
             .toList()
 
@@ -155,7 +157,8 @@ private fun parseClipPath(node: Node): ClipPath {
 
 private fun parseExtraElement(node: Node): Extra {
     val containedElements =
-        node.childNodes.asSequence()
+        node.childNodes
+            .asSequence()
             .mapNotNull(::parseElement)
             .toList()
 
@@ -179,9 +182,13 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
 
     val rotation = removeFloatOrNull("android:rotation")
 
-    if (scaleX == null && scaleY == null &&
-        translationX == null && translationY == null &&
-        pivotX == null && pivotY == null && rotation == null
+    if (scaleX == null &&
+        scaleY == null &&
+        translationX == null &&
+        translationY == null &&
+        pivotX == null &&
+        pivotY == null &&
+        rotation == null
     ) {
         return Matrix3.IDENTITY
     }

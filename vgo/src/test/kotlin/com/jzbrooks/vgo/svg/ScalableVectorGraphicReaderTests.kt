@@ -111,7 +111,8 @@ class ScalableVectorGraphicReaderTests {
     fun testStoreIdForPath() {
         val graphic: Graphic = parse(node)
 
-        assertThat(graphic::elements).index(0)
+        assertThat(graphic::elements)
+            .index(0)
             .isInstanceOf(Path::class)
             .prop(Path::id)
             .isEqualTo("heart")
