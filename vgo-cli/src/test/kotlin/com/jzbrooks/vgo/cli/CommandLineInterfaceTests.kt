@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo
+package com.jzbrooks.vgo.cli
 
 import assertk.assertThat
 import assertk.assertions.contains
@@ -6,6 +6,7 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.matches
 import assertk.assertions.startsWith
+import com.jzbrooks.vgo.Vgo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach

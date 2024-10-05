@@ -20,9 +20,15 @@ class BaselineTests {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizationFinishes.${inputFile.extension}"
-        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath, "--indent", "2")
 
-        val exitCode = Vgo().run(arguments)
+        val options =
+            Vgo.Options(
+                indent = 2,
+                input = listOf(unoptimizedAsset.toString()),
+                output = listOf(outputFilePath),
+            )
+
+        val exitCode = Vgo(options).run()
 
         assertThat(exitCode).isEqualTo(0)
     }
@@ -36,9 +42,14 @@ class BaselineTests {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsEquivalentToBaseline.${inputFile.extension}"
-        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath, "--indent", "2")
+        val options =
+            Vgo.Options(
+                indent = 2,
+                input = listOf(unoptimizedAsset.toString()),
+                output = listOf(outputFilePath),
+            )
 
-        Vgo().run(arguments)
+        Vgo(options).run()
 
         val content = File(outputFilePath)
         val baselineContent = baselineAsset.toFile()
@@ -54,9 +65,14 @@ class BaselineTests {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsNotLargerThanBaseline.${inputFile.extension}"
-        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath, "--indent", "2")
+        val options =
+            Vgo.Options(
+                indent = 2,
+                input = listOf(unoptimizedAsset.toString()),
+                output = listOf(outputFilePath),
+            )
 
-        Vgo().run(arguments)
+        Vgo(options).run()
 
         val optimizedAssetSize = File(outputFilePath).length()
         val baselineAssetSize = baselineAsset.toFile().length()
@@ -70,9 +86,14 @@ class BaselineTests {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsNotLargerThanOriginal.${inputFile.extension}"
-        val arguments = arrayOf(unoptimizedAsset.toString(), "-o", outputFilePath, "--indent", "2")
+        val options =
+            Vgo.Options(
+                indent = 2,
+                input = listOf(unoptimizedAsset.toString()),
+                output = listOf(outputFilePath),
+            )
 
-        Vgo().run(arguments)
+        Vgo(options).run()
 
         val optimizedAssetSize = File(outputFilePath).length()
         val unoptimizedAssetSize = unoptimizedAsset.toFile().length()
