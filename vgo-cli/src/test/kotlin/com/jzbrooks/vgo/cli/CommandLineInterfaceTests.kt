@@ -6,7 +6,6 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.matches
 import assertk.assertions.startsWith
-import com.jzbrooks.vgo.Vgo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -36,7 +35,7 @@ class CommandLineInterfaceTests {
     fun testLongVersionFlag() {
         val arguments = arrayOf("--version")
 
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
 
         assertThat(exitCode).isEqualTo(0)
         assertThat(systemOutput.toString()).matches(Regex("\\d+.\\d+.\\d+\r?\n"))
@@ -46,7 +45,7 @@ class CommandLineInterfaceTests {
     fun testShortVersionFlag() {
         val arguments = arrayOf("-v")
 
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
 
         assertThat(exitCode).isEqualTo(0)
         assertThat(systemOutput.toString()).matches(Regex("\\d+.\\d+.\\d+\r?\n"))
@@ -56,7 +55,7 @@ class CommandLineInterfaceTests {
     fun testLongHelpFlag() {
         val arguments = arrayOf("--help")
 
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
 
         assertThat(exitCode).isEqualTo(0)
         val output = systemOutput.toString()
@@ -68,7 +67,7 @@ class CommandLineInterfaceTests {
     fun testShortHelpFlag() {
         val arguments = arrayOf("-h")
 
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
 
         assertThat(exitCode).isEqualTo(0)
         val output = systemOutput.toString()
@@ -79,7 +78,7 @@ class CommandLineInterfaceTests {
     @Test
     fun testLongStatsFlag() {
         val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/stats-test.xml", "--stats")
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         assertThat(systemOutput.toString()).contains("Percent saved:")
     }
@@ -94,7 +93,7 @@ class CommandLineInterfaceTests {
                 "build/integrationTest/unmodified-stats-omitted.xml",
                 "--stats",
             )
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         val report = systemOutput.toString()
         assertThat(report).doesNotContain(input)
@@ -109,7 +108,7 @@ class CommandLineInterfaceTests {
                 "build/integrationTest/multi-stats-test-directory",
                 "--stats",
             )
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         val report = systemOutput.toString()
         assertThat(report).contains(Paths.get("src/test/resources/in-place-modify/avocado_example.xml").toString())
@@ -127,7 +126,7 @@ class CommandLineInterfaceTests {
                 "build/integrationTest/multi-stats-test-two.xml",
                 "--stats",
             )
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         val report = systemOutput.toString()
         assertThat(report).contains(avocadoExampleRelativePath)
@@ -137,7 +136,7 @@ class CommandLineInterfaceTests {
     @Test
     fun testShortStatsFlag() {
         val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/stats-test.xml", "-s")
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         assertThat(systemOutput.toString()).contains("Percent saved:")
     }
@@ -148,7 +147,7 @@ class CommandLineInterfaceTests {
         File(avocadoExampleRelativePath).copyTo(overwritePath.toFile(), overwrite = true)
 
         val arguments = arrayOf(overwritePath.toString(), "-s")
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
 
         assertThat(exitCode).isEqualTo(0)
         assertThat(systemOutput.toString()).contains("Percent saved:")
@@ -158,7 +157,7 @@ class CommandLineInterfaceTests {
     @Test
     fun testIndentOption() {
         val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/indent-test.xml", "--indent", "4")
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         val output = File("build/integrationTest/indent-test.xml").readText()
         assertThat(output).contains("    <path")
@@ -167,7 +166,7 @@ class CommandLineInterfaceTests {
     @Test
     fun testFormatOption() {
         val arguments = arrayOf(avocadoExampleRelativePath, "-o", "build/integrationTest/format-test.svg", "--format", "svg")
-        val exitCode = Vgo().run(arguments)
+        val exitCode = CommandLineInterface().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         val output = File("build/integrationTest/format-test.svg").readText()
         assertThat(output).startsWith("<svg")

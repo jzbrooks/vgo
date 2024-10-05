@@ -7,7 +7,7 @@ tasks {
     jar {
         dependsOn(configurations.runtimeClasspath)
         manifest {
-            attributes["Main-Class"] = "com.jzbrooks.vgo.cli.ApplicationKt"
+            attributes["Main-Class"] = "com.jzbrooks.vgo.cli.CommandLineInterface"
             attributes["Bundle-Version"] = project.properties["VERSION_NAME"]
         }
 

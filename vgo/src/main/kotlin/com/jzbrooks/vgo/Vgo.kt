@@ -28,11 +28,6 @@ class Vgo(
     private var totalBytesAfter = 0.0
 
     fun run(): Int {
-        if (options.printHelp) {
-            println(HELP_MESSAGE)
-            return 0
-        }
-
         if (options.printVersion) {
             println(BuildConstants.VERSION_NAME)
             return 0
@@ -278,7 +273,6 @@ class Vgo(
         get() = key.isDirectory && (value.isDirectory || !value.exists())
 
     data class Options(
-        val printHelp: Boolean = false,
         val printVersion: Boolean = false,
         val printStats: Boolean = false,
         val output: List<String> = emptyList(),
@@ -286,18 +280,4 @@ class Vgo(
         val indent: Int? = null,
         val format: String? = null,
     )
-
-    companion object {
-        private const val HELP_MESSAGE = """
-> vgo [options] [file/directory]
-
-Options:
-  -h --help       print this message
-  -o --output     file or directory, if not provided the input will be overwritten
-  -s --stats      print statistics on processed files to standard out
-  -v --version    print the version number
-  --indent value  write files with value columns of indentation
-  --format value  output format (svg, vd, etc)
-        """
-    }
 }

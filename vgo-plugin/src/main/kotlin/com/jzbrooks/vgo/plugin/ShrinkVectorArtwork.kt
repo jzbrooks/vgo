@@ -36,7 +36,6 @@ open class ShrinkVectorArtwork : DefaultTask() {
     fun shrink() {
         val options =
             Vgo.Options(
-                printHelp = false,
                 printVersion = false,
                 printStats = showStatistics,
                 indent = indent.takeIf { it > 0 }?.toInt(),
