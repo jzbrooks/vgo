@@ -85,25 +85,28 @@ class CommandLineInterfaceTests {
 
     @Test
     fun `unmodified files are omitted from statistics`() {
-        val input = "src/test/resources/baseline/simple_heart_optimized.xml"
         val arguments =
             arrayOf(
-                input,
+                heartExampleRelativePath,
                 "-o",
                 "build/integrationTest/unmodified-stats-omitted.xml",
                 "--stats",
             )
-        val exitCode = CommandLineInterface().run(arguments)
-        assertThat(exitCode).isEqualTo(0)
+        val firstRunExitCode = CommandLineInterface().run(arguments)
+        assertThat(firstRunExitCode).isEqualTo(0)
+
+        val secondRunExitCode = CommandLineInterface().run(arguments)
+        assertThat(secondRunExitCode).isEqualTo(0)
+
         val report = systemOutput.toString()
-        assertThat(report).doesNotContain(input)
+        assertThat(report).doesNotContain(heartExampleRelativePath)
     }
 
     @Test
     fun `directory inputs include a filename with statistics`() {
         val arguments =
             arrayOf(
-                "src/test/resources/in-place-modify",
+                "src/test/resources",
                 "-o",
                 "build/integrationTest/multi-stats-test-directory",
                 "--stats",
@@ -111,7 +114,7 @@ class CommandLineInterfaceTests {
         val exitCode = CommandLineInterface().run(arguments)
         assertThat(exitCode).isEqualTo(0)
         val report = systemOutput.toString()
-        assertThat(report).contains(Paths.get("src/test/resources/in-place-modify/avocado_example.xml").toString())
+        assertThat(report).contains(Paths.get("src/test/resources/avocado_example.xml").toString())
     }
 
     @Test
