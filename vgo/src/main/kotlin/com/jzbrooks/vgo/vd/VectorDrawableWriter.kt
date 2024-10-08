@@ -22,7 +22,9 @@ import kotlin.math.abs
 import kotlin.math.atan
 import kotlin.math.hypot
 
-class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()) : Writer<VectorDrawable> {
+class VectorDrawableWriter(
+    override val options: Set<Writer.Option> = emptySet(),
+) : Writer<VectorDrawable> {
     private val commandPrinter = VectorDrawableCommandPrinter(3)
 
     private val formatter =
@@ -145,7 +147,8 @@ class VectorDrawableWriter(override val options: Set<Writer.Option> = emptySet()
                 is ClipPath -> {
                     document.createElement("clip-path").apply {
                         val data =
-                            (element.elements[0] as Path).commands
+                            (element.elements[0] as Path)
+                                .commands
                                 .joinToString(separator = "", transform = commandPrinter::print)
 
                         setAttribute("android:pathData", data)

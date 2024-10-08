@@ -19,51 +19,28 @@ import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
-import kotlin.system.exitProcess
 
-class Application {
-    private var printStats = false
+class Vgo(
+    private val options: Options,
+) {
     private var printFileNames = false
     private var totalBytesBefore = 0.0
     private var totalBytesAfter = 0.0
-    private var outputFormat: String? = null
 
-    fun run(args: Array<String>): Int {
-        val argReader = ArgReader(args.toMutableList())
-
-        if (argReader.readFlag("help|h")) {
-            println(HELP_MESSAGE)
-            return 0
-        }
-
-        if (argReader.readFlag("version|v")) {
+    fun run(): Int {
+        if (options.printVersion) {
             println(BuildConstants.VERSION_NAME)
             return 0
         }
 
         val writerOptions = mutableSetOf<Writer.Option>()
-        argReader.readOption("indent")?.toIntOrNull()?.let { indentColumns ->
+        options.indent?.let { indentColumns ->
             writerOptions.add(Writer.Option.Indent(indentColumns))
         }
 
-        printStats = argReader.readFlag("stats|s")
-
-        val outputs =
-            run {
-                val outputPaths = mutableListOf<String>()
-                var output = argReader.readOption("output|o")
-                while (output != null) {
-                    outputPaths.add(output)
-                    output = argReader.readOption("output|o")
-                }
-                outputPaths.toList()
-            }
-
-        outputFormat = argReader.readOption("format")
-
-        var inputs = argReader.readArguments()
+        var inputs = options.input
         if (inputs.isEmpty()) {
-            require(outputs.isEmpty())
+            require(options.output.isEmpty())
 
             var path = readlnOrNull()
             val standardInPaths = mutableListOf<String>()
@@ -76,8 +53,8 @@ class Application {
         }
 
         val inputOutputMap =
-            if (outputs.isNotEmpty()) {
-                inputs.zip(outputs) { a, b ->
+            if (options.output.isNotEmpty()) {
+                inputs.zip(options.output) { a, b ->
                     Pair(File(a), File(b))
                 }
             } else {
@@ -88,7 +65,7 @@ class Application {
 
         val files = inputOutputMap.count { (input, _) -> input.isFile }
         val containsDirectory = inputOutputMap.any { (input, _) -> input.isDirectory }
-        printFileNames = printStats && (files > 1 || containsDirectory)
+        printFileNames = options.printStats && (files > 1 || containsDirectory)
 
         return handleFiles(inputOutputMap, writerOptions)
     }
@@ -146,12 +123,16 @@ class Application {
             val document = documentBuilderFactory.newDocumentBuilder().parse(input)
             document.documentElement.normalize()
 
-            val rootNodes = document.childNodes.asSequence().filter { it.nodeType == Document.ELEMENT_NODE }.toList()
+            val rootNodes =
+                document.childNodes
+                    .asSequence()
+                    .filter { it.nodeType == Document.ELEMENT_NODE }
+                    .toList()
 
             var graphic =
                 when {
                     rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> {
-                        if (outputFormat == "vd") {
+                        if (this.options.format == "vd") {
                             ByteArrayOutputStream().use { pipeOrigin ->
                                 val errors = Svg2Vector.parseSvgToXml(input.toPath(), pipeOrigin)
                                 if (errors != "") {
@@ -174,7 +155,8 @@ class Application {
                                             it.nodeType == Document.ELEMENT_NODE
                                         }
 
-                                    com.jzbrooks.vgo.vd.parse(documentRoot)
+                                    com.jzbrooks.vgo.vd
+                                        .parse(documentRoot)
                                 }
                             }
                         } else {
@@ -182,12 +164,13 @@ class Application {
                         }
                     }
                     rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } -> {
-                        com.jzbrooks.vgo.vd.parse(rootNodes.first())
+                        com.jzbrooks.vgo.vd
+                            .parse(rootNodes.first())
                     }
                     else -> if (input == output) return else null
                 }
 
-            if (graphic is VectorDrawable && outputFormat == "svg") {
+            if (graphic is VectorDrawable && this.options.format == "svg") {
                 graphic = graphic.toSvg()
             }
 
@@ -220,7 +203,7 @@ class Application {
                     inputStream.copyTo(outputStream)
                 }
 
-                if (printStats) {
+                if (this.options.printStats) {
                     val sizeAfter = outputStream.channel.size()
                     val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
                     totalBytesBefore += sizeBefore
@@ -249,12 +232,12 @@ class Application {
             handleFile(file, File(output, file.name), options)
         }
 
-        if (printStats) {
+        if (this.options.printStats) {
             val message = "| Total bytes saved: ${(totalBytesBefore - totalBytesAfter).roundToInt()} |"
             val border = "-".repeat(message.length)
             println(
                 """
-                
+
                 $border
                 $message
                 $border
@@ -263,8 +246,8 @@ class Application {
         }
     }
 
-    private fun formatByteDescription(bytes: Long): String {
-        return when {
+    private fun formatByteDescription(bytes: Long): String =
+        when {
             bytes >= 1024 * 1024 * 1024 -> {
                 val gigabytes = bytes / (1024.0 * 1024.0 * 1024.0)
                 "%.2f GiB".format(gigabytes)
@@ -279,7 +262,6 @@ class Application {
             }
             else -> "$bytes B"
         }
-    }
 
     private val Map.Entry<File, File>.inputExists
         get() = key.exists()
@@ -290,20 +272,12 @@ class Application {
     private val Map.Entry<File, File>.isDirectoryPair
         get() = key.isDirectory && (value.isDirectory || !value.exists())
 
-    companion object {
-        private const val HELP_MESSAGE = """
-> vgo [options] [file/directory]
-
-Options:
-  -h --help       print this message
-  -o --output     file or directory, if not provided the input will be overwritten
-  -s --stats      print statistics on processed files to standard out
-  -v --version    print the version number
-  --indent value  write files with value columns of indentation
-  --format value  output format (svg, vd, etc)
-        """
-
-        @JvmStatic
-        fun main(args: Array<String>): Unit = exitProcess(Application().run(args))
-    }
+    data class Options(
+        val printVersion: Boolean = false,
+        val printStats: Boolean = false,
+        val output: List<String> = emptyList(),
+        val input: List<String> = emptyList(),
+        val indent: Int? = null,
+        val format: String? = null,
+    )
 }

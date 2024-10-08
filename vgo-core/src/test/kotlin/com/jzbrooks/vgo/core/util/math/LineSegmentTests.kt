@@ -27,12 +27,16 @@ class LineSegmentTests {
         assertThat(actual).isNull()
     }
 
-    data class Intersection(val first: LineSegment, val second: LineSegment, val result: Point?)
+    data class Intersection(
+        val first: LineSegment,
+        val second: LineSegment,
+        val result: Point?,
+    )
 
     companion object {
         @JvmStatic
-        fun testIntersections(): List<Intersection> {
-            return listOf(
+        fun testIntersections(): List<Intersection> =
+            listOf(
                 Intersection(
                     LineSegment(Point(0f, 10f), Point(0f, -10f)),
                     LineSegment(Point(-1f, 0f), Point(1f, 0f)),
@@ -44,13 +48,11 @@ class LineSegmentTests {
                     Point(2.4f, 2.4f),
                 ),
             )
-        }
 
         @JvmStatic
-        fun testParallelLinesReturnsNull(): List<Pair<LineSegment, LineSegment>> {
-            return listOf(
+        fun testParallelLinesReturnsNull(): List<Pair<LineSegment, LineSegment>> =
+            listOf(
                 LineSegment(Point(0f, 3f), Point(0f, 3f)) to LineSegment(Point(1f, 3f), Point(1f, 3f)),
             )
-        }
     }
 }

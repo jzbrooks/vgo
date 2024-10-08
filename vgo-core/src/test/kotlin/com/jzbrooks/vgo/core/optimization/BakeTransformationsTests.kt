@@ -152,7 +152,8 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group::elements).index(0)
+        assertThat(group::elements)
+            .index(0)
             .isInstanceOf(Path::class)
             .prop(Path::commands)
             .containsExactly(
@@ -187,7 +188,8 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group::elements).index(0)
+        assertThat(group::elements)
+            .index(0)
             .isInstanceOf(Path::class)
             .prop(Path::commands)
             .containsExactly(
@@ -220,9 +222,11 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group::elements).index(0)
+        assertThat(group::elements)
+            .index(0)
             .isInstanceOf(Path::class)
-            .prop(Path::commands).all {
+            .prop(Path::commands)
+            .all {
                 index(0).isInstanceOf(MoveTo::class).prop(MoveTo::parameters).index(0).all {
                     prop(Point::x).isCloseTo(-10f, 0.001f)
                     prop(Point::y).isCloseTo(10f, 0.001f)
@@ -265,9 +269,11 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        assertThat(group::elements).index(0)
+        assertThat(group::elements)
+            .index(0)
             .isInstanceOf(Path::class)
-            .prop(Path::commands).all {
+            .prop(Path::commands)
+            .all {
                 index(0).isEqualTo(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))))
 
                 index(1).isInstanceOf(LineTo::class).all {

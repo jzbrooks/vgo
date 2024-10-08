@@ -50,9 +50,10 @@ class RemoveRedundantCommands : TopDownOptimization {
                 is VerticalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue
                 is HorizontalLineTo -> if (current.parameters.all { it.absoluteValue < 1e-3f }) continue
                 is CubicBezierCurve ->
-                    if (current.parameters.map(
-                            CubicBezierCurve.Parameter::end,
-                        ).all { it.isApproximately(Point.ZERO) }
+                    if (current.parameters
+                            .map(
+                                CubicBezierCurve.Parameter::end,
+                            ).all { it.isApproximately(Point.ZERO) }
                     ) {
                         continue
                     }
@@ -64,9 +65,10 @@ class RemoveRedundantCommands : TopDownOptimization {
                         continue
                     }
                 is QuadraticBezierCurve ->
-                    if (current.parameters.map(
-                            QuadraticBezierCurve.Parameter::end,
-                        ).all { it.isApproximately(Point.ZERO) }
+                    if (current.parameters
+                            .map(
+                                QuadraticBezierCurve.Parameter::end,
+                            ).all { it.isApproximately(Point.ZERO) }
                     ) {
                         continue
                     }

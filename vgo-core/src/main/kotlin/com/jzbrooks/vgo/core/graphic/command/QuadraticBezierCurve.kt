@@ -6,5 +6,8 @@ data class QuadraticBezierCurve(
     override var variant: CommandVariant,
     override var parameters: List<Parameter>,
 ) : ParameterizedCommand<QuadraticBezierCurve.Parameter> {
-    data class Parameter(var control: Point, override var end: Point) : CommandParameter
+    data class Parameter(
+        var control: Point,
+        override var end: Point,
+    ) : CommandParameter
 }

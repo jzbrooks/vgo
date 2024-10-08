@@ -3,9 +3,12 @@ package com.jzbrooks.vgo.core.graphic.command
 import com.jzbrooks.vgo.core.util.math.Point
 
 @JvmInline
-value class CommandString(val data: String) {
-    fun toCommandList(): List<Command> {
-        return data.split(commandRegex)
+value class CommandString(
+    val data: String,
+) {
+    fun toCommandList(): List<Command> =
+        data
+            .split(commandRegex)
             .asSequence()
             .filter { it.isNotBlank() }
             .map { command ->
@@ -13,7 +16,8 @@ value class CommandString(val data: String) {
                 when {
                     command.startsWith('M', true) -> {
                         val parameters =
-                            number.findAll(command)
+                            number
+                                .findAll(command)
                                 .map(MatchResult::value)
                                 .map(String::toFloat)
                                 .chunked(2)
@@ -24,7 +28,8 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('L', true) -> {
                         val parameters =
-                            number.findAll(command)
+                            number
+                                .findAll(command)
                                 .map(MatchResult::value)
                                 .map(String::toFloat)
                                 .chunked(2)
@@ -35,7 +40,8 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('V', true) -> {
                         val parameters =
-                            number.findAll(command)
+                            number
+                                .findAll(command)
                                 .map { it.value.toFloat() }
                                 .toList()
 
@@ -43,7 +49,8 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('H', true) -> {
                         val parameters =
-                            number.findAll(command)
+                            number
+                                .findAll(command)
                                 .map { it.value.toFloat() }
                                 .toList()
 
@@ -51,7 +58,8 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('Q', true) -> {
                         val parameters =
-                            number.findAll(command)
+                            number
+                                .findAll(command)
                                 .map(MatchResult::value)
                                 .map(String::toFloat)
                                 .chunked(4)
@@ -62,7 +70,8 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('T', true) -> {
                         val parameters =
-                            number.findAll(command)
+                            number
+                                .findAll(command)
                                 .map(MatchResult::value)
                                 .map(String::toFloat)
                                 .chunked(2)
@@ -73,7 +82,8 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('C', true) -> {
                         val parameters =
-                            number.findAll(command)
+                            number
+                                .findAll(command)
                                 .map(MatchResult::value)
                                 .map(String::toFloat)
                                 .chunked(6)
@@ -84,7 +94,8 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('S', true) -> {
                         val parameters =
-                            number.findAll(command)
+                            number
+                                .findAll(command)
                                 .map(MatchResult::value)
                                 .map(String::toFloat)
                                 .chunked(4)
@@ -95,7 +106,8 @@ value class CommandString(val data: String) {
                     }
                     command.startsWith('A', true) -> {
                         val parameters =
-                            number.findAll(command)
+                            number
+                                .findAll(command)
                                 .map(MatchResult::value)
                                 .map(String::toFloat)
                                 .chunked(7)
@@ -108,11 +120,8 @@ value class CommandString(val data: String) {
                     else -> throw IllegalStateException("Expected one of $commandRegex but was $command")
                 }
             }.toList()
-    }
 
-    private fun mapPoint(components: List<Float>): Point {
-        return Point(components[0], components[1])
-    }
+    private fun mapPoint(components: List<Float>): Point = Point(components[0], components[1])
 
     private fun mapQuadraticBezierCurveParameter(components: List<Float>): QuadraticBezierCurve.Parameter {
         val control = Point(components[0], components[1])

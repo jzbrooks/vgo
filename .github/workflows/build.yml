@@ -65,7 +65,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: vgo
-        path: vgo/build/libs/vgo
+        path: vgo-cli/build/libs/vgo
 
   # Prepare a draft release for GitHub Releases page for the manual verification
   # If accepted and published, release workflow would be triggered
@@ -80,6 +80,12 @@ jobs:
       # Check out current repository
       - name: Fetch Sources
         uses: actions/checkout@v4
+
+      - name: archive vgo
+        uses: actions/download-artifact@v4
+        with:
+          name: vgo
+          path: ${{ github.workspace }}/vgo
 
       # Remove old release drafts by using the curl request for the available releases with draft flag
       - name: Remove Old Release Drafts
@@ -101,4 +107,5 @@ jobs:
             --notes "$(cat << 'EOM'
           ${{ needs.build.outputs.changelog }}
           EOM
-          )"
+          ) \
+            ${{ github.workspace }}/vgo"

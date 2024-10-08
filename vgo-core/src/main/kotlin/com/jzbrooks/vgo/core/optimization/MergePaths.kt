@@ -77,8 +77,8 @@ class MergePaths : BottomUpOptimization {
     private fun haveSameAttributes(
         first: Path,
         second: Path,
-    ): Boolean {
-        return first.id == second.id &&
+    ): Boolean =
+        first.id == second.id &&
             first.foreign == second.foreign &&
             first.fill == second.fill &&
             first.fillRule == second.fillRule &&
@@ -87,5 +87,4 @@ class MergePaths : BottomUpOptimization {
             first.strokeLineCap == second.strokeLineCap &&
             first.strokeLineJoin == second.strokeLineJoin &&
             first.strokeMiterLimit == second.strokeMiterLimit
-    }
 }

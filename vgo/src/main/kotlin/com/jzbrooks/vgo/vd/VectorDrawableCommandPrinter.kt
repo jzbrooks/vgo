@@ -18,7 +18,9 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.sign
 
-class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrinter {
+class VectorDrawableCommandPrinter(
+    private val decimalDigits: Int,
+) : CommandPrinter {
     private val formatter =
         DecimalFormat().apply {
             maximumFractionDigits = decimalDigits
@@ -27,8 +29,8 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrin
             roundingMode = RoundingMode.HALF_UP
         }
 
-    override fun print(command: Command): String {
-        return when (command) {
+    override fun print(command: Command): String =
+        when (command) {
             is MoveTo -> print(command)
             is LineTo -> print(command)
             is VerticalLineTo -> print(command)
@@ -41,7 +43,6 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrin
             is ClosePath -> "Z"
             else -> throw IllegalArgumentException("An unexpected command type was encountered: $command")
         }
-    }
 
     private fun print(moveTo: MoveTo): String {
         val command =
@@ -241,8 +242,8 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrin
             append(print(point.y))
         }
 
-    private fun print(parameter: CubicBezierCurve.Parameter): String {
-        return parameter.run {
+    private fun print(parameter: CubicBezierCurve.Parameter): String =
+        parameter.run {
             buildString {
                 append(print(startControl))
                 if (endControl.x >= 0) append(' ')
@@ -251,30 +252,27 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrin
                 append(print(end))
             }
         }
-    }
 
-    private fun print(parameter: SmoothCubicBezierCurve.Parameter): String {
-        return parameter.run {
+    private fun print(parameter: SmoothCubicBezierCurve.Parameter): String =
+        parameter.run {
             buildString {
                 append(print(endControl))
                 if (end.x >= 0) append(' ')
                 append(print(end))
             }
         }
-    }
 
-    private fun print(parameter: QuadraticBezierCurve.Parameter): String {
-        return parameter.run {
+    private fun print(parameter: QuadraticBezierCurve.Parameter): String =
+        parameter.run {
             buildString {
                 append(print(control))
                 if (end.x >= 0) append(' ')
                 append(print(end))
             }
         }
-    }
 
-    private fun print(parameter: EllipticalArcCurve.Parameter): String {
-        return parameter.run {
+    private fun print(parameter: EllipticalArcCurve.Parameter): String =
+        parameter.run {
             buildString {
                 append(print(radiusX))
                 if (radiusY >= 0) append(',')
@@ -289,5 +287,4 @@ class VectorDrawableCommandPrinter(private val decimalDigits: Int) : CommandPrin
                 append(print(end))
             }
         }
-    }
 }

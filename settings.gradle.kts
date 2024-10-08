@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 
-include("vgo-core", "vgo", "vgo-plugin")
+include("vgo-core", "vgo", "vgo-plugin", "vgo-cli")

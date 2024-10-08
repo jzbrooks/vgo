@@ -1,7 +1,9 @@
 package com.jzbrooks.vgo.core
 
 @JvmInline
-value class Color(private val argb: UInt) {
+value class Color(
+    private val argb: UInt,
+) {
     val alpha: UByte
         get() = (argb shr 24).toUByte()
 
@@ -22,8 +24,8 @@ value class Color(private val argb: UInt) {
 
     operator fun component4() = blue
 
-    fun toHexString(format: HexFormat): String {
-        return if (alpha != 0xFF.toUByte()) {
+    fun toHexString(format: HexFormat): String =
+        if (alpha != 0xFF.toUByte()) {
             val pattern = "#%02x%02x%02x%02x"
             when (format) {
                 HexFormat.ARGB ->
@@ -50,7 +52,6 @@ value class Color(private val argb: UInt) {
                 hexColor
             }
         }
-    }
 
     enum class HexFormat {
         RGBA,

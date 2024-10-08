@@ -21,7 +21,9 @@ import kotlin.math.sqrt
 /**
  * Convert curves into shorter commands where possible
  */
-class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimization {
+class SimplifyBezierCurveCommands(
+    private val tolerance: Float,
+) : TopDownOptimization {
     private var skipAnother = false
 
     override fun visit(graphic: Graphic) {}
@@ -99,7 +101,8 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
                     )
                     continue@loop
                 }
-                if (lastAdded !is SmoothCubicBezierCurve && lastAdded !is CubicBezierCurve &&
+                if (lastAdded !is SmoothCubicBezierCurve &&
+                    lastAdded !is CubicBezierCurve &&
                     currentFinalParameter.startControl == Point.ZERO
                 ) {
                     commands.add(
@@ -213,12 +216,35 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
             return false
         }
 
-        if (sqrt((a * parameters.last().endControl.x.toDouble() + b * parameters.last().endControl.y.toDouble()).pow(2) * d) > tolerance) {
+        if (sqrt(
+                (
+                    a *
+                        parameters
+                            .last()
+                            .endControl.x
+                            .toDouble() + b *
+                        parameters
+                            .last()
+                            .endControl.y
+                            .toDouble()
+                ).pow(2) * d,
+            ) > tolerance
+        ) {
             return false
         }
 
         if (sqrt(
-                (a * parameters.last().startControl.x.toDouble() + b * parameters.last().startControl.y.toDouble()).pow(2) * d,
+                (
+                    a *
+                        parameters
+                            .last()
+                            .startControl.x
+                            .toDouble() + b *
+                        parameters
+                            .last()
+                            .startControl.y
+                            .toDouble()
+                ).pow(2) * d,
             ) > tolerance
         ) {
             return false
@@ -237,7 +263,20 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
             return false
         }
 
-        if (sqrt((a * parameters.last().endControl.x.toDouble() + b * parameters.last().endControl.y.toDouble()).pow(2) * d) > tolerance) {
+        if (sqrt(
+                (
+                    a *
+                        parameters
+                            .last()
+                            .endControl.x
+                            .toDouble() + b *
+                        parameters
+                            .last()
+                            .endControl.y
+                            .toDouble()
+                ).pow(2) * d,
+            ) > tolerance
+        ) {
             return false
         }
 
@@ -254,7 +293,20 @@ class SimplifyBezierCurveCommands(private val tolerance: Float) : TopDownOptimiz
             return false
         }
 
-        if (sqrt((a * parameters.last().control.x.toDouble() + b * parameters.last().control.y.toDouble()).pow(2) * d) > tolerance) {
+        if (sqrt(
+                (
+                    a *
+                        parameters
+                            .last()
+                            .control.x
+                            .toDouble() + b *
+                        parameters
+                            .last()
+                            .control.y
+                            .toDouble()
+                ).pow(2) * d,
+            ) > tolerance
+        ) {
             return false
         }
 

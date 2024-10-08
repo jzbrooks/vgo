@@ -65,7 +65,9 @@ class VectorDrawableWriterTests {
 
             val output = memoryStream.toDocument()
             val firstGenNodes = output.firstChild.childNodes.toList()
-            val transformGroupNodes = output.firstChild.firstChild.childNodes.toList()
+            val transformGroupNodes =
+                output.firstChild.firstChild.childNodes
+                    .toList()
 
             assertThat(firstGenNodes + transformGroupNodes)
                 .transform("path element count") { it.count { item -> item.nodeName == "path" } }
@@ -129,7 +131,9 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val groupChildren = output.firstChild.firstChild.childNodes.toList()
+            val groupChildren =
+                output.firstChild.firstChild.childNodes
+                    .toList()
 
             assertThat(groupChildren).hasSameSizeAs((graphic.elements[0] as Group).elements)
         }
@@ -154,7 +158,9 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val extraNode = output.firstChild.firstChild.childNodes.item(1)
+            val extraNode =
+                output.firstChild.firstChild.childNodes
+                    .item(1)
 
             assertThat(extraNode).hasName("bicycle")
         }
@@ -166,18 +172,19 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val extraNode = output.firstChild.firstChild.childNodes.item(1)
+            val extraNode =
+                output.firstChild.firstChild.childNodes
+                    .item(1)
 
             assertThat(extraNode.firstChild).hasName("group")
         }
     }
 
-    private fun ByteArrayOutputStream.toDocument(): Document {
-        return DocumentBuilderFactory
+    private fun ByteArrayOutputStream.toDocument(): Document =
+        DocumentBuilderFactory
             .newInstance()
             .newDocumentBuilder()
             .parse(ByteArrayInputStream(this.toByteArray()))
-    }
 
     companion object {
         val graphic =

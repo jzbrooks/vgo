@@ -42,18 +42,23 @@ class InPlaceModificationTest {
 
     @Test
     fun `in-place optimization completes successfully`() {
-        val arguments = arrayOf("src/test/resources/in-place-modify")
-
-        val exitCode = Application().run(arguments)
+        val options =
+            Vgo.Options(
+                input = listOf("src/test/resources/in-place-modify"),
+            )
+        val exitCode = Vgo(options).run()
 
         assertThat(exitCode).isEqualTo(0)
     }
 
     @Test
     fun `individual file statistics are reported with a directory input`() {
-        val arguments = arrayOf("src/test/resources/in-place-modify", "--stats")
-
-        Application().run(arguments)
+        val options =
+            Vgo.Options(
+                printStats = true,
+                input = listOf("src/test/resources/in-place-modify"),
+            )
+        Vgo(options).run()
 
         assertThat(systemOutput.toString())
             .contains(Paths.get("src/test/resources/in-place-modify/avocado_example.xml").toString())
@@ -61,9 +66,13 @@ class InPlaceModificationTest {
 
     @Test
     fun `non-vector files are not mentioned in statistics reporting with a directory input`() {
-        val arguments = arrayOf("src/test/resources/in-place-modify", "--stats")
+        val options =
+            Vgo.Options(
+                printStats = true,
+                input = listOf("src/test/resources/in-place-modify"),
+            )
 
-        Application().run(arguments)
+        Vgo(options).run()
 
         assertThat(systemOutput.toString())
             .doesNotContain("src/test/resources/in-place-modify/non_vector.xml")
@@ -71,9 +80,13 @@ class InPlaceModificationTest {
 
     @Test
     fun `only modified files appear in statistics reporting`() {
-        val arguments = arrayOf("src/test/resources/in-place-modify", "--stats")
+        val options =
+            Vgo.Options(
+                printStats = true,
+                input = listOf("src/test/resources/in-place-modify"),
+            )
 
-        Application().run(arguments)
+        Vgo(options).run()
 
         assertThat(systemOutput.toString())
             .doesNotContain("src/test/resources/in-place-modify/avocado_example_optimized.xml")
@@ -84,7 +97,11 @@ class InPlaceModificationTest {
         val input = File("src/test/resources/in-place-modify/non_vector.xml")
         val before = input.readText()
 
-        Application().run(arrayOf(input.parent))
+        val options =
+            Vgo.Options(
+                input = listOf(input.parent.toString()),
+            )
+        Vgo(options).run()
 
         val after = input.readText()
         assertThat(after).isEqualTo(before)
