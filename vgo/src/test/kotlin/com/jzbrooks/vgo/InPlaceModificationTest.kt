@@ -3,10 +3,12 @@ package com.jzbrooks.vgo
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import assertk.assertions.exists
 import assertk.assertions.isEqualTo
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInfo
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.PrintStream
@@ -16,17 +18,10 @@ class InPlaceModificationTest {
     private lateinit var systemOutput: ByteArrayOutputStream
 
     @BeforeEach
-    fun copyToSide() {
+    fun copyToSide(info: TestInfo) {
         val originalFolder = File("src/test/resources/in-place-modify/")
-        val reservedFolder = File("build/test-results/inPlaceModification/reserved/")
-        originalFolder.copyRecursively(reservedFolder, true)
-    }
-
-    @AfterEach
-    fun resetFiles() {
-        val originalFolder = File("src/test/resources/in-place-modify/")
-        val reservedFolder = File("build/test-results/inPlaceModification/reserved/")
-        reservedFolder.copyRecursively(originalFolder, true)
+        val workingFolder = File("build/test-results/inPlaceModification/${info.displayName}/")
+        originalFolder.copyRecursively(workingFolder, true)
     }
 
     @BeforeEach
@@ -41,10 +36,10 @@ class InPlaceModificationTest {
     }
 
     @Test
-    fun `in-place optimization completes successfully`() {
+    fun `in-place optimization completes successfully`(info: TestInfo) {
         val options =
             Vgo.Options(
-                input = listOf("src/test/resources/in-place-modify"),
+                input = listOf("build/test-results/inPlaceModification/${info.displayName}/"),
             )
         val exitCode = Vgo(options).run()
 
@@ -52,49 +47,49 @@ class InPlaceModificationTest {
     }
 
     @Test
-    fun `individual file statistics are reported with a directory input`() {
+    fun `individual file statistics are reported with a directory input`(info: TestInfo) {
         val options =
             Vgo.Options(
                 printStats = true,
-                input = listOf("src/test/resources/in-place-modify"),
+                input = listOf("build/test-results/inPlaceModification/${info.displayName}/"),
             )
         Vgo(options).run()
 
         assertThat(systemOutput.toString())
-            .contains(Paths.get("src/test/resources/in-place-modify/avocado_example.xml").toString())
+            .contains(Paths.get("build/test-results/inPlaceModification/${info.displayName}/avocado_example.xml").toString())
     }
 
     @Test
-    fun `non-vector files are not mentioned in statistics reporting with a directory input`() {
+    fun `non-vector files are not mentioned in statistics reporting with a directory input`(info: TestInfo) {
         val options =
             Vgo.Options(
                 printStats = true,
-                input = listOf("src/test/resources/in-place-modify"),
-            )
-
-        Vgo(options).run()
-
-        assertThat(systemOutput.toString())
-            .doesNotContain("src/test/resources/in-place-modify/non_vector.xml")
-    }
-
-    @Test
-    fun `only modified files appear in statistics reporting`() {
-        val options =
-            Vgo.Options(
-                printStats = true,
-                input = listOf("src/test/resources/in-place-modify"),
+                input = listOf("build/test-results/inPlaceModification/${info.displayName}"),
             )
 
         Vgo(options).run()
 
         assertThat(systemOutput.toString())
-            .doesNotContain("src/test/resources/in-place-modify/avocado_example_optimized.xml")
+            .doesNotContain("build/test-results/inPlaceModification/${info.displayName}/non_vector.xml")
     }
 
     @Test
-    fun `non-vector files are not modified`() {
-        val input = File("src/test/resources/in-place-modify/non_vector.xml")
+    fun `only modified files appear in statistics reporting`(info: TestInfo) {
+        val options =
+            Vgo.Options(
+                printStats = true,
+                input = listOf("build/test-results/inPlaceModification/${info.displayName}"),
+            )
+
+        Vgo(options).run()
+
+        assertThat(systemOutput.toString())
+            .doesNotContain("build/test-results/inPlaceModification/${info.displayName}/avocado_example_optimized.xml")
+    }
+
+    @Test
+    fun `non-vector files are not modified`(info: TestInfo) {
+        val input = File("build/test-results/inPlaceModification/${info.displayName}/non_vector.xml")
         val before = input.readText()
 
         val options =
@@ -105,5 +100,18 @@ class InPlaceModificationTest {
 
         val after = input.readText()
         assertThat(after).isEqualTo(before)
+    }
+
+    @Test
+    fun `format option results in new file extension`(info: TestInfo) {
+        val options =
+            Vgo.Options(
+                format = "svg",
+                input = listOf("build/test-results/inPlaceModification/${info.displayName}"),
+            )
+
+        Vgo(options).run()
+
+        assertThat(File("build/test-results/inPlaceModification/${info.displayName}/avocado_example.svg")).exists()
     }
 }
