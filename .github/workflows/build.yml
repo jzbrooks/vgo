@@ -85,7 +85,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: vgo
-          path: ${{ github.workspace }}/vgo
+          path: ${{ github.workspace }}/dist
+
+      - name: Generate checksum
+        run: |
+            cd ${{ github.workspace }}/dist
+            sha256sum vgo > vgo.sha256
 
       # Remove old release drafts by using the curl request for the available releases with draft flag
       - name: Remove Old Release Drafts
@@ -101,11 +106,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v${{ needs.build.outputs.version }} \
+          gh release create v${{ needs.build.outputs.version }} ${{ github.workspace }}/dist/vgo ${{ github.workspace }}/dist/vgo.sha256 \
             --draft \
             --title "v${{ needs.build.outputs.version }}" \
             --notes "$(cat << 'EOM'
           ${{ needs.build.outputs.changelog }}
           EOM
-          ) \
-            ${{ github.workspace }}/vgo"
+          ) 
