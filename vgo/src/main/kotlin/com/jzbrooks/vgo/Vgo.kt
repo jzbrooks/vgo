@@ -16,6 +16,7 @@ import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.file.Paths
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
@@ -59,7 +60,7 @@ class Vgo(
                 }
             } else {
                 inputs.zip(inputs) { a, b ->
-                    Pair(File(a), File(b))
+
                 }
             }.toMap()
 
@@ -68,6 +69,24 @@ class Vgo(
         printFileNames = options.printStats && (files > 1 || containsDirectory)
 
         return handleFiles(inputOutputMap, writerOptions)
+    }
+
+    private fun pairOutputs(): Map<File, File> {
+        val inputFiles = options.input.map(::File)
+        return if (options.output.isNotEmpty()) {
+            inputFiles.zip(options.output.map(::File)).toMap()
+        } else {
+            inputFiles.mapIndexed { index, input ->
+                if (!input.isDirectory) {
+                    val outputExtension = when (options.format) {
+                        "svg" -> "svg"
+                        "vd" -> "xml"
+                        else -> input.extension
+                    }
+                    val outputFilePath = options.output.dropLastWhile { it != '.' } + outputExtension
+                }
+            }.toMap()
+        }
     }
 
     private fun handleFiles(
