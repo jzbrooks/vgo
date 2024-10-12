@@ -66,8 +66,8 @@ class Vgo(
         return handleFiles(inputOutputMap, writerOptions)
     }
 
-    private fun pairOutputs(): Map<File, Path> {
-        return if (options.output.isNotEmpty()) {
+    private fun pairOutputs(): Map<File, Path> =
+        if (options.output.isNotEmpty()) {
             options.input.zip(options.output) { a, b ->
                 Pair(File(a), Paths.get(b))
             }
@@ -76,7 +76,6 @@ class Vgo(
                 Pair(File(a), Paths.get(b))
             }
         }.toMap()
-    }
 
     private fun handleFile(
         input: File,
@@ -153,11 +152,12 @@ class Vgo(
                 optimizationRegistry?.apply(graphic)
             }
 
-            val output = when(this.options.format) {
-                "vd" -> outputPath.resolveSibling("${outputPath.fileName}.xml")
-                "svg" -> outputPath.resolveSibling("${outputPath.fileName}.svg")
-                else -> outputPath
-            }.toFile()
+            val output =
+                when (this.options.format) {
+                    "vd" -> outputPath.resolveSibling("${outputPath.fileName}.xml")
+                    "svg" -> outputPath.resolveSibling("${outputPath.fileName}.svg")
+                    else -> outputPath
+                }.toFile()
 
             if (output.parentFile?.exists() == false) output.parentFile.mkdirs()
             if (!output.exists()) output.createNewFile()
