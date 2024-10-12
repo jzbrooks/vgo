@@ -15,6 +15,8 @@
 
 ### Fixed
 
+- Conversions without a specified output file will write a file the file extension corresponding to the format.
+
 ### Security
 
 ## 2.4.0 - 2024-10-02

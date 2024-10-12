@@ -16,7 +16,15 @@ import org.w3c.dom.Document
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
 import javax.xml.parsers.DocumentBuilderFactory
+import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.isSameFileAs
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.pathString
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -52,17 +60,7 @@ class Vgo(
             inputs = standardInPaths
         }
 
-        val inputOutputMap =
-            if (options.output.isNotEmpty()) {
-                inputs.zip(options.output) { a, b ->
-                    Pair(File(a), File(b))
-                }
-            } else {
-                inputs.zip(inputs) { a, b ->
-                    Pair(File(a), File(b))
-                }
-            }.toMap()
-
+        val inputOutputMap = pairOutputs()
         val files = inputOutputMap.count { (input, _) -> input.isFile }
         val containsDirectory = inputOutputMap.any { (input, _) -> input.isDirectory }
         printFileNames = options.printStats && (files > 1 || containsDirectory)
@@ -70,49 +68,20 @@ class Vgo(
         return handleFiles(inputOutputMap, writerOptions)
     }
 
-    private fun handleFiles(
-        inputOutputMap: Map<File, File>,
-        writerOptions: Set<Writer.Option>,
-    ): Int {
-        for (entry in inputOutputMap) {
-            val (input, output) = entry
-
-            when {
-                entry.isFilePair -> handleFile(input, output, writerOptions)
-                entry.isDirectoryPair -> handleDirectory(input, output, writerOptions)
-                !entry.inputExists -> {
-                    System.err.println("${input.path} does not exist.")
-                    return 65
-                }
-                else -> {
-                    System.err.println(
-                        """
-                        A given input and output pair (grouped positionally)
-                        must be either files or directories.
-                        Input is a ${if (input.isFile) "file" else "directory"}
-                            path: ${input.absolutePath}
-                            exists: ${input.exists()}
-                            isWritable: ${input.canWrite()}
-                        Output is a ${if (output.isFile) "file" else "directory"}
-                            path: ${output.absolutePath}
-                            exists: ${input.exists()}
-                            isWritable: ${input.canWrite()}
-
-                        Storage: ${output.usableSpace} / ${output.totalSpace} is usable.
-                        """.trimIndent(),
-                    )
-
-                    return 65
-                }
+    private fun pairOutputs(): Map<File, Path> =
+        if (options.output.isNotEmpty()) {
+            options.input.zip(options.output) { a, b ->
+                Pair(File(a), Paths.get(b))
             }
-        }
-
-        return 0
-    }
+        } else {
+            options.input.zip(options.input) { a, b ->
+                Pair(File(a), Paths.get(b))
+            }
+        }.toMap()
 
     private fun handleFile(
         input: File,
-        output: File,
+        outputPath: Path,
         options: Set<Writer.Option>,
     ) {
         input.inputStream().use { inputStream ->
@@ -167,7 +136,7 @@ class Vgo(
                         com.jzbrooks.vgo.vd
                             .parse(rootNodes.first())
                     }
-                    else -> if (input == output) return else null
+                    else -> if (outputPath.isSameFileAs(input.toPath())) return else null
                 }
 
             if (graphic is VectorDrawable && this.options.format == "svg") {
@@ -184,6 +153,17 @@ class Vgo(
             if (graphic != null) {
                 optimizationRegistry?.apply(graphic)
             }
+
+            val output =
+                if (input.path == outputPath.pathString) {
+                    when (this.options.format) {
+                        "vd" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.xml")
+                        "svg" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.svg")
+                        else -> outputPath
+                    }
+                } else {
+                    outputPath
+                }.toFile()
 
             if (output.parentFile?.exists() == false) output.parentFile.mkdirs()
             if (!output.exists()) output.createNewFile()
@@ -220,16 +200,57 @@ class Vgo(
         }
     }
 
+    private fun handleFiles(
+        inputOutputMap: Map<File, Path>,
+        writerOptions: Set<Writer.Option>,
+    ): Int {
+        for (entry in inputOutputMap) {
+            val (input, output) = entry
+
+            when {
+                entry.isFilePair -> handleFile(input, output, writerOptions)
+                entry.isDirectoryPair -> handleDirectory(input, output, writerOptions)
+                !entry.inputExists -> {
+                    System.err.println("${input.path} does not exist.")
+                    return 65
+                }
+                else -> {
+                    val output = output.toFile()
+                    System.err.println(
+                        """
+                        A given input and output pair (grouped positionally)
+                        must be either files or directories.
+                        Input is a ${if (input.isFile) "file" else "directory"}
+                            path: ${input.absolutePath}
+                            exists: ${input.exists()}
+                            isWritable: ${input.canWrite()}
+                        Output is a ${if (output.isFile) "file" else "directory"}
+                            path: ${output.absolutePath}
+                            exists: ${input.exists()}
+                            isWritable: ${input.canWrite()}
+
+                        Storage: ${output.usableSpace} / ${output.totalSpace} is usable.
+                        """.trimIndent(),
+                    )
+
+                    return 65
+                }
+            }
+        }
+
+        return 0
+    }
+
     private fun handleDirectory(
         input: File,
-        output: File,
+        output: Path,
         options: Set<Writer.Option>,
     ) {
         assert(input.isDirectory)
-        assert(output.isDirectory || !output.exists())
+        assert(output.isDirectory() || !output.exists())
 
         for (file in input.walkTopDown().filter { file -> !file.isHidden && !file.isDirectory }) {
-            handleFile(file, File(output, file.name), options)
+            handleFile(file, output.resolve(file.name), options)
         }
 
         if (this.options.printStats) {
@@ -263,14 +284,14 @@ class Vgo(
             else -> "$bytes B"
         }
 
-    private val Map.Entry<File, File>.inputExists
+    private val Map.Entry<File, Path>.inputExists
         get() = key.exists()
 
-    private val Map.Entry<File, File>.isFilePair
-        get() = key.isFile && (value.isFile || !value.exists())
+    private val Map.Entry<File, Path>.isFilePair
+        get() = key.isFile && (value.isRegularFile() || !value.exists())
 
-    private val Map.Entry<File, File>.isDirectoryPair
-        get() = key.isDirectory && (value.isDirectory || !value.exists())
+    private val Map.Entry<File, Path>.isDirectoryPair
+        get() = key.isDirectory && (value.isDirectory() || !value.exists())
 
     data class Options(
         val printVersion: Boolean = false,
