@@ -4,7 +4,7 @@ vgo is a tool for optimizing and converting between vector artwork representatio
 
 vgo is built on vgo-core, a library and intermediate representation for vector graphics.
 
-[![Build Status](https://github.com/jzbrooks/vgo/workflows/build/badge.svg?branch=master)](https://github.com/jzbrooks/vgo/actions?workflow=build)
+[![Build Status](https://github.com/jzbrooks/vgo/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/jzbrooks/vgo/actions/workflows/build.yml)
 [![Maven Central: vgo](https://img.shields.io/maven-central/v/com.jzbrooks/vgo?label=vgo)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo)
 [![Maven Central: vgo-core](https://img.shields.io/maven-central/v/com.jzbrooks/vgo-core?label=vgo-core)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo-core)
 [![Maven Central: vgo-plugin](https://img.shields.io/maven-central/v/com.jzbrooks/vgo-plugin?label=vgo-plugin)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo-plugin)
@@ -33,6 +33,11 @@ pluginManagement {
 ```
 
 Then, in the relevant project, add the plugin.
+
+> [!NOTE]
+> You must have the android tools sdk on your build classpath if you are converting SVGs to vector drawables. 
+> This is typically done by applying the Android Gradle Plugin.
+
 ```groovy
 plugins {
     id 'com.jzbrooks.vgo'
@@ -49,10 +54,6 @@ vgo {
     indent = 0
 }
 ```
-
-> [!NOTE]
-> You must have the android tools sdk on your build classpath if you are converting SVGs to vector drawables. 
-> This is typically done by applying the Android Gradle Plugin.
 
 > [!TIP]
 > For Android projects a non-zero indent is better for readability and provides no apk size impact after AAPT processing.
