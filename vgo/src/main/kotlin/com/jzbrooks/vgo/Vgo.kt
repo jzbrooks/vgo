@@ -24,6 +24,7 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.isSameFileAs
 import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.pathString
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -154,10 +155,14 @@ class Vgo(
             }
 
             val output =
-                when (this.options.format) {
-                    "vd" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.xml")
-                    "svg" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.svg")
-                    else -> outputPath
+                if (input.path == outputPath.pathString) {
+                    when (this.options.format) {
+                        "vd" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.xml")
+                        "svg" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.svg")
+                        else -> outputPath
+                    }
+                } else {
+                    outputPath
                 }.toFile()
 
             if (output.parentFile?.exists() == false) output.parentFile.mkdirs()

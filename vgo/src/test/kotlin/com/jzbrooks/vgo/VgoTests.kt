@@ -5,6 +5,7 @@ import assertk.assertions.contains
 import assertk.assertions.doesNotContain
 import assertk.assertions.exists
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -14,7 +15,7 @@ import java.io.File
 import java.io.PrintStream
 import java.nio.file.Paths
 
-class InPlaceModificationTest {
+class VgoTests {
     private lateinit var systemOutput: ByteArrayOutputStream
 
     @BeforeEach
@@ -47,7 +48,7 @@ class InPlaceModificationTest {
     }
 
     @Test
-    fun `individual file statistics are reported with a directory input`(info: TestInfo) {
+    fun `in-place individual file statistics are reported with a directory input`(info: TestInfo) {
         val options =
             Vgo.Options(
                 printStats = true,
@@ -60,7 +61,7 @@ class InPlaceModificationTest {
     }
 
     @Test
-    fun `non-vector files are not mentioned in statistics reporting with a directory input`(info: TestInfo) {
+    fun `in-place non-vector files are not mentioned in statistics reporting with a directory input`(info: TestInfo) {
         val options =
             Vgo.Options(
                 printStats = true,
@@ -74,7 +75,7 @@ class InPlaceModificationTest {
     }
 
     @Test
-    fun `only modified files appear in statistics reporting`(info: TestInfo) {
+    fun `in-place only modified files appear in statistics reporting`(info: TestInfo) {
         val options =
             Vgo.Options(
                 printStats = true,
@@ -88,7 +89,7 @@ class InPlaceModificationTest {
     }
 
     @Test
-    fun `non-vector files are not modified`(info: TestInfo) {
+    fun `in-place non-vector files are not modified`(info: TestInfo) {
         val input = File("build/test-results/inPlaceModification/${info.displayName}/non_vector.xml")
         val before = input.readText()
 
@@ -103,7 +104,7 @@ class InPlaceModificationTest {
     }
 
     @Test
-    fun `format option results in new file extension`(info: TestInfo) {
+    fun `in-place format option results in new file extension`(info: TestInfo) {
         val options =
             Vgo.Options(
                 format = "svg",
@@ -113,5 +114,23 @@ class InPlaceModificationTest {
         Vgo(options).run()
 
         assertThat(File("build/test-results/inPlaceModification/${info.displayName}/avocado_example.svg")).exists()
+    }
+
+    @Test
+    fun `output-specified file extension is not overwritten by conversion format`(info: TestInfo) {
+        val options =
+            Vgo.Options(
+                format = "svg",
+                input = listOf("build/test-results/inPlaceModification/${info.displayName}/avocado_example.xml"),
+                output = listOf("build/test-results/inPlaceModification/${info.displayName}/avocado_example.vec"),
+            )
+
+        Vgo(options).run()
+
+        assertThat(File("build/test-results/inPlaceModification/${info.displayName}/avocado_example.vec")).exists()
+        assertThat(File("build/test-results/inPlaceModification/${info.displayName}/avocado_example.svg"))
+            .transform("exists") {
+                it.exists()
+            }.isFalse() // todo: replace this with doesNotExists() when assertk is updated
     }
 }
