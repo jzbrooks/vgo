@@ -16,6 +16,7 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import kotlin.math.sign
 
 class VectorDrawableCommandPrinter(
@@ -27,6 +28,10 @@ class VectorDrawableCommandPrinter(
             isDecimalSeparatorAlwaysShown = false
             isGroupingUsed = false
             roundingMode = RoundingMode.HALF_UP
+            decimalFormatSymbols =
+                DecimalFormatSymbols().apply {
+                    decimalSeparator = '.'
+                }
         }
 
     override fun print(command: Command): String =
