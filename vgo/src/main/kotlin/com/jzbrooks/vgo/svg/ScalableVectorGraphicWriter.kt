@@ -31,6 +31,7 @@ class ScalableVectorGraphicWriter(
             maximumFractionDigits = 2 // todo: parameterize?
             minimumIntegerDigits = 0
             isDecimalSeparatorAlwaysShown = false
+            isGroupingUsed = false
             roundingMode = RoundingMode.HALF_UP
             decimalFormatSymbols =
                 DecimalFormatSymbols().apply {
