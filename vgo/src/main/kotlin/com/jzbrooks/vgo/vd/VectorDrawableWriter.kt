@@ -12,6 +12,7 @@ import org.w3c.dom.Document
 import java.io.OutputStream
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.util.Collections.emptySet
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -33,6 +34,10 @@ class VectorDrawableWriter(
             minimumIntegerDigits = 0
             isDecimalSeparatorAlwaysShown = false
             roundingMode = RoundingMode.HALF_UP
+            decimalFormatSymbols =
+                DecimalFormatSymbols().apply {
+                    decimalSeparator = '.'
+                }
         }
 
     override fun write(
