@@ -16,6 +16,8 @@
 ### Fixed
 
 - Conversions without a specified output file will write a file the file extension corresponding to the format.
+- Decimal separators are locale-invariant.
+- Crash when using the cli to convert an svg containing a clip path to vector drawable. 
 
 ### Security
 
