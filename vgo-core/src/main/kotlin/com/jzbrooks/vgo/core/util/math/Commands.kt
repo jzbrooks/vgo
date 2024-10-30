@@ -60,7 +60,3 @@ fun computeAbsoluteCoordinates(commands: List<Command>): Point {
 
     return currentPoint
 }
-
-fun samplePerimeter(commands: List<Command>): List<Point> {
-    return emptyList()
-}
