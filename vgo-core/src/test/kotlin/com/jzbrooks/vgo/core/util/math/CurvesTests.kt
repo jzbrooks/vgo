@@ -3,7 +3,6 @@ package com.jzbrooks.vgo.core.util.math
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
@@ -34,14 +33,14 @@ class CurvesTests {
     @Test
     fun `Ensure non-relative interpolation throws`() {
         assertThrows<AssertionError> {
-            nonRelativeCurve.interpolate(0.2f)
+            nonRelativeCurve.interpolateRelative(0.2f)
         }
     }
 
     @Test
     fun `Ensure multiple curve parameter interpolation throws`() {
         assertThrows<AssertionError> {
-            multiParameterCurve.interpolate(0.2f)
+            multiParameterCurve.interpolateRelative(0.2f)
         }
     }
 
@@ -59,37 +58,6 @@ class CurvesTests {
         }
     }
 
-    @Test
-    fun `Ensure non-relative shortcut throws`() {
-        val nonRelativeCurve =
-            SmoothCubicBezierCurve(
-                CommandVariant.ABSOLUTE,
-                listOf(
-                    SmoothCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f)),
-                ),
-            )
-
-        assertThrows<AssertionError> {
-            nonRelativeCurve.isConvex()
-        }
-    }
-
-    @Test
-    fun `Ensure multiple shortcut curve parameters throws`() {
-        val mutliParameterCurve =
-            SmoothCubicBezierCurve(
-                CommandVariant.RELATIVE,
-                listOf(
-                    SmoothCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f)),
-                    SmoothCubicBezierCurve.Parameter(Point(-5f, 2.25f), Point(-5f, 5f)),
-                ),
-            )
-
-        assertThrows<AssertionError> {
-            mutliParameterCurve.isConvex()
-        }
-    }
-
     @MethodSource
     @ParameterizedTest
     fun `Curve fits to circle`(data: FitCircle) {
@@ -99,22 +67,8 @@ class CurvesTests {
 
     @MethodSource
     @ParameterizedTest
-    fun `Shortcut curve does not fit to circle`(curve: SmoothCubicBezierCurve) {
-        val circle = curve.fitCircle(0.01f)
-        assertThat(circle).isNull()
-    }
-
-    @MethodSource
-    @ParameterizedTest
     fun `Point along a curve is computed correctly`(data: ParameterizedCurve) {
-        val point = data.curve.interpolate(data.t)
-        assertThat(point).isEqualTo(data.expected)
-    }
-
-    @MethodSource
-    @ParameterizedTest
-    fun `Point along a shortcut curve is computed correctly`(data: ShortcutParameterizedCurve) {
-        val point = data.curve.interpolate(data.t)
+        val point = data.curve.interpolateRelative(data.t)
         assertThat(point).isEqualTo(data.expected)
     }
 
@@ -130,26 +84,10 @@ class CurvesTests {
         assertThat(curve.isConvex()).isFalse()
     }
 
-    @MethodSource
-    @ParameterizedTest
-    fun `Convex shortcut curves are convex`(curve: SmoothCubicBezierCurve) {
-        assertThat(curve.isConvex()).isTrue()
-    }
-
-    @MethodSource
-    @ParameterizedTest
-    fun `Concave shortcut curves are not convex`(curve: SmoothCubicBezierCurve) {
-        assertThat(curve.isConvex()).isFalse()
-    }
 
     data class FitCircle(
         val curve: CubicBezierCurve,
         val expectedCircle: Circle,
-    )
-
-    data class ShortcutFitCircle(
-        val curve: SmoothCubicBezierCurve,
-        val expectedCircle: Circle?,
     )
 
     data class ParameterizedCurve(
@@ -206,21 +144,6 @@ class CurvesTests {
             )
 
         @JvmStatic
-        fun `Point along a shortcut curve is computed correctly`(): List<ShortcutParameterizedCurve> =
-            listOf(
-                ShortcutParameterizedCurve(
-                    SmoothCubicBezierCurve(
-                        CommandVariant.RELATIVE,
-                        listOf(
-                            SmoothCubicBezierCurve.Parameter(Point(-5.1f, 14f), Point(12.4f, 11.1f)),
-                        ),
-                    ),
-                    0.54f,
-                    Point(-0.099726915f, 7.381562f),
-                ),
-            )
-
-        @JvmStatic
         fun `Convex curves are convex`(): List<CubicBezierCurve> =
             listOf(
                 CubicBezierCurve(
@@ -250,40 +173,6 @@ class CurvesTests {
                     CommandVariant.RELATIVE,
                     listOf(
                         CubicBezierCurve.Parameter(Point(109f, 8f), Point(113f, 12f), Point(120f, 10f)),
-                    ),
-                ),
-            )
-
-        @JvmStatic
-        fun `Convex shortcut curves are convex`(): List<SmoothCubicBezierCurve> =
-            listOf(
-                SmoothCubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        SmoothCubicBezierCurve.Parameter(Point(5f, 2.25f), Point(5f, 5f)),
-                    ),
-                ),
-                SmoothCubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        SmoothCubicBezierCurve.Parameter(Point(1.5f, 0.5f), Point(3.5f, 2f)),
-                    ),
-                ),
-                SmoothCubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        SmoothCubicBezierCurve.Parameter(Point(109f, 8f), Point(113f, 12f)),
-                    ),
-                ),
-            )
-
-        @JvmStatic
-        fun `Concave shortcut curves are not convex`(): List<SmoothCubicBezierCurve> =
-            listOf(
-                SmoothCubicBezierCurve(
-                    CommandVariant.RELATIVE,
-                    listOf(
-                        SmoothCubicBezierCurve.Parameter(Point(2.5f, 0f), Point(-5f, 2.25f)),
                     ),
                 ),
             )

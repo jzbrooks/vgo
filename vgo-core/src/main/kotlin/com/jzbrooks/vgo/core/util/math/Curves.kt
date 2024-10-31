@@ -16,11 +16,11 @@ private const val ARC_TOLERANCE = 0.5f
  * Requires that the curve only has a single parameter
  * Requires that the curve use relative coordinates
  */
-fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
+fun CubicBezierCurve.fitCircle(tolerance: Float = 1e-3f): Circle? {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
-    val mid = interpolate(0.5f)
+    val mid = interpolateRelative(0.5f)
 
     val end = parameters[0].end
     val m1 = mid * 0.5f
@@ -38,7 +38,7 @@ fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
     val withinTolerance =
         radius < 1e7 &&
             floatArrayOf(0.25f, 0.75f).all {
-                val curveValue = interpolate(it)
+                val curveValue = interpolateRelative(it)
                 abs(curveValue.distanceTo(center) - radius) <= tolerance
             }
 
@@ -49,15 +49,11 @@ fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
  * Requires that the curve only has a single parameter
  * Requires that the curve use relative coordinates
  */
-fun CubicCurve<*>.interpolate(t: Float): Point {
+fun CubicBezierCurve.interpolateRelative(t: Float): Point {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
-    val (startControl, endControl, end) =
-        when (this) {
-            is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-            is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
-        }
+    val (startControl, endControl, end) = parameters[0]
 
     val square = t * t
     val cube = square * t
@@ -74,15 +70,11 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
  * Requires that the curve only has a single parameter
  * Requires that the curve use relative coordinates
 */
-fun CubicCurve<*>.isConvex(tolerance: Float = 1e-3f): Boolean {
+fun CubicBezierCurve.isConvex(tolerance: Float = 1e-3f): Boolean {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
-    val (startControl, endControl, end) =
-        when (this) {
-            is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-            is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
-        }
+    val (startControl, endControl, end) = parameters[0]
 
     val firstDiagonal = LineSegment(Point.ZERO, endControl)
     val secondDiagonal = LineSegment(startControl, end)
@@ -121,7 +113,7 @@ fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBez
     )
 }
 
-fun CubicCurve<*>.liesOnCircle(
+fun CubicBezierCurve.liesOnCircle(
     circle: Circle,
     tolerance: Float = 1e-3f,
 ): Boolean {
@@ -129,7 +121,7 @@ fun CubicCurve<*>.liesOnCircle(
     val tolerance = min(ARC_THRESHOLD * tolerance, ARC_TOLERANCE * circle.radius / 100)
 
     return floatArrayOf(0f, 0.25f, 0.5f, 0.75f, 1f).all { t ->
-        abs(interpolate(t).distanceTo(circle.center) - circle.radius) <= tolerance
+        abs(interpolateRelative(t).distanceTo(circle.center) - circle.radius) <= tolerance
     }
 }
 

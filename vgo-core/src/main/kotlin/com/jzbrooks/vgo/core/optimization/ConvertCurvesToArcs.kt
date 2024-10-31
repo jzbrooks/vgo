@@ -12,6 +12,7 @@ import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.CubicCurve
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.util.math.Circle
 import com.jzbrooks.vgo.core.util.math.computeAbsoluteCoordinates
 import com.jzbrooks.vgo.core.util.math.findArcAngle
 import com.jzbrooks.vgo.core.util.math.fitCircle
@@ -101,52 +102,52 @@ class ConvertCurvesToArcs(
 
                     val previous = computeAbsoluteCoordinates(commands.take(i))
 
-                    while (nextCommand is CubicCurve<*> && nextCommand.isConvex() && nextCommand.liesOnCircle(relativeCircle)) {
-                        val normalizedNext =
-                            if (nextCommand is SmoothCubicBezierCurve) {
-                                nextCommand.toCubicBezierCurve(pendingCurves.last())
-                            } else {
-                                nextCommand
+                    if (nextCommand != null) {
+                        var currentCurve = currentCommand
+                        var nextCurve = convertToCircularCubicCurve(nextCommand, relativeCircle, currentCurve)
+
+                        while (nextCommand is CubicCurve<*> && nextCurve != null) {
+                            pendingCurves.add(nextCommand)
+
+                            val next = computeAbsoluteCoordinates(commands.take(j + 1))
+
+                            angle += nextCurve.findArcAngle(relativeCircle)
+
+                            if (angle - 2 * Math.PI > 1e-3) {
+                                break
                             }
 
-                        check(normalizedNext is CubicBezierCurve)
+                            if (angle > Math.PI) arc.parameters[0].arc = EllipticalArcCurve.ArcFlag.LARGE
 
-                        pendingCurves.add(nextCommand)
-
-                        val next = computeAbsoluteCoordinates(commands.take(j + 1))
-
-                        angle += normalizedNext.findArcAngle(relativeCircle)
-
-                        if (angle - 2 * Math.PI > 1e-3) {
-                            break
-                        }
-
-                        if (angle > Math.PI) arc.parameters[0].arc = EllipticalArcCurve.ArcFlag.LARGE
-
-                        if (2 * Math.PI - angle > 1e-3) {
-                            arc.parameters[0].end = next - previous
-                        } else {
-                            arc.parameters[0].end = (relativeCircle.center - normalizedNext.parameters[0].end) * 2f
-                            ellipticalArcs.add(
-                                EllipticalArcCurve(
-                                    CommandVariant.RELATIVE,
-                                    listOf(
-                                        EllipticalArcCurve.Parameter(
-                                            radius,
-                                            radius,
-                                            0f,
-                                            EllipticalArcCurve.ArcFlag.SMALL,
-                                            sweep,
-                                            next - (previous + arc.parameters[0].end),
+                            if (2 * Math.PI - angle > 1e-3) {
+                                arc.parameters[0].end = next - previous
+                            } else {
+                                arc.parameters[0].end = (relativeCircle.center - nextCurve.parameters[0].end) * 2f
+                                ellipticalArcs.add(
+                                    EllipticalArcCurve(
+                                        CommandVariant.RELATIVE,
+                                        listOf(
+                                            EllipticalArcCurve.Parameter(
+                                                radius,
+                                                radius,
+                                                0f,
+                                                EllipticalArcCurve.ArcFlag.SMALL,
+                                                sweep,
+                                                next - (previous + arc.parameters[0].end),
+                                            ),
                                         ),
                                     ),
-                                ),
-                            )
-                            break
-                        }
+                                )
+                                break
+                            }
 
-                        relativeCircle.center += normalizedNext.parameters[0].end
-                        nextCommand = commands.getOrNull(++j)
+                            relativeCircle.center += nextCurve.parameters[0].end
+                            nextCommand = commands.getOrNull(++j)
+                            currentCurve = nextCurve
+                            nextCurve = nextCommand?.let {
+                                convertToCircularCubicCurve(it, relativeCircle, currentCurve)
+                            }
+                        }
                     }
 
                     // If the next curve is a shorthand, it must be converted
@@ -244,5 +245,17 @@ class ConvertCurvesToArcs(
         }
 
         return newCommands
+    }
+
+    private fun convertToCircularCubicCurve(
+        command: Command,
+        relativeCircle: Circle,
+        previousCurve: CubicBezierCurve?,
+    ): CubicBezierCurve? {
+        return when (command) {
+            is CubicBezierCurve -> command
+            is SmoothCubicBezierCurve -> command.toCubicBezierCurve(previousCurve!!)
+            else -> null
+        }?.takeIf { it.isConvex() && it.liesOnCircle(relativeCircle) }
     }
 }
