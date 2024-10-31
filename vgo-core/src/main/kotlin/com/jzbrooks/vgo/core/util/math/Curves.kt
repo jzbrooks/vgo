@@ -3,7 +3,9 @@ package com.jzbrooks.vgo.core.util.math
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.CubicCurve
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import kotlin.math.abs
 import kotlin.math.acos
 import kotlin.math.hypot
@@ -51,6 +53,13 @@ fun CubicBezierCurve.fitCircle(tolerance: Float = 1e-3f): Circle? {
  */
 fun CubicBezierCurve.interpolateRelative(t: Float): Point {
     assert(variant == CommandVariant.RELATIVE)
+    return interpolate(Point.ZERO, t)
+}
+
+/**
+ * Requires that the curve only has a single parameter
+ */
+fun CubicBezierCurve.interpolate(currentPoint: Point, t: Float): Point {
     assert(parameters.size == 1)
 
     val (startControl, endControl, end) = parameters[0]
@@ -59,10 +68,11 @@ fun CubicBezierCurve.interpolateRelative(t: Float): Point {
     val cube = square * t
     val param = 1 - t
     val paramSquare = param * param
+    val paramCube = paramSquare * param
 
     return Point(
-        3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
-        3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y,
+        x = currentPoint.x * paramCube + 3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
+        y = currentPoint.y * paramCube + 3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y,
     )
 }
 
@@ -113,6 +123,29 @@ fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBez
     )
 }
 
+fun SmoothCubicBezierCurve.interpolateRelative(previousControl: Point, t: Float): Point? {
+    assert(variant == CommandVariant.RELATIVE)
+
+    return interpolate(Point.ZERO, previousControl, t)
+}
+
+fun SmoothCubicBezierCurve.interpolate(currentPoint: Point, previousControl: Point, t: Float): Point {
+    assert(parameters.size == 1)
+
+    val (endControl, end) = parameters[0]
+
+    val param = 1 - t
+    val paramSquare = param * param
+    val paramCube = paramSquare * param
+    val square = t * t
+    val cube = square * t
+
+    return Point(
+        x = paramCube * currentPoint.x + 3 * paramSquare * t * previousControl.x + 3 * param * square * endControl.x + cube * end.x,
+        y = paramCube * currentPoint.y + 3 * paramSquare * t * previousControl.y + 3 * param * square * endControl.y + cube * end.y
+    )
+}
+
 fun CubicBezierCurve.liesOnCircle(
     circle: Circle,
     tolerance: Float = 1e-3f,
@@ -134,3 +167,50 @@ fun CubicBezierCurve.findArcAngle(circle: Circle): Float {
 
     return acos(innerProduct / magnitudeProduct)
 }
+
+fun QuadraticBezierCurve.interpolateRelative(t: Float): Point? {
+    assert(variant == CommandVariant.RELATIVE)
+    return interpolate(Point.ZERO, t)
+}
+
+fun QuadraticBezierCurve.interpolate(currentPoint: Point, t: Float): Point {
+    assert(parameters.size == 1)
+
+    val (control, end) = parameters[0]
+
+    val param = 1 - t
+    val paramSquare = param * param
+    val square = t * t
+
+    return Point(
+        x = paramSquare * currentPoint.x + 2 * param * t * control.x + square * end.x,
+        y = paramSquare * currentPoint.y + 2 * param * t * control.y + square * end.y
+    )
+}
+
+fun SmoothQuadraticBezierCurve.interpolateRelative(previousControl: Point, t: Float): Point {
+    assert(variant == CommandVariant.RELATIVE)
+    return interpolate(Point.ZERO, previousControl, t)
+}
+
+fun SmoothQuadraticBezierCurve.interpolate(currentPoint: Point, previousControl: Point, t: Float): Point {
+    assert(parameters.size == 1)
+
+    val end = parameters[0]
+
+    // Calculate the "smooth" control point by reflecting `previousControl` across `currentPoint`
+    val control = Point(
+        x = 2 * currentPoint.x - previousControl.x,
+        y = 2 * currentPoint.y - previousControl.y
+    )
+
+    val param = 1 - t
+    val paramSquare = param * param
+    val square = t * t
+
+    return Point(
+        x = paramSquare * currentPoint.x + 2 * param * t * control.x + square * end.x,
+        y = paramSquare * currentPoint.y + 2 * param * t * control.y + square * end.y
+    )
+}
+

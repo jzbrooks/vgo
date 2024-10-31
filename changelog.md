@@ -3,11 +3,13 @@
 ## Unreleased
 
 ### Added
+- Bezier curve and elliptical arc interpolation functions
 
 ### Changed
 
 - `vgo-plugin` (`com.jzbrooks.vgo.plugin`) no longer requires a particular version of Android Gradle Plugin.
   Note: `:vgo` is now an abstract implementation of the tool which does not assume either a cli or plugin context. CLI related logic has been relocated into `:vgo-cli`.
+- **Breaking:** `CubicCurve<*>.interpolate` has been split into `CubicBezierCurve.interpolateRelative` and `SmoothCubicBezierCurve.interpolateRelative`
 
 ### Deprecated
 
