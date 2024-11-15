@@ -13,8 +13,7 @@ import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 
-
-class Surveyor() {
+class Surveyor {
     private val pathStart = ArrayDeque<Point>()
 
     // Updated once per process call when computing
@@ -22,6 +21,7 @@ class Surveyor() {
     // because the coordinates are accurate regardless
     // of their absolute or relative nature.
     private lateinit var currentPoint: Point
+    private lateinit var previousControlPoint: Point
 
     fun findBoundingBox(commands: List<Command>): Rectangle {
         pathStart.clear()
@@ -59,10 +59,10 @@ class Surveyor() {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
-                                    command.parameters
-                                        .map<Point, Point> { commandPoint ->
-                                            (commandPoint + currentPoint)
-                                        }.also<List<Point>> { currentPoint = it.last().copy() },
+                                        command.parameters
+                                            .map<Point, Point> { commandPoint ->
+                                                (commandPoint + currentPoint)
+                                            }.also<List<Point>> { currentPoint = it.last().copy() },
                                 )
                             } else {
                                 command
@@ -77,10 +77,10 @@ class Surveyor() {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
-                                    command.parameters
-                                        .map<Point, Point> { commandPoint ->
-                                            (commandPoint + currentPoint)
-                                        }.also<List<Point>> { currentPoint = it.last().copy() },
+                                        command.parameters
+                                            .map<Point, Point> { commandPoint ->
+                                                (commandPoint + currentPoint)
+                                            }.also<List<Point>> { currentPoint = it.last().copy() },
                                 )
                             } else {
                                 command
@@ -111,10 +111,10 @@ class Surveyor() {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
-                                    command.parameters
-                                        .map<Float, Float> { x ->
-                                            (x + currentPoint.x)
-                                        }.also<List<Float>> { currentPoint = currentPoint.copy(x = it.last()) },
+                                        command.parameters
+                                            .map<Float, Float> { x ->
+                                                (x + currentPoint.x)
+                                            }.also<List<Float>> { currentPoint = currentPoint.copy(x = it.last()) },
                                 )
                             } else {
                                 command
@@ -137,10 +137,10 @@ class Surveyor() {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
-                                    command.parameters
-                                        .map<Float, Float> { y ->
-                                            (y + currentPoint.y)
-                                        }.also<List<Float>> { currentPoint = currentPoint.copy(y = it.last()) },
+                                        command.parameters
+                                            .map<Float, Float> { y ->
+                                                (y + currentPoint.y)
+                                            }.also<List<Float>> { currentPoint = currentPoint.copy(y = it.last()) },
                                 )
                             } else {
                                 command
@@ -163,20 +163,42 @@ class Surveyor() {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
-                                    command.parameters
-                                        .map<CubicBezierCurve.Parameter, CubicBezierCurve.Parameter> {
-                                            it.copy(
-                                                startControl = it.startControl + currentPoint,
-                                                endControl = it.endControl + currentPoint,
-                                                end = it.end + currentPoint,
-                                            )
-                                        }.also<List<CubicBezierCurve.Parameter>> {
-                                            currentPoint = it.last().end.copy()
-                                        },
+                                        command.parameters
+                                            .map<CubicBezierCurve.Parameter, CubicBezierCurve.Parameter> {
+                                                it.copy(
+                                                    startControl = it.startControl + currentPoint,
+                                                    endControl = it.endControl + currentPoint,
+                                                    end = it.end + currentPoint,
+                                                )
+                                            }.also<List<CubicBezierCurve.Parameter>> {
+                                                currentPoint = it.last().end.copy()
+                                            },
                                 )
                             } else {
                                 command
                             }
+
+                        previousControlPoint = command1.parameters.last().endControl
+
+                        for (t in listOf(0f, 0.25f, 0.75f, 1f)) {
+                            val interpolatedPoint = command1.interpolateRelative(t)
+                            if (interpolatedPoint.x < rectangle.left) {
+                                rectangle = rectangle.copy(left = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.x > rectangle.right) {
+                                rectangle = rectangle.copy(right = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.y > rectangle.top) {
+                                rectangle = rectangle.copy(top = interpolatedPoint.y)
+                            }
+
+                            if (interpolatedPoint.y < rectangle.bottom) {
+                                rectangle = rectangle.copy(bottom = interpolatedPoint.y)
+                            }
+                        }
+
                         command1
                     }
 
@@ -186,19 +208,41 @@ class Surveyor() {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
-                                    command.parameters
-                                        .map<SmoothCubicBezierCurve.Parameter, SmoothCubicBezierCurve.Parameter> {
-                                            it.copy(
-                                                endControl = it.endControl + currentPoint,
-                                                end = it.end + currentPoint,
-                                            )
-                                        }.also<List<SmoothCubicBezierCurve.Parameter>> {
-                                            currentPoint = it.last().end.copy()
-                                        },
+                                        command.parameters
+                                            .map<SmoothCubicBezierCurve.Parameter, SmoothCubicBezierCurve.Parameter> {
+                                                it.copy(
+                                                    endControl = it.endControl + currentPoint,
+                                                    end = it.end + currentPoint,
+                                                )
+                                            }.also<List<SmoothCubicBezierCurve.Parameter>> {
+                                                currentPoint = it.last().end.copy()
+                                            },
                                 )
                             } else {
                                 command
                             }
+
+                        previousControlPoint = command1.parameters.last().endControl
+
+                        for (t in listOf(0f, 0.25f, 0.75f, 1f)) {
+                            val interpolatedPoint = command1.interpolateRelative(previousControlPoint, t)
+                            if (interpolatedPoint.x < rectangle.left) {
+                                rectangle = rectangle.copy(left = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.x > rectangle.right) {
+                                rectangle = rectangle.copy(right = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.y > rectangle.top) {
+                                rectangle = rectangle.copy(top = interpolatedPoint.y)
+                            }
+
+                            if (interpolatedPoint.y < rectangle.bottom) {
+                                rectangle = rectangle.copy(bottom = interpolatedPoint.y)
+                            }
+                        }
+
                         command1
                     }
 
@@ -208,34 +252,78 @@ class Surveyor() {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
-                                    command.parameters
-                                        .map<QuadraticBezierCurve.Parameter, QuadraticBezierCurve.Parameter> {
-                                            it.copy(
-                                                control = it.control + currentPoint,
-                                                end = it.end + currentPoint,
-                                            )
-                                        }.also<List<QuadraticBezierCurve.Parameter>> {
-                                            currentPoint = it.last().end.copy()
-                                        },
+                                        command.parameters
+                                            .map<QuadraticBezierCurve.Parameter, QuadraticBezierCurve.Parameter> {
+                                                it.copy(
+                                                    control = it.control + currentPoint,
+                                                    end = it.end + currentPoint,
+                                                )
+                                            }.also<List<QuadraticBezierCurve.Parameter>> {
+                                                currentPoint = it.last().end.copy()
+                                            },
                                 )
                             } else {
                                 command
                             }
+
+                        previousControlPoint = command1.parameters.last().control
+
+                        for (t in listOf(0f, 0.25f, 0.75f, 1f)) {
+                            val interpolatedPoint = command1.interpolateRelative(t)
+                            if (interpolatedPoint.x < rectangle.left) {
+                                rectangle = rectangle.copy(left = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.x > rectangle.right) {
+                                rectangle = rectangle.copy(right = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.y > rectangle.top) {
+                                rectangle = rectangle.copy(top = interpolatedPoint.y)
+                            }
+
+                            if (interpolatedPoint.y < rectangle.bottom) {
+                                rectangle = rectangle.copy(bottom = interpolatedPoint.y)
+                            }
+                        }
+
                         command1
                     }
 
-                    is SmoothQuadraticBezierCurve -> if (command.variant == CommandVariant.RELATIVE) {
-                        command.copy(
-                            variant = CommandVariant.ABSOLUTE,
-                            parameters =
-                            command.parameters
-                                .map<Point, Point> { commandPoint ->
-                                    commandPoint + currentPoint
-                                }.also<List<Point>> { currentPoint = it.last().copy() },
-                        )
-                    } else {
-                        command
-                    }
+                    is SmoothQuadraticBezierCurve ->
+                        if (command.variant == CommandVariant.RELATIVE) {
+                            command.copy(
+                                variant = CommandVariant.ABSOLUTE,
+                                parameters =
+                                    command.parameters
+                                        .map<Point, Point> { commandPoint ->
+                                            commandPoint + currentPoint
+                                        }.also<List<Point>> { currentPoint = it.last().copy() },
+                            )
+                        } else {
+                            command
+                        }.also { curve ->
+                            previousControlPoint = curve.parameters.last()
+
+                            for (t in listOf(0f, 0.25f, 0.75f, 1f)) {
+                                val interpolatedPoint = curve.interpolateRelative(previousControlPoint, t)
+                                if (interpolatedPoint.x < rectangle.left) {
+                                    rectangle = rectangle.copy(left = interpolatedPoint.x)
+                                }
+
+                                if (interpolatedPoint.x > rectangle.right) {
+                                    rectangle = rectangle.copy(right = interpolatedPoint.x)
+                                }
+
+                                if (interpolatedPoint.y > rectangle.top) {
+                                    rectangle = rectangle.copy(top = interpolatedPoint.y)
+                                }
+
+                                if (interpolatedPoint.y < rectangle.bottom) {
+                                    rectangle = rectangle.copy(bottom = interpolatedPoint.y)
+                                }
+                            }
+                        }
 
                     is EllipticalArcCurve -> {
                         val command1 =
@@ -243,16 +331,35 @@ class Surveyor() {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
-                                    command.parameters
-                                        .map<EllipticalArcCurve.Parameter, EllipticalArcCurve.Parameter> {
-                                            it.copy(end = it.end + currentPoint)
-                                        }.also<List< EllipticalArcCurve.Parameter>> {
-                                            currentPoint = it.last().end.copy()
-                                        },
+                                        command.parameters
+                                            .map<EllipticalArcCurve.Parameter, EllipticalArcCurve.Parameter> {
+                                                it.copy(end = it.end + currentPoint)
+                                            }.also<List<EllipticalArcCurve.Parameter>> {
+                                                currentPoint = it.last().end.copy()
+                                            },
                                 )
                             } else {
                                 command
                             }
+
+                        val box = command1.computeBoundingBox(Point.ZERO)
+
+                        if (box.left < rectangle.left) {
+                            rectangle = rectangle.copy(left = box.left)
+                        }
+
+                        if (box.right > rectangle.right) {
+                            rectangle = rectangle.copy(right = box.right)
+                        }
+
+                        if (box.top > rectangle.top) {
+                            rectangle = rectangle.copy(top = box.top)
+                        }
+
+                        if (box.bottom < rectangle.bottom) {
+                            rectangle = rectangle.copy(top = box.bottom)
+                        }
+
                         command1
                     }
 
@@ -268,5 +375,4 @@ class Surveyor() {
 
         return rectangle
     }
-
 }

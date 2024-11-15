@@ -6,6 +6,8 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -58,6 +60,41 @@ class CurvesTests {
         }
     }
 
+    @Test
+    fun `Elliptical arc interpolation works`() {
+        val curve =
+            EllipticalArcCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    EllipticalArcCurve.Parameter(
+                        50f,
+                        50f,
+                        0f,
+                        EllipticalArcCurve.ArcFlag.SMALL,
+                        EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                        Point(200f, 100f),
+                    ),
+                ),
+            )
+
+        val result = curve.computeBoundingBox(Point(100f, 100f))
+
+        assertThat(result).isEqualTo(Rectangle(0f, 0f, 0f, 0f))
+    }
+
+    @Test
+    fun `Quadratic interpolation works`() {
+        val curve =
+            QuadraticBezierCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(QuadraticBezierCurve.Parameter(Point(5f, 10f), Point(10f, 10f))),
+            )
+
+        val result = curve.interpolate(Point.ZERO, 0.5f)
+
+        assertThat(result).isEqualTo(Point(5f, 7.5f))
+    }
+
     @MethodSource
     @ParameterizedTest
     fun `Curve fits to circle`(data: FitCircle) {
@@ -83,7 +120,6 @@ class CurvesTests {
     fun `Concave curves are not convex`(curve: CubicBezierCurve) {
         assertThat(curve.isConvex()).isFalse()
     }
-
 
     data class FitCircle(
         val curve: CubicBezierCurve,

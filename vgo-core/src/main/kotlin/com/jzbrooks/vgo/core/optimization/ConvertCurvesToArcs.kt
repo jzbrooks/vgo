@@ -144,9 +144,10 @@ class ConvertCurvesToArcs(
                             relativeCircle.center += nextCurve.parameters[0].end
                             nextCommand = commands.getOrNull(++j)
                             currentCurve = nextCurve
-                            nextCurve = nextCommand?.let {
-                                convertToCircularCubicCurve(it, relativeCircle, currentCurve)
-                            }
+                            nextCurve =
+                                nextCommand?.let {
+                                    convertToCircularCubicCurve(it, relativeCircle, currentCurve)
+                                }
                         }
                     }
 
@@ -251,11 +252,10 @@ class ConvertCurvesToArcs(
         command: Command,
         relativeCircle: Circle,
         previousCurve: CubicBezierCurve?,
-    ): CubicBezierCurve? {
-        return when (command) {
+    ): CubicBezierCurve? =
+        when (command) {
             is CubicBezierCurve -> command
             is SmoothCubicBezierCurve -> command.toCubicBezierCurve(previousCurve!!)
             else -> null
         }?.takeIf { it.isConvex() && it.liesOnCircle(relativeCircle) }
-    }
 }
