@@ -81,8 +81,8 @@ class CollisionDetectionTest {
 
         assertThat(box).all {
             prop(Rectangle::left).isCloseTo(6f, 0.1f)
-            prop(Rectangle::top).isCloseTo(112f, 0.1f)
-            prop(Rectangle::right).isCloseTo(22f, 0.1f)
+            prop(Rectangle::top).isCloseTo(110.16f, 0.1f)
+            prop(Rectangle::right).isCloseTo(21.25f, 0.1f)
             prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }

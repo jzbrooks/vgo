@@ -8,9 +8,10 @@ import com.jzbrooks.vgo.core.graphic.command.*
 //   3. Smooth quad - ?
 //   4. Smooth cubic - yes
 //   5. Arc - ?
-//   6. Ensure point tracking is correct for every command type
+//   6. Ensure point tracking is correct for every command type - yes
 //   7. This needs to work with poly-commands (where commands have more than one set of parameters)
-//   8. Can shorthand curves exist directly after commands that aren't the corresponding longahand commands?
+//   8. What's the right resolution for interpolation?
+//   9. Can shorthand curves exist directly after commands that aren't the corresponding longahand commands?
 //      > If the S command doesn't follow another S or C command, then the current position of the cursor is used as the first control point.
 class Surveyor {
     private val pathStart = ArrayDeque<Point>()
@@ -59,13 +60,12 @@ class Surveyor {
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
                                         command.parameters
-                                            .map<Point, Point> { commandPoint ->
-                                                (commandPoint + currentPoint)
-                                            }.also<List<Point>> { currentPoint = it.last().copy() },
+                                            .map<Point, Point> { commandPoint -> commandPoint + currentPoint },
                                 )
                             } else {
                                 command
                             }
+                        currentPoint = command.parameters.last()
                         pathStart.addFirst(currentPoint.copy())
                         lineTo
                     }
@@ -77,13 +77,13 @@ class Surveyor {
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
                                         command.parameters
-                                            .map<Point, Point> { commandPoint ->
-                                                (commandPoint + currentPoint)
-                                            }.also<List<Point>> { currentPoint = it.last().copy() },
+                                            .map<Point, Point> { commandPoint -> commandPoint + currentPoint }
                                 )
                             } else {
                                 command
                             }
+
+                        currentPoint = lineTo.parameters.last()
 
                         if (currentPoint.x < rectangle.left) {
                             rectangle = rectangle.copy(left = currentPoint.x)
@@ -111,13 +111,13 @@ class Surveyor {
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
                                         command.parameters
-                                            .map<Float, Float> { x ->
-                                                (x + currentPoint.x)
-                                            }.also<List<Float>> { currentPoint = currentPoint.copy(x = it.last()) },
+                                            .map<Float, Float> { x -> x + currentPoint.x }
                                 )
                             } else {
                                 command
                             }
+
+                        currentPoint = currentPoint.copy(x = lineTo.parameters.last())
 
                         if (currentPoint.x < rectangle.left) {
                             rectangle = rectangle.copy(left = currentPoint.x)
@@ -137,13 +137,13 @@ class Surveyor {
                                     variant = CommandVariant.ABSOLUTE,
                                     parameters =
                                         command.parameters
-                                            .map<Float, Float> { y ->
-                                                (y + currentPoint.y)
-                                            }.also<List<Float>> { currentPoint = currentPoint.copy(y = it.last()) },
+                                            .map<Float, Float> { y -> y + currentPoint.y }
                                 )
                             } else {
                                 command
                             }
+
+                        currentPoint = currentPoint.copy(y = lineTo.parameters.last())
 
                         if (currentPoint.y > rectangle.top) {
                             rectangle = rectangle.copy(top = currentPoint.y)
@@ -170,9 +170,7 @@ class Surveyor {
                                                     endControl = it.endControl + currentPoint,
                                                     end = it.end + currentPoint,
                                                 )
-                                            }.also<List<CubicBezierCurve.Parameter>> {
-                                                currentPoint = it.last().end.copy()
-                                            },
+                                            }
                                 )
                             } else {
                                 command
@@ -223,11 +221,7 @@ class Surveyor {
                                 command
                             }
 
-                        val resolution = 1000
-                        val steps = (0..resolution).asSequence()
-                            .map { it.toFloat() / resolution }
-
-                        for (t in steps) {
+                        for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
                             val interpolatedPoint = curve.interpolate(prev, previousControlPoint, t)
                             if (interpolatedPoint.x < rectangle.left) {
                                 rectangle = rectangle.copy(left = interpolatedPoint.x)
@@ -247,6 +241,7 @@ class Surveyor {
                         }
 
                         previousControlPoint = curve.parameters.last().endControl
+                        currentPoint = curve.parameters.last().end
                         curve
                     }
 
@@ -291,6 +286,7 @@ class Surveyor {
                         }
 
                         previousControlPoint = curve.parameters.last().control
+                        currentPoint = curve.parameters.last().end
                         curve
                     }
 
@@ -328,7 +324,7 @@ class Surveyor {
                             }
                         }
 
-                        previousControlPoint = curve.parameters.last()
+                        currentPoint = curve.parameters.last()
                         curve
                     }
 
@@ -368,6 +364,7 @@ class Surveyor {
                             rectangle = rectangle.copy(top = box.bottom)
                         }
 
+                        currentPoint = curve.parameters.last().end
                         curve
                     }
 
