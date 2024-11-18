@@ -13,6 +13,7 @@ import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import org.junit.jupiter.api.Test
 
@@ -79,10 +80,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(10f)
-            prop(Rectangle::top).isEqualTo(20f)
-            prop(Rectangle::right).isEqualTo(40f)
-            prop(Rectangle::bottom).isEqualTo(5f)
+            prop(Rectangle::left).isCloseTo(6f, 0.1f)
+            prop(Rectangle::top).isCloseTo(112f, 0.1f)
+            prop(Rectangle::right).isCloseTo(22f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 

@@ -6,9 +6,12 @@ import com.jzbrooks.vgo.core.graphic.command.*
 //   1. Cubic works - yes
 //   2. Quad works - yes
 //   3. Smooth quad - ?
-//   4. Smooth cubic - ?
+//   4. Smooth cubic - yes
 //   5. Arc - ?
-//   2. This needs to work with poly-commands (where commands have more than one set of parameters)
+//   6. Ensure point tracking is correct for every command type
+//   7. This needs to work with poly-commands (where commands have more than one set of parameters)
+//   8. Can shorthand curves exist directly after commands that aren't the corresponding longahand commands?
+//      > If the S command doesn't follow another S or C command, then the current position of the cursor is used as the first control point.
 class Surveyor {
     private val pathStart = ArrayDeque<Point>()
 
@@ -50,7 +53,7 @@ class Surveyor {
             val modifiedCommand =
                 when (command) {
                     is MoveTo -> {
-                        val command1 =
+                        val lineTo =
                             if (command.variant == CommandVariant.RELATIVE) {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
@@ -64,11 +67,11 @@ class Surveyor {
                                 command
                             }
                         pathStart.addFirst(currentPoint.copy())
-                        command1
+                        lineTo
                     }
 
                     is LineTo -> {
-                        val command1 =
+                        val lineTo =
                             if (command.variant == CommandVariant.RELATIVE) {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
@@ -98,11 +101,11 @@ class Surveyor {
                             rectangle = rectangle.copy(bottom = currentPoint.y)
                         }
 
-                        command1
+                        lineTo
                     }
 
                     is HorizontalLineTo -> {
-                        val command1 =
+                        val lineTo =
                             if (command.variant == CommandVariant.RELATIVE) {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
@@ -124,11 +127,11 @@ class Surveyor {
                             rectangle = rectangle.copy(right = currentPoint.x)
                         }
 
-                        command1
+                        lineTo
                     }
 
                     is VerticalLineTo -> {
-                        val command1 =
+                        val lineTo =
                             if (command.variant == CommandVariant.RELATIVE) {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
@@ -150,12 +153,12 @@ class Surveyor {
                             rectangle = rectangle.copy(bottom = currentPoint.y)
                         }
 
-                        command1
+                        lineTo
                     }
 
                     is CubicBezierCurve -> {
                         val prev = currentPoint
-                        val command1 =
+                        val curve =
                             if (command.variant == CommandVariant.RELATIVE) {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
@@ -175,10 +178,8 @@ class Surveyor {
                                 command
                             }
 
-                        previousControlPoint = command1.parameters.last().endControl
-
                         for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
-                            val interpolatedPoint = command1.interpolate(prev, t)
+                            val interpolatedPoint = curve.interpolate(prev, t)
                             if (interpolatedPoint.x < rectangle.left) {
                                 rectangle = rectangle.copy(left = interpolatedPoint.x)
                             }
@@ -196,12 +197,14 @@ class Surveyor {
                             }
                         }
 
-                        command1
+                        previousControlPoint = curve.parameters.last().endControl
+                        currentPoint = curve.parameters.last().end
+                        curve
                     }
 
                     is SmoothCubicBezierCurve -> {
                         val prev = currentPoint
-                        val command1 =
+                        val curve =
                             if (command.variant == CommandVariant.RELATIVE) {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
@@ -220,93 +223,11 @@ class Surveyor {
                                 command
                             }
 
-                        previousControlPoint = command1.parameters.last().endControl
+                        val resolution = 1000
+                        val steps = (0..resolution).asSequence()
+                            .map { it.toFloat() / resolution }
 
-                        for (t in listOf(0f, 0.1f, 0.25f, 0.5f, 0.75f, 1f)) {
-                            val interpolatedPoint = command1.interpolate(prev, previousControlPoint, t)
-                            if (interpolatedPoint.x < rectangle.left) {
-                                rectangle = rectangle.copy(left = interpolatedPoint.x)
-                            }
-
-                            if (interpolatedPoint.x > rectangle.right) {
-                                rectangle = rectangle.copy(right = interpolatedPoint.x)
-                            }
-
-                            if (interpolatedPoint.y > rectangle.top) {
-                                rectangle = rectangle.copy(top = interpolatedPoint.y)
-                            }
-
-                            if (interpolatedPoint.y < rectangle.bottom) {
-                                rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                            }
-                        }
-
-                        command1
-                    }
-
-                    is QuadraticBezierCurve -> {
-                        val prev = currentPoint
-                        val command1 =
-                            if (command.variant == CommandVariant.RELATIVE) {
-                                command.copy(
-                                    variant = CommandVariant.ABSOLUTE,
-                                    parameters =
-                                        command.parameters
-                                            .map<QuadraticBezierCurve.Parameter, QuadraticBezierCurve.Parameter> {
-                                                it.copy(
-                                                    control = it.control + currentPoint,
-                                                    end = it.end + currentPoint,
-                                                )
-                                            }.also<List<QuadraticBezierCurve.Parameter>> {
-                                                currentPoint = it.last().end.copy()
-                                            },
-                                )
-                            } else {
-                                command
-                            }
-
-                        previousControlPoint = command1.parameters.last().control
-
-                        for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
-                            val interpolatedPoint = command1.interpolate(prev, t)
-                            if (interpolatedPoint.x < rectangle.left) {
-                                rectangle = rectangle.copy(left = interpolatedPoint.x)
-                            }
-
-                            if (interpolatedPoint.x > rectangle.right) {
-                                rectangle = rectangle.copy(right = interpolatedPoint.x)
-                            }
-
-                            if (interpolatedPoint.y > rectangle.top) {
-                                rectangle = rectangle.copy(top = interpolatedPoint.y)
-                            }
-
-                            if (interpolatedPoint.y < rectangle.bottom) {
-                                rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                            }
-                        }
-
-                        command1
-                    }
-
-                    is SmoothQuadraticBezierCurve -> {
-                        val prev = currentPoint
-                        val curve = if (command.variant == CommandVariant.RELATIVE) {
-                            command.copy(
-                                variant = CommandVariant.ABSOLUTE,
-                                parameters =
-                                    command.parameters
-                                        .map<Point, Point> { commandPoint ->
-                                            commandPoint + currentPoint
-                                        }.also<List<Point>> { currentPoint = it.last().copy() },
-                            )
-                        } else {
-                            command
-                        }
-
-                        previousControlPoint = curve.parameters.last()
-
-                        for (t in listOf(0f, 0.25f, 0.75f, 1f)) {
+                        for (t in steps) {
                             val interpolatedPoint = curve.interpolate(prev, previousControlPoint, t)
                             if (interpolatedPoint.x < rectangle.left) {
                                 rectangle = rectangle.copy(left = interpolatedPoint.x)
@@ -325,11 +246,95 @@ class Surveyor {
                             }
                         }
 
+                        previousControlPoint = curve.parameters.last().endControl
+                        curve
+                    }
+
+                    is QuadraticBezierCurve -> {
+                        val prev = currentPoint
+                        val curve =
+                            if (command.variant == CommandVariant.RELATIVE) {
+                                command.copy(
+                                    variant = CommandVariant.ABSOLUTE,
+                                    parameters =
+                                        command.parameters
+                                            .map<QuadraticBezierCurve.Parameter, QuadraticBezierCurve.Parameter> {
+                                                it.copy(
+                                                    control = it.control + currentPoint,
+                                                    end = it.end + currentPoint,
+                                                )
+                                            }.also<List<QuadraticBezierCurve.Parameter>> {
+                                                currentPoint = it.last().end.copy()
+                                            },
+                                )
+                            } else {
+                                command
+                            }
+
+                        for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            val interpolatedPoint = curve.interpolate(prev, t)
+                            if (interpolatedPoint.x < rectangle.left) {
+                                rectangle = rectangle.copy(left = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.x > rectangle.right) {
+                                rectangle = rectangle.copy(right = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.y > rectangle.top) {
+                                rectangle = rectangle.copy(top = interpolatedPoint.y)
+                            }
+
+                            if (interpolatedPoint.y < rectangle.bottom) {
+                                rectangle = rectangle.copy(bottom = interpolatedPoint.y)
+                            }
+                        }
+
+                        previousControlPoint = curve.parameters.last().control
+                        curve
+                    }
+
+                    is SmoothQuadraticBezierCurve -> {
+                        val prev = currentPoint
+                        val curve = if (command.variant == CommandVariant.RELATIVE) {
+                            command.copy(
+                                variant = CommandVariant.ABSOLUTE,
+                                parameters =
+                                    command.parameters
+                                        .map<Point, Point> { commandPoint ->
+                                            commandPoint + currentPoint
+                                        }.also<List<Point>> { currentPoint = it.last().copy() },
+                            )
+                        } else {
+                            command
+                        }
+
+                        for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            val interpolatedPoint = curve.interpolate(prev, previousControlPoint, t)
+                            if (interpolatedPoint.x < rectangle.left) {
+                                rectangle = rectangle.copy(left = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.x > rectangle.right) {
+                                rectangle = rectangle.copy(right = interpolatedPoint.x)
+                            }
+
+                            if (interpolatedPoint.y > rectangle.top) {
+                                rectangle = rectangle.copy(top = interpolatedPoint.y)
+                            }
+
+                            if (interpolatedPoint.y < rectangle.bottom) {
+                                rectangle = rectangle.copy(bottom = interpolatedPoint.y)
+                            }
+                        }
+
+                        previousControlPoint = curve.parameters.last()
                         curve
                     }
 
                     is EllipticalArcCurve -> {
-                        val command1 =
+                        val prev = currentPoint
+                        val curve =
                             if (command.variant == CommandVariant.RELATIVE) {
                                 command.copy(
                                     variant = CommandVariant.ABSOLUTE,
@@ -345,7 +350,7 @@ class Surveyor {
                                 command
                             }
 
-                        val box = command1.computeBoundingBox(Point.ZERO)
+                        val box = curve.computeBoundingBox(prev)
 
                         if (box.left < rectangle.left) {
                             rectangle = rectangle.copy(left = box.left)
@@ -363,7 +368,7 @@ class Surveyor {
                             rectangle = rectangle.copy(top = box.bottom)
                         }
 
-                        command1
+                        curve
                     }
 
                     is ClosePath -> {
