@@ -13,6 +13,7 @@ import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import org.junit.jupiter.api.Test
 
@@ -226,7 +227,7 @@ class CollisionDetectionTest {
     }
 
     @Test
-    fun `Sample smooth curves`() {
+    fun `smooth cubic bounding box`() {
         val commands =
             listOf<Command>(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
@@ -331,6 +332,74 @@ class CollisionDetectionTest {
             prop(Rectangle::left).isEqualTo(10f)
             prop(Rectangle::top).isEqualTo(130f)
             prop(Rectangle::right).isEqualTo(81.875f)
+            prop(Rectangle::bottom).isEqualTo(10f)
+        }
+    }
+
+    @Test
+    fun `absolute smooth polyquadratic curve bounding box`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                QuadraticBezierCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        QuadraticBezierCurve.Parameter(
+                            Point(40f, 10f),
+                            Point(10f, 40f),
+                        ),
+                    ),
+                ),
+                SmoothQuadraticBezierCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        Point(90f, 40f),
+                        Point(50f, 80f),
+                    ),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isEqualTo(3.75f)
+            prop(Rectangle::top).isEqualTo(80f)
+            prop(Rectangle::right).isEqualTo(135f)
+            prop(Rectangle::bottom).isEqualTo(10f)
+        }
+    }
+
+    @Test
+    fun `relative smooth polyquadratic curve bounding box`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                QuadraticBezierCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        QuadraticBezierCurve.Parameter(
+                            Point(40f, 10f),
+                            Point(10f, 40f),
+                        ),
+                    ),
+                ),
+                SmoothQuadraticBezierCurve(
+                    CommandVariant.RELATIVE,
+                    listOf(
+                        Point(90f, 40f),
+                        Point(50f, 80f),
+                    ),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isEqualTo(4.375f)
+            prop(Rectangle::top).isEqualTo(160f)
+            prop(Rectangle::right).isEqualTo(173.125f)
             prop(Rectangle::bottom).isEqualTo(10f)
         }
     }

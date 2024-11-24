@@ -237,18 +237,22 @@ fun SmoothQuadraticBezierCurve.interpolate(
 ): Point {
     assert(parameters.size == 1)
 
-    val end = parameters[0]
+    return parameters.first().interpolateSmoothQuadraticBezierCurve(currentPoint, previousControl, t)
+}
 
-    // Calculate the "smooth" control point by reflecting `previousControl` across `currentPoint`
-    val control = (currentPoint * 2f) - previousControl
-
+// todo: it might be a little nicer if the T parameter was a value class around a point
+fun Point.interpolateSmoothQuadraticBezierCurve(
+    currentPoint: Point,
+    control: Point,
+    t: Float,
+): Point {
     val param = 1 - t
     val paramSquare = param * param
     val square = t * t
 
     return Point(
-        x = paramSquare * currentPoint.x + 2 * param * t * control.x + square * end.x,
-        y = paramSquare * currentPoint.y + 2 * param * t * control.y + square * end.y,
+        x = paramSquare * currentPoint.x + 2 * param * t * control.x + square * x,
+        y = paramSquare * currentPoint.y + 2 * param * t * control.y + square * y,
     )
 }
 
