@@ -255,7 +255,7 @@ class CollisionDetectionTest {
     }
 
     @Test
-    fun `Sample quadratic curves`() {
+    fun `quadratic curve bounding box`() {
         val commands =
             listOf<Command>(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
@@ -274,7 +274,69 @@ class CollisionDetectionTest {
     }
 
     @Test
-    fun `correct bounding box for polycommands`() {
+    fun `absolute polyquadratic curve bounding box`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                QuadraticBezierCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        QuadraticBezierCurve.Parameter(
+                            Point(40f, 10f),
+                            Point(10f, 40f),
+                        ),
+                        QuadraticBezierCurve.Parameter(
+                            Point(90f, 40f),
+                            Point(50f, 80f),
+                        ),
+                    ),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isEqualTo(10f)
+            prop(Rectangle::top).isEqualTo(80f)
+            prop(Rectangle::right).isEqualTo(62.5f)
+            prop(Rectangle::bottom).isEqualTo(10f)
+        }
+    }
+
+    @Test
+    fun `relative polyquadratic curve bounding box`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                QuadraticBezierCurve(
+                    CommandVariant.RELATIVE,
+                    listOf(
+                        QuadraticBezierCurve.Parameter(
+                            Point(40f, 10f),
+                            Point(10f, 40f),
+                        ),
+                        QuadraticBezierCurve.Parameter(
+                            Point(90f, 40f),
+                            Point(50f, 80f),
+                        ),
+                    ),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isEqualTo(10f)
+            prop(Rectangle::top).isEqualTo(130f)
+            prop(Rectangle::right).isEqualTo(81.875f)
+            prop(Rectangle::bottom).isEqualTo(10f)
+        }
+    }
+
+    @Test
+    fun `moveto polycommand bounding box`() {
         val commands =
             listOf<Command>(
                 MoveTo(CommandVariant.RELATIVE, listOf(Point(10f, 10f), Point(10f, 10f), Point(10f, 10f))),

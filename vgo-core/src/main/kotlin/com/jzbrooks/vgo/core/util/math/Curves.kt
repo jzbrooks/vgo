@@ -150,20 +150,7 @@ fun SmoothCubicBezierCurve.interpolate(
 ): Point {
     assert(parameters.size == 1)
 
-    val startControl = (currentPoint * 2f) - previousControl
-
-    val (endControl, end) = parameters[0]
-
-    val param = 1 - t
-    val paramSquare = param * param
-    val paramCube = paramSquare * param
-    val square = t * t
-    val cube = square * t
-
-    return Point(
-        x = paramCube * currentPoint.x + 3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
-        y = paramCube * currentPoint.y + 3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y,
-    )
+    return parameters.first().interpolate(currentPoint, previousControl, t)
 }
 
 fun SmoothCubicBezierCurve.Parameter.interpolate(
@@ -218,8 +205,13 @@ fun QuadraticBezierCurve.interpolate(
 ): Point {
     assert(parameters.size == 1)
 
-    val (control, end) = parameters[0]
+    return parameters.first().interpolate(currentPoint, t)
+}
 
+fun QuadraticBezierCurve.Parameter.interpolate(
+    currentPoint: Point,
+    t: Float,
+): Point {
     val param = 1 - t
     val paramSquare = param * param
     val square = t * t
