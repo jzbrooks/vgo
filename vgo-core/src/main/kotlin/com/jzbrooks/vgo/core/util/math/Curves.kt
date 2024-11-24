@@ -65,9 +65,16 @@ fun CubicBezierCurve.interpolate(
     t: Float,
 ): Point {
     assert(parameters.size == 1)
+    return parameters.first().interpolate(currentPoint, t)
+}
 
-    val (startControl, endControl, end) = parameters[0]
-
+/**
+ * Requires that the curve only has a single parameter
+ */
+fun CubicBezierCurve.Parameter.interpolate(
+    currentPoint: Point,
+    t: Float,
+): Point {
     val square = t * t
     val cube = square * t
     val param = 1 - t
