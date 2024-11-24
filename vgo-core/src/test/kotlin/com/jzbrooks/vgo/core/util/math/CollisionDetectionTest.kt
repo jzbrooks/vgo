@@ -13,7 +13,6 @@ import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import org.junit.jupiter.api.Test
 
@@ -45,11 +44,16 @@ class CollisionDetectionTest {
         val commands =
             listOf<Command>(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(CubicBezierCurve.Parameter(
-                    Point(0f, 50f),
-                    Point(10f, 50f),
-                    Point(20f, 100f),
-                )))
+                CubicBezierCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        CubicBezierCurve.Parameter(
+                            Point(0f, 50f),
+                            Point(10f, 50f),
+                            Point(20f, 100f),
+                        ),
+                    ),
+                ),
             )
 
         val surveyor = Surveyor()
@@ -68,12 +72,17 @@ class CollisionDetectionTest {
         val commands =
             listOf<Command>(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(CubicBezierCurve.Parameter(
-                    Point(0f, 50f),
-                    Point(10f, 50f),
-                    Point(20f, 100f),
-                ))),
-                SmoothCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(SmoothCubicBezierCurve.Parameter(Point(0f, 25f), Point(10f, 75f))))
+                CubicBezierCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        CubicBezierCurve.Parameter(
+                            Point(0f, 50f),
+                            Point(10f, 50f),
+                            Point(20f, 100f),
+                        ),
+                    ),
+                ),
+                SmoothCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(SmoothCubicBezierCurve.Parameter(Point(0f, 25f), Point(10f, 75f)))),
             )
 
         val surveyor = Surveyor()
@@ -92,7 +101,7 @@ class CollisionDetectionTest {
         val commands =
             listOf<Command>(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
-                QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(40f, 10f), Point(10f, 40f))))
+                QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(40f, 10f), Point(10f, 40f)))),
             )
 
         val surveyor = Surveyor()
@@ -102,6 +111,24 @@ class CollisionDetectionTest {
             prop(Rectangle::left).isEqualTo(10f)
             prop(Rectangle::top).isEqualTo(40f)
             prop(Rectangle::right).isEqualTo(25f)
+            prop(Rectangle::bottom).isEqualTo(10f)
+        }
+    }
+
+    @Test
+    fun `correct bounding box for polycommands`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.RELATIVE, listOf(Point(10f, 10f), Point(10f, 10f), Point(10f, 10f))),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isEqualTo(10f)
+            prop(Rectangle::top).isEqualTo(30f)
+            prop(Rectangle::right).isEqualTo(30f)
             prop(Rectangle::bottom).isEqualTo(10f)
         }
     }
