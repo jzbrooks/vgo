@@ -166,6 +166,25 @@ fun SmoothCubicBezierCurve.interpolate(
     )
 }
 
+fun SmoothCubicBezierCurve.Parameter.interpolate(
+    currentPoint: Point,
+    previousControl: Point,
+    t: Float,
+): Point {
+    val startControl = (currentPoint * 2f) - previousControl
+
+    val param = 1 - t
+    val paramSquare = param * param
+    val paramCube = paramSquare * param
+    val square = t * t
+    val cube = square * t
+
+    return Point(
+        x = paramCube * currentPoint.x + 3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
+        y = paramCube * currentPoint.y + 3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y,
+    )
+}
+
 fun CubicBezierCurve.liesOnCircle(
     circle: Circle,
     tolerance: Float = 1e-3f,

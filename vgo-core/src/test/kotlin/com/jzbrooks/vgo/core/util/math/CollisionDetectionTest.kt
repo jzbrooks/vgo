@@ -144,6 +144,88 @@ class CollisionDetectionTest {
     }
 
     @Test
+    fun `relative smooth polycubic bounding box`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                CubicBezierCurve(
+                    CommandVariant.RELATIVE,
+                    listOf(
+                        CubicBezierCurve.Parameter(
+                            Point(0f, 50f),
+                            Point(10f, 50f),
+                            Point(20f, 100f),
+                        ),
+                    ),
+                ),
+                SmoothCubicBezierCurve(
+                    CommandVariant.RELATIVE,
+                    listOf(
+                        SmoothCubicBezierCurve.Parameter(
+                            Point(10f, 50f),
+                            Point(20f, 100f),
+                        ),
+                        SmoothCubicBezierCurve.Parameter(
+                            Point(10f, 50f),
+                            Point(20f, 100f),
+                        ),
+                    ),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isEqualTo(10f)
+            prop(Rectangle::top).isEqualTo(310f)
+            prop(Rectangle::right).isEqualTo(70f)
+            prop(Rectangle::bottom).isEqualTo(10f)
+        }
+    }
+
+    @Test
+    fun `absolute smooth polycubic bounding box`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                CubicBezierCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        CubicBezierCurve.Parameter(
+                            Point(0f, 50f),
+                            Point(10f, 50f),
+                            Point(20f, 100f),
+                        ),
+                    ),
+                ),
+                SmoothCubicBezierCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        SmoothCubicBezierCurve.Parameter(
+                            Point(70f, 120f),
+                            Point(150f, 200f),
+                        ),
+                        SmoothCubicBezierCurve.Parameter(
+                            Point(175f, 175f),
+                            Point(200f, 250f),
+                        ),
+                    ),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isCloseTo(6f, 0.1f)
+            prop(Rectangle::top).isEqualTo(250f)
+            prop(Rectangle::right).isEqualTo(200f)
+            prop(Rectangle::bottom).isEqualTo(10f)
+        }
+    }
+
+    @Test
     fun `Sample smooth curves`() {
         val commands =
             listOf<Command>(
