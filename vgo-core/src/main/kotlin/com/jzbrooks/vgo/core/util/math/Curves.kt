@@ -196,17 +196,31 @@ fun Point.interpolateSmoothQuadraticBezierCurve(
     )
 }
 
-fun EllipticalArcCurve.Parameter.computeCenter(currentPoint: Point, endOverride: Point? = null): Point {
+data class CenterParameterization(
+    val center: Point,
+    val radiusX: Float,
+    val radiusY: Float,
+    val phi: Double,
+)
+
+/**
+ * Computes the parameters needed to specify the entire ellipse
+ * @param currentPoint the current point at the start of the curve in absolute coordinates
+ *
+ * **See also:** [https://www.w3.org/TR/SVG11/implnote.html#ArcConversionEndpointToCenter](https://www.w3.org/TR/SVG11/implnote.html#ArcConversionEndpointToCenter)
+ */
+fun EllipticalArcCurve.Parameter.computeCenterParameterization(variant: CommandVariant, currentPoint: Point): CenterParameterization {
     val phi = Math.toRadians(angle.toDouble())
     val cosPhi = cos(phi)
     val sinPhi = sin(phi)
     var rx = radiusX
     var ry = radiusY
 
-    val end = endOverride ?: end
+    val start = currentPoint
+    val end = if (variant == CommandVariant.RELATIVE) end + currentPoint else end
 
-    val x1prime = cosPhi * (currentPoint.x - end.x) / 2.0f + sinPhi * (currentPoint.y - end.y) / 2.0f
-    val y1prime = -sinPhi * (currentPoint.x - end.x) / 2.0f + cosPhi * (currentPoint.y - end.y) / 2.0f
+    val x1prime = cosPhi * (start.x - end.x) / 2.0f + sinPhi * (start.y - end.y) / 2.0f
+    val y1prime = -sinPhi * (start.x - end.x) / 2.0f + cosPhi * (start.y - end.y) / 2.0f
 
     // handle minuscule radii
     val x1primeSquared = x1prime * x1prime
@@ -228,40 +242,18 @@ fun EllipticalArcCurve.Parameter.computeCenter(currentPoint: Point, endOverride:
     val cxPrime = c * (rx * y1prime) / ry
     val cyPrime = c * (-ry * x1prime) / rx
 
-    val cx = cosPhi * cxPrime - sinPhi * cyPrime + (currentPoint.x + end.x) / 2.0
-    val cy = sinPhi * cxPrime + cosPhi * cyPrime + (currentPoint.y + end.y) / 2.0
+    val cx = cosPhi * cxPrime - sinPhi * cyPrime + (start.x + end.x) / 2.0
+    val cy = sinPhi * cxPrime + cosPhi * cyPrime + (start.y + end.y) / 2.0
 
-    return Point(cx.toFloat(), cy.toFloat())
+    return CenterParameterization(
+        Point(cx.toFloat(), cy.toFloat()),
+        rx,
+        ry,
+        phi
+    )
 }
 
-fun EllipticalArcCurve.Parameter.computeBoundingBoxRelative(dxy: Point): Rectangle {
-    val currentPoint = dxy
-    val end = dxy + end
-
-    val center = computeCenter(currentPoint, end)
-
-    var box = Rectangle(
-        center.x - radiusX,
-        center.y + radiusY,
-        center.x + radiusX,
-        center.y - radiusY,
-    )
-
-    if (end.x < box.left) box = box.copy(left = end.x)
-    if (end.x > box.right) box = box.copy(right = end.x)
-    if (end.y > box.top) box = box.copy(top = end.y)
-    if (end.y < box.bottom) box = box.copy(bottom = end.y)
-
-    return box
-}
-
-fun EllipticalArcCurve.Parameter.computeBoundingBox(currentPoint: Point): Rectangle {
-    val center = computeCenter(currentPoint)
-
-    return Rectangle(
-        center.x - radiusX,
-        center.y + radiusY,
-        center.x + radiusX,
-        center.y - radiusY,
-    )
+fun EllipticalArcCurve.Parameter.computeBoundingBox(variant: CommandVariant, currentPoint: Point): Rectangle {
+    val centerParameterization = computeCenterParameterization(variant, currentPoint)
+    return Rectangle(0f, 0f, 0f, 0f)
 }

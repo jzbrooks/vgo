@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import assertk.assertions.prop
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
@@ -77,9 +78,9 @@ class CurvesTests {
                 ),
             )
 
-        val result = curve.parameters.first().computeCenter(Point(200f, 200f))
+        val result = curve.parameters.first().computeCenterParameterization(CommandVariant.ABSOLUTE, Point(10f, 10f))
 
-        assertThat(result).isEqualTo(Rectangle(0f, 0f, 0f, 0f))
+        assertThat(result).prop(CenterParameterization::center).isEqualTo(Point(105f, 55f))
     }
 
     @Test
@@ -90,7 +91,7 @@ class CurvesTests {
                 listOf(QuadraticBezierCurve.Parameter(Point(5f, 10f), Point(10f, 10f))),
             )
 
-        val result = curve.interpolate(Point.ZERO, 0.5f)
+        val result = curve.parameters.first().interpolate(Point.ZERO, 0.5f)
 
         assertThat(result).isEqualTo(Point(5f, 7.5f))
     }

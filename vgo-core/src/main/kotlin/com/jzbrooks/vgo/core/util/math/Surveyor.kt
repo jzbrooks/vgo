@@ -338,7 +338,7 @@ class Surveyor {
                 is EllipticalArcCurve -> {
                     for (arcParameter in command.parameters) {
                         if (command.variant == CommandVariant.RELATIVE) {
-                            val box = arcParameter.computeBoundingBoxRelative(currentPoint)
+                            val box = arcParameter.computeBoundingBox(command.variant, currentPoint)
 
                             if (box.left < rectangle.left) {
                                 rectangle = rectangle.copy(left = box.left)
@@ -358,7 +358,7 @@ class Surveyor {
 
                             currentPoint += arcParameter.end
                         } else {
-                            val box = arcParameter.computeBoundingBox(currentPoint)
+                            val box = arcParameter.computeBoundingBox(command.variant, currentPoint)
 
                             if (box.left < rectangle.left) {
                                 rectangle = rectangle.copy(left = box.left)
