@@ -1,16 +1,7 @@
 package com.jzbrooks.vgo.core.util.math
 
-import com.jzbrooks.vgo.core.graphic.command.CommandVariant
-import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.CubicCurve
-import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
-import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
-import kotlin.math.abs
-import kotlin.math.acos
-import kotlin.math.hypot
-import kotlin.math.min
+import com.jzbrooks.vgo.core.graphic.command.*
+import kotlin.math.*
 
 private const val ARC_THRESHOLD = 2f
 private const val ARC_TOLERANCE = 0.5f
@@ -134,25 +125,6 @@ fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBez
     )
 }
 
-fun SmoothCubicBezierCurve.interpolateRelative(
-    previousControl: Point,
-    t: Float,
-): Point {
-    assert(variant == CommandVariant.RELATIVE)
-
-    return interpolate(Point.ZERO, previousControl, t)
-}
-
-fun SmoothCubicBezierCurve.interpolate(
-    currentPoint: Point,
-    previousControl: Point,
-    t: Float,
-): Point {
-    assert(parameters.size == 1)
-
-    return parameters.first().interpolate(currentPoint, previousControl, t)
-}
-
 fun SmoothCubicBezierCurve.Parameter.interpolate(
     currentPoint: Point,
     previousControl: Point,
@@ -194,20 +166,6 @@ fun CubicBezierCurve.findArcAngle(circle: Circle): Float {
     return acos(innerProduct / magnitudeProduct)
 }
 
-fun QuadraticBezierCurve.interpolateRelative(t: Float): Point {
-    assert(variant == CommandVariant.RELATIVE)
-    return interpolate(Point.ZERO, t)
-}
-
-fun QuadraticBezierCurve.interpolate(
-    currentPoint: Point,
-    t: Float,
-): Point {
-    assert(parameters.size == 1)
-
-    return parameters.first().interpolate(currentPoint, t)
-}
-
 fun QuadraticBezierCurve.Parameter.interpolate(
     currentPoint: Point,
     t: Float,
@@ -220,24 +178,6 @@ fun QuadraticBezierCurve.Parameter.interpolate(
         x = paramSquare * currentPoint.x + 2 * param * t * control.x + square * end.x,
         y = paramSquare * currentPoint.y + 2 * param * t * control.y + square * end.y,
     )
-}
-
-fun SmoothQuadraticBezierCurve.interpolateRelative(
-    previousControl: Point,
-    t: Float,
-): Point {
-    assert(variant == CommandVariant.RELATIVE)
-    return interpolate(Point.ZERO, previousControl, t)
-}
-
-fun SmoothQuadraticBezierCurve.interpolate(
-    currentPoint: Point,
-    previousControl: Point,
-    t: Float,
-): Point {
-    assert(parameters.size == 1)
-
-    return parameters.first().interpolateSmoothQuadraticBezierCurve(currentPoint, previousControl, t)
 }
 
 // todo: it might be a little nicer if the T parameter was a value class around a point
@@ -256,17 +196,72 @@ fun Point.interpolateSmoothQuadraticBezierCurve(
     )
 }
 
-fun EllipticalArcCurve.computeBoundingBox(currentPoint: Point): Rectangle {
-    assert(parameters.size == 1)
+fun EllipticalArcCurve.Parameter.computeCenter(currentPoint: Point, endOverride: Point? = null): Point {
+    val phi = Math.toRadians(angle.toDouble())
+    val cosPhi = cos(phi)
+    val sinPhi = sin(phi)
+    var rx = radiusX
+    var ry = radiusY
 
-    val rx = parameters[0].radiusX
-    val ry = parameters[0].radiusY
-    val endPoint = parameters[0].end
+    val end = endOverride ?: end
+
+    val x1prime = cosPhi * (currentPoint.x - end.x) / 2.0f + sinPhi * (currentPoint.y - end.y) / 2.0f
+    val y1prime = -sinPhi * (currentPoint.x - end.x) / 2.0f + cosPhi * (currentPoint.y - end.y) / 2.0f
+
+    // handle minuscule radii
+    val x1primeSquared = x1prime * x1prime
+    val y1primeSquared = y1prime * y1prime
+
+    var radiusChecker = x1primeSquared / (radiusX * radiusX) + y1primeSquared / (radiusY * radiusY)
+    if (radiusChecker > 1) {
+        val root = sqrt(radiusChecker)
+        rx *= root.toFloat()
+        ry *= root.toFloat()
+    }
+
+    var rx2 = rx * rx
+    var ry2 = ry * ry
+    val sign = if ((arc == EllipticalArcCurve.ArcFlag.LARGE) == (sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE)) -1 else 1
+    val sq = ((rx2 * ry2 - rx2 * y1primeSquared - ry2 * x1primeSquared) / (rx2 * y1primeSquared + ry2 * x1primeSquared))
+    val c = sign * sqrt(sq.coerceAtLeast(0.0))
+
+    val cxPrime = c * (rx * y1prime) / ry
+    val cyPrime = c * (-ry * x1prime) / rx
+
+    val cx = cosPhi * cxPrime - sinPhi * cyPrime + (currentPoint.x + end.x) / 2.0
+    val cy = sinPhi * cxPrime + cosPhi * cyPrime + (currentPoint.y + end.y) / 2.0
+
+    return Point(cx.toFloat(), cy.toFloat())
+}
+
+fun EllipticalArcCurve.Parameter.computeBoundingBoxRelative(dxy: Point): Rectangle {
+    val currentPoint = dxy
+    val end = dxy + end
+
+    val center = computeCenter(currentPoint, end)
+
+    var box = Rectangle(
+        center.x - radiusX,
+        center.y + radiusY,
+        center.x + radiusX,
+        center.y - radiusY,
+    )
+
+    if (end.x < box.left) box = box.copy(left = end.x)
+    if (end.x > box.right) box = box.copy(right = end.x)
+    if (end.y > box.top) box = box.copy(top = end.y)
+    if (end.y < box.bottom) box = box.copy(bottom = end.y)
+
+    return box
+}
+
+fun EllipticalArcCurve.Parameter.computeBoundingBox(currentPoint: Point): Rectangle {
+    val center = computeCenter(currentPoint)
 
     return Rectangle(
-        left = minOf(currentPoint.x - rx, endPoint.x - rx),
-        right = maxOf(currentPoint.x + rx, endPoint.x + rx),
-        top = maxOf(currentPoint.y + ry, endPoint.y + ry),
-        bottom = minOf(currentPoint.y - ry, endPoint.y - ry),
+        center.x - radiusX,
+        center.y + radiusY,
+        center.x + radiusX,
+        center.y - radiusY,
     )
 }

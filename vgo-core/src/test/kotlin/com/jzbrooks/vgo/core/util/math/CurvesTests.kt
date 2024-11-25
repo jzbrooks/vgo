@@ -61,7 +61,7 @@ class CurvesTests {
     }
 
     @Test
-    fun `Elliptical arc interpolation works`() {
+    fun `Elliptical arc center computation`() {
         val curve =
             EllipticalArcCurve(
                 CommandVariant.ABSOLUTE,
@@ -77,7 +77,7 @@ class CurvesTests {
                 ),
             )
 
-        val result = curve.computeBoundingBox(Point(100f, 100f))
+        val result = curve.parameters.first().computeCenter(Point(200f, 200f))
 
         assertThat(result).isEqualTo(Rectangle(0f, 0f, 0f, 0f))
     }

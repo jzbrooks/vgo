@@ -8,6 +8,7 @@ import assertk.assertions.prop
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
 import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
@@ -19,7 +20,7 @@ import org.junit.jupiter.api.Test
 
 class CollisionDetectionTest {
     @Test
-    fun `Sample points`() {
+    fun `line bounding box`() {
         val commands =
             listOf<Command>(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 5f))),
@@ -41,7 +42,7 @@ class CollisionDetectionTest {
     }
 
     @Test
-    fun `Sample curves`() {
+    fun `cubic curve bounding box`() {
         val commands =
             listOf<Command>(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
@@ -401,6 +402,68 @@ class CollisionDetectionTest {
             prop(Rectangle::top).isEqualTo(160f)
             prop(Rectangle::right).isEqualTo(173.125f)
             prop(Rectangle::bottom).isEqualTo(10f)
+        }
+    }
+
+    @Test
+    fun `absolute elliptical arc curve bounding box`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(200f, 200f))),
+                EllipticalArcCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        EllipticalArcCurve.Parameter(
+                            50f,
+                            50f,
+                            0f,
+                            EllipticalArcCurve.ArcFlag.SMALL,
+                            EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                            Point(200f, 100f),
+                        ),
+                    ),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isEqualTo(150f)
+            prop(Rectangle::top).isEqualTo(100f)
+            prop(Rectangle::right).isEqualTo(250f)
+            prop(Rectangle::bottom).isEqualTo(200f)
+        }
+    }
+
+    @Test
+    fun `relative elliptical arc curve bounding box`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(200f, 200f))),
+                EllipticalArcCurve(
+                    CommandVariant.RELATIVE,
+                    listOf(
+                        EllipticalArcCurve.Parameter(
+                            50f,
+                            50f,
+                            0f,
+                            EllipticalArcCurve.ArcFlag.SMALL,
+                            EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                            Point(200f, 100f),
+                        ),
+                    ),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isEqualTo(150f)
+            prop(Rectangle::top).isEqualTo(100f)
+            prop(Rectangle::right).isEqualTo(250f)
+            prop(Rectangle::bottom).isEqualTo(200f)
         }
     }
 

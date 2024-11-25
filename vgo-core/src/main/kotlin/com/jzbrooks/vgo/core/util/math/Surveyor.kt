@@ -16,11 +16,11 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 // TODO:
 //   1. Cubic works - yes
 //   2. Quad works - yes
-//   3. Smooth quad - ?
+//   3. Smooth quad - yes
 //   4. Smooth cubic - yes
-//   5. Arc - ?
+//   5. Arc - 1/2
 //   6. Ensure point tracking is correct for every command type - yes
-//   7. This needs to work with poly-commands (where commands have more than one set of parameters) - 1/2
+//   7. This needs to work with poly-commands (where commands have more than one set of parameters) - yes
 //   8. What's the right resolution for interpolation?
 //   9. Can shorthand curves exist directly after commands that aren't the corresponding longahand commands?
 //      > If the S command doesn't follow another S or C command, then the current position of the cursor is used as the first control point.
@@ -336,43 +336,49 @@ class Surveyor {
                 }
 
                 is EllipticalArcCurve -> {
-                    val prev = currentPoint
-                    val curve =
+                    for (arcParameter in command.parameters) {
                         if (command.variant == CommandVariant.RELATIVE) {
-                            command.copy(
-                                variant = CommandVariant.ABSOLUTE,
-                                parameters =
-                                    command.parameters
-                                        .map<EllipticalArcCurve.Parameter, EllipticalArcCurve.Parameter> {
-                                            it.copy(end = it.end + currentPoint)
-                                        }.also<List<EllipticalArcCurve.Parameter>> {
-                                            currentPoint = it.last().end.copy()
-                                        },
-                            )
+                            val box = arcParameter.computeBoundingBoxRelative(currentPoint)
+
+                            if (box.left < rectangle.left) {
+                                rectangle = rectangle.copy(left = box.left)
+                            }
+
+                            if (box.right > rectangle.right) {
+                                rectangle = rectangle.copy(right = box.right)
+                            }
+
+                            if (box.top > rectangle.top) {
+                                rectangle = rectangle.copy(top = box.top)
+                            }
+
+                            if (box.bottom < rectangle.bottom) {
+                                rectangle = rectangle.copy(top = box.bottom)
+                            }
+
+                            currentPoint += arcParameter.end
                         } else {
-                            command
+                            val box = arcParameter.computeBoundingBox(currentPoint)
+
+                            if (box.left < rectangle.left) {
+                                rectangle = rectangle.copy(left = box.left)
+                            }
+
+                            if (box.right > rectangle.right) {
+                                rectangle = rectangle.copy(right = box.right)
+                            }
+
+                            if (box.top > rectangle.top) {
+                                rectangle = rectangle.copy(top = box.top)
+                            }
+
+                            if (box.bottom < rectangle.bottom) {
+                                rectangle = rectangle.copy(top = box.bottom)
+                            }
+
+                            currentPoint = arcParameter.end
                         }
-
-                    val box = curve.computeBoundingBox(prev)
-
-                    if (box.left < rectangle.left) {
-                        rectangle = rectangle.copy(left = box.left)
                     }
-
-                    if (box.right > rectangle.right) {
-                        rectangle = rectangle.copy(right = box.right)
-                    }
-
-                    if (box.top > rectangle.top) {
-                        rectangle = rectangle.copy(top = box.top)
-                    }
-
-                    if (box.bottom < rectangle.bottom) {
-                        rectangle = rectangle.copy(top = box.bottom)
-                    }
-
-                    currentPoint = curve.parameters.last().end
-                    curve
                 }
 
                 is ClosePath -> {
