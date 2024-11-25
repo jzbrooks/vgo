@@ -430,9 +430,9 @@ class CollisionDetectionTest {
 
         assertThat(box).all {
             prop(Rectangle::left).isEqualTo(150f)
-            prop(Rectangle::top).isEqualTo(100f)
+            prop(Rectangle::top).isEqualTo(200f)
             prop(Rectangle::right).isEqualTo(250f)
-            prop(Rectangle::bottom).isEqualTo(200f)
+            prop(Rectangle::bottom).isEqualTo(100f)
         }
     }
 
@@ -460,10 +460,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(150f)
-            prop(Rectangle::top).isEqualTo(100f)
-            prop(Rectangle::right).isEqualTo(250f)
-            prop(Rectangle::bottom).isEqualTo(200f)
+            prop(Rectangle::left).isCloseTo(188.1f, 0.1f)
+            prop(Rectangle::top).isCloseTo(361.8f, 0.1f)
+            prop(Rectangle::right).isCloseTo(411.8f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(138.2f, 0.1f)
         }
     }
 

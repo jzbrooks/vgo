@@ -1,7 +1,18 @@
 package com.jzbrooks.vgo.core.util.math
 
-import com.jzbrooks.vgo.core.graphic.command.*
-import kotlin.math.*
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.CubicCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import kotlin.math.abs
+import kotlin.math.acos
+import kotlin.math.cos
+import kotlin.math.hypot
+import kotlin.math.min
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 private const val ARC_THRESHOLD = 2f
 private const val ARC_TOLERANCE = 0.5f
@@ -209,7 +220,10 @@ data class CenterParameterization(
  *
  * **See also:** [https://www.w3.org/TR/SVG11/implnote.html#ArcConversionEndpointToCenter](https://www.w3.org/TR/SVG11/implnote.html#ArcConversionEndpointToCenter)
  */
-fun EllipticalArcCurve.Parameter.computeCenterParameterization(variant: CommandVariant, currentPoint: Point): CenterParameterization {
+fun EllipticalArcCurve.Parameter.computeCenterParameterization(
+    variant: CommandVariant,
+    currentPoint: Point,
+): CenterParameterization {
     val phi = Math.toRadians(angle.toDouble())
     val cosPhi = cos(phi)
     val sinPhi = sin(phi)
@@ -249,11 +263,20 @@ fun EllipticalArcCurve.Parameter.computeCenterParameterization(variant: CommandV
         Point(cx.toFloat(), cy.toFloat()),
         rx,
         ry,
-        phi
+        phi,
     )
 }
 
-fun EllipticalArcCurve.Parameter.computeBoundingBox(variant: CommandVariant, currentPoint: Point): Rectangle {
+fun EllipticalArcCurve.Parameter.computeBoundingBox(
+    variant: CommandVariant,
+    currentPoint: Point,
+): Rectangle {
     val centerParameterization = computeCenterParameterization(variant, currentPoint)
-    return Rectangle(0f, 0f, 0f, 0f)
+
+    return Rectangle(
+        centerParameterization.center.x - centerParameterization.radiusX,
+        centerParameterization.center.y + centerParameterization.radiusY,
+        centerParameterization.center.x + centerParameterization.radiusX,
+        centerParameterization.center.y - centerParameterization.radiusY,
+    )
 }

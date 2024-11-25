@@ -353,7 +353,7 @@ class Surveyor {
                             }
 
                             if (box.bottom < rectangle.bottom) {
-                                rectangle = rectangle.copy(top = box.bottom)
+                                rectangle = rectangle.copy(bottom = box.bottom)
                             }
 
                             currentPoint += arcParameter.end
@@ -373,7 +373,7 @@ class Surveyor {
                             }
 
                             if (box.bottom < rectangle.bottom) {
-                                rectangle = rectangle.copy(top = box.bottom)
+                                rectangle = rectangle.copy(bottom = box.bottom)
                             }
 
                             currentPoint = arcParameter.end
