@@ -468,6 +468,37 @@ class CollisionDetectionTest {
     }
 
     @Test
+    fun `rotated elliptical arc curve bounding box`() {
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(200f, 200f))),
+                EllipticalArcCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(
+                        EllipticalArcCurve.Parameter(
+                            50f,
+                            80f,
+                            40f,
+                            EllipticalArcCurve.ArcFlag.SMALL,
+                            EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                            Point(400f, 400f),
+                        ),
+                    ),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isCloseTo(119.1f, 0.1f)
+            prop(Rectangle::top).isCloseTo(495.3f, 0.1f)
+            prop(Rectangle::right).isCloseTo(481f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(104.7f, 0.1f)
+        }
+    }
+
+    @Test
     fun `moveto polycommand bounding box`() {
         val commands =
             listOf<Command>(

@@ -267,16 +267,28 @@ fun EllipticalArcCurve.Parameter.computeCenterParameterization(
     )
 }
 
+/**
+ * Computes an axis-aligned bounding box for an elliptical arc.
+ *
+ * The entire ellipse is used to calculate the box, not just
+ * the segment of the ellipse that constitutes the arc.
+ */
 fun EllipticalArcCurve.Parameter.computeBoundingBox(
     variant: CommandVariant,
     currentPoint: Point,
 ): Rectangle {
     val centerParameterization = computeCenterParameterization(variant, currentPoint)
 
+    val cosPhi = cos(centerParameterization.phi)
+    val sinPhi = sin(centerParameterization.phi)
+
+    val xOffset = hypot(centerParameterization.radiusX * cosPhi, centerParameterization.radiusY * sinPhi)
+    val yOffset = hypot(centerParameterization.radiusX * sinPhi, centerParameterization.radiusY * cosPhi)
+
     return Rectangle(
-        centerParameterization.center.x - centerParameterization.radiusX,
-        centerParameterization.center.y + centerParameterization.radiusY,
-        centerParameterization.center.x + centerParameterization.radiusX,
-        centerParameterization.center.y - centerParameterization.radiusY,
+        centerParameterization.center.x - xOffset.toFloat(),
+        centerParameterization.center.y + yOffset.toFloat(),
+        centerParameterization.center.x + xOffset.toFloat(),
+        centerParameterization.center.y - yOffset.toFloat(),
     )
 }
