@@ -13,17 +13,9 @@ import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 
-// TODO:
-//   1. Cubic works - yes
-//   2. Quad works - yes
-//   3. Smooth quad - yes
-//   4. Smooth cubic - yes
-//   5. Arc - 1/2
-//   6. Ensure point tracking is correct for every command type - yes
-//   7. This needs to work with poly-commands (where commands have more than one set of parameters) - yes
-//   8. What's the right resolution for interpolation?
-//   9. Can shorthand curves exist directly after commands that aren't the corresponding longahand commands?
-//      > If the S command doesn't follow another S or C command, then the current position of the cursor is used as the first control point.
+/**
+ * Makes determinations based on the boundaries of a given set of path data
+ */
 class Surveyor {
     private val pathStart = ArrayDeque<Point>()
 
@@ -59,6 +51,7 @@ class Surveyor {
 
         (commands.firstOrNull() as MoveTo?)?.let { firstMoveTo ->
             currentPoint = firstMoveTo.parameters.first()
+            previousControlPoint = currentPoint
             pathStart.addFirst(currentPoint.copy())
             rectangle = Rectangle(currentPoint.x, currentPoint.y, currentPoint.x, currentPoint.y)
 
@@ -73,7 +66,6 @@ class Surveyor {
                 pathStart.addFirst(currentPoint.copy())
             }
 
-            // TODO: is this right?
             if (command.shouldResetPreviousControlPoint) {
                 previousControlPoint = currentPoint
             }
@@ -97,11 +89,12 @@ class Surveyor {
 
                 is HorizontalLineTo -> {
                     for (parameter in command.parameters) {
-                        if (command.variant == CommandVariant.RELATIVE) {
-                            currentPoint = currentPoint.copy(x = currentPoint.x + parameter)
-                        } else {
-                            currentPoint = currentPoint.copy(x = parameter)
-                        }
+                        currentPoint =
+                            if (command.variant == CommandVariant.RELATIVE) {
+                                currentPoint.copy(x = currentPoint.x + parameter)
+                            } else {
+                                currentPoint.copy(x = parameter)
+                            }
 
                         if (currentPoint.x < rectangle.left) {
                             rectangle = rectangle.copy(left = currentPoint.x)
@@ -115,11 +108,12 @@ class Surveyor {
 
                 is VerticalLineTo -> {
                     for (parameter in command.parameters) {
-                        if (command.variant == CommandVariant.RELATIVE) {
-                            currentPoint = currentPoint.copy(y = currentPoint.y + parameter)
-                        } else {
-                            currentPoint = currentPoint.copy(y = parameter)
-                        }
+                        currentPoint =
+                            if (command.variant == CommandVariant.RELATIVE) {
+                                currentPoint.copy(y = currentPoint.y + parameter)
+                            } else {
+                                currentPoint.copy(y = parameter)
+                            }
 
                         if (currentPoint.y > rectangle.top) {
                             rectangle = rectangle.copy(top = currentPoint.y)
@@ -134,45 +128,17 @@ class Surveyor {
                 is CubicBezierCurve -> {
                     for (parameter in command.parameters) {
                         if (command.variant == CommandVariant.RELATIVE) {
-                            for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            for (t in interpolationResolution) {
                                 val interpolatedPoint = parameter.interpolate(Point.ZERO, t) + currentPoint
-                                if (interpolatedPoint.x < rectangle.left) {
-                                    rectangle = rectangle.copy(left = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.x > rectangle.right) {
-                                    rectangle = rectangle.copy(right = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.y > rectangle.top) {
-                                    rectangle = rectangle.copy(top = interpolatedPoint.y)
-                                }
-
-                                if (interpolatedPoint.y < rectangle.bottom) {
-                                    rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                                }
+                                expandBoundingBoxForPoint(interpolatedPoint)
                             }
 
                             previousControlPoint = currentPoint + parameter.endControl
                             currentPoint += parameter.end
                         } else {
-                            for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            for (t in interpolationResolution) {
                                 val interpolatedPoint = parameter.interpolate(currentPoint, t)
-                                if (interpolatedPoint.x < rectangle.left) {
-                                    rectangle = rectangle.copy(left = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.x > rectangle.right) {
-                                    rectangle = rectangle.copy(right = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.y > rectangle.top) {
-                                    rectangle = rectangle.copy(top = interpolatedPoint.y)
-                                }
-
-                                if (interpolatedPoint.y < rectangle.bottom) {
-                                    rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                                }
+                                expandBoundingBoxForPoint(interpolatedPoint)
                             }
 
                             previousControlPoint = parameter.endControl
@@ -184,46 +150,18 @@ class Surveyor {
                 is SmoothCubicBezierCurve -> {
                     for (parameter in command.parameters) {
                         if (command.variant == CommandVariant.RELATIVE) {
-                            for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            for (t in interpolationResolution) {
                                 val interpolatedPoint =
                                     parameter.interpolate(Point.ZERO, previousControlPoint - currentPoint, t) + currentPoint
-                                if (interpolatedPoint.x < rectangle.left) {
-                                    rectangle = rectangle.copy(left = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.x > rectangle.right) {
-                                    rectangle = rectangle.copy(right = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.y > rectangle.top) {
-                                    rectangle = rectangle.copy(top = interpolatedPoint.y)
-                                }
-
-                                if (interpolatedPoint.y < rectangle.bottom) {
-                                    rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                                }
+                                expandBoundingBoxForPoint(interpolatedPoint)
                             }
 
                             previousControlPoint = currentPoint + parameter.endControl
                             currentPoint += parameter.end
                         } else {
-                            for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            for (t in interpolationResolution) {
                                 val interpolatedPoint = parameter.interpolate(currentPoint, previousControlPoint, t)
-                                if (interpolatedPoint.x < rectangle.left) {
-                                    rectangle = rectangle.copy(left = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.x > rectangle.right) {
-                                    rectangle = rectangle.copy(right = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.y > rectangle.top) {
-                                    rectangle = rectangle.copy(top = interpolatedPoint.y)
-                                }
-
-                                if (interpolatedPoint.y < rectangle.bottom) {
-                                    rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                                }
+                                expandBoundingBoxForPoint(interpolatedPoint)
                             }
 
                             previousControlPoint = parameter.endControl
@@ -235,45 +173,17 @@ class Surveyor {
                 is QuadraticBezierCurve -> {
                     for (parameter in command.parameters) {
                         if (command.variant == CommandVariant.RELATIVE) {
-                            for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            for (t in interpolationResolution) {
                                 val interpolatedPoint = parameter.interpolate(Point.ZERO, t) + currentPoint
-                                if (interpolatedPoint.x < rectangle.left) {
-                                    rectangle = rectangle.copy(left = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.x > rectangle.right) {
-                                    rectangle = rectangle.copy(right = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.y > rectangle.top) {
-                                    rectangle = rectangle.copy(top = interpolatedPoint.y)
-                                }
-
-                                if (interpolatedPoint.y < rectangle.bottom) {
-                                    rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                                }
+                                expandBoundingBoxForPoint(interpolatedPoint)
                             }
 
                             previousControlPoint = currentPoint + parameter.control
                             currentPoint += parameter.end
                         } else {
-                            for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            for (t in interpolationResolution) {
                                 val interpolatedPoint = parameter.interpolate(currentPoint, t)
-                                if (interpolatedPoint.x < rectangle.left) {
-                                    rectangle = rectangle.copy(left = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.x > rectangle.right) {
-                                    rectangle = rectangle.copy(right = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.y > rectangle.top) {
-                                    rectangle = rectangle.copy(top = interpolatedPoint.y)
-                                }
-
-                                if (interpolatedPoint.y < rectangle.bottom) {
-                                    rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                                }
+                                expandBoundingBoxForPoint(interpolatedPoint)
                             }
 
                             previousControlPoint = parameter.control
@@ -287,46 +197,18 @@ class Surveyor {
                         val control = currentPoint * 2f - previousControlPoint
 
                         if (command.variant == CommandVariant.RELATIVE) {
-                            for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            for (t in interpolationResolution) {
                                 val interpolatedPoint =
                                     parameter.interpolateSmoothQuadraticBezierCurve(Point.ZERO, control - currentPoint, t) + currentPoint
-                                if (interpolatedPoint.x < rectangle.left) {
-                                    rectangle = rectangle.copy(left = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.x > rectangle.right) {
-                                    rectangle = rectangle.copy(right = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.y > rectangle.top) {
-                                    rectangle = rectangle.copy(top = interpolatedPoint.y)
-                                }
-
-                                if (interpolatedPoint.y < rectangle.bottom) {
-                                    rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                                }
+                                expandBoundingBoxForPoint(interpolatedPoint)
                             }
 
                             previousControlPoint = control
                             currentPoint += parameter
                         } else {
-                            for (t in listOf(0f, 0.25f, 0.5f, 0.75f, 1f)) {
+                            for (t in interpolationResolution) {
                                 val interpolatedPoint = parameter.interpolateSmoothQuadraticBezierCurve(currentPoint, control, t)
-                                if (interpolatedPoint.x < rectangle.left) {
-                                    rectangle = rectangle.copy(left = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.x > rectangle.right) {
-                                    rectangle = rectangle.copy(right = interpolatedPoint.x)
-                                }
-
-                                if (interpolatedPoint.y > rectangle.top) {
-                                    rectangle = rectangle.copy(top = interpolatedPoint.y)
-                                }
-
-                                if (interpolatedPoint.y < rectangle.bottom) {
-                                    rectangle = rectangle.copy(bottom = interpolatedPoint.y)
-                                }
+                                expandBoundingBoxForPoint(interpolatedPoint)
                             }
 
                             previousControlPoint = control
@@ -337,45 +219,13 @@ class Surveyor {
 
                 is EllipticalArcCurve -> {
                     for (arcParameter in command.parameters) {
+                        val box = arcParameter.computeBoundingBox(command.variant, currentPoint)
+
+                        expandBoundingBoxForBox(box)
+
                         if (command.variant == CommandVariant.RELATIVE) {
-                            val box = arcParameter.computeBoundingBox(command.variant, currentPoint)
-
-                            if (box.left < rectangle.left) {
-                                rectangle = rectangle.copy(left = box.left)
-                            }
-
-                            if (box.right > rectangle.right) {
-                                rectangle = rectangle.copy(right = box.right)
-                            }
-
-                            if (box.top > rectangle.top) {
-                                rectangle = rectangle.copy(top = box.top)
-                            }
-
-                            if (box.bottom < rectangle.bottom) {
-                                rectangle = rectangle.copy(bottom = box.bottom)
-                            }
-
                             currentPoint += arcParameter.end
                         } else {
-                            val box = arcParameter.computeBoundingBox(command.variant, currentPoint)
-
-                            if (box.left < rectangle.left) {
-                                rectangle = rectangle.copy(left = box.left)
-                            }
-
-                            if (box.right > rectangle.right) {
-                                rectangle = rectangle.copy(right = box.right)
-                            }
-
-                            if (box.top > rectangle.top) {
-                                rectangle = rectangle.copy(top = box.top)
-                            }
-
-                            if (box.bottom < rectangle.bottom) {
-                                rectangle = rectangle.copy(bottom = box.bottom)
-                            }
-
                             currentPoint = arcParameter.end
                         }
                     }
@@ -403,21 +253,48 @@ class Surveyor {
                 currentPoint = lineToParameter
             }
 
-            if (currentPoint.x < rectangle.left) {
-                rectangle = rectangle.copy(left = currentPoint.x)
-            }
-
-            if (currentPoint.x > rectangle.right) {
-                rectangle = rectangle.copy(right = currentPoint.x)
-            }
-
-            if (currentPoint.y > rectangle.top) {
-                rectangle = rectangle.copy(top = currentPoint.y)
-            }
-
-            if (currentPoint.y < rectangle.bottom) {
-                rectangle = rectangle.copy(bottom = currentPoint.y)
-            }
+            expandBoundingBoxForPoint(currentPoint)
         }
+    }
+
+    private fun expandBoundingBoxForPoint(point: Point) {
+        if (point.x < rectangle.left) {
+            rectangle = rectangle.copy(left = point.x)
+        }
+
+        if (point.x > rectangle.right) {
+            rectangle = rectangle.copy(right = point.x)
+        }
+
+        if (point.y > rectangle.top) {
+            rectangle = rectangle.copy(top = point.y)
+        }
+
+        if (point.y < rectangle.bottom) {
+            rectangle = rectangle.copy(bottom = point.y)
+        }
+    }
+
+    private fun expandBoundingBoxForBox(box: Rectangle) {
+        if (box.left < rectangle.left) {
+            rectangle = rectangle.copy(left = box.left)
+        }
+
+        if (box.right > rectangle.right) {
+            rectangle = rectangle.copy(right = box.right)
+        }
+
+        if (box.top > rectangle.top) {
+            rectangle = rectangle.copy(top = box.top)
+        }
+
+        if (box.bottom < rectangle.bottom) {
+            rectangle = rectangle.copy(bottom = box.bottom)
+        }
+    }
+
+    private companion object {
+        const val RESOLUTION = 10
+        val interpolationResolution = (1..RESOLUTION).map { it / RESOLUTION.toDouble() }.map(Double::toFloat)
     }
 }

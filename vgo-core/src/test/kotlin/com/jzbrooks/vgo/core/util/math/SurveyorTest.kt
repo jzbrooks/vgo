@@ -3,7 +3,6 @@ package com.jzbrooks.vgo.core.util.math
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.isCloseTo
-import assertk.assertions.isEqualTo
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -18,7 +17,7 @@ import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import org.junit.jupiter.api.Test
 
-class CollisionDetectionTest {
+class SurveyorTest {
     @Test
     fun `line bounding box`() {
         val commands =
@@ -34,10 +33,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(10f)
-            prop(Rectangle::top).isEqualTo(20f)
-            prop(Rectangle::right).isEqualTo(40f)
-            prop(Rectangle::bottom).isEqualTo(5f)
+            prop(Rectangle::left).isCloseTo(10f, 0.1f)
+            prop(Rectangle::top).isCloseTo(20f, 0.1f)
+            prop(Rectangle::right).isCloseTo(40f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(5f, 0.1f)
         }
     }
 
@@ -62,10 +61,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isCloseTo(6f, 0.1f)
-            prop(Rectangle::top).isEqualTo(100f)
-            prop(Rectangle::right).isEqualTo(20f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(5.9f, 0.1f)
+            prop(Rectangle::top).isCloseTo(100f, 0.1f)
+            prop(Rectangle::right).isCloseTo(20f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -100,10 +99,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(10f)
-            prop(Rectangle::top).isEqualTo(310f)
-            prop(Rectangle::right).isEqualTo(70f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(10f, 0.1f)
+            prop(Rectangle::top).isCloseTo(310f, 0.1f)
+            prop(Rectangle::right).isCloseTo(70f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -138,10 +137,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isCloseTo(6f, 0.1f)
-            prop(Rectangle::top).isEqualTo(250f)
-            prop(Rectangle::right).isEqualTo(200f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(5.9f, 0.1f)
+            prop(Rectangle::top).isCloseTo(250f, 0.1f)
+            prop(Rectangle::right).isCloseTo(200f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -179,10 +178,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(10f)
-            prop(Rectangle::top).isEqualTo(310f)
-            prop(Rectangle::right).isEqualTo(70f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(10f, 0.1f)
+            prop(Rectangle::top).isCloseTo(310f, 0.1f)
+            prop(Rectangle::right).isCloseTo(70f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -220,10 +219,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isCloseTo(6f, 0.1f)
-            prop(Rectangle::top).isEqualTo(250f)
-            prop(Rectangle::right).isEqualTo(200f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(5.9f, 0.1f)
+            prop(Rectangle::top).isCloseTo(250f, 0.1f)
+            prop(Rectangle::right).isCloseTo(200f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -249,9 +248,9 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isCloseTo(6f, 0.1f)
-            prop(Rectangle::top).isCloseTo(110.16f, 0.1f)
-            prop(Rectangle::right).isCloseTo(21.25f, 0.1f)
+            prop(Rectangle::left).isCloseTo(5.9f, 0.1f)
+            prop(Rectangle::top).isCloseTo(111.8f, 0.1f)
+            prop(Rectangle::right).isCloseTo(21.9f, 0.1f)
             prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
@@ -268,10 +267,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(10f)
-            prop(Rectangle::top).isEqualTo(40f)
-            prop(Rectangle::right).isEqualTo(25f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(10f, 0.1f)
+            prop(Rectangle::top).isCloseTo(40f, 0.1f)
+            prop(Rectangle::right).isCloseTo(25f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -299,10 +298,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(10f)
-            prop(Rectangle::top).isEqualTo(80f)
-            prop(Rectangle::right).isEqualTo(62.5f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(10f, 0.1f)
+            prop(Rectangle::top).isCloseTo(80f, 0.1f)
+            prop(Rectangle::right).isCloseTo(63.2f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -330,10 +329,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(10f)
-            prop(Rectangle::top).isEqualTo(130f)
-            prop(Rectangle::right).isEqualTo(81.875f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(10f, 0.1f)
+            prop(Rectangle::top).isCloseTo(130f, 0.1f)
+            prop(Rectangle::right).isCloseTo(82.3f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -364,10 +363,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(3.75f)
-            prop(Rectangle::top).isEqualTo(80f)
-            prop(Rectangle::right).isEqualTo(135f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(3.6f, 0.1f)
+            prop(Rectangle::top).isCloseTo(80f, 0.1f)
+            prop(Rectangle::right).isCloseTo(136.4f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -398,10 +397,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(4.375f)
-            prop(Rectangle::top).isEqualTo(160f)
-            prop(Rectangle::right).isEqualTo(173.125f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(4f, 0.1f)
+            prop(Rectangle::top).isCloseTo(160f, 0.1f)
+            prop(Rectangle::right).isCloseTo(175.6f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
@@ -429,10 +428,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(150f)
-            prop(Rectangle::top).isEqualTo(200f)
-            prop(Rectangle::right).isEqualTo(250f)
-            prop(Rectangle::bottom).isEqualTo(100f)
+            prop(Rectangle::left).isCloseTo(150f, 0.1f)
+            prop(Rectangle::top).isCloseTo(200f, 0.1f)
+            prop(Rectangle::right).isCloseTo(250f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(100f, 0.1f)
         }
     }
 
@@ -509,10 +508,33 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(10f)
-            prop(Rectangle::top).isEqualTo(30f)
-            prop(Rectangle::right).isEqualTo(30f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(10f, 0.1f)
+            prop(Rectangle::top).isCloseTo(30f, 0.1f)
+            prop(Rectangle::right).isCloseTo(30f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
+        }
+    }
+
+    @Test
+    fun `shorthand after moveto bounding box`() {
+        // M 100,200 S 200,300,300,200
+        val commands =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 200f))),
+                SmoothCubicBezierCurve(
+                    CommandVariant.ABSOLUTE,
+                    listOf(SmoothCubicBezierCurve.Parameter(Point(200f, 300f), Point(300f, 200f))),
+                ),
+            )
+
+        val surveyor = Surveyor()
+        val box = surveyor.findBoundingBox(commands)
+
+        assertThat(box).all {
+            prop(Rectangle::left).isCloseTo(100f, 0.1f)
+            prop(Rectangle::top).isCloseTo(244.1f, 0.1f)
+            prop(Rectangle::right).isCloseTo(300f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(200f, 0.1f)
         }
     }
 
@@ -560,10 +582,10 @@ class CollisionDetectionTest {
         val box = surveyor.findBoundingBox(commands)
 
         assertThat(box).all {
-            prop(Rectangle::left).isEqualTo(10f)
-            prop(Rectangle::top).isEqualTo(90f)
-            prop(Rectangle::right).isEqualTo(90f)
-            prop(Rectangle::bottom).isEqualTo(10f)
+            prop(Rectangle::left).isCloseTo(10f, 0.1f)
+            prop(Rectangle::top).isCloseTo(90f, 0.1f)
+            prop(Rectangle::right).isCloseTo(90f, 0.1f)
+            prop(Rectangle::bottom).isCloseTo(10f, 0.1f)
         }
     }
 
