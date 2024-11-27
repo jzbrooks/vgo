@@ -7,3 +7,6 @@ data class Rectangle(
     val right: Float,
     val bottom: Float,
 )
+
+infix fun Rectangle.intersects(rectangle: Rectangle): Boolean =
+    !(left > rectangle.right || right < rectangle.left || top < rectangle.bottom || bottom > rectangle.top)
