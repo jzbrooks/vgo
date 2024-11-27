@@ -626,6 +626,23 @@ public final class com/jzbrooks/vgo/core/util/element/TraverseKt {
 	public static final fun traverseTopDown (Lcom/jzbrooks/vgo/core/graphic/Element;Lkotlin/jvm/functions/Function1;)Lcom/jzbrooks/vgo/core/graphic/Element;
 }
 
+public final class com/jzbrooks/vgo/core/util/math/CenterParameterization {
+	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;FFD)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun component2 ()F
+	public final fun component3 ()F
+	public final fun component4 ()D
+	public final fun copy (Lcom/jzbrooks/vgo/core/util/math/Point;FFD)Lcom/jzbrooks/vgo/core/util/math/CenterParameterization;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/util/math/CenterParameterization;Lcom/jzbrooks/vgo/core/util/math/Point;FFDILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/CenterParameterization;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCenter ()Lcom/jzbrooks/vgo/core/util/math/Point;
+	public final fun getPhi ()D
+	public final fun getRadiusX ()F
+	public final fun getRadiusY ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
 public final class com/jzbrooks/vgo/core/util/math/Circle {
 	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;F)V
 	public final fun component1 ()Lcom/jzbrooks/vgo/core/util/math/Point;
@@ -645,14 +662,20 @@ public final class com/jzbrooks/vgo/core/util/math/CommandsKt {
 }
 
 public final class com/jzbrooks/vgo/core/util/math/CurvesKt {
+	public static final fun computeBoundingBox (Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$Parameter;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/util/math/Rectangle;
+	public static final fun computeCenterParameterization (Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$Parameter;Lcom/jzbrooks/vgo/core/graphic/command/CommandVariant;Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/util/math/CenterParameterization;
 	public static final fun findArcAngle (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;Lcom/jzbrooks/vgo/core/util/math/Circle;)F
-	public static final fun fitCircle (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;F)Lcom/jzbrooks/vgo/core/util/math/Circle;
-	public static synthetic fun fitCircle$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Circle;
-	public static final fun interpolate (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;F)Lcom/jzbrooks/vgo/core/util/math/Point;
-	public static final fun isConvex (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;F)Z
-	public static synthetic fun isConvex$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;FILjava/lang/Object;)Z
-	public static final fun liesOnCircle (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;Lcom/jzbrooks/vgo/core/util/math/Circle;F)Z
-	public static synthetic fun liesOnCircle$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;Lcom/jzbrooks/vgo/core/util/math/Circle;FILjava/lang/Object;)Z
+	public static final fun fitCircle (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;F)Lcom/jzbrooks/vgo/core/util/math/Circle;
+	public static synthetic fun fitCircle$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Circle;
+	public static final fun interpolate (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve$Parameter;Lcom/jzbrooks/vgo/core/util/math/Point;F)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public static final fun interpolate (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;Lcom/jzbrooks/vgo/core/util/math/Point;F)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public static final fun interpolate (Lcom/jzbrooks/vgo/core/graphic/command/QuadraticBezierCurve$Parameter;Lcom/jzbrooks/vgo/core/util/math/Point;F)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public static final fun interpolate (Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve$Parameter;Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;F)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public static final fun interpolateSmoothQuadraticBezierCurve (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;F)Lcom/jzbrooks/vgo/core/util/math/Point;
+	public static final fun isConvex (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;F)Z
+	public static synthetic fun isConvex$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;FILjava/lang/Object;)Z
+	public static final fun liesOnCircle (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;Lcom/jzbrooks/vgo/core/util/math/Circle;F)Z
+	public static synthetic fun liesOnCircle$default (Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;Lcom/jzbrooks/vgo/core/util/math/Circle;FILjava/lang/Object;)Z
 	public static final fun toCubicBezierCurve (Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve;Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;)Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;
 }
 
@@ -727,6 +750,33 @@ public final class com/jzbrooks/vgo/core/util/math/Point {
 
 public final class com/jzbrooks/vgo/core/util/math/Point$Companion {
 	public final fun getZERO ()Lcom/jzbrooks/vgo/core/util/math/Point;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/Rectangle {
+	public fun <init> (FFFF)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun component3 ()F
+	public final fun component4 ()F
+	public final fun copy (FFFF)Lcom/jzbrooks/vgo/core/util/math/Rectangle;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/util/math/Rectangle;FFFFILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Rectangle;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBottom ()F
+	public final fun getLeft ()F
+	public final fun getRight ()F
+	public final fun getTop ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/util/math/RectangleKt {
+	public static final fun intersects (Lcom/jzbrooks/vgo/core/util/math/Rectangle;Lcom/jzbrooks/vgo/core/util/math/Rectangle;)Z
+}
+
+public final class com/jzbrooks/vgo/core/util/math/Surveyor {
+	public static final field RESOLUTION I
+	public fun <init> ()V
+	public final fun findBoundingBox (Ljava/util/List;)Lcom/jzbrooks/vgo/core/util/math/Rectangle;
 }
 
 public final class com/jzbrooks/vgo/core/util/math/Vector3 {

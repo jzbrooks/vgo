@@ -34,16 +34,9 @@ class CurvesTests {
         )
 
     @Test
-    fun `Ensure non-relative interpolation throws`() {
-        assertThrows<AssertionError> {
-            nonRelativeCurve.interpolateRelative(0.2f)
-        }
-    }
-
-    @Test
     fun `Ensure multiple curve parameter interpolation throws`() {
         assertThrows<AssertionError> {
-            multiParameterCurve.interpolateRelative(0.2f)
+            multiParameterCurve.interpolate(Point.ZERO, 0.2f)
         }
     }
 
@@ -106,7 +99,7 @@ class CurvesTests {
     @MethodSource
     @ParameterizedTest
     fun `Point along a curve is computed correctly`(data: ParameterizedCurve) {
-        val point = data.curve.interpolateRelative(data.t)
+        val point = data.curve.interpolate(Point.ZERO, data.t)
         assertThat(point).isEqualTo(data.expected)
     }
 

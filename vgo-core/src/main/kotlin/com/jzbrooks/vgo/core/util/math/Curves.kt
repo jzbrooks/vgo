@@ -25,7 +25,7 @@ fun CubicBezierCurve.fitCircle(tolerance: Float = 1e-3f): Circle? {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
-    val mid = interpolateRelative(0.5f)
+    val mid = interpolate(Point.ZERO, 0.5f)
 
     val end = parameters[0].end
     val m1 = mid * 0.5f
@@ -43,20 +43,11 @@ fun CubicBezierCurve.fitCircle(tolerance: Float = 1e-3f): Circle? {
     val withinTolerance =
         radius < 1e7 &&
             floatArrayOf(0.25f, 0.75f).all {
-                val curveValue = interpolateRelative(it)
+                val curveValue = interpolate(Point.ZERO, it)
                 abs(curveValue.distanceTo(center) - radius) <= tolerance
             }
 
     return if (withinTolerance) Circle(center, radius) else null
-}
-
-/**
- * Requires that the curve only has a single parameter
- * Requires that the curve use relative coordinates
- */
-fun CubicBezierCurve.interpolateRelative(t: Float): Point {
-    assert(variant == CommandVariant.RELATIVE)
-    return interpolate(Point.ZERO, t)
 }
 
 /**
@@ -128,6 +119,7 @@ fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBez
             else -> throw IllegalStateException("A destructuring of control points is required for ${previous::class.simpleName}.")
         }
 
+    // todo: is this implied control point computed correctly? It doesn't look reflected
     return CubicBezierCurve(
         variant,
         parameters.map { (endControl, end) ->
@@ -163,7 +155,7 @@ fun CubicBezierCurve.liesOnCircle(
     val tolerance = min(ARC_THRESHOLD * tolerance, ARC_TOLERANCE * circle.radius / 100)
 
     return floatArrayOf(0f, 0.25f, 0.5f, 0.75f, 1f).all { t ->
-        abs(interpolateRelative(t).distanceTo(circle.center) - circle.radius) <= tolerance
+        abs(interpolate(Point.ZERO, t).distanceTo(circle.center) - circle.radius) <= tolerance
     }
 }
 
