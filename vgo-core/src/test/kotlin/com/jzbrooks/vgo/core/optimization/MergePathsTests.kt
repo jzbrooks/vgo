@@ -113,6 +113,10 @@ class MergePathsTests {
                     createPath(
                         listOf(
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                        ),
+                    ),
+                    createPath(
+                        listOf(
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                         ),
                     ),
@@ -178,6 +182,10 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                ),
+            ),
+            createPath(
+                listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                 ),
             ),
@@ -243,6 +251,10 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                ),
+            ),
+            createPath(
+                listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                 ),
             ),
@@ -297,6 +309,10 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                ),
+            ),
+            createPath(
+                listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                 ),
             ),
