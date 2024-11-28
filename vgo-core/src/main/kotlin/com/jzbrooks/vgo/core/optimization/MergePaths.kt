@@ -61,11 +61,7 @@ class MergePaths : BottomUpOptimization {
         for (current in paths.drop(1)) {
             val previous = mergedPaths.last()
 
-            // Paths that intersect can cause problems with even odd rules and with
-            // merging paths of relative coordinates. For example, sometimes a path
-            // begins with a relative moveto for the sake of its implicit lineto commands
-            // (points after the first in the command), but the first moveto in a path
-            // is always considered relative to the origin—so absolute!
+            // Paths that intersect can cause problems with even odd rules and with transparency.
             if (!haveSameAttributes(current, previous) ||
                 surveyor.findBoundingBox(previous.commands) intersects surveyor.findBoundingBox(current.commands)
             ) {
