@@ -7,11 +7,15 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.util.math.Surveyor
+import com.jzbrooks.vgo.core.util.math.intersects
 
 /**
  * Merges multiple paths into a single path where possible
  */
 class MergePaths : BottomUpOptimization {
+    private val surveyor = Surveyor()
+
     override fun visit(graphic: Graphic) = merge(graphic)
 
     override fun visit(group: Group) = merge(group)
@@ -57,14 +61,10 @@ class MergePaths : BottomUpOptimization {
         for (current in paths.drop(1)) {
             val previous = mergedPaths.last()
 
-            // Avoid merging paths with even odd fill rule, because
-            // the merge might cause some paths to be considered 'interior'
-            // according to those rules when they were previously exterior
-            // in their own paths.
-            //
-            // There might be a reasonable way to deduce that situation more
-            // specifically, which could enable merging of some even odd paths.
-            if (!haveSameAttributes(current, previous) || current.fillRule == Path.FillRule.EVEN_ODD) {
+            // Intersecting paths can cause problems with path fill rules and with transparency.
+            if (!haveSameAttributes(current, previous) ||
+                surveyor.findBoundingBox(previous.commands) intersects surveyor.findBoundingBox(current.commands)
+            ) {
                 mergedPaths.add(current)
             } else {
                 previous.commands += current.commands

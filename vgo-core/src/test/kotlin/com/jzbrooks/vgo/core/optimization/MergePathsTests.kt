@@ -2,14 +2,17 @@ package com.jzbrooks.vgo.core.optimization
 
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import assertk.assertions.hasSize
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
@@ -113,6 +116,10 @@ class MergePathsTests {
                     createPath(
                         listOf(
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                        ),
+                    ),
+                    createPath(
+                        listOf(
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                         ),
                     ),
@@ -178,6 +185,10 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                ),
+            ),
+            createPath(
+                listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                 ),
             ),
@@ -243,6 +254,10 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                ),
+            ),
+            createPath(
+                listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                 ),
             ),
@@ -297,9 +312,109 @@ class MergePathsTests {
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                ),
+            ),
+            createPath(
+                listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                 ),
             ),
         )
+    }
+
+    @Test
+    fun `overlapping paths are not merged`() {
+        // M 10,30
+        // A 20,20 0,0,1 50,30
+        // A 20,20 0,0,1 90,30
+        // Q 90,60 50,90
+        // Q 10,60 10,30
+        val firstHeart =
+            createPath(
+                listOf<Command>(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 30f))),
+                    EllipticalArcCurve(
+                        CommandVariant.ABSOLUTE,
+                        listOf(
+                            EllipticalArcCurve.Parameter(
+                                20f,
+                                20f,
+                                0f,
+                                EllipticalArcCurve.ArcFlag.SMALL,
+                                EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                Point(50f, 30f),
+                            ),
+                        ),
+                    ),
+                    EllipticalArcCurve(
+                        CommandVariant.ABSOLUTE,
+                        listOf(
+                            EllipticalArcCurve.Parameter(
+                                20f,
+                                20f,
+                                0f,
+                                EllipticalArcCurve.ArcFlag.SMALL,
+                                EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                Point(90f, 30f),
+                            ),
+                        ),
+                    ),
+                    QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(90f, 60f), Point(50f, 90f)))),
+                    QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(QuadraticBezierCurve.Parameter(Point(10f, 60f), Point(10f, 30f)))),
+                ),
+            )
+
+        // M 20,40
+        // A 20,20 0,0,1 60,40
+        // A 20,20 0,0,1 100,40
+        // Q 100,70 60,100
+        // Q 20,70 20,40
+        val offsetHeart =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 40f))),
+                    EllipticalArcCurve(
+                        CommandVariant.ABSOLUTE,
+                        listOf(
+                            EllipticalArcCurve.Parameter(
+                                20f,
+                                20f,
+                                0f,
+                                EllipticalArcCurve.ArcFlag.SMALL,
+                                EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                Point(60f, 40f),
+                            ),
+                        ),
+                    ),
+                    EllipticalArcCurve(
+                        CommandVariant.ABSOLUTE,
+                        listOf(
+                            EllipticalArcCurve.Parameter(
+                                20f,
+                                20f,
+                                0f,
+                                EllipticalArcCurve.ArcFlag.SMALL,
+                                EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                Point(100f, 40f),
+                            ),
+                        ),
+                    ),
+                    QuadraticBezierCurve(
+                        CommandVariant.ABSOLUTE,
+                        listOf(QuadraticBezierCurve.Parameter(Point(100f, 70f), Point(60f, 100f))),
+                    ),
+                    QuadraticBezierCurve(
+                        CommandVariant.ABSOLUTE,
+                        listOf(QuadraticBezierCurve.Parameter(Point(20f, 70f), Point(20f, 40f))),
+                    ),
+                ),
+            )
+
+        val graphic = createGraphic(listOf(firstHeart, offsetHeart))
+        val optimization = MergePaths()
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
+
+        assertThat(graphic::elements).hasSize(2)
     }
 }

@@ -3,11 +3,16 @@ package com.jzbrooks.vgo.core.util.math
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.CubicCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import kotlin.math.abs
 import kotlin.math.acos
+import kotlin.math.cos
 import kotlin.math.hypot
 import kotlin.math.min
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 private const val ARC_THRESHOLD = 2f
 private const val ARC_TOLERANCE = 0.5f
@@ -16,11 +21,11 @@ private const val ARC_TOLERANCE = 0.5f
  * Requires that the curve only has a single parameter
  * Requires that the curve use relative coordinates
  */
-fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
+fun CubicBezierCurve.fitCircle(tolerance: Float = 1e-3f): Circle? {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
-    val mid = interpolate(0.5f)
+    val mid = interpolate(Point.ZERO, 0.5f)
 
     val end = parameters[0].end
     val m1 = mid * 0.5f
@@ -38,7 +43,7 @@ fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
     val withinTolerance =
         radius < 1e7 &&
             floatArrayOf(0.25f, 0.75f).all {
-                val curveValue = interpolate(it)
+                val curveValue = interpolate(Point.ZERO, it)
                 abs(curveValue.distanceTo(center) - radius) <= tolerance
             }
 
@@ -47,26 +52,31 @@ fun CubicCurve<*>.fitCircle(tolerance: Float = 1e-3f): Circle? {
 
 /**
  * Requires that the curve only has a single parameter
- * Requires that the curve use relative coordinates
  */
-fun CubicCurve<*>.interpolate(t: Float): Point {
-    assert(variant == CommandVariant.RELATIVE)
+fun CubicBezierCurve.interpolate(
+    currentPoint: Point,
+    t: Float,
+): Point {
     assert(parameters.size == 1)
+    return parameters.first().interpolate(currentPoint, t)
+}
 
-    val (startControl, endControl, end) =
-        when (this) {
-            is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-            is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
-        }
-
+/**
+ * Requires that the curve only has a single parameter
+ */
+fun CubicBezierCurve.Parameter.interpolate(
+    currentPoint: Point,
+    t: Float,
+): Point {
     val square = t * t
     val cube = square * t
     val param = 1 - t
     val paramSquare = param * param
+    val paramCube = paramSquare * param
 
     return Point(
-        3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
-        3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y,
+        x = currentPoint.x * paramCube + 3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
+        y = currentPoint.y * paramCube + 3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y,
     )
 }
 
@@ -74,15 +84,11 @@ fun CubicCurve<*>.interpolate(t: Float): Point {
  * Requires that the curve only has a single parameter
  * Requires that the curve use relative coordinates
 */
-fun CubicCurve<*>.isConvex(tolerance: Float = 1e-3f): Boolean {
+fun CubicBezierCurve.isConvex(tolerance: Float = 1e-3f): Boolean {
     assert(variant == CommandVariant.RELATIVE)
     assert(parameters.size == 1)
 
-    val (startControl, endControl, end) =
-        when (this) {
-            is CubicBezierCurve -> Triple(parameters[0].startControl, parameters[0].endControl, parameters[0].end)
-            is SmoothCubicBezierCurve -> Triple(Point.ZERO, parameters[0].endControl, parameters[0].end)
-        }
+    val (startControl, endControl, end) = parameters[0]
 
     val firstDiagonal = LineSegment(Point.ZERO, endControl)
     val secondDiagonal = LineSegment(startControl, end)
@@ -113,6 +119,7 @@ fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBez
             else -> throw IllegalStateException("A destructuring of control points is required for ${previous::class.simpleName}.")
         }
 
+    // todo: is this implied control point computed correctly? It doesn't look reflected
     return CubicBezierCurve(
         variant,
         parameters.map { (endControl, end) ->
@@ -121,7 +128,26 @@ fun SmoothCubicBezierCurve.toCubicBezierCurve(previous: CubicCurve<*>): CubicBez
     )
 }
 
-fun CubicCurve<*>.liesOnCircle(
+fun SmoothCubicBezierCurve.Parameter.interpolate(
+    currentPoint: Point,
+    previousControl: Point,
+    t: Float,
+): Point {
+    val startControl = (currentPoint * 2f) - previousControl
+
+    val param = 1 - t
+    val paramSquare = param * param
+    val paramCube = paramSquare * param
+    val square = t * t
+    val cube = square * t
+
+    return Point(
+        x = paramCube * currentPoint.x + 3 * paramSquare * t * startControl.x + 3 * param * square * endControl.x + cube * end.x,
+        y = paramCube * currentPoint.y + 3 * paramSquare * t * startControl.y + 3 * param * square * endControl.y + cube * end.y,
+    )
+}
+
+fun CubicBezierCurve.liesOnCircle(
     circle: Circle,
     tolerance: Float = 1e-3f,
 ): Boolean {
@@ -129,7 +155,7 @@ fun CubicCurve<*>.liesOnCircle(
     val tolerance = min(ARC_THRESHOLD * tolerance, ARC_TOLERANCE * circle.radius / 100)
 
     return floatArrayOf(0f, 0.25f, 0.5f, 0.75f, 1f).all { t ->
-        abs(interpolate(t).distanceTo(circle.center) - circle.radius) <= tolerance
+        abs(interpolate(Point.ZERO, t).distanceTo(circle.center) - circle.radius) <= tolerance
     }
 }
 
@@ -141,4 +167,120 @@ fun CubicBezierCurve.findArcAngle(circle: Circle): Float {
     val magnitudeProduct = hypot(center.x, center.y) * hypot(edge.x, edge.y)
 
     return acos(innerProduct / magnitudeProduct)
+}
+
+fun QuadraticBezierCurve.Parameter.interpolate(
+    currentPoint: Point,
+    t: Float,
+): Point {
+    val param = 1 - t
+    val paramSquare = param * param
+    val square = t * t
+
+    return Point(
+        x = paramSquare * currentPoint.x + 2 * param * t * control.x + square * end.x,
+        y = paramSquare * currentPoint.y + 2 * param * t * control.y + square * end.y,
+    )
+}
+
+// todo: it might be a little nicer if the T parameter was a value class around a point
+fun Point.interpolateSmoothQuadraticBezierCurve(
+    currentPoint: Point,
+    control: Point,
+    t: Float,
+): Point {
+    val param = 1 - t
+    val paramSquare = param * param
+    val square = t * t
+
+    return Point(
+        x = paramSquare * currentPoint.x + 2 * param * t * control.x + square * x,
+        y = paramSquare * currentPoint.y + 2 * param * t * control.y + square * y,
+    )
+}
+
+data class CenterParameterization(
+    val center: Point,
+    val radiusX: Float,
+    val radiusY: Float,
+    val phi: Double,
+)
+
+/**
+ * Computes the parameters needed to specify the entire ellipse
+ * @param currentPoint the current point at the start of the curve in absolute coordinates
+ *
+ * **See also:** [https://www.w3.org/TR/SVG11/implnote.html#ArcConversionEndpointToCenter](https://www.w3.org/TR/SVG11/implnote.html#ArcConversionEndpointToCenter)
+ */
+fun EllipticalArcCurve.Parameter.computeCenterParameterization(
+    variant: CommandVariant,
+    currentPoint: Point,
+): CenterParameterization {
+    val phi = Math.toRadians(angle.toDouble())
+    val cosPhi = cos(phi)
+    val sinPhi = sin(phi)
+    var rx = radiusX
+    var ry = radiusY
+
+    val start = currentPoint
+    val end = if (variant == CommandVariant.RELATIVE) end + currentPoint else end
+
+    val x1prime = cosPhi * (start.x - end.x) / 2.0f + sinPhi * (start.y - end.y) / 2.0f
+    val y1prime = -sinPhi * (start.x - end.x) / 2.0f + cosPhi * (start.y - end.y) / 2.0f
+
+    // handle minuscule radii
+    val x1primeSquared = x1prime * x1prime
+    val y1primeSquared = y1prime * y1prime
+
+    var radiusChecker = x1primeSquared / (radiusX * radiusX) + y1primeSquared / (radiusY * radiusY)
+    if (radiusChecker > 1) {
+        val root = sqrt(radiusChecker)
+        rx *= root.toFloat()
+        ry *= root.toFloat()
+    }
+
+    var rx2 = rx * rx
+    var ry2 = ry * ry
+    val sign = if ((arc == EllipticalArcCurve.ArcFlag.LARGE) == (sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE)) -1 else 1
+    val sq = ((rx2 * ry2 - rx2 * y1primeSquared - ry2 * x1primeSquared) / (rx2 * y1primeSquared + ry2 * x1primeSquared))
+    val c = sign * sqrt(sq.coerceAtLeast(0.0))
+
+    val cxPrime = c * (rx * y1prime) / ry
+    val cyPrime = c * (-ry * x1prime) / rx
+
+    val cx = cosPhi * cxPrime - sinPhi * cyPrime + (start.x + end.x) / 2.0
+    val cy = sinPhi * cxPrime + cosPhi * cyPrime + (start.y + end.y) / 2.0
+
+    return CenterParameterization(
+        Point(cx.toFloat(), cy.toFloat()),
+        rx,
+        ry,
+        phi,
+    )
+}
+
+/**
+ * Computes an axis-aligned bounding box for an elliptical arc.
+ *
+ * The entire ellipse is used to calculate the box, not just
+ * the segment of the ellipse that constitutes the arc.
+ */
+fun EllipticalArcCurve.Parameter.computeBoundingBox(
+    variant: CommandVariant,
+    currentPoint: Point,
+): Rectangle {
+    val centerParameterization = computeCenterParameterization(variant, currentPoint)
+
+    val cosPhi = cos(centerParameterization.phi)
+    val sinPhi = sin(centerParameterization.phi)
+
+    val xOffset = hypot(centerParameterization.radiusX * cosPhi, centerParameterization.radiusY * sinPhi)
+    val yOffset = hypot(centerParameterization.radiusX * sinPhi, centerParameterization.radiusY * cosPhi)
+
+    return Rectangle(
+        centerParameterization.center.x - xOffset.toFloat(),
+        centerParameterization.center.y + yOffset.toFloat(),
+        centerParameterization.center.x + xOffset.toFloat(),
+        centerParameterization.center.y - yOffset.toFloat(),
+    )
 }
