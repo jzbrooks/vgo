@@ -774,7 +774,6 @@ public final class com/jzbrooks/vgo/core/util/math/RectangleKt {
 }
 
 public final class com/jzbrooks/vgo/core/util/math/Surveyor {
-	public static final field RESOLUTION I
 	public fun <init> ()V
 	public final fun findBoundingBox (Ljava/util/List;)Lcom/jzbrooks/vgo/core/util/math/Rectangle;
 }

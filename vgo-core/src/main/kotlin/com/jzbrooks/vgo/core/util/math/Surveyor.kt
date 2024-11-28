@@ -294,7 +294,7 @@ class Surveyor {
     }
 
     private companion object {
-        const val RESOLUTION = 10
+        private const val RESOLUTION = 10
         val interpolationResolution = (1..RESOLUTION).map { it / RESOLUTION.toDouble() }.map(Double::toFloat)
     }
 }
