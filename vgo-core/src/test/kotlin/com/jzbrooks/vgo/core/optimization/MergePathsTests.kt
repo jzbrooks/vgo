@@ -40,7 +40,7 @@ class MergePathsTests {
             )
 
         val graphic = createGraphic(paths)
-        val optimization = MergePaths()
+        val optimization = MergePaths(MergePaths.Constraints.None)
 
         traverseBottomUp(graphic) { it.accept(optimization) }
 
@@ -90,7 +90,7 @@ class MergePathsTests {
 
         val group = Group(paths)
         val graphic = createGraphic(listOf(group))
-        val optimization = MergePaths()
+        val optimization = MergePaths(MergePaths.Constraints.None)
 
         traverseBottomUp(graphic) { it.accept(optimization) }
 
@@ -161,7 +161,7 @@ class MergePathsTests {
             )
 
         val graphic = createGraphic(paths)
-        val optimization = MergePaths()
+        val optimization = MergePaths(MergePaths.Constraints.None)
 
         traverseBottomUp(graphic) { it.accept(optimization) }
 
@@ -229,7 +229,7 @@ class MergePathsTests {
             )
 
         val graphic = createGraphic(paths)
-        val optimization = MergePaths()
+        val optimization = MergePaths(MergePaths.Constraints.None)
 
         traverseBottomUp(graphic) { it.accept(optimization) }
 
@@ -291,7 +291,7 @@ class MergePathsTests {
             )
 
         val graphic = createGraphic(paths)
-        val optimization = MergePaths()
+        val optimization = MergePaths(MergePaths.Constraints.None)
 
         traverseBottomUp(graphic) { it.accept(optimization) }
 
@@ -411,7 +411,7 @@ class MergePathsTests {
             )
 
         val graphic = createGraphic(listOf(firstHeart, offsetHeart))
-        val optimization = MergePaths()
+        val optimization = MergePaths(MergePaths.Constraints.None)
 
         traverseBottomUp(graphic) { it.accept(optimization) }
 

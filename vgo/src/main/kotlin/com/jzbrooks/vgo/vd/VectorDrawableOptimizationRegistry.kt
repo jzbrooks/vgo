@@ -21,7 +21,7 @@ class VectorDrawableOptimizationRegistry :
                 BakeTransformations(),
                 CollapseGroups(),
                 RemoveEmptyGroups(),
-                MergePaths(),
+                MergePaths(MergePaths.Constraints.PathLength(VectorDrawableCommandPrinter(3), 800)),
             ),
         topDownOptimizations =
             listOf(
