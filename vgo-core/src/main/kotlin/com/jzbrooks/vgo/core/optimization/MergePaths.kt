@@ -61,7 +61,7 @@ class MergePaths : BottomUpOptimization {
         for (current in paths.drop(1)) {
             val previous = mergedPaths.last()
 
-            // Paths that intersect can cause problems with even odd rules and with transparency.
+            // Intersecting paths can cause problems with path fill rules and with transparency.
             if (!haveSameAttributes(current, previous) ||
                 surveyor.findBoundingBox(previous.commands) intersects surveyor.findBoundingBox(current.commands)
             ) {
