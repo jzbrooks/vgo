@@ -139,8 +139,10 @@ class MergePaths(
             first.strokeMiterLimit == second.strokeMiterLimit
 
     sealed interface Constraints {
+        /** Constraints the optimization by preventing merging paths beyond a given maximum length */
         data class PathLength(
             val commandPrinter: CommandPrinter,
+            /** The maximum length of a single path */
             val maxLength: Int,
         ) : Constraints
 
