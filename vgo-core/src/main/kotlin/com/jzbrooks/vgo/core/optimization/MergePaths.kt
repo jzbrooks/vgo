@@ -102,7 +102,7 @@ class MergePaths(
             val currentLength = current.commands.joinToString("", transform = constraints.commandPrinter::print).length
             val accumulatedLength = pathLength + currentLength
 
-            if (accumulatedLength >= constraints.maxLength || unableToMerge(previous, current)) {
+            if (accumulatedLength > constraints.maxLength || unableToMerge(previous, current)) {
                 mergedPaths.add(current)
                 pathLength = currentLength
             } else {

@@ -10,6 +10,7 @@ import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.FakeCommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
@@ -416,5 +417,42 @@ class MergePathsTests {
         traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).hasSize(2)
+    }
+
+    @Test
+    fun pathLengthConstraints() {
+        val paths =
+            listOf(
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+                ),
+            )
+
+        val graphic = createGraphic(paths)
+        val optimization = MergePaths(MergePaths.Constraints.PathLength(FakeCommandPrinter(), 16))
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
+
+        assertThat(graphic::elements).containsExactly(
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
+                ),
+            ),
+            createPath(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
+            ),
+        )
     }
 }
