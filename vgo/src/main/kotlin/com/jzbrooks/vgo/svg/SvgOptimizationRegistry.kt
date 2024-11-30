@@ -21,7 +21,7 @@ class SvgOptimizationRegistry :
                 BakeTransformations(),
                 CollapseGroups(),
                 RemoveEmptyGroups(),
-                MergePaths(),
+                MergePaths(MergePaths.Constraints.None),
             ),
         topDownOptimizations =
             listOf(

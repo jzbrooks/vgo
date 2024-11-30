@@ -4,13 +4,14 @@
 
 ### Added
 - `com.jzbrooks.vgo.core.util.math.Surveyor`, which computes the bounding box of an arbitrary list of commands 
-- Bezier curve interpolation for all variants and elliptical arc bounding box functions
+- Bézier curve interpolation for all variants and elliptical arc bounding box functions
 
 ### Changed
 
 - `vgo-plugin` (`com.jzbrooks.vgo.plugin`) no longer requires a particular version of Android Gradle Plugin.
   Note: `:vgo` is an abstract implementation of the tool which does not assume either a cli or plugin context. CLI related logic has been relocated into `:vgo-cli`.
 - **Breaking:** `CubicCurve<*>.interpolate` has been split into `CubicBezierCurve.interpolate` and `SmoothCubicBezierCurve.interpolate`
+- `com.jzbrooks.vgo.core.optimization.MergePaths` constructor accepts constraints. See `com.jzbrooks.vgo.core.optimization.MergePaths.Constraints`.
 - Paths with an even odd fill rule can be merged
 
 ### Deprecated
@@ -22,7 +23,8 @@
 - Overlapping paths are no longer merged, which avoids some image warping issues (#88, #101)
 - Conversions without a specified output file will write a file the file extension corresponding to the format.
 - Decimal separators are locale-invariant.
-- Crash when using the cli to convert an svg containing a clip path to vector drawable.
+- Crash when using the CLI to convert an SVG containing a clip path to vector drawable.
+- (Vector Drawable) Path merging avoids merging a single path data string beyond the framework string length limit (#82)
 
 ### Security
 
