@@ -15,7 +15,7 @@ import com.jzbrooks.vgo.core.util.math.intersects
  * Merges multiple paths into a single path where possible
  */
 class MergePaths(
-    private val constraints: Constraints,
+    private val constraints: Constraints = Constraints.None,
 ) : BottomUpOptimization {
     private val surveyor = Surveyor()
 

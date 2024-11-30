@@ -545,11 +545,36 @@ public final class com/jzbrooks/vgo/core/optimization/ConvertCurvesToArcs : com/
 
 public final class com/jzbrooks/vgo/core/optimization/MergePaths : com/jzbrooks/vgo/core/optimization/BottomUpOptimization {
 	public fun <init> ()V
+	public fun <init> (Lcom/jzbrooks/vgo/core/optimization/MergePaths$Constraints;)V
+	public synthetic fun <init> (Lcom/jzbrooks/vgo/core/optimization/MergePaths$Constraints;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public abstract interface class com/jzbrooks/vgo/core/optimization/MergePaths$Constraints {
+}
+
+public final class com/jzbrooks/vgo/core/optimization/MergePaths$Constraints$None : com/jzbrooks/vgo/core/optimization/MergePaths$Constraints {
+	public static final field INSTANCE Lcom/jzbrooks/vgo/core/optimization/MergePaths$Constraints$None;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/optimization/MergePaths$Constraints$PathLength : com/jzbrooks/vgo/core/optimization/MergePaths$Constraints {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;I)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;
+	public final fun component2 ()I
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;I)Lcom/jzbrooks/vgo/core/optimization/MergePaths$Constraints$PathLength;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/optimization/MergePaths$Constraints$PathLength;Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;IILjava/lang/Object;)Lcom/jzbrooks/vgo/core/optimization/MergePaths$Constraints$PathLength;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCommandPrinter ()Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;
+	public final fun getMaxLength ()I
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public abstract interface class com/jzbrooks/vgo/core/optimization/Optimization {
