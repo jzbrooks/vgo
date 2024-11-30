@@ -14,10 +14,6 @@
 - `com.jzbrooks.vgo.core.optimization.MergePaths` constructor accepts constraints. See `com.jzbrooks.vgo.core.optimization.MergePaths.Constraints`.
 - Paths with an even odd fill rule can be merged
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Overlapping paths are no longer merged, which avoids some image warping issues (#88, #101)
@@ -26,8 +22,6 @@
 - Crash when using the CLI to convert an SVG containing a clip path to vector drawable.
 - (Vector Drawable) Path merging avoids merging a single path data string beyond the framework string length limit (#82)
 - Paths with an initial relative command are modified to make that command absolute when merged (#111) 
-
-### Security
 
 ## 2.4.0 - 2024-10-02
 
