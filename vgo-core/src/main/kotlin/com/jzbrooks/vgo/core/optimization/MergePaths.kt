@@ -7,7 +7,20 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.ParameterizedCommand
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.Surveyor
 import com.jzbrooks.vgo.core.util.math.intersects
 
@@ -73,7 +86,7 @@ class MergePaths(
             if (unableToMerge(previous, current)) {
                 mergedPaths.add(current)
             } else {
-                previous.commands += current.commands
+                previous.commands += makeFirstCommandAbsolute(current.commands)
             }
         }
 
@@ -99,14 +112,15 @@ class MergePaths(
         for (current in paths.drop(1)) {
             val previous = mergedPaths.last()
 
-            val currentLength = current.commands.joinToString("", transform = constraints.commandPrinter::print).length
+            val mergeableCommands = makeFirstCommandAbsolute(current.commands)
+            val currentLength = mergeableCommands.joinToString("", transform = constraints.commandPrinter::print).length
             val accumulatedLength = pathLength + currentLength
 
             if (accumulatedLength > constraints.maxLength || unableToMerge(previous, current)) {
                 mergedPaths.add(current)
                 pathLength = currentLength
             } else {
-                previous.commands += current.commands
+                previous.commands += mergeableCommands
                 pathLength = accumulatedLength
             }
         }
@@ -137,6 +151,83 @@ class MergePaths(
             first.strokeLineCap == second.strokeLineCap &&
             first.strokeLineJoin == second.strokeLineJoin &&
             first.strokeMiterLimit == second.strokeMiterLimit
+
+    private fun makeFirstCommandAbsolute(commands: List<Command>): List<Command> {
+        val firstCommand = commands.firstOrNull() as? ParameterizedCommand<*> ?: return commands
+
+        if (firstCommand.variant == CommandVariant.RELATIVE) {
+            var currentPoint = Point.ZERO
+
+            when (firstCommand) {
+                is MoveTo, is LineTo, is SmoothQuadraticBezierCurve -> {
+                    firstCommand.parameters =
+                        firstCommand.parameters.map { point ->
+                            (point + currentPoint).also { point -> currentPoint = point }
+                        }
+                }
+                is HorizontalLineTo -> {
+                    firstCommand.parameters =
+                        firstCommand.parameters.map { x ->
+                            (x + currentPoint.x).also { x -> currentPoint = currentPoint.copy(x = x) }
+                        }
+                }
+                is VerticalLineTo -> {
+                    firstCommand.parameters =
+                        firstCommand.parameters.map { x ->
+                            (x + currentPoint.x).also { x -> currentPoint = currentPoint.copy(x = x) }
+                        }
+                }
+                is CubicBezierCurve -> {
+                    firstCommand.parameters =
+                        firstCommand.parameters.map { parameter ->
+                            val newEnd = parameter.end + currentPoint
+                            parameter
+                                .copy(
+                                    startControl = parameter.startControl + currentPoint,
+                                    endControl = parameter.endControl + currentPoint,
+                                    end = newEnd,
+                                ).also { currentPoint = newEnd }
+                        }
+                }
+                is SmoothCubicBezierCurve -> {
+                    firstCommand.parameters =
+                        firstCommand.parameters.map { parameter ->
+                            val newEnd = parameter.end + currentPoint
+                            parameter
+                                .copy(
+                                    endControl = parameter.endControl + currentPoint,
+                                    end = newEnd,
+                                ).also { currentPoint = newEnd }
+                        }
+                }
+                is QuadraticBezierCurve -> {
+                    firstCommand.parameters =
+                        firstCommand.parameters.map { parameter ->
+                            val newEnd = parameter.end + currentPoint
+                            parameter
+                                .copy(
+                                    control = parameter.control + currentPoint,
+                                    end = newEnd,
+                                ).also { currentPoint = newEnd }
+                        }
+                }
+                is EllipticalArcCurve -> {
+                    firstCommand.parameters =
+                        firstCommand.parameters.map { parameter ->
+                            val newEnd = parameter.end + currentPoint
+                            parameter
+                                .copy(
+                                    end = newEnd,
+                                ).also { currentPoint = newEnd }
+                        }
+                }
+            }
+
+            firstCommand.variant = CommandVariant.ABSOLUTE
+        }
+
+        return commands
+    }
 
     sealed interface Constraints {
         /** Constraints the optimization by preventing merging paths beyond a given maximum length */

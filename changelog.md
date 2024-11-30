@@ -25,6 +25,7 @@
 - Decimal separators are locale-invariant.
 - Crash when using the CLI to convert an SVG containing a clip path to vector drawable.
 - (Vector Drawable) Path merging avoids merging a single path data string beyond the framework string length limit (#82)
+- Paths with an initial relative command are modified to make that command absolute when merged (#111) 
 
 ### Security
 
