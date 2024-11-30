@@ -1,18 +1,24 @@
 package com.jzbrooks.vgo.core.optimization
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import assertk.assertions.first
 import assertk.assertions.hasSize
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
 import com.jzbrooks.vgo.core.graphic.command.FakeCommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.ParameterizedCommand
 import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.util.element.createGraphic
@@ -454,5 +460,35 @@ class MergePathsTests {
                 listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
             ),
         )
+    }
+
+    @Test
+    fun mergedPathsInitialCommandIsMadeAbsolute() {
+        val paths =
+            listOf(
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.RELATIVE, listOf(Point(10f, 10f), Point(10f, 10f)))),
+                ),
+            )
+
+        val graphic = createGraphic(paths)
+        val optimization = MergePaths(MergePaths.Constraints.None)
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
+
+        assertThat(graphic::elements)
+            .first()
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .index(1)
+            .isInstanceOf<ParameterizedCommand<*>>()
+            .all {
+                prop(ParameterizedCommand<*>::variant).isEqualTo(CommandVariant.ABSOLUTE)
+                prop(ParameterizedCommand<*>::variant.name) { it.parameters }
+                    .isEqualTo(listOf(Point(10f, 10f), Point(20f, 20f)))
+            }
     }
 }
