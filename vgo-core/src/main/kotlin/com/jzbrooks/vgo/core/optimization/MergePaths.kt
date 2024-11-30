@@ -112,14 +112,15 @@ class MergePaths(
         for (current in paths.drop(1)) {
             val previous = mergedPaths.last()
 
-            val currentLength = current.commands.joinToString("", transform = constraints.commandPrinter::print).length
+            val mergeableCommands = makeFirstCommandAbsolute(current.commands)
+            val currentLength = mergeableCommands.joinToString("", transform = constraints.commandPrinter::print).length
             val accumulatedLength = pathLength + currentLength
 
             if (accumulatedLength > constraints.maxLength || unableToMerge(previous, current)) {
                 mergedPaths.add(current)
                 pathLength = currentLength
             } else {
-                previous.commands += makeFirstCommandAbsolute(current.commands)
+                previous.commands += mergeableCommands
                 pathLength = accumulatedLength
             }
         }

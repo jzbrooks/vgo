@@ -491,4 +491,32 @@ class MergePathsTests {
                     .isEqualTo(listOf(Point(10f, 10f), Point(20f, 20f)))
             }
     }
+
+    @Test
+    fun mergedPathsInitialCommandIsMadeAbsoluteBeforeConstraints() {
+        // This would be merged if directly considered by constraints (merged length is 15)
+        // M0,0
+        // m10,10 1,1 -> M0,0 m10,10 1, 1
+
+        // When the relative command is made absolute for merging, the merged path would
+        // be longer (17 chars) than the constraint.
+        // M0,0
+        // M10,10 11,11 -> M0,0 M10,10 11,11
+        val paths =
+            listOf(
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.RELATIVE, listOf(Point(10f, 10f), Point(1f, 1f), Point(1f, 1f)))),
+                ),
+            )
+
+        val graphic = createGraphic(paths)
+        val optimization = MergePaths(MergePaths.Constraints.PathLength(FakeCommandPrinter(), 16))
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
+
+        assertThat(graphic::elements).hasSize(2)
+    }
 }
