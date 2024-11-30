@@ -3,6 +3,21 @@
 ## Unreleased
 
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 3.0.0 - 2024-11-30
+
+### Added
+
 - `com.jzbrooks.vgo.core.util.math.Surveyor`, which computes the bounding box of an arbitrary list of commands 
 - Bézier curve interpolation for all variants and elliptical arc bounding box functions
 
@@ -21,7 +36,7 @@
 - Decimal separators are locale-invariant.
 - Crash when using the CLI to convert an SVG containing a clip path to vector drawable.
 - (Vector Drawable) Path merging avoids merging a single path data string beyond the framework string length limit (#82)
-- Paths with an initial relative command are modified to make that command absolute when merged (#111) 
+- Paths with an initial relative command are modified to make that command absolute when merged (#111)
 
 ## 2.4.0 - 2024-10-02
 
