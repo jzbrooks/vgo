@@ -33,7 +33,7 @@
 
 - Overlapping paths are no longer merged, which avoids some image warping issues (#88, #101)
 - Conversions without a specified output file will write a file the file extension corresponding to the format.
-- Decimal separators are locale-invariant.
+- Decimal separators are locale-invariant. (#60)
 - Crash when using the CLI to convert an SVG containing a clip path to vector drawable.
 - (Vector Drawable) Path merging avoids merging a single path data string beyond the framework string length limit (#82)
 - Paths with an initial relative command are modified to make that command absolute when merged (#111)
