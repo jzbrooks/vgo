@@ -2,7 +2,7 @@
 
 vgo is a tool for optimizing and converting between vector artwork representations.
 
-vgo is built on vgo-core, a library and intermediate representation for vector graphics.
+vgo is built on vgo-core, a library and intermediate representation for vector graphics which aims for readability and speed.
 
 [![Build Status](https://github.com/jzbrooks/vgo/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/jzbrooks/vgo/actions/workflows/build.yml)
 [![Maven Central: vgo](https://img.shields.io/maven-central/v/com.jzbrooks/vgo?label=vgo)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo)
@@ -20,7 +20,9 @@ Download the distribution from the releases page and ensure it has execute permi
 vgo requires Java 17.
 
 ## Gradle Plugin
-The plugin adds the `shrinkVectorArtwork` task to your project.
+The plugin aims to be fast and small by leveraging the JVM your gradle build is already using-no node-based tools are incorporated into your build.
+
+The `shrinkVectorArtwork` task is added to your project on plugin application.
 
 To incorporate the plugin in your build, configure maven central plugin resolution:
 ```groovy
