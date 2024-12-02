@@ -17,7 +17,7 @@ kotlin.sourceSets
 dependencies {
     implementation(project(":vgo-core"))
 
-    compileOnly("com.android.tools:sdk-common:31.7.2")
+    compileOnly("com.android.tools:sdk-common:31.7.3")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.3")
