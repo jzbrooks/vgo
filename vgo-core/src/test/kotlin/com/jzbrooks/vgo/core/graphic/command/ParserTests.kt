@@ -227,6 +227,38 @@ class ParserTests {
     }
 
     @Test
+    fun testMultipleArcParametersWithoutCommaBetweenFlags() {
+        val pathCommandString = "M1,1 A 1,1,0,01,3,3 2,2,0,10,4,4"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            EllipticalArcCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    EllipticalArcCurve.Parameter(
+                        1f,
+                        1f,
+                        0f,
+                        EllipticalArcCurve.ArcFlag.SMALL,
+                        EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                        Point(3f, 3f),
+                    ),
+                    EllipticalArcCurve.Parameter(
+                        2f,
+                        2f,
+                        0f,
+                        EllipticalArcCurve.ArcFlag.LARGE,
+                        EllipticalArcCurve.SweepFlag.ANTICLOCKWISE,
+                        Point(4f, 4f),
+                    ),
+                ),
+            ),
+        )
+    }
+
+    @Test
     fun testParseRelativeCommandString() {
         val pathCommandString = "l2 5"
 
