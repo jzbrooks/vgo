@@ -12,7 +12,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.util.math.Point
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle.parameters
 import org.junit.jupiter.api.Test
 
 class ParserTests {
