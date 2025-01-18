@@ -2,17 +2,8 @@
 
 ## Unreleased
 
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
 ### Fixed
-
-### Security
+- Incorrect parsing of elliptical arc parameters when no separator was present between flag parameters
 
 ## 3.0.0 - 2024-11-30
 
