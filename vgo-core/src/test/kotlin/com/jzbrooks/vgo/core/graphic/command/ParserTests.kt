@@ -5,6 +5,7 @@ import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
+import assertk.assertions.first
 import assertk.assertions.hasClass
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
@@ -201,6 +202,62 @@ class ParserTests {
     }
 
     @Test
+    fun testArcParameterWithoutCommaBetweenFlags() {
+        val pathCommandString = "M1,1 A 1,1,0,01,3,3"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            EllipticalArcCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    EllipticalArcCurve.Parameter(
+                        1f,
+                        1f,
+                        0f,
+                        EllipticalArcCurve.ArcFlag.SMALL,
+                        EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                        Point(3f, 3f),
+                    ),
+                ),
+            ),
+        )
+    }
+
+    @Test
+    fun testMultipleArcParametersWithoutCommaBetweenFlags() {
+        val pathCommandString = "M1,1 A 1,1,0,01,3,3 2,2,0,10,4,4"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            EllipticalArcCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    EllipticalArcCurve.Parameter(
+                        1f,
+                        1f,
+                        0f,
+                        EllipticalArcCurve.ArcFlag.SMALL,
+                        EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                        Point(3f, 3f),
+                    ),
+                    EllipticalArcCurve.Parameter(
+                        2f,
+                        2f,
+                        0f,
+                        EllipticalArcCurve.ArcFlag.LARGE,
+                        EllipticalArcCurve.SweepFlag.ANTICLOCKWISE,
+                        Point(4f, 4f),
+                    ),
+                ),
+            ),
+        )
+    }
+
+    @Test
     fun testParseRelativeCommandString() {
         val pathCommandString = "l2 5"
 
@@ -220,7 +277,7 @@ class ParserTests {
 
         val lineCommand = commands[0] as LineTo
 
-        assertThat(lineCommand.parameters[0]).isEqualTo(Point(2.1f, 5f))
+        assertThat(lineCommand::parameters).first().isEqualTo(Point(2.1f, 5f))
     }
 
     @Test
@@ -231,7 +288,7 @@ class ParserTests {
 
         val lineCommand = commands[0] as LineTo
 
-        assertThat(lineCommand.parameters[0]).isEqualTo(Point(200f, 5f))
+        assertThat(lineCommand::parameters).first().isEqualTo(Point(200f, 5f))
     }
 
     @Test

@@ -106,13 +106,49 @@ value class CommandString(
                     }
                     command.startsWith('A', true) -> {
                         val parameters =
-                            number
-                                .findAll(command)
-                                .map(MatchResult::value)
-                                .map(String::toFloat)
-                                .chunked(7)
-                                .map(::mapEllipticalArcCurveParameter)
-                                .toList()
+                            buildList {
+                                val parameterValues = number.findAll(command).map(MatchResult::value).toMutableList()
+                                while (parameterValues.size > 5) {
+                                    if (parameterValues[3].length > 1) {
+                                        val flagShorthand = parameterValues[3]
+
+                                        add(
+                                            EllipticalArcCurve.Parameter(
+                                                parameterValues.removeFirst().toFloat(),
+                                                parameterValues.removeFirst().toFloat(),
+                                                parameterValues.removeFirst().toFloat(),
+                                                mapArcFlag(flagShorthand[0].toString().toFloat()).also {
+                                                    parameterValues.removeFirst()
+                                                },
+                                                mapSweepFlag(flagShorthand[1].toString().toFloat()),
+                                                Point(
+                                                    parameterValues.removeFirst().toFloat(),
+                                                    parameterValues.removeFirst().toFloat(),
+                                                ),
+                                            ),
+                                        )
+                                    } else {
+                                        check(parameterValues.size > 6) {
+                                            "$parameterValues must have 7 distinct numerical arguments if the" +
+                                                " flags are not combined without an argument separator (space or comma)"
+                                        }
+
+                                        add(
+                                            EllipticalArcCurve.Parameter(
+                                                parameterValues.removeFirst().toFloat(),
+                                                parameterValues.removeFirst().toFloat(),
+                                                parameterValues.removeFirst().toFloat(),
+                                                mapArcFlag(parameterValues.removeFirst().toFloat()),
+                                                mapSweepFlag(parameterValues.removeFirst().toFloat()),
+                                                Point(
+                                                    parameterValues.removeFirst().toFloat(),
+                                                    parameterValues.removeFirst().toFloat(),
+                                                ),
+                                            ),
+                                        )
+                                    }
+                                }
+                            }
 
                         EllipticalArcCurve(variant, parameters)
                     }
@@ -145,26 +181,19 @@ value class CommandString(
         return SmoothCubicBezierCurve.Parameter(endControl, end)
     }
 
-    private fun mapEllipticalArcCurveParameter(components: List<Float>): EllipticalArcCurve.Parameter {
-        val radiusX = components[0]
-        val radiusY = components[1]
-        val angle = components[2]
-        val arcFlag =
-            when (components[3]) {
-                1f -> EllipticalArcCurve.ArcFlag.LARGE
-                0f -> EllipticalArcCurve.ArcFlag.SMALL
-                else -> throw IllegalArgumentException("Unexpected elliptical curve arc flag value: ${components[4]}\nExpected 0 or 1.")
-            }
-        val sweepFlag =
-            when (components[4]) {
-                1f -> EllipticalArcCurve.SweepFlag.CLOCKWISE
-                0f -> EllipticalArcCurve.SweepFlag.ANTICLOCKWISE
-                else -> throw IllegalArgumentException("Unexpected elliptical curve sweep flag value: ${components[4]}\nExpected 0 or 1.")
-            }
-        val end = Point(components[5], components[6])
+    private fun mapArcFlag(value: Float): EllipticalArcCurve.ArcFlag =
+        when (value) {
+            1f -> EllipticalArcCurve.ArcFlag.LARGE
+            0f -> EllipticalArcCurve.ArcFlag.SMALL
+            else -> throw IllegalArgumentException("Unexpected elliptical curve arc flag value: $value\nExpected 0 or 1.")
+        }
 
-        return EllipticalArcCurve.Parameter(radiusX, radiusY, angle, arcFlag, sweepFlag, end)
-    }
+    private fun mapSweepFlag(value: Float): EllipticalArcCurve.SweepFlag =
+        when (value) {
+            1f -> EllipticalArcCurve.SweepFlag.CLOCKWISE
+            0f -> EllipticalArcCurve.SweepFlag.ANTICLOCKWISE
+            else -> throw IllegalArgumentException("Unexpected elliptical curve sweep flag value: $value\nExpected 0 or 1.")
+        }
 
     companion object {
         private val commandRegex = Regex("(?=[MmLlHhVvCcSsQqTtAaZz])\\s*")
