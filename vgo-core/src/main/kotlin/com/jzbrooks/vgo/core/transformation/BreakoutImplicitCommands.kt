@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -22,11 +22,7 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
  * Enables more resolution in the other command
  * related optimizations like [CommandVariant] and [RemoveRedundantCommands]
  */
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.BreakoutImplicitCommands"),
-)
-class BreakoutImplicitCommands : TopDownOptimization {
+class BreakoutImplicitCommands : TopDownTransformation {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}

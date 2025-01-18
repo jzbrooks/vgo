@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
@@ -7,11 +7,7 @@ import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.RemoveTransparentPaths"),
-)
-class RemoveTransparentPaths : TopDownOptimization {
+class RemoveTransparentPaths : TopDownTransformation {
     override fun visit(graphic: Graphic) = removeTransparentPaths(graphic)
 
     override fun visit(group: Group) = removeTransparentPaths(group)

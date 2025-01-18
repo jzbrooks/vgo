@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ElementVisitor
@@ -25,13 +25,9 @@ import java.util.Stack
 /**
  * Apply transformations to paths command coordinates in a group
  */
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.BakeTransformation"),
-)
 class BakeTransformations :
     ElementVisitor,
-    BottomUpOptimization {
+    BottomUpTransformation {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}

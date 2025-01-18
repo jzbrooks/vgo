@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -25,11 +25,7 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
  * number, you can omit the separator between it and the preceeding
  * pair. It becomes 10,0-1,1.
  */
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.Polycommands"),
-)
-class Polycommands : TopDownOptimization {
+class Polycommands : TopDownTransformation {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}

@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -26,13 +26,9 @@ import com.jzbrooks.vgo.core.util.math.Point
  * or the shortest representation of coordinates
  * @param mode determines the operating mode of the command
  */
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.CommandVariant"),
-)
 class CommandVariant(
     private val mode: Mode,
-) : TopDownOptimization {
+) : TopDownTransformation {
     private val pathStart = ArrayDeque<Point>()
 
     // Updated once per process call when computing

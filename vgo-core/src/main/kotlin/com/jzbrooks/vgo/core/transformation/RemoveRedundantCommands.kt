@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -26,11 +26,7 @@ import kotlin.math.absoluteValue
 /**
  * Elide commands that don't contribute to the overall graphic
  */
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.RemoveRedundantCommands"),
-)
-class RemoveRedundantCommands : TopDownOptimization {
+class RemoveRedundantCommands : TopDownTransformation {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}
