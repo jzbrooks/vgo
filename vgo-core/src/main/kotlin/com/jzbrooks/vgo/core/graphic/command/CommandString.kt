@@ -109,10 +109,16 @@ value class CommandString(
                             number
                                 .findAll(command)
                                 .map(MatchResult::value)
-                                .map(String::toFloat)
                                 .chunked(7)
+                                .map {
+                                    if (it.size == 6) {
+                                        it.take(3).map { it.toFloat() } + it[3].map { it.toString().toFloat() } +
+                                            it.drop(4).map { it.toFloat() }
+                                    } else {
+                                        it.map { it.toFloat() }
+                                    }
+                                }.toList()
                                 .map(::mapEllipticalArcCurveParameter)
-                                .toList()
 
                         EllipticalArcCurve(variant, parameters)
                     }

@@ -5,12 +5,14 @@ import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
+import assertk.assertions.first
 import assertk.assertions.hasClass
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.util.math.Point
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyle.parameters
 import org.junit.jupiter.api.Test
 
 class ParserTests {
@@ -201,6 +203,30 @@ class ParserTests {
     }
 
     @Test
+    fun testArcParameterWithoutCommaBetweenFlags() {
+        val pathCommandString = "M1,1 A 1,1,0,01,3,3"
+
+        val commands = CommandString(pathCommandString).toCommandList()
+
+        assertThat(commands).containsExactly(
+            moveToSingle,
+            EllipticalArcCurve(
+                CommandVariant.ABSOLUTE,
+                listOf(
+                    EllipticalArcCurve.Parameter(
+                        1f,
+                        1f,
+                        0f,
+                        EllipticalArcCurve.ArcFlag.SMALL,
+                        EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                        Point(3f, 3f),
+                    ),
+                ),
+            ),
+        )
+    }
+
+    @Test
     fun testParseRelativeCommandString() {
         val pathCommandString = "l2 5"
 
@@ -220,7 +246,7 @@ class ParserTests {
 
         val lineCommand = commands[0] as LineTo
 
-        assertThat(lineCommand.parameters[0]).isEqualTo(Point(2.1f, 5f))
+        assertThat(lineCommand::parameters).first().isEqualTo(Point(2.1f, 5f))
     }
 
     @Test
@@ -231,7 +257,7 @@ class ParserTests {
 
         val lineCommand = commands[0] as LineTo
 
-        assertThat(lineCommand.parameters[0]).isEqualTo(Point(200f, 5f))
+        assertThat(lineCommand::parameters).first().isEqualTo(Point(200f, 5f))
     }
 
     @Test
