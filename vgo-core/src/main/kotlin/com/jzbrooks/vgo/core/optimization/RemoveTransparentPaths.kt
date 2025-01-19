@@ -7,6 +7,7 @@ import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 
+@Suppress("DEPRECATION")
 @Deprecated(
     "Has been relocated to the transformation package",
     replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.RemoveTransparentPaths"),

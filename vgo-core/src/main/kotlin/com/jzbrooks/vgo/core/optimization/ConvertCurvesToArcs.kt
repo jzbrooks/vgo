@@ -23,6 +23,7 @@ import com.jzbrooks.vgo.core.util.math.toCubicBezierCurve
 /**
  * Converts cubic Bézier curves to arcs, when they are shorter.
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Has been relocated to the transformation package",
     replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.ConvertCurvesToArcs"),

@@ -26,6 +26,7 @@ import kotlin.math.absoluteValue
 /**
  * Elide commands that don't contribute to the overall graphic
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Has been relocated to the transformation package",
     replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.RemoveRedundantCommands"),

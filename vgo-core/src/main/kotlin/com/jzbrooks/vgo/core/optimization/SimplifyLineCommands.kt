@@ -17,6 +17,7 @@ import kotlin.math.sign
 /**
  * Convert lines into shorter commands where possible
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Has been relocated to the transformation package",
     replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.SimplifyLineCommands"),

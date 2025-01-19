@@ -25,6 +25,7 @@ import java.util.Stack
 /**
  * Apply transformations to paths command coordinates in a group
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Has been relocated to the transformation package",
     replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.BakeTransformation"),

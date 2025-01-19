@@ -26,6 +26,7 @@ import com.jzbrooks.vgo.core.util.math.Point
  * or the shortest representation of coordinates
  * @param mode determines the operating mode of the command
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Has been relocated to the transformation package",
     replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.CommandVariant"),

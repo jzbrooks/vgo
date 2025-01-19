@@ -27,6 +27,7 @@ import com.jzbrooks.vgo.core.util.math.intersects
 /**
  * Merges multiple paths into a single path where possible
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Has been relocated to the transformation package",
     replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.MergePaths"),

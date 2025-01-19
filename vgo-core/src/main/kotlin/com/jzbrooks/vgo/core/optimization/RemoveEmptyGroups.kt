@@ -11,6 +11,7 @@ import com.jzbrooks.vgo.core.util.math.Matrix3
 /**
  * Remove unnecessary groups
  */
+@Suppress("DEPRECATION")
 @Deprecated(
     "Has been relocated to the transformation package",
     replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.RemoveEmptyGroups"),
