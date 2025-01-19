@@ -1,32 +1,26 @@
 package com.jzbrooks.vgo
 
-import com.android.ide.common.vectordrawable.Svg2Vector
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
-import com.jzbrooks.vgo.svg.parse
-import com.jzbrooks.vgo.util.xml.asSequence
+import com.jzbrooks.vgo.util.parse
 import com.jzbrooks.vgo.vd.VectorDrawable
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter
 import com.jzbrooks.vgo.vd.toSvg
-import org.w3c.dom.Document
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
-import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
-import kotlin.io.path.isSameFileAs
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.pathString
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
+import kotlin.system.exitProcess
 
 class Vgo(
     private val options: Options,
@@ -82,119 +76,70 @@ class Vgo(
     private fun handleFile(
         input: File,
         outputPath: Path,
-        options: Set<Writer.Option>,
+        writerOptions: Set<Writer.Option>,
     ) {
-        input.inputStream().use { inputStream ->
-            val sizeBefore = inputStream.channel.size()
+        val parsedGraphic = parse(input, options.format)
+        if (parsedGraphic == null) {
+            System.err.println("Failed to parse $input")
+            exitProcess(-1)
+        }
 
-            val documentBuilderFactory = DocumentBuilderFactory.newInstance()
+        var graphic = parsedGraphic.graphic
+        val sizeBefore = parsedGraphic.sizeBefore
 
-            val document = documentBuilderFactory.newDocumentBuilder().parse(input)
-            document.documentElement.normalize()
+        if (graphic is VectorDrawable && options.format == "svg") {
+            graphic = graphic.toSvg()
+        }
 
-            val rootNodes =
-                document.childNodes
-                    .asSequence()
-                    .filter { it.nodeType == Document.ELEMENT_NODE }
-                    .toList()
-
-            var graphic =
-                when {
-                    rootNodes.any { it.nodeName == "svg" || input.extension == "svg" } -> {
-                        if (this.options.format == "vd") {
-                            ByteArrayOutputStream().use { pipeOrigin ->
-                                val errors = Svg2Vector.parseSvgToXml(input.toPath(), pipeOrigin)
-                                if (errors != "") {
-                                    System.err.println(
-                                        """
-                                        Skipping ${input.path}
-
-                                          $errors
-                                        """.trimIndent(),
-                                    )
-                                    null
-                                } else {
-                                    val pipeTerminal = ByteArrayInputStream(pipeOrigin.toByteArray())
-                                    val convertedDocument =
-                                        documentBuilderFactory.newDocumentBuilder().parse(pipeTerminal)
-                                    convertedDocument.documentElement.normalize()
-
-                                    val documentRoot =
-                                        convertedDocument.childNodes.asSequence().first {
-                                            it.nodeType == Document.ELEMENT_NODE
-                                        }
-
-                                    com.jzbrooks.vgo.vd
-                                        .parse(documentRoot)
-                                }
-                            }
-                        } else {
-                            parse(rootNodes.first())
-                        }
-                    }
-                    rootNodes.any { it.nodeName == "vector" && input.extension == "xml" } -> {
-                        com.jzbrooks.vgo.vd
-                            .parse(rootNodes.first())
-                    }
-                    else -> if (outputPath.isSameFileAs(input.toPath())) return else null
-                }
-
-            if (graphic is VectorDrawable && this.options.format == "svg") {
-                graphic = graphic.toSvg()
+        val optimizationRegistry =
+            when (graphic) {
+                is VectorDrawable -> VectorDrawableOptimizationRegistry()
+                is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                else -> null
             }
 
-            val optimizationRegistry =
-                when (graphic) {
-                    is VectorDrawable -> VectorDrawableOptimizationRegistry()
-                    is ScalableVectorGraphic -> SvgOptimizationRegistry()
-                    else -> null
-                }
+        optimizationRegistry?.apply(graphic)
 
-            if (graphic != null) {
-                optimizationRegistry?.apply(graphic)
+        val output =
+            if (input.path == outputPath.pathString) {
+                when (options.format) {
+                    "vd" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.xml")
+                    "svg" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.svg")
+                    else -> outputPath
+                }
+            } else {
+                outputPath
+            }.toFile()
+
+        if (output.parentFile?.exists() == false) output.parentFile.mkdirs()
+        if (!output.exists()) output.createNewFile()
+
+        output.outputStream().use { outputStream ->
+            if (graphic is VectorDrawable) {
+                val writer = VectorDrawableWriter(writerOptions)
+                writer.write(graphic, outputStream)
             }
 
-            val output =
-                if (input.path == outputPath.pathString) {
-                    when (this.options.format) {
-                        "vd" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.xml")
-                        "svg" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.svg")
-                        else -> outputPath
-                    }
-                } else {
-                    outputPath
-                }.toFile()
+            if (graphic is ScalableVectorGraphic) {
+                val writer = ScalableVectorGraphicWriter(writerOptions)
+                writer.write(graphic, outputStream)
+            }
 
-            if (output.parentFile?.exists() == false) output.parentFile.mkdirs()
-            if (!output.exists()) output.createNewFile()
+            if (input != output) {
+                input.inputStream().use { it.copyTo(outputStream) }
+            }
 
-            output.outputStream().use { outputStream ->
-                if (graphic is VectorDrawable) {
-                    val writer = VectorDrawableWriter(options)
-                    writer.write(graphic, outputStream)
-                }
+            if (options.printStats) {
+                val sizeAfter = outputStream.channel.size()
+                val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
+                totalBytesBefore += sizeBefore
+                totalBytesAfter += sizeAfter
 
-                if (graphic is ScalableVectorGraphic) {
-                    val writer = ScalableVectorGraphicWriter(options)
-                    writer.write(graphic, outputStream)
-                }
-
-                if (graphic == null && input != output) {
-                    inputStream.copyTo(outputStream)
-                }
-
-                if (this.options.printStats) {
-                    val sizeAfter = outputStream.channel.size()
-                    val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
-                    totalBytesBefore += sizeBefore
-                    totalBytesAfter += sizeAfter
-
-                    if (percentSaved.absoluteValue > 1e-3) {
-                        if (printFileNames) println("\n${input.path}")
-                        println("Size before: " + formatByteDescription(sizeBefore))
-                        println("Size after: " + formatByteDescription(sizeAfter))
-                        println("Percent saved: $percentSaved")
-                    }
+                if (percentSaved.absoluteValue > 1e-3) {
+                    if (printFileNames) println("\n${input.path}")
+                    println("Size before: " + formatByteDescription(sizeBefore))
+                    println("Size after: " + formatByteDescription(sizeAfter))
+                    println("Percent saved: $percentSaved")
                 }
             }
         }
