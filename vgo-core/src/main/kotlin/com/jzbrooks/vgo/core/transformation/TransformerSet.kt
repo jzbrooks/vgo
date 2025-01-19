@@ -4,7 +4,7 @@ import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.util.element.traverseBottomUp
 import com.jzbrooks.vgo.core.util.element.traverseTopDown
 
-abstract class Optimizer(
+abstract class TransformerSet(
     private val bottomUpTransformations: List<BottomUpTransformation>,
     private val topDownTransformations: List<TopDownTransformation>,
 ) {

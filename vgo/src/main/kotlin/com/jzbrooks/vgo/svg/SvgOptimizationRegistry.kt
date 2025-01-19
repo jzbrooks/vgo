@@ -6,16 +6,16 @@ import com.jzbrooks.vgo.core.transformation.CollapseGroups
 import com.jzbrooks.vgo.core.transformation.CommandVariant
 import com.jzbrooks.vgo.core.transformation.ConvertCurvesToArcs
 import com.jzbrooks.vgo.core.transformation.MergePaths
-import com.jzbrooks.vgo.core.transformation.Optimizer
 import com.jzbrooks.vgo.core.transformation.Polycommands
 import com.jzbrooks.vgo.core.transformation.RemoveEmptyGroups
 import com.jzbrooks.vgo.core.transformation.RemoveRedundantCommands
 import com.jzbrooks.vgo.core.transformation.RemoveTransparentPaths
 import com.jzbrooks.vgo.core.transformation.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.transformation.SimplifyLineCommands
+import com.jzbrooks.vgo.core.transformation.TransformerSet
 
 class SvgOptimizationRegistry :
-    Optimizer(
+    TransformerSet(
         bottomUpTransformations =
             listOf(
                 BakeTransformations(),
