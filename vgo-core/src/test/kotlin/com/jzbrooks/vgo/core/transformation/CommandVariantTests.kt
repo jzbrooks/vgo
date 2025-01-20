@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import assertk.assertThat
 import assertk.assertions.hasSize
@@ -19,7 +19,7 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
-import com.jzbrooks.vgo.core.optimization.CommandVariant as CommandVariantOpt
+import com.jzbrooks.vgo.core.transformation.CommandVariant as CommandVariantOpt
 
 class CommandVariantTests {
     @Test
