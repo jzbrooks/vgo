@@ -23,7 +23,7 @@ import kotlin.math.sqrt
  */
 class SimplifyBezierCurveCommands(
     private val tolerance: Float,
-) : TopDownTransformation {
+) : TopDownTransformer {
     private var skipAnother = false
 
     override fun visit(graphic: Graphic) {}

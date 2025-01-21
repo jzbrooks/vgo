@@ -29,7 +29,7 @@ import com.jzbrooks.vgo.core.util.math.intersects
  */
 class MergePaths(
     private val constraints: Constraints = Constraints.None,
-) : BottomUpTransformation {
+) : BottomUpTransformer {
     private val surveyor = Surveyor()
 
     override fun visit(graphic: Graphic) = merge(graphic)

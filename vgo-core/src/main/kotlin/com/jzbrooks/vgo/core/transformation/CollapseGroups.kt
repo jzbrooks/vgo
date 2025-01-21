@@ -11,7 +11,7 @@ import com.jzbrooks.vgo.core.util.math.Matrix3
 /**
  * Collapse unnecessary nested groups into a single group
  */
-class CollapseGroups : BottomUpTransformation {
+class CollapseGroups : BottomUpTransformer {
     private val Group.isMergeable: Boolean
         get() {
             val hasValidClipPath = elements.any { it is ClipPath }

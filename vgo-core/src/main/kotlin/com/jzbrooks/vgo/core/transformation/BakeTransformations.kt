@@ -27,7 +27,7 @@ import java.util.Stack
  */
 class BakeTransformations :
     ElementVisitor,
-    BottomUpTransformation {
+    BottomUpTransformer {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}

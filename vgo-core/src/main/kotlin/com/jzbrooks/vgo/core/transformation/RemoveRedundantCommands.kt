@@ -26,7 +26,7 @@ import kotlin.math.absoluteValue
 /**
  * Elide commands that don't contribute to the overall graphic
  */
-class RemoveRedundantCommands : TopDownTransformation {
+class RemoveRedundantCommands : TopDownTransformer {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}

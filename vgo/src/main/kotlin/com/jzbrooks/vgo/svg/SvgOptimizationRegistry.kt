@@ -16,14 +16,14 @@ import com.jzbrooks.vgo.core.transformation.TransformerSet
 
 class SvgOptimizationRegistry :
     TransformerSet(
-        bottomUpTransformations =
+        bottomUpTransformers =
             listOf(
                 BakeTransformations(),
                 CollapseGroups(),
                 RemoveEmptyGroups(),
                 MergePaths(MergePaths.Constraints.None),
             ),
-        topDownTransformations =
+        topDownTransformers =
             listOf(
                 RemoveTransparentPaths(),
                 BreakoutImplicitCommands(),

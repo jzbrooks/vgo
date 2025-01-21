@@ -25,7 +25,7 @@ import com.jzbrooks.vgo.core.util.math.toCubicBezierCurve
  */
 class ConvertCurvesToArcs(
     private val printer: CommandPrinter,
-) : TopDownTransformation {
+) : TopDownTransformer {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}

@@ -5,21 +5,21 @@ import com.jzbrooks.vgo.core.util.element.traverseBottomUp
 import com.jzbrooks.vgo.core.util.element.traverseTopDown
 
 abstract class TransformerSet(
-    private val bottomUpTransformations: List<BottomUpTransformation>,
-    private val topDownTransformations: List<TopDownTransformation>,
+    private val bottomUpTransformers: List<BottomUpTransformer>,
+    private val topDownTransformers: List<TopDownTransformer>,
 ) {
     fun apply(graphic: Graphic) {
-        if (bottomUpTransformations.isNotEmpty()) {
+        if (bottomUpTransformers.isNotEmpty()) {
             traverseBottomUp(graphic) { element ->
-                for (optimization in bottomUpTransformations) {
+                for (optimization in bottomUpTransformers) {
                     element.accept(optimization)
                 }
             }
         }
 
-        if (topDownTransformations.isNotEmpty()) {
+        if (topDownTransformers.isNotEmpty()) {
             traverseTopDown(graphic) { element ->
-                for (optimization in topDownTransformations) {
+                for (optimization in topDownTransformers) {
                     element.accept(optimization)
                 }
             }

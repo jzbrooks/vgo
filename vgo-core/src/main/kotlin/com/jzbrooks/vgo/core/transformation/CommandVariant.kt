@@ -28,7 +28,7 @@ import com.jzbrooks.vgo.core.util.math.Point
  */
 class CommandVariant(
     private val mode: Mode,
-) : TopDownTransformation {
+) : TopDownTransformer {
     private val pathStart = ArrayDeque<Point>()
 
     // Updated once per process call when computing

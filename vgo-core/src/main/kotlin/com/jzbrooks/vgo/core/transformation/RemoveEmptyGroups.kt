@@ -11,7 +11,7 @@ import com.jzbrooks.vgo.core.util.math.Matrix3
 /**
  * Remove unnecessary groups
  */
-class RemoveEmptyGroups : BottomUpTransformation {
+class RemoveEmptyGroups : BottomUpTransformer {
     override fun visit(graphic: Graphic) {
         removeEmptyGroups(graphic)
     }

@@ -22,7 +22,7 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
  * Enables more resolution in the other command
  * related optimizations like [CommandVariant] and [RemoveRedundantCommands]
  */
-class BreakoutImplicitCommands : TopDownTransformation {
+class BreakoutImplicitCommands : TopDownTransformer {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}

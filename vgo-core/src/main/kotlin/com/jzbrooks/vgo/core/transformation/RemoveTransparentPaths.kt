@@ -7,7 +7,7 @@ import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 
-class RemoveTransparentPaths : TopDownTransformation {
+class RemoveTransparentPaths : TopDownTransformer {
     override fun visit(graphic: Graphic) = removeTransparentPaths(graphic)
 
     override fun visit(group: Group) = removeTransparentPaths(group)

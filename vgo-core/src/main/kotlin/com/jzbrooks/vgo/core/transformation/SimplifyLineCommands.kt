@@ -19,7 +19,7 @@ import kotlin.math.sign
  */
 class SimplifyLineCommands(
     private val tolerance: Float,
-) : TopDownTransformation {
+) : TopDownTransformer {
     lateinit var commands: MutableList<Command>
 
     override fun visit(graphic: Graphic) {}
