@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
@@ -11,12 +11,7 @@ import com.jzbrooks.vgo.core.util.math.Matrix3
 /**
  * Collapse unnecessary nested groups into a single group
  */
-@Suppress("DEPRECATION")
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.CollapseGroups"),
-)
-class CollapseGroups : BottomUpOptimization {
+class CollapseGroups : BottomUpTransformer {
     private val Group.isMergeable: Boolean
         get() {
             val hasValidClipPath = elements.any { it is ClipPath }

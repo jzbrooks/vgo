@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -23,14 +23,9 @@ import com.jzbrooks.vgo.core.util.math.toCubicBezierCurve
 /**
  * Converts cubic Bézier curves to arcs, when they are shorter.
  */
-@Suppress("DEPRECATION")
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.ConvertCurvesToArcs"),
-)
 class ConvertCurvesToArcs(
     private val printer: CommandPrinter,
-) : TopDownOptimization {
+) : TopDownTransformer {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}

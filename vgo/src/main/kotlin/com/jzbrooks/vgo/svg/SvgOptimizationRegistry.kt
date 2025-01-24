@@ -1,29 +1,29 @@
 package com.jzbrooks.vgo.svg
 
-import com.jzbrooks.vgo.core.optimization.BakeTransformations
-import com.jzbrooks.vgo.core.optimization.BreakoutImplicitCommands
-import com.jzbrooks.vgo.core.optimization.CollapseGroups
-import com.jzbrooks.vgo.core.optimization.CommandVariant
-import com.jzbrooks.vgo.core.optimization.ConvertCurvesToArcs
-import com.jzbrooks.vgo.core.optimization.MergePaths
-import com.jzbrooks.vgo.core.optimization.OptimizationRegistry
-import com.jzbrooks.vgo.core.optimization.Polycommands
-import com.jzbrooks.vgo.core.optimization.RemoveEmptyGroups
-import com.jzbrooks.vgo.core.optimization.RemoveRedundantCommands
-import com.jzbrooks.vgo.core.optimization.RemoveTransparentPaths
-import com.jzbrooks.vgo.core.optimization.SimplifyBezierCurveCommands
-import com.jzbrooks.vgo.core.optimization.SimplifyLineCommands
+import com.jzbrooks.vgo.core.transformation.BakeTransformations
+import com.jzbrooks.vgo.core.transformation.BreakoutImplicitCommands
+import com.jzbrooks.vgo.core.transformation.CollapseGroups
+import com.jzbrooks.vgo.core.transformation.CommandVariant
+import com.jzbrooks.vgo.core.transformation.ConvertCurvesToArcs
+import com.jzbrooks.vgo.core.transformation.MergePaths
+import com.jzbrooks.vgo.core.transformation.Polycommands
+import com.jzbrooks.vgo.core.transformation.RemoveEmptyGroups
+import com.jzbrooks.vgo.core.transformation.RemoveRedundantCommands
+import com.jzbrooks.vgo.core.transformation.RemoveTransparentPaths
+import com.jzbrooks.vgo.core.transformation.SimplifyBezierCurveCommands
+import com.jzbrooks.vgo.core.transformation.SimplifyLineCommands
+import com.jzbrooks.vgo.core.transformation.TransformerSet
 
 class SvgOptimizationRegistry :
-    OptimizationRegistry(
-        bottomUpOptimizations =
+    TransformerSet(
+        bottomUpTransformers =
             listOf(
                 BakeTransformations(),
                 CollapseGroups(),
                 RemoveEmptyGroups(),
                 MergePaths(MergePaths.Constraints.None),
             ),
-        topDownOptimizations =
+        topDownTransformers =
             listOf(
                 RemoveTransparentPaths(),
                 BreakoutImplicitCommands(),

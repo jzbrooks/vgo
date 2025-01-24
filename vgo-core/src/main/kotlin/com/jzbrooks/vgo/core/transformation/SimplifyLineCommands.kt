@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -17,14 +17,9 @@ import kotlin.math.sign
 /**
  * Convert lines into shorter commands where possible
  */
-@Suppress("DEPRECATION")
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.SimplifyLineCommands"),
-)
 class SimplifyLineCommands(
     private val tolerance: Float,
-) : TopDownOptimization {
+) : TopDownTransformer {
     lateinit var commands: MutableList<Command>
 
     override fun visit(graphic: Graphic) {}

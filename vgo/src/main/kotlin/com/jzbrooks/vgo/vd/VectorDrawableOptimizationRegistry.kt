@@ -1,22 +1,22 @@
 package com.jzbrooks.vgo.vd
 
-import com.jzbrooks.vgo.core.optimization.BakeTransformations
-import com.jzbrooks.vgo.core.optimization.BreakoutImplicitCommands
-import com.jzbrooks.vgo.core.optimization.CollapseGroups
-import com.jzbrooks.vgo.core.optimization.CommandVariant
-import com.jzbrooks.vgo.core.optimization.ConvertCurvesToArcs
-import com.jzbrooks.vgo.core.optimization.MergePaths
-import com.jzbrooks.vgo.core.optimization.OptimizationRegistry
-import com.jzbrooks.vgo.core.optimization.Polycommands
-import com.jzbrooks.vgo.core.optimization.RemoveEmptyGroups
-import com.jzbrooks.vgo.core.optimization.RemoveRedundantCommands
-import com.jzbrooks.vgo.core.optimization.RemoveTransparentPaths
-import com.jzbrooks.vgo.core.optimization.SimplifyBezierCurveCommands
-import com.jzbrooks.vgo.core.optimization.SimplifyLineCommands
+import com.jzbrooks.vgo.core.transformation.BakeTransformations
+import com.jzbrooks.vgo.core.transformation.BreakoutImplicitCommands
+import com.jzbrooks.vgo.core.transformation.CollapseGroups
+import com.jzbrooks.vgo.core.transformation.CommandVariant
+import com.jzbrooks.vgo.core.transformation.ConvertCurvesToArcs
+import com.jzbrooks.vgo.core.transformation.MergePaths
+import com.jzbrooks.vgo.core.transformation.Polycommands
+import com.jzbrooks.vgo.core.transformation.RemoveEmptyGroups
+import com.jzbrooks.vgo.core.transformation.RemoveRedundantCommands
+import com.jzbrooks.vgo.core.transformation.RemoveTransparentPaths
+import com.jzbrooks.vgo.core.transformation.SimplifyBezierCurveCommands
+import com.jzbrooks.vgo.core.transformation.SimplifyLineCommands
+import com.jzbrooks.vgo.core.transformation.TransformerSet
 
 class VectorDrawableOptimizationRegistry :
-    OptimizationRegistry(
-        bottomUpOptimizations =
+    TransformerSet(
+        bottomUpTransformers =
             listOf(
                 BakeTransformations(),
                 CollapseGroups(),
@@ -24,7 +24,7 @@ class VectorDrawableOptimizationRegistry :
                 // https://cs.android.com/android/platform/superproject/main/+/2e48e15a8097916063eacc023044bc90bb93c73e:frameworks/base/libs/androidfw/StringPool.cpp;l=328
                 MergePaths(MergePaths.Constraints.PathLength(VectorDrawableCommandPrinter(3), (1 shl 15) - 1)),
             ),
-        topDownOptimizations =
+        topDownTransformers =
             listOf(
                 RemoveTransparentPaths(),
                 BreakoutImplicitCommands(),

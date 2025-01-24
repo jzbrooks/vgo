@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.core.optimization
+package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -21,14 +21,9 @@ import kotlin.math.sqrt
 /**
  * Convert curves into shorter commands where possible
  */
-@Suppress("DEPRECATION")
-@Deprecated(
-    "Has been relocated to the transformation package",
-    replaceWith = ReplaceWith("com.jzbrooks.vgo.core.transformation.SimplifyBezierCurveCommands"),
-)
 class SimplifyBezierCurveCommands(
     private val tolerance: Float,
-) : TopDownOptimization {
+) : TopDownTransformer {
     private var skipAnother = false
 
     override fun visit(graphic: Graphic) {}
