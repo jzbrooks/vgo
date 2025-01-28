@@ -16,6 +16,7 @@ import java.nio.file.Paths
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
+import kotlin.io.path.isSameFileAs
 import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.pathString
 import kotlin.math.absoluteValue
@@ -92,6 +93,8 @@ class Vgo(
         if (!output.exists()) output.createNewFile()
 
         val parsedGraphic = parse(input, options.format)
+
+        if (parsedGraphic == null && outputPath.isSameFileAs(input.toPath())) return
 
         output.outputStream().use { outputStream ->
             if (parsedGraphic != null) {
