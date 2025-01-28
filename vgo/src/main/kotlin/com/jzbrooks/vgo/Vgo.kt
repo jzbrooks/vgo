@@ -20,7 +20,6 @@ import kotlin.io.path.nameWithoutExtension
 import kotlin.io.path.pathString
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
-import kotlin.system.exitProcess
 
 class Vgo(
     private val options: Options,
@@ -78,28 +77,6 @@ class Vgo(
         outputPath: Path,
         writerOptions: Set<Writer.Option>,
     ) {
-        val parsedGraphic = parse(input, options.format)
-        if (parsedGraphic == null) {
-            System.err.println("Failed to parse $input")
-            exitProcess(-1)
-        }
-
-        var graphic = parsedGraphic.graphic
-        val sizeBefore = parsedGraphic.sizeBefore
-
-        if (graphic is VectorDrawable && options.format == "svg") {
-            graphic = graphic.toSvg()
-        }
-
-        val optimizationRegistry =
-            when (graphic) {
-                is VectorDrawable -> VectorDrawableOptimizationRegistry()
-                is ScalableVectorGraphic -> SvgOptimizationRegistry()
-                else -> null
-            }
-
-        optimizationRegistry?.apply(graphic)
-
         val output =
             if (input.path == outputPath.pathString) {
                 when (options.format) {
@@ -114,33 +91,51 @@ class Vgo(
         if (output.parentFile?.exists() == false) output.parentFile.mkdirs()
         if (!output.exists()) output.createNewFile()
 
+        val parsedGraphic = parse(input, options.format)
+
         output.outputStream().use { outputStream ->
-            if (graphic is VectorDrawable) {
-                val writer = VectorDrawableWriter(writerOptions)
-                writer.write(graphic, outputStream)
-            }
+            if (parsedGraphic != null) {
+                var graphic = parsedGraphic.graphic
+                val sizeBefore = parsedGraphic.sizeBefore
 
-            if (graphic is ScalableVectorGraphic) {
-                val writer = ScalableVectorGraphicWriter(writerOptions)
-                writer.write(graphic, outputStream)
-            }
-
-            if (input != output) {
-                input.inputStream().use { it.copyTo(outputStream) }
-            }
-
-            if (options.printStats) {
-                val sizeAfter = outputStream.channel.size()
-                val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
-                totalBytesBefore += sizeBefore
-                totalBytesAfter += sizeAfter
-
-                if (percentSaved.absoluteValue > 1e-3) {
-                    if (printFileNames) println("\n${input.path}")
-                    println("Size before: " + formatByteDescription(sizeBefore))
-                    println("Size after: " + formatByteDescription(sizeAfter))
-                    println("Percent saved: $percentSaved")
+                if (graphic is VectorDrawable && options.format == "svg") {
+                    graphic = graphic.toSvg()
                 }
+
+                val optimizationRegistry =
+                    when (graphic) {
+                        is VectorDrawable -> VectorDrawableOptimizationRegistry()
+                        is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                        else -> null
+                    }
+
+                optimizationRegistry?.apply(graphic)
+
+                if (graphic is VectorDrawable) {
+                    val writer = VectorDrawableWriter(writerOptions)
+                    writer.write(graphic, outputStream)
+                }
+
+                if (graphic is ScalableVectorGraphic) {
+                    val writer = ScalableVectorGraphicWriter(writerOptions)
+                    writer.write(graphic, outputStream)
+                }
+
+                if (options.printStats) {
+                    val sizeAfter = outputStream.channel.size()
+                    val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
+                    totalBytesBefore += sizeBefore
+                    totalBytesAfter += sizeAfter
+
+                    if (percentSaved.absoluteValue > 1e-3) {
+                        if (printFileNames) println("\n${input.path}")
+                        println("Size before: " + formatByteDescription(sizeBefore))
+                        println("Size after: " + formatByteDescription(sizeAfter))
+                        println("Percent saved: $percentSaved")
+                    }
+                }
+            } else if (input != output) {
+                input.inputStream().use { it.copyTo(outputStream) }
             }
         }
     }
