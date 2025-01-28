@@ -17,6 +17,8 @@ internal fun parse(
     file.inputStream().use { inputStream ->
         val sizeBefore = inputStream.channel.size()
 
+        if (sizeBefore == 0L) return@use null
+
         val documentBuilderFactory = DocumentBuilderFactory.newInstance()
         val document = documentBuilderFactory.newDocumentBuilder().parse(inputStream)
         document.documentElement.normalize()
