@@ -92,15 +92,16 @@ class Vgo(
         if (output.parentFile?.exists() == false) output.parentFile.mkdirs()
         if (!output.exists()) output.createNewFile()
 
-        val parsedGraphic = parse(input, options.format)
+        val sizeBefore = input.length()
+        var graphic = parse(input, options.format)
 
-        if (parsedGraphic == null && outputPath.isSameFileAs(input.toPath())) return
+        // When the inputs are directories, the non-vector files shouldn't be skipped.
+        // If the corresponding output path differs, the file will be copied below if
+        // it is unable to be parsed.
+        if (graphic == null && outputPath.isSameFileAs(input.toPath())) return
 
         output.outputStream().use { outputStream ->
-            if (parsedGraphic != null) {
-                var graphic = parsedGraphic.graphic
-                val sizeBefore = parsedGraphic.sizeBefore
-
+            if (graphic != null) {
                 if (graphic is VectorDrawable && options.format == "svg") {
                     graphic = graphic.toSvg()
                 }

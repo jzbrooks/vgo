@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Added
+- `com.jzbrooks.vgo.util.parse` parses a file into support `Graphic` subtypes if possible
+
 ### Changed
 - Relocated classes that transform vector IR from `com.jzbrooks.vgo.core.optimization` to `com.jzbrooks.vgo.core.transformation` and renamed some relevant classes. The former package is deprecated in favor of the latter, with a strong 1:1 correspondence between structures (modulo names).
 
