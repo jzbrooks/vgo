@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.util
 
 import com.android.ide.common.vectordrawable.Svg2Vector
+import com.jzbrooks.vgo.core.graphic.Graphic
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -8,17 +9,15 @@ import javax.xml.parsers.DocumentBuilderFactory
 import com.jzbrooks.vgo.svg.parse as svgParse
 import com.jzbrooks.vgo.vd.parse as vdParse
 
-fun parse(file: File): ParsedGraphic? = parse(file, null)
+fun parse(file: File): Graphic? = parse(file, null)
 
 internal fun parse(
     file: File,
     format: String? = null,
-): ParsedGraphic? =
-    file.inputStream().use { inputStream ->
-        val sizeBefore = inputStream.channel.size()
+): Graphic? {
+    if (file.length() == 0L) return null
 
-        if (sizeBefore == 0L) return@use null
-
+    return file.inputStream().use { inputStream ->
         val documentBuilderFactory = DocumentBuilderFactory.newInstance()
         val document = documentBuilderFactory.newDocumentBuilder().parse(inputStream)
         document.documentElement.normalize()
@@ -50,9 +49,11 @@ internal fun parse(
                         svgParse(document.documentElement)
                     }
                 }
+
                 document.documentElement.nodeName == "vector" && file.extension == "xml" -> vdParse(document.documentElement)
                 else -> null
             }
 
-        if (graphic != null) ParsedGraphic(graphic, sizeBefore) else null
+        graphic
     }
+}
