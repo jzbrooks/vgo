@@ -28,9 +28,14 @@ class CommandLineInterface {
                 outputPaths.toList()
             }
 
-        var format = argReader.readOption("format")
+        val format = argReader.readOption("format")
+        val noOptimization = argReader.readFlag("no-optimization")
 
-        var inputs = argReader.readArguments()
+        if (format == null && noOptimization) {
+            System.err.println("Warning: skipping optimization without --format is a no-op.")
+        }
+
+        val inputs = argReader.readArguments()
 
         val options =
             Vgo.Options(
@@ -39,6 +44,7 @@ class CommandLineInterface {
                 indent = indent,
                 output = outputs,
                 format = format,
+                noOptimization = noOptimization,
                 input = inputs,
             )
 
@@ -51,12 +57,13 @@ class CommandLineInterface {
 > vgo [options] [file/directory]
 
 Options:
-  -h --help       print this message
-  -o --output     file or directory, if not provided the input will be overwritten
-  -s --stats      print statistics on processed files to standard out
-  -v --version    print the version number
-  --indent value  write files with value columns of indentation
-  --format value  output format (svg, vd, etc)
+  -h --help          print this message
+  -o --output        file or directory, if not provided the input will be overwritten
+  -s --stats         print statistics on processed files to standard out
+  -v --version       print the version number
+  --indent value     write files with value columns of indentation
+  --format value     write specified output format (svg, vd)
+  --no-optimization  skip graphic optimization
             """.trimIndent()
 
         @JvmStatic

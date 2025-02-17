@@ -53,6 +53,7 @@ vgo {
     outputs = inputs
     showStatistics = true
     format = OutputFormat.UNCHANGED
+    noOptimization = false
     indent = 0
 }
 ```
@@ -72,6 +73,7 @@ Options:
   -v --version    print the version number
   --indent [value]  write files with value columns of indentation
   --format [value]  output format (svg, vd, etc) - ALPHA
+  --no-optimiation  skip graphic optimization
 ```
 
 > `java -jar vgo` for Windows
