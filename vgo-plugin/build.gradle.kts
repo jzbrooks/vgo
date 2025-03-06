@@ -8,10 +8,13 @@ plugins {
 dependencies {
     implementation(project(":vgo"))
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.0")
+    testImplementation(platform("org.junit:junit-bom:5.12.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
 }
 
 gradlePlugin {
