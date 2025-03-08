@@ -30,7 +30,7 @@ tasks {
     val sourcesJar by registering(Jar::class) {
         archiveClassifier.set("sources")
         from(sourceSets["main"].allSource)
-    }
+    })
 
     val javadocJar by registering(Jar::class) {
         archiveClassifier.set("javadoc")
