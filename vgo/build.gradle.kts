@@ -94,14 +94,14 @@ tasks {
         rename("(\\w+)_testOptimizationFinishes.(xml|svg)", "$1_optimized.$2")
     }
 
-    val sourcesJar by creating(Jar::class) {
+    val sourcesJar by registering(Jar::class) {
         dependsOn(generateConstants)
 
         archiveClassifier.set("sources")
         from(sourceSets["main"].allSource)
     }
 
-    val javadocJar by creating(Jar::class) {
+    val javadocJar by registering(Jar::class) {
         dependsOn(generateConstants)
 
         archiveClassifier.set("javadoc")
