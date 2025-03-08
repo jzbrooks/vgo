@@ -19,6 +19,8 @@ dependencies {
 
     compileOnly("com.android.tools:sdk-common:31.9.2")
 
+    implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.10")
+
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
