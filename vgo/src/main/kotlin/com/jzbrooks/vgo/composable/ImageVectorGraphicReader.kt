@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
+import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
@@ -21,7 +22,10 @@ import org.jetbrains.kotlin.psi.KtConstantExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtLiteralStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
+import org.jetbrains.kotlin.psi.KtQualifiedExpression
+import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
@@ -49,9 +53,15 @@ fun parse(file: File): ImageVectorGraphic {
         val project = environment.project
         val file = createPsiFile(project, file.name, text)
 
-        val builderCall = findImageVectorBuilderCall(file)
-        if (builderCall != null) {
-            return parseImageVectorBuilder(builderCall)
+        // Find all potential vector building expressions
+        val vectorExpressions = findVectorExpressions(file)
+
+        // Parse the first valid expression found (if any)
+        for (expr in vectorExpressions) {
+            val graphic = parseVectorExpression(expr)
+            if (graphic != null) {
+                return graphic
+            }
         }
 
         error("Failed to parse file ${file.name}")
@@ -67,6 +77,54 @@ private fun createPsiFile(
 ): KtFile {
     val virtualFile = LightVirtualFile(fileName, KotlinFileType.INSTANCE, text)
     return PsiManager.getInstance(project).findFile(virtualFile) as KtFile
+}
+
+private fun findVectorExpressions(file: KtFile): List<PsiElement> {
+    val results = mutableListOf<PsiElement>()
+
+    file.accept(object : KtTreeVisitorVoid() {
+        override fun visitCallExpression(expression: KtCallExpression) {
+            super.visitCallExpression(expression)
+
+            // Check if it's a direct ImageVector.Builder call
+            val calleeExpr = expression.calleeExpression
+            if (calleeExpr is KtNameReferenceExpression && calleeExpr.getReferencedName() == "Builder" ||
+                calleeExpr is KtDotQualifiedExpression && calleeExpr.text.contains("ImageVector.Builder")) {
+                results.add(expression)
+            }
+        }
+
+        override fun visitQualifiedExpression(expression: KtQualifiedExpression) {
+            super.visitQualifiedExpression(expression)
+
+            // Check for Builder().apply{} pattern
+            if (expression is KtDotQualifiedExpression) {
+                val selector = expression.selectorExpression
+                if (selector is KtCallExpression) {
+                    val calleeExpr = selector.calleeExpression
+                    if (calleeExpr is KtNameReferenceExpression && calleeExpr.getReferencedName() == "apply") {
+                        val receiver = expression.receiverExpression
+                        when (receiver) {
+                            is KtCallExpression -> {
+                                val receiverCallee = receiver.calleeExpression
+                                if (receiverCallee is KtNameReferenceExpression && receiverCallee.getReferencedName() == "Builder" ||
+                                    receiverCallee is KtDotQualifiedExpression && receiverCallee.text.contains("ImageVector.Builder")) {
+                                    results.add(expression)
+                                }
+                            }
+                            is KtDotQualifiedExpression -> {
+                                if (receiver.text.contains("ImageVector.Builder")) {
+                                    results.add(expression)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
+
+    return results
 }
 
 private fun findImageVectorBuilderCall(file: KtFile): KtCallExpression? {
@@ -92,27 +150,61 @@ private fun findImageVectorBuilderCall(file: KtFile): KtCallExpression? {
     return builderCall
 }
 
-private fun parseImageVectorBuilder(callExpression: KtCallExpression): ImageVectorGraphic {
-    // Extract parameters and create ImageVectorGraphic
+private fun parseVectorExpression(element: PsiElement): ImageVectorGraphic? {
     val elements = mutableListOf<Element>()
     var id: String? = null
     val foreign = mutableMapOf<String, String>()
 
-    // Extract named arguments from the builder call
-    callExpression.valueArgumentList?.arguments?.forEach { arg ->
-        if (arg is KtValueArgument) {
-            val argumentName = arg.getArgumentName()?.asName?.identifier
-            val expression = arg.getArgumentExpression()
+    val parent = element.parent.parent
+    when (parent) {
+        // todo: handle when the image builder is stored in variable
+        is KtDotQualifiedExpression -> {
+            val receiver = (parent.receiverExpression as KtDotQualifiedExpression).selectorExpression
+            if (receiver is KtCallExpression) {
+                receiver.valueArgumentList?.arguments?.forEach { arg ->
+                    if (arg is KtValueArgument) {
+                        val argumentName = arg.getArgumentName()?.asName?.identifier
+                        val expression = arg.getArgumentExpression()
 
-            when (argumentName) {
-                "name" -> {
-                    if (expression is KtStringTemplateExpression) {
-                        id = expression.entries.joinToString("") { it.text }
+                        when (argumentName) {
+                            "name" -> {
+                                if (expression is KtStringTemplateExpression) {
+                                    id = expression.entries.joinToString("") {
+                                        when (it) {
+                                            is KtLiteralStringTemplateEntry -> it.text
+                                            is KtSimpleNameStringTemplateEntry -> it.text
+                                            else -> ""
+                                        }
+                                    }
+                                }
+                            }
+                            "defaultWidth", "defaultHeight", "viewportWidth", "viewportHeight" -> {
+                                if (expression != null) {
+                                    foreign[argumentName] = expression.text
+                                }
+                            }
+                        }
                     }
                 }
-                "defaultWidth", "defaultHeight", "viewportWidth", "viewportHeight" -> {
-                    if (expression != null) {
-                        foreign[argumentName] = expression.text
+
+                // Parse the apply block
+                val selector = parent.selectorExpression
+                if (selector is KtCallExpression) {
+                    val lambdaArg = selector.lambdaArguments.firstOrNull()
+                    val lambdaExpr = lambdaArg?.getLambdaExpression()
+                    val bodyExpr = lambdaExpr?.bodyExpression
+
+                    if (bodyExpr != null) {
+                        // Process all statements in the apply block
+                        for (statement in bodyExpr.statements) {
+                            if (statement is KtCallExpression &&
+                                statement.calleeExpression?.text == "addPath") {
+                                val pathElement = parseAddPathCall(statement)
+                                if (pathElement != null) {
+                                    elements.add(pathElement)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -122,18 +214,6 @@ private fun parseImageVectorBuilder(callExpression: KtCallExpression): ImageVect
     // If no ID was found, generate a random one
     if (id == null) {
         id = UUID.randomUUID().toString()
-    }
-
-    // Process lambda body to find addPath calls
-    callExpression.lambdaArguments.forEach { lambdaArg ->
-        lambdaArg.getLambdaExpression()?.bodyExpression?.statements?.forEach { statement ->
-            if (statement is KtCallExpression && statement.calleeExpression?.text == "addPath") {
-                val pathElement = parseAddPathCall(statement)
-                if (pathElement != null) {
-                    elements.add(pathElement)
-                }
-            }
-        }
     }
 
     return ImageVectorGraphic(elements, id).apply {
