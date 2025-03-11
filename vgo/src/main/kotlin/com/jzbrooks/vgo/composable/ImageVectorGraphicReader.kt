@@ -58,7 +58,7 @@ fun parse(file: File): ImageVectorGraphic {
 
         // Parse the first valid expression found (if any)
         for (expr in vectorExpressions) {
-            val graphic = parseVectorExpression(expr)
+            val graphic = parseVectorExpression(expr, file.name)
             if (graphic != null) {
                 return graphic
             }
@@ -127,30 +127,7 @@ private fun findVectorExpressions(file: KtFile): List<PsiElement> {
     return results
 }
 
-private fun findImageVectorBuilderCall(file: KtFile): KtCallExpression? {
-    var builderCall: KtCallExpression? = null
-
-    file.accept(
-        object : KtTreeVisitorVoid() {
-            override fun visitCallExpression(expression: KtCallExpression) {
-                super.visitCallExpression(expression)
-
-                val calleeExpr = expression.calleeExpression
-                if (calleeExpr is KtNameReferenceExpression &&
-                    calleeExpr.getReferencedName() == "Builder" ||
-                    calleeExpr is KtDotQualifiedExpression &&
-                    calleeExpr.text == "ImageVector.Builder"
-                ) {
-                    builderCall = expression
-                }
-            }
-        },
-    )
-
-    return builderCall
-}
-
-private fun parseVectorExpression(element: PsiElement): ImageVectorGraphic? {
+private fun parseVectorExpression(element: PsiElement, fileName: String): ImageVectorGraphic? {
     val elements = mutableListOf<Element>()
     var id: String? = null
     val foreign = mutableMapOf<String, String>()
@@ -216,7 +193,7 @@ private fun parseVectorExpression(element: PsiElement): ImageVectorGraphic? {
         id = UUID.randomUUID().toString()
     }
 
-    return ImageVectorGraphic(elements, id).apply {
+    return ImageVectorGraphic(elements, id, fileName, null).apply {
         this.foreign.putAll(foreign)
     }
 }
@@ -309,22 +286,3 @@ private fun parsePathDataExpression(expression: KtExpression?): List<Command> {
 
     return emptyList()
 }
-
-// fun findPathDataReferences(element: PsiElement): List<KtCallExpression> {
-//    val result = mutableListOf<KtCallExpression>()
-//
-//    element.accept(
-//        object : KtTreeVisitorVoid() {
-//            override fun visitCallExpression(expression: KtCallExpression) {
-//                super.visitCallExpression(expression)
-//
-//                val calleeExpr = expression.calleeExpression
-//                if (calleeExpr is KtNameReferenceExpression && calleeExpr.getReferencedName() == "PathData") {
-//                    result.add(expression)
-//                }
-//            }
-//        },
-//    )
-//
-//    return result
-// }
