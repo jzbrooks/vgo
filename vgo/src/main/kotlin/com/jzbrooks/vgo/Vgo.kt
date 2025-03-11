@@ -3,6 +3,7 @@ package com.jzbrooks.vgo
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.composable.ImageVectorGraphic
+import com.jzbrooks.vgo.composable.ImageVectorGraphicWriter
 import com.jzbrooks.vgo.composable.toVectorDrawable
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
@@ -130,6 +131,11 @@ class Vgo(
 
                 if (graphic is ScalableVectorGraphic) {
                     val writer = ScalableVectorGraphicWriter(writerOptions)
+                    writer.write(graphic, outputStream)
+                }
+
+                if (graphic is ImageVectorGraphic) {
+                    val writer = ImageVectorGraphicWriter(writerOptions)
                     writer.write(graphic, outputStream)
                 }
 
