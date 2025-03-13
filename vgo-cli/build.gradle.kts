@@ -4,6 +4,8 @@ plugins {
 
 tasks {
     jar {
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
         dependsOn(configurations.runtimeClasspath)
         manifest {
             attributes["Main-Class"] = "com.jzbrooks.vgo.cli.CommandLineInterface"
@@ -24,26 +26,6 @@ tasks {
                     .get()
                     .asFileTree.files
                     .map(::zipTree),
-            )
-
-            exclude(
-                "**/*.kotlin_metadata",
-                "**/*.kotlin_module",
-                "**/*.kotlin_builtins",
-                "**/module-info.class",
-                "META-INF/maven/**",
-                "META-INF/*.version",
-                "META-INF/LICENSE*",
-                "META-INF/LGPL2.1",
-                "META-INF/DEPENDENCIES",
-                "META-INF/AL2.0",
-                "META-INF/BCKEY.DSA",
-                "META-INF/BC2048KE.DSA",
-                "META-INF/BCKEY.SF",
-                "META-INF/BC2048KE.SF",
-                "**/NOTICE*",
-                "javax/activation/**",
-                "xsd/catalog.xml",
             )
         }
     }
