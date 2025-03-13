@@ -3,12 +3,29 @@
 ## Unreleased
 
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 3.1.0 - 2025-03-13
+
+### Added
+
 - `com.jzbrooks.vgo.util.parse` parses a file into support `Graphic` subtypes if possible
 
 ### Changed
+
 - Relocated classes that transform vector IR from `com.jzbrooks.vgo.core.optimization` to `com.jzbrooks.vgo.core.transformation` and renamed some relevant classes. The former package is deprecated in favor of the latter, with a strong 1:1 correspondence between structures (modulo names).
 
 ### Fixed
+
 - Incorrect parsing of elliptical arc parameters when no separator was present between flag parameters
 - NPE when converting an SVG to Vector Drawable in some cases (#139)
 
