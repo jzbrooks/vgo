@@ -1,8 +1,6 @@
 ## vgo
 
-vgo is a tool for optimizing and converting between vector artwork representations.
-
-vgo is built on vgo-core, a library and intermediate representation for vector graphics which aims for readability and speed.
+vgo optimizes vector graphics through a format-agnostic approach by leveraging vgo-core's intermediate representation. It not only optimizes the graphic but also converts between formats like SVG and Android Vector Drawables—with potential to support more formats in the future.
 
 [![Build Status](https://github.com/jzbrooks/vgo/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/jzbrooks/vgo/actions/workflows/build.yml)
 [![Maven Central: vgo](https://img.shields.io/maven-central/v/com.jzbrooks/vgo?label=vgo)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo)
