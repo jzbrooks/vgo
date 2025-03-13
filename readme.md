@@ -1,11 +1,11 @@
 ## vgo
 
-vgo optimizes vector graphics through a format-agnostic approach by leveraging vgo-core's intermediate representation. It not only optimizes the graphic but also converts between formats like SVG and Android Vector Drawables—with potential to support more formats in the future.
-
 [![Build Status](https://github.com/jzbrooks/vgo/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/jzbrooks/vgo/actions/workflows/build.yml)
 [![Maven Central: vgo](https://img.shields.io/maven-central/v/com.jzbrooks/vgo?label=vgo)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo)
 [![Maven Central: vgo-core](https://img.shields.io/maven-central/v/com.jzbrooks/vgo-core?label=vgo-core)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo-core)
 [![Maven Central: vgo-plugin](https://img.shields.io/maven-central/v/com.jzbrooks/vgo-plugin?label=vgo-plugin)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo-plugin)
+
+vgo optimizes vector graphics through a format-agnostic approach by leveraging vgo-core's intermediate representation. It not only optimizes the graphic but also converts between formats like SVG and Android Vector Drawables—with potential to support more formats in the future.
 
 ## Installation
 
