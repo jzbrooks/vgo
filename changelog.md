@@ -10,6 +10,7 @@
 
 ### Fixed
 - Incorrect parsing of elliptical arc parameters when no separator was present between flag parameters
+- NPE when converting an SVG to Vector Drawable in some cases (#139)
 
 ## 3.0.0 - 2024-11-30
 
