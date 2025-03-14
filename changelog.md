@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- An option to disable optimizations for conversion only use cases (`--no-optimization` cli flag and `com.jzbrooks.vgo.plugin.VgoPluginExtension.noOptimization` for the gradle plugin)
 
 ### Changed
 

@@ -106,14 +106,16 @@ class Vgo(
                     graphic = graphic.toSvg()
                 }
 
-                val optimizationRegistry =
-                    when (graphic) {
-                        is VectorDrawable -> VectorDrawableOptimizationRegistry()
-                        is ScalableVectorGraphic -> SvgOptimizationRegistry()
-                        else -> null
-                    }
+                if (!options.noOptimization) {
+                    val optimizationRegistry =
+                        when (graphic) {
+                            is VectorDrawable -> VectorDrawableOptimizationRegistry()
+                            is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                            else -> null
+                        }
 
-                optimizationRegistry?.apply(graphic)
+                    optimizationRegistry?.apply(graphic)
+                }
 
                 if (graphic is VectorDrawable) {
                     val writer = VectorDrawableWriter(writerOptions)
@@ -244,5 +246,6 @@ class Vgo(
         val input: List<String> = emptyList(),
         val indent: Int? = null,
         val format: String? = null,
+        val noOptimization: Boolean = false,
     )
 }

@@ -7,5 +7,6 @@ open class VgoPluginExtension {
     var outputs: FileTree? = inputs
     var showStatistics = true
     var format = OutputFormat.UNCHANGED
+    var noOptimization = false
     var indent: Byte = 0
 }
