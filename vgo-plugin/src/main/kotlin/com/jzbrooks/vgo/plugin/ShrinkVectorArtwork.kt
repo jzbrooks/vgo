@@ -32,6 +32,9 @@ open class ShrinkVectorArtwork : DefaultTask() {
     @get:Input
     val indent = extension.indent
 
+    @get:Input
+    val noOptimization = extension.noOptimization
+
     @TaskAction
     fun shrink() {
         val options =
@@ -42,6 +45,7 @@ open class ShrinkVectorArtwork : DefaultTask() {
                 output = emptyList(),
                 format = outputFormat.cliName,
                 input = files,
+                noOptimization = noOptimization,
             )
 
         Vgo(options).run()
