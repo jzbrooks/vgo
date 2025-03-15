@@ -145,7 +145,10 @@ private fun parseVectorExpression(
 
     val parent = element.parent.parent
     when (parent) {
-        // todo: handle when the image builder is stored in variable
+        // todo: handle when the image builder is stored in variable, scoping functions are used, and direct calls
+        // todo: handle builder calls for ktx extensions e.g. ImageVector.Builder(...).path() {} .build()
+        // todo: handle builder calls like addPath with list of commands instead of path data string
+        //  e.g. ImageVector.Builder(...).addPath(listOf(...)) {}
         is KtDotQualifiedExpression -> {
             val receiver = (parent.receiverExpression as KtDotQualifiedExpression).selectorExpression
             if (receiver is KtCallExpression) {
@@ -199,11 +202,6 @@ private fun parseVectorExpression(
                 }
             }
         }
-    }
-
-    // If no ID was found, generate a random one
-    if (id == null) {
-        id = UUID.randomUUID().toString()
     }
 
     return ImageVectorGraphic(elements, id, fileName, null).apply {
