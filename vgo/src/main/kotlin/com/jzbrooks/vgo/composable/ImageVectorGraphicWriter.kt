@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.composable
 
 import com.jzbrooks.vgo.core.Writer
+import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
@@ -306,6 +307,198 @@ class ImageVectorGraphicWriter(
                 codeBlock.add(") {\n")
                 codeBlock.withIndent {
                     for (child in element.elements) {
+                        emitElement(child, codeBlock)
+                    }
+                }
+                codeBlock.add("}\n")
+            }
+            is ClipPath -> {
+                val pathNode = ClassName("androidx.compose.ui.graphics.vector", "PathNode")
+
+                codeBlock.add("group(\n")
+                codeBlock.withIndent {
+                    add("clipPathData = listOf(\n")
+                    withIndent {
+                        // todo: This might be wrong? Can these commands be flatmapped?
+                        for (command in element.elements.filterIsInstance<Path>().flatMap { it.commands }) {
+                            when (command) {
+                                is MoveTo -> {
+                                    val coord = command.parameters.first()
+                                    if (command.variant == CommandVariant.ABSOLUTE) {
+                                        add("%T.MoveTo(%Lf, %Lf),\n", pathNode, coord.x, coord.y)
+                                    } else {
+                                        add("%T.RelativeMoveTo(%Lf, %Lf),\n", pathNode, coord.x, coord.y)
+                                    }
+
+                                    for (parameter in command.parameters.drop(1)) {
+                                        if (command.variant == CommandVariant.ABSOLUTE) {
+                                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, parameter.x, parameter.y)
+                                        } else {
+                                            add("%T.RelativeLineTo(%Lf, %Lf),\n", pathNode, parameter.x, parameter.y)
+                                        }
+                                    }
+                                }
+                                is LineTo -> {
+                                    for (parameter in command.parameters) {
+                                        if (command.variant == CommandVariant.ABSOLUTE) {
+                                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, parameter.x, parameter.y)
+                                        } else {
+                                            add("%T.RelativeLineTo(%Lf, %Lf),\n", pathNode, parameter.x, parameter.y)
+                                        }
+                                    }
+                                }
+                                is HorizontalLineTo -> {
+                                    for (parameter in command.parameters) {
+                                        if (command.variant == CommandVariant.ABSOLUTE) {
+                                            add("%T.HorizontalLineTo(%Lf),\n", pathNode, parameter)
+                                        } else {
+                                            add("%T.RelativeHorizontalLineTo(%Lf),\n", pathNode, parameter)
+                                        }
+                                    }
+                                }
+                                is VerticalLineTo -> {
+                                    for (parameter in command.parameters) {
+                                        if (command.variant == CommandVariant.ABSOLUTE) {
+                                            add("%T.VerticalLineTo(%Lf),\n", pathNode, parameter)
+                                        } else {
+                                            add("%T.RelativeVerticalLineTo(%Lf),\n", pathNode, parameter)
+                                        }
+                                    }
+                                }
+                                is CubicBezierCurve -> {
+                                    for (parameter in command.parameters) {
+                                        if (command.variant == CommandVariant.ABSOLUTE) {
+                                            add(
+                                                "%T.CurveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf),\n",
+                                                pathNode,
+                                                parameter.startControl.x,
+                                                parameter.startControl.y,
+                                                parameter.endControl.x,
+                                                parameter.endControl.y,
+                                                parameter.end.x,
+                                                parameter.end.y,
+                                            )
+                                        } else {
+                                            add(
+                                                "%T.RelativeCurveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf),\n",
+                                                pathNode,
+                                                parameter.startControl.x,
+                                                parameter.startControl.y,
+                                                parameter.endControl.x,
+                                                parameter.endControl.y,
+                                                parameter.end.x,
+                                                parameter.end.y,
+                                            )
+                                        }
+                                    }
+                                }
+                                is SmoothCubicBezierCurve -> {
+                                    for (parameter in command.parameters) {
+                                        if (command.variant == CommandVariant.ABSOLUTE) {
+                                            add(
+                                                "%T.ReflectiveCurveTo(%Lf, %Lf, %Lf, %Lf),\n",
+                                                pathNode,
+                                                parameter.endControl.x,
+                                                parameter.endControl.y,
+                                                parameter.end.x,
+                                                parameter.end.y,
+                                            )
+                                        } else {
+                                            add(
+                                                "%T.RelativeReflectiveCurveTo(%Lf, %Lf, %Lf, %Lf),\n",
+                                                pathNode,
+                                                parameter.endControl.x,
+                                                parameter.endControl.y,
+                                                parameter.end.x,
+                                                parameter.end.y,
+                                            )
+                                        }
+                                    }
+                                }
+                                is QuadraticBezierCurve -> {
+                                    for (parameter in command.parameters) {
+                                        if (command.variant == CommandVariant.ABSOLUTE) {
+                                            add(
+                                                "%T.QuadTo(%Lf, %Lf, %Lf, %Lf),\n",
+                                                pathNode,
+                                                parameter.control.x,
+                                                parameter.control.y,
+                                                parameter.end.x,
+                                                parameter.end.y,
+                                            )
+                                        } else {
+                                            add(
+                                                "%T.RelativeQuadTo(%Lf, %Lf, %Lf, %Lf),\n",
+                                                pathNode,
+                                                parameter.control.x,
+                                                parameter.control.y,
+                                                parameter.end.x,
+                                                parameter.end.y,
+                                            )
+                                        }
+                                    }
+                                }
+                                is SmoothQuadraticBezierCurve -> {
+                                    for (parameter in command.parameters) {
+                                        if (command.variant == CommandVariant.ABSOLUTE) {
+                                            add(
+                                                "%T.ReflectiveQuadTo(%Lf, %Lf),\n",
+                                                pathNode,
+                                                parameter.x,
+                                                parameter.y,
+                                            )
+                                        } else {
+                                            add(
+                                                "%T.RelativeReflectiveQuadTo(%Lf, %Lf),\n",
+                                                pathNode,
+                                                parameter.x,
+                                                parameter.y,
+                                            )
+                                        }
+                                    }
+                                }
+
+                                is EllipticalArcCurve -> {
+                                    for (parameter in command.parameters) {
+                                        if (command.variant == CommandVariant.ABSOLUTE) {
+                                            add(
+                                                "%T.ArcTo(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf),\n",
+                                                pathNode,
+                                                parameter.radiusX,
+                                                parameter.radiusY,
+                                                parameter.angle,
+                                                parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
+                                                parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                                parameter.end.x,
+                                                parameter.end.y,
+                                            )
+                                        } else {
+                                            add(
+                                                "%T.RelativeArcTo(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf),\n",
+                                                parameter.radiusX,
+                                                parameter.radiusY,
+                                                parameter.angle,
+                                                parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
+                                                parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                                parameter.end.x,
+                                                parameter.end.y,
+                                            )
+                                        }
+                                    }
+                                }
+
+                                ClosePath -> {
+                                    add("%T.Close,\n", pathNode)
+                                }
+                            }
+                        }
+                    }
+                    codeBlock.add("),\n")
+                }
+                codeBlock.add(") {\n")
+                codeBlock.withIndent {
+                    for (child in element.elements) {
+                        // todo: figure out how VGO tracks clip paths (the rules are slightly weird for VDs and I vaguely remember modeling being weird)
                         emitElement(child, codeBlock)
                     }
                 }
