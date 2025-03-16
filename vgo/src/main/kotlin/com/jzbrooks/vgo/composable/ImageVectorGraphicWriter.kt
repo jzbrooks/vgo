@@ -54,16 +54,17 @@ class ImageVectorGraphicWriter(
             CodeBlock
                 .builder()
                 .add(
-                    "%T.Builder(defaultWidth = %L, defaultHeight = %L, viewportWidth = %L, viewportHeight = %L)\n",
+                    "%T.Builder(defaultWidth = %L.dp, defaultHeight = %L.dp, viewportWidth = %Lf, viewportHeight = %Lf)\n",
                     imageVector,
-                    graphic.foreign.getValue("defaultWidth") + ".dp",
-                    graphic.foreign.getValue("defaultHeight") + ".dp",
+                    graphic.foreign.getValue("defaultWidth"),
+                    graphic.foreign.getValue("defaultHeight"),
                     graphic.foreign.getValue("viewportWidth"),
                     graphic.foreign.getValue("viewportHeight"),
                 ).indent()
 
         codeBlock.withIndent {
             for (element in graphic.elements) {
+                codeBlock.add(".")
                 emitElement(element, codeBlock)
             }
         }
@@ -86,7 +87,7 @@ class ImageVectorGraphicWriter(
 
         when (element) {
             is Path -> {
-                codeBlock.add(".path(\n")
+                codeBlock.add("path(\n")
                 codeBlock.withIndent {
                     if (element.fill.alpha > 0u) {
                         add(
@@ -294,9 +295,9 @@ class ImageVectorGraphicWriter(
 
                 // todo: handle pivot
 
-                codeBlock.add(".group(\n")
+                codeBlock.add("group(\n")
                 codeBlock.withIndent {
-                    add("rotation = %Lf,\n", rotation)
+                    add("rotate = %Lf,\n", rotation)
                     add("scaleX = %Lf,\n", scaleX)
                     add("scaleY = %Lf,\n", scaleY)
                     add("translationX = %Lf,\n", translationX)
