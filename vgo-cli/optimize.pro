@@ -15,3 +15,11 @@
   public static com.android.ide.common.vectordrawable.SvgNode$ClipRule[] values();
   public static com.android.ide.common.vectordrawable.SvgNode$ClipRule valueOf(java.lang.String);
 }
+
+-dontwarn com.google.auto.service.**
+-dontwarn kotlin.annotations.jvm.**
+-dontwarn kotlinx.coroutines.future.**
+-dontwarn org.jetbrains.annotations.**
+-dontwarn org.jetbrains.kotlin.com.google.errorprone.**
+-dontwarn org.jetbrains.kotlin.com.google.j2objc.**
+-dontwarn org.kxml2.io.**
