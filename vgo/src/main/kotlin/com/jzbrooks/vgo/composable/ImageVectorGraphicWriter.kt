@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.composable
 
 import com.jzbrooks.vgo.core.Writer
+import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -20,6 +21,10 @@ import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.withIndent
 import java.io.OutputStream
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.hypot
+import kotlin.math.sqrt
 
 class ImageVectorGraphicWriter(
     override val options: Set<Writer.Option> = emptySet(),
@@ -66,7 +71,7 @@ class ImageVectorGraphicWriter(
                         codeBlock.add(".path(\n")
                         codeBlock.withIndent {
                             if (element.fill.alpha > 0u) {
-                                codeBlock.add(
+                                add(
                                     "fill = %T(%M(%L, %L, %L, %L)),\n",
                                     solidColorBrush,
                                     composeColor,
@@ -78,7 +83,7 @@ class ImageVectorGraphicWriter(
                             }
 
                             if (element.stroke.alpha > 0u && element.strokeWidth > 0f) {
-                                codeBlock.add(
+                                add(
                                     "stroke = %T(%M(%L, %L, %L, %L)),\n",
                                     solidColorBrush,
                                     composeColor,
@@ -87,60 +92,60 @@ class ImageVectorGraphicWriter(
                                     element.stroke.blue,
                                     element.stroke.alpha,
                                 )
-                                codeBlock.add("strokeLineWidth = %Lf\n", element.strokeWidth)
+                                add("strokeLineWidth = %Lf\n", element.strokeWidth)
                             }
                         }
-                        codeBlock.add(") {\n")
-                        codeBlock.withIndent {
+                        add(") {\n")
+                        withIndent {
                             for (command in element.commands) {
                                 when (command) {
                                     is MoveTo -> {
                                         val coord = command.parameters.first()
                                         if (command.variant == CommandVariant.ABSOLUTE) {
-                                            codeBlock.add("moveTo(%Lf, %Lf)\n", coord.x, coord.y)
+                                            add("moveTo(%Lf, %Lf)\n", coord.x, coord.y)
                                         } else {
-                                            codeBlock.add("moveToRelative(%Lf, %Lf)\n", coord.x, coord.y)
+                                            add("moveToRelative(%Lf, %Lf)\n", coord.x, coord.y)
                                         }
 
                                         for (parameter in command.parameters.drop(1)) {
                                             if (command.variant == CommandVariant.ABSOLUTE) {
-                                                codeBlock.add("lineTo(%Lf, %Lf)\n", parameter.x, parameter.y)
+                                                add("lineTo(%Lf, %Lf)\n", parameter.x, parameter.y)
                                             } else {
-                                                codeBlock.add("lineToRelative(%Lf, %Lf)\n", parameter.x, parameter.y)
+                                                add("lineToRelative(%Lf, %Lf)\n", parameter.x, parameter.y)
                                             }
                                         }
                                     }
                                     is LineTo -> {
                                         for (parameter in command.parameters) {
                                             if (command.variant == CommandVariant.ABSOLUTE) {
-                                                codeBlock.add("lineTo(%Lf, %Lf)\n", parameter.x, parameter.y)
+                                                add("lineTo(%Lf, %Lf)\n", parameter.x, parameter.y)
                                             } else {
-                                                codeBlock.add("lineToRelative(%Lf, %Lf)\n", parameter.x, parameter.y)
+                                                add("lineToRelative(%Lf, %Lf)\n", parameter.x, parameter.y)
                                             }
                                         }
                                     }
                                     is HorizontalLineTo -> {
                                         for (parameter in command.parameters) {
                                             if (command.variant == CommandVariant.ABSOLUTE) {
-                                                codeBlock.add("horizontalLineTo(%Lf)\n", parameter)
+                                                add("horizontalLineTo(%Lf)\n", parameter)
                                             } else {
-                                                codeBlock.add("horizontalLineToRelative(%Lf)\n", parameter)
+                                                add("horizontalLineToRelative(%Lf)\n", parameter)
                                             }
                                         }
                                     }
                                     is VerticalLineTo -> {
                                         for (parameter in command.parameters) {
                                             if (command.variant == CommandVariant.ABSOLUTE) {
-                                                codeBlock.add("verticalLineTo(%Lf)\n", parameter)
+                                                add("verticalLineTo(%Lf)\n", parameter)
                                             } else {
-                                                codeBlock.add("verticalLineToRelative(%Lf)\n", parameter)
+                                                add("verticalLineToRelative(%Lf)\n", parameter)
                                             }
                                         }
                                     }
                                     is CubicBezierCurve -> {
                                         for (parameter in command.parameters) {
                                             if (command.variant == CommandVariant.ABSOLUTE) {
-                                                codeBlock.add(
+                                                add(
                                                     "curveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf)\n",
                                                     parameter.startControl.x,
                                                     parameter.startControl.y,
@@ -150,7 +155,7 @@ class ImageVectorGraphicWriter(
                                                     parameter.end.y,
                                                 )
                                             } else {
-                                                codeBlock.add(
+                                                add(
                                                     "curveToRelative(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf)\n",
                                                     parameter.startControl.x,
                                                     parameter.startControl.y,
@@ -165,7 +170,7 @@ class ImageVectorGraphicWriter(
                                     is SmoothCubicBezierCurve -> {
                                         for (parameter in command.parameters) {
                                             if (command.variant == CommandVariant.ABSOLUTE) {
-                                                codeBlock.add(
+                                                add(
                                                     "reflectiveCurveTo(%Lf, %Lf, %Lf, %Lf)\n",
                                                     parameter.endControl.x,
                                                     parameter.endControl.y,
@@ -173,7 +178,7 @@ class ImageVectorGraphicWriter(
                                                     parameter.end.y,
                                                 )
                                             } else {
-                                                codeBlock.add(
+                                                add(
                                                     "reflectiveCurveToRelative(%Lf, %Lf, %Lf, %Lf)\n",
                                                     parameter.endControl.x,
                                                     parameter.endControl.y,
@@ -186,7 +191,7 @@ class ImageVectorGraphicWriter(
                                     is QuadraticBezierCurve -> {
                                         for (parameter in command.parameters) {
                                             if (command.variant == CommandVariant.ABSOLUTE) {
-                                                codeBlock.add(
+                                                add(
                                                     "quadTo(%Lf, %Lf, %Lf, %Lf)\n",
                                                     parameter.control.x,
                                                     parameter.control.y,
@@ -194,7 +199,7 @@ class ImageVectorGraphicWriter(
                                                     parameter.end.y,
                                                 )
                                             } else {
-                                                codeBlock.add(
+                                                add(
                                                     "quadToRelative(%Lf, %Lf, %Lf, %Lf)\n",
                                                     parameter.control.x,
                                                     parameter.control.y,
@@ -207,13 +212,13 @@ class ImageVectorGraphicWriter(
                                     is SmoothQuadraticBezierCurve -> {
                                         for (parameter in command.parameters) {
                                             if (command.variant == CommandVariant.ABSOLUTE) {
-                                                codeBlock.add(
+                                                add(
                                                     "reflectiveQuadTo(%Lf, %Lf)\n",
                                                     parameter.x,
                                                     parameter.y,
                                                 )
                                             } else {
-                                                codeBlock.add(
+                                                add(
                                                     "reflectiveQuadToRelative(%Lf, %Lf)\n",
                                                     parameter.x,
                                                     parameter.y,
@@ -225,7 +230,7 @@ class ImageVectorGraphicWriter(
                                     is EllipticalArcCurve -> {
                                         for (parameter in command.parameters) {
                                             if (command.variant == CommandVariant.ABSOLUTE) {
-                                                codeBlock.add(
+                                                add(
                                                     "arcTo(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf)\n",
                                                     parameter.radiusX,
                                                     parameter.radiusY,
@@ -236,7 +241,7 @@ class ImageVectorGraphicWriter(
                                                     parameter.end.y,
                                                 )
                                             } else {
-                                                codeBlock.add(
+                                                add(
                                                     "arcToRelative(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf)\n",
                                                     parameter.radiusX,
                                                     parameter.radiusY,
@@ -251,10 +256,37 @@ class ImageVectorGraphicWriter(
                                     }
 
                                     ClosePath -> {
-                                        codeBlock.add("close()\n")
+                                        add("close()\n")
                                     }
                                 }
                             }
+                        }
+                        add("}\n")
+                    }
+                    is Group -> {
+                        val matrix = element.transform
+
+                        val scaleX = hypot(matrix[0, 0], matrix[0, 1])
+                        val scaleY = hypot(matrix[1, 0], matrix[1, 1])
+
+                        val rotation = atan2(matrix[0, 1], matrix[0, 0]) * (180 / PI).toFloat()
+
+                        val translationX = matrix[0, 2]
+                        val translationY = matrix[1, 2]
+
+                        // todo: handle pivot
+
+                        codeBlock.add(".group(\n")
+                        codeBlock.withIndent {
+                            add("rotation = %Lf,\n", rotation)
+                            add("scaleX = %Lf,\n", scaleX)
+                            add("scaleY = %Lf,\n", scaleY)
+                            add("translationX = %Lf,\n", translationX)
+                            add("translationY = %Lf,\n", translationY)
+                        }
+                        codeBlock.add(") {\n")
+                        codeBlock.withIndent {
+                            // todo: iterate through the children of the group
                         }
                         codeBlock.add("}\n")
                     }
