@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.vd
 
+import com.jzbrooks.vgo.composable.ImageVectorGraphic
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
@@ -20,6 +21,26 @@ fun VectorDrawable.toSvg(): ScalableVectorGraphic {
     foreign.clear()
 
     return ScalableVectorGraphic(elements, id, svgElementAttributes)
+}
+
+fun VectorDrawable.toImageVector(): ImageVectorGraphic {
+    val width = foreign.remove("android:width")?.removeSuffix("dp") ?: "24"
+    val height = foreign.remove("android:height")?.removeSuffix("dp") ?: "24"
+    val viewportHeight = foreign.remove("android:viewportHeight") ?: "24"
+    val viewportWidth = foreign.remove("android:viewportWidth") ?: "24"
+
+    val imageVectorElementAttributes =
+        mutableMapOf(
+            "viewportWidth" to viewportWidth,
+            "viewportHeight" to viewportHeight,
+            "defaultWidth" to width,
+            "defaultHeight" to height,
+        )
+
+    traverse(this)
+    foreign.clear()
+
+    return ImageVectorGraphic(elements, id, imageVectorElementAttributes, id ?: "image", null)
 }
 
 private fun traverse(element: Element): Element {

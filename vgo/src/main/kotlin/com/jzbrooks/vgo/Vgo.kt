@@ -8,10 +8,12 @@ import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
+import com.jzbrooks.vgo.svg.toVectorDrawable
 import com.jzbrooks.vgo.util.parse
 import com.jzbrooks.vgo.vd.VectorDrawable
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter
+import com.jzbrooks.vgo.vd.toImageVector
 import com.jzbrooks.vgo.vd.toSvg
 import java.io.File
 import java.nio.file.Path
@@ -86,6 +88,7 @@ class Vgo(
                 when (options.format) {
                     "vd" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.xml")
                     "svg" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.svg")
+                    "iv" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.kt")
                     else -> outputPath
                 }
             } else {
@@ -105,12 +108,23 @@ class Vgo(
 
         output.outputStream().use { outputStream ->
             if (graphic != null) {
-                if (graphic is VectorDrawable && options.format == "svg") {
-                    graphic = graphic.toSvg()
-                }
-
-                if (graphic is ImageVectorGraphic && options.format == "vd") {
-                    graphic = graphic.toVectorDrawable()
+                when (options.format) {
+                    "vd" -> {
+                        if (graphic is ScalableVectorGraphic) {
+                            graphic = graphic.toVectorDrawable()
+                        }
+                    }
+                    "svg" -> {
+                        if (graphic is VectorDrawable) {
+                            graphic = graphic.toSvg()
+                        }
+                    }
+                    "iv" -> {
+                        if (graphic is VectorDrawable) {
+                            graphic = graphic.toImageVector()
+                        }
+                    }
+                    else -> System.err.println("Unknown format ${options.format}")
                 }
 
                 if (!options.noOptimization) {

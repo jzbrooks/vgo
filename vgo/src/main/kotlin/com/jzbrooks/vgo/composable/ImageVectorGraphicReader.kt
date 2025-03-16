@@ -30,7 +30,6 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
 import java.io.File
-import java.util.UUID
 
 fun parse(file: File): ImageVectorGraphic {
     val text = file.readText()
@@ -204,7 +203,7 @@ private fun parseVectorExpression(
         }
     }
 
-    return ImageVectorGraphic(elements, id, fileName, null).apply {
+    return ImageVectorGraphic(elements, id, mutableMapOf(), fileName, null).apply {
         this.foreign.putAll(foreign)
     }
 }
