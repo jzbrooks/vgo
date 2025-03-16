@@ -10,6 +10,12 @@ tasks {
         manifest {
             attributes["Main-Class"] = "com.jzbrooks.vgo.cli.CommandLineInterface"
             attributes["Bundle-Version"] = project.properties["VERSION_NAME"]
+
+            exclude(
+                "META-INF/*.SF",
+                "META-INF/*.DSA",
+                "META-INF/*.RSA",
+            )
         }
 
         val sourceClasses =
