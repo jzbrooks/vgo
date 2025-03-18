@@ -221,7 +221,7 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
             Matrix3.IDENTITY
         }
 
-    return pivot * translation * rotate * scale * pivotInverse
+    return pivotInverse * translation * rotate * scale * pivot
 }
 
 private fun NamedNodeMap.extractColor(
