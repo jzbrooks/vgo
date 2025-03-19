@@ -19,6 +19,8 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.withIndent
@@ -41,7 +43,16 @@ class ImageVectorGraphicWriter(
                     fileName = "${graphic.propertyName}.kt",
                 ).addImport("androidx.compose.ui.unit", "dp")
                 .addProperty(createImageVectorProperty(graphic))
-                .build()
+                .addProperty(
+                    PropertySpec
+                        .builder(
+                            "_${graphic.propertyName}",
+                            ClassName("androidx.compose.ui.graphics.vector", "ImageVector").copy(nullable = true),
+                            KModifier.PRIVATE,
+                        ).initializer("null")
+                        .mutable(true)
+                        .build(),
+                ).build()
 
         stream.writer().use { writer ->
             fileSpec.writeTo(writer)
@@ -51,7 +62,7 @@ class ImageVectorGraphicWriter(
     private fun createImageVectorProperty(graphic: ImageVectorGraphic): PropertySpec {
         val imageVector = ClassName("androidx.compose.ui.graphics.vector", "ImageVector")
 
-        val codeBlock =
+        val imageVectorAllocation =
             CodeBlock
                 .builder()
                 .add(
@@ -63,19 +74,30 @@ class ImageVectorGraphicWriter(
                     graphic.foreign.getValue("viewportHeight"),
                 ).indent()
 
-        codeBlock.withIndent {
+        imageVectorAllocation.withIndent {
             for (element in graphic.elements) {
-                codeBlock.add(".")
-                emitElement(element, codeBlock)
+                imageVectorAllocation.add(".")
+                emitElement(element, imageVectorAllocation)
             }
         }
 
-        codeBlock.add(".build()")
-        codeBlock.unindent()
+        imageVectorAllocation.add(".build()")
+
+        val backingProperty = "_${graphic.propertyName}"
+
+        val lazyImageVectorAllocation =
+            CodeBlock
+                .builder()
+                .add(
+                    """
+                    return $backingProperty ?: %L.also { $backingProperty = it }
+                    """.trimIndent(),
+                    imageVectorAllocation.build(),
+                )
 
         return PropertySpec
             .builder(graphic.propertyName, imageVector)
-            .initializer(codeBlock.build())
+            .getter(FunSpec.getterBuilder().addCode(lazyImageVectorAllocation.build()).build())
             .build()
     }
 
@@ -88,7 +110,7 @@ class ImageVectorGraphicWriter(
 
         when (element) {
             is Path -> {
-                codeBlock.add("path(\n")
+                codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "path"))
                 codeBlock.withIndent {
                     if (element.fill.alpha > 0u) {
                         add(
@@ -294,9 +316,7 @@ class ImageVectorGraphicWriter(
                 val translationX = matrix[0, 2]
                 val translationY = matrix[1, 2]
 
-                // todo: handle pivot
-
-                codeBlock.add("group(\n")
+                codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "group"))
                 codeBlock.withIndent {
                     add("rotate = %Lf,\n", rotation)
                     add("scaleX = %Lf,\n", scaleX)
@@ -315,7 +335,7 @@ class ImageVectorGraphicWriter(
             is ClipPath -> {
                 val pathNode = ClassName("androidx.compose.ui.graphics.vector", "PathNode")
 
-                codeBlock.add("group(\n")
+                codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "group"))
                 codeBlock.withIndent {
                     add("clipPathData = listOf(\n")
                     withIndent {
