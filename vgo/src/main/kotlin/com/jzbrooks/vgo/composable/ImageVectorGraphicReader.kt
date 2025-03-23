@@ -3,8 +3,13 @@ package com.jzbrooks.vgo.composable
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandString
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.util.math.Point
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
@@ -17,6 +22,8 @@ import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.idea.KotlinFileType
+import org.jetbrains.kotlin.psi.KtBinaryExpression
+import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtConstantExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
@@ -24,7 +31,10 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtLiteralStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
+import org.jetbrains.kotlin.psi.KtProperty
+import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
+import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
@@ -49,15 +59,21 @@ fun parse(file: File): ImageVectorGraphic {
                 EnvironmentConfigFiles.JVM_CONFIG_FILES,
             )
 
+        val propertyNameFallback = file.nameWithoutExtension
         val project = environment.project
-        val file = createPsiFile(project, file.name, text)
+        val psiFile = createPsiFile(project, file.name, text)
 
-        // Find all potential vector building expressions
-        val vectorExpressions = findVectorExpressions(file)
+        // Find and parse property-based vector definitions
+        val propertyVectors = findPropertyVectors(psiFile)
+        if (propertyVectors.isNotEmpty()) {
+            val first = propertyVectors.first()
+            return first
+        }
 
-        // Parse the first valid expression found (if any)
+        // Fallback to the older pattern using direct builders
+        val vectorExpressions = findVectorExpressions(psiFile)
         for (expr in vectorExpressions) {
-            val graphic = parseVectorExpression(expr, file.name)
+            val graphic = parseVectorExpression(expr, propertyNameFallback)
             if (graphic != null) {
                 return graphic
             }
@@ -78,6 +94,200 @@ private fun createPsiFile(
     return PsiManager.getInstance(project).findFile(virtualFile) as KtFile
 }
 
+/**
+ * Find property-based ImageVector definitions like:
+ * val BackingIcons.Outlined.Add: ImageVector get() = _Add ?: ImageVector.Builder(...).apply { ... }.build()
+ */
+private fun findPropertyVectors(file: KtFile): List<ImageVectorGraphic> {
+    val results = mutableListOf<ImageVectorGraphic>()
+
+    file.accept(
+        object : KtTreeVisitorVoid() {
+            override fun visitProperty(property: KtProperty) {
+                super.visitProperty(property)
+
+                // Check if it's an ImageVector property
+                if (property.typeReference?.text == "ImageVector") {
+                    val getter = property.getter
+                    if (getter != null) {
+                        val vectorGraphic = parsePropertyGetter(property, getter)
+                        if (vectorGraphic != null) {
+                            results.add(vectorGraphic)
+                        }
+                    }
+                }
+            }
+        },
+    )
+
+    return results
+}
+
+/**
+ * Parse the getter of an ImageVector property to extract the vector definition
+ */
+private fun parsePropertyGetter(property: KtProperty, getter: KtPropertyAccessor): ImageVectorGraphic? {
+    val propertyName = property.name ?: return null
+
+    // Find package name from qualified property if available
+    val packageName = if (property.receiverTypeReference != null) {
+        property.receiverTypeReference!!.text
+    } else {
+        null
+    }
+
+    // Extract the body of the getter
+    val bodyExpr = getter.bodyExpression ?: return null
+
+    // Handle the _Add ?: ImageVector.Builder(...).apply { ... }.build() pattern
+    var builderExpression: KtExpression? = null
+
+    // First check if there's a direct return expression
+    if (bodyExpr is KtBlockExpression) {
+        for (statement in bodyExpr.statements) {
+            if (statement is KtReturnExpression) {
+                val returnValue = statement.returnedExpression
+                if (returnValue is KtBinaryExpression && returnValue.operationToken.toString() == "ELVIS") {
+                    // Handle the elvis operator (_Add ?: ImageVector.Builder...)
+                    builderExpression = returnValue.right
+                } else {
+                    // Direct return of builder expression
+                    builderExpression = returnValue
+                }
+                break
+            } else if (statement is KtBinaryExpression && statement.operationToken.toString() == "ELVIS") {
+                // Handle the elvis operator without explicit return
+                builderExpression = statement.right
+                break
+            } else if (statement is KtDotQualifiedExpression) {
+                // Direct builder expression without elvis
+                builderExpression = statement
+                break
+            }
+        }
+    } else if (bodyExpr is KtBinaryExpression && bodyExpr.operationToken.toString() == "ELVIS") {
+        // Handle elvis operator as the direct body
+        builderExpression = bodyExpr.right
+    } else {
+        // Direct expression body
+        builderExpression = bodyExpr
+    }
+
+    if (builderExpression != null) {
+        // If the expression ends with .build().also { _Add = it }
+        if (builderExpression is KtDotQualifiedExpression &&
+            builderExpression.selectorExpression?.text?.contains("also") == true) {
+            // Extract the part before .also
+            builderExpression = builderExpression.receiverExpression
+        }
+
+        // If the expression ends with .build()
+        if (builderExpression is KtDotQualifiedExpression &&
+            builderExpression.selectorExpression?.text?.contains("build") == true) {
+            // Extract the part before .build()
+            builderExpression = builderExpression.receiverExpression
+        }
+
+        // Now we should have the ImageVector.Builder(...).apply { ... } part
+        return parseVectorBuilderExpression(builderExpression, propertyName, packageName)
+    }
+
+    return null
+}
+
+/**
+ * Parse a vector builder expression (ImageVector.Builder(...).apply { ... })
+ */
+private fun parseVectorBuilderExpression(
+    expression: KtExpression,
+    propertyName: String,
+    packageName: String?
+): ImageVectorGraphic? {
+    val elements = mutableListOf<Element>()
+    var id: String? = null
+    val foreign = mutableMapOf<String, String>()
+
+    // Handle the ImageVector.Builder(...).apply { ... } pattern
+    if (expression is KtDotQualifiedExpression) {
+        // Extract the Builder part
+        val builderExpr = expression.receiverExpression
+
+        if (builderExpr is KtCallExpression ||
+            (builderExpr is KtDotQualifiedExpression && builderExpr.selectorExpression is KtCallExpression)) {
+
+            // Extract the builder arguments (name, dimensions, etc.)
+            val callExpr = if (builderExpr is KtCallExpression) {
+                builderExpr
+            } else {
+                (builderExpr as KtDotQualifiedExpression).selectorExpression as KtCallExpression
+            }
+
+            callExpr.valueArgumentList?.arguments?.forEach { arg ->
+                if (arg is KtValueArgument) {
+                    val argumentName = arg.getArgumentName()?.asName?.identifier
+                    val argExpr = arg.getArgumentExpression()
+
+                    when (argumentName) {
+                        "name" -> {
+                            if (argExpr is KtStringTemplateExpression) {
+                                id = argExpr.entries.joinToString("") {
+                                    when (it) {
+                                        is KtLiteralStringTemplateEntry -> it.text
+                                        is KtSimpleNameStringTemplateEntry -> it.text
+                                        else -> ""
+                                    }
+                                }
+                            }
+                        }
+                        "defaultWidth", "defaultHeight", "viewportWidth", "viewportHeight" -> {
+                            if (argExpr != null) {
+                                foreign[argumentName] = argExpr.text
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Parse the apply block containing path definitions
+            val applyExpr = expression.selectorExpression
+            if (applyExpr is KtCallExpression && applyExpr.calleeExpression?.text == "apply") {
+                val lambdaArg = applyExpr.lambdaArguments.firstOrNull()
+                val lambdaExpr = lambdaArg?.getLambdaExpression()
+                val bodyExpr = lambdaExpr?.bodyExpression
+
+                if (bodyExpr != null) {
+                    // Process statements in the apply block (path calls)
+                    for (statement in bodyExpr.statements) {
+                        when {
+                            // Handle path {} builder pattern
+                            statement is KtCallExpression && statement.calleeExpression?.text == "path" -> {
+                                val pathElement = parsePathBuilderCall(statement)
+                                if (pathElement != null) {
+                                    elements.add(pathElement)
+                                }
+                            }
+                            // Handle addPath() method (backward compatibility)
+                            statement is KtCallExpression && statement.calleeExpression?.text == "addPath" -> {
+                                val pathElement = parseAddPathCall(statement)
+                                if (pathElement != null) {
+                                    elements.add(pathElement)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return if (elements.isNotEmpty() || id != null) {
+        ImageVectorGraphic(elements, id, foreign, propertyName, packageName)
+    } else {
+        null
+    }
+}
+
+// Previous methods for backward compatibility
 private fun findVectorExpressions(file: KtFile): List<PsiElement> {
     val results = mutableListOf<PsiElement>()
 
@@ -136,21 +346,20 @@ private fun findVectorExpressions(file: KtFile): List<PsiElement> {
 
 private fun parseVectorExpression(
     element: PsiElement,
-    fileName: String,
+    propertyName: String,
 ): ImageVectorGraphic? {
     val elements = mutableListOf<Element>()
     var id: String? = null
     val foreign = mutableMapOf<String, String>()
 
-    val parent = element.parent.parent
-    when (parent) {
-        // todo: handle when the image builder is stored in variable, scoping functions are used, and direct calls
-        // todo: handle builder calls for ktx extensions e.g. ImageVector.Builder(...).path() {} .build()
-        // todo: handle builder calls like addPath with list of commands instead of path data string
-        //  e.g. ImageVector.Builder(...).addPath(listOf(...)) {}
+    when (val parent = element.parent.parent) {
+        // Handle the legacy apply block pattern
         is KtDotQualifiedExpression -> {
-            val receiver = (parent.receiverExpression as KtDotQualifiedExpression).selectorExpression
+            val receiver = (parent.receiverExpression as? KtDotQualifiedExpression)?.selectorExpression
+                ?: parent.receiverExpression
+
             if (receiver is KtCallExpression) {
+                // Extract builder parameters
                 receiver.valueArgumentList?.arguments?.forEach { arg ->
                     if (arg is KtValueArgument) {
                         val argumentName = arg.getArgumentName()?.asName?.identifier
@@ -188,12 +397,24 @@ private fun parseVectorExpression(
                     if (bodyExpr != null) {
                         // Process all statements in the apply block
                         for (statement in bodyExpr.statements) {
-                            if (statement is KtCallExpression &&
-                                statement.calleeExpression?.text == "addPath"
-                            ) {
-                                val pathElement = parseAddPathCall(statement)
-                                if (pathElement != null) {
-                                    elements.add(pathElement)
+                            // Process both addPath and path builder patterns
+                            when {
+                                // Handle addPath() method
+                                statement is KtCallExpression &&
+                                statement.calleeExpression?.text == "addPath" -> {
+                                    val pathElement = parseAddPathCall(statement)
+                                    if (pathElement != null) {
+                                        elements.add(pathElement)
+                                    }
+                                }
+
+                                // Handle path {} builder pattern
+                                statement is KtCallExpression &&
+                                statement.calleeExpression?.text == "path" -> {
+                                    val pathElement = parsePathBuilderCall(statement)
+                                    if (pathElement != null) {
+                                        elements.add(pathElement)
+                                    }
                                 }
                             }
                         }
@@ -203,9 +424,153 @@ private fun parseVectorExpression(
         }
     }
 
-    return ImageVectorGraphic(elements, id, mutableMapOf(), fileName, null).apply {
-        this.foreign.putAll(foreign)
+    return ImageVectorGraphic(elements, id, foreign, propertyName, null)
+}
+
+private fun parsePathBuilderCall(callExpression: KtCallExpression): Path? {
+    var fillColor: Int? = null
+    var strokeColor: Int? = null
+    var strokeWidth: Float? = null
+    var fillAlpha: Float? = null
+    var strokeAlpha: Float? = null
+    val commands = mutableListOf<Command>()
+
+    // Extract named arguments from path call
+    callExpression.valueArgumentList?.arguments?.forEach { arg ->
+        if (arg is KtValueArgument) {
+            val argumentName = arg.getArgumentName()?.asName?.identifier
+            val expression = arg.getArgumentExpression()
+
+            when (argumentName) {
+                "fill" -> {
+                    fillColor = parseColorArgument(expression)
+                }
+                "stroke" -> {
+                    strokeColor = parseColorArgument(expression)
+                }
+                "strokeWidth", "strokeLineWidth" -> {
+                    val floatText = (expression as? KtConstantExpression)?.text
+                    strokeWidth = floatText?.toFloatOrNull()
+                        ?: floatText?.removeSuffix("f")?.toFloatOrNull()
+                }
+                "fillAlpha" -> {
+                    val floatText = (expression as? KtConstantExpression)?.text
+                    fillAlpha = floatText?.toFloatOrNull()
+                        ?: floatText?.removeSuffix("f")?.toFloatOrNull()
+                }
+                "strokeAlpha" -> {
+                    val floatText = (expression as? KtConstantExpression)?.text
+                    strokeAlpha = floatText?.toFloatOrNull()
+                        ?: floatText?.removeSuffix("f")?.toFloatOrNull()
+                }
+            }
+        }
     }
+
+    // Process the path commands in the lambda block
+    val lambdaArg = callExpression.lambdaArguments.firstOrNull()
+    val lambdaExpr = lambdaArg?.getLambdaExpression()
+    val bodyExpr = lambdaExpr?.bodyExpression
+
+    if (bodyExpr != null) {
+        commands.addAll(parsePathCommands(bodyExpr))
+    }
+
+    // Create a default color if none provided
+    val effectiveFillColor = fillColor ?: 0xFF000000.toInt()
+    val effectiveStrokeColor = strokeColor ?: 0x00000000.toInt()
+
+    return Path(
+        id = null,
+        commands = commands,
+        fill = Color(effectiveFillColor.toUInt()),
+        stroke = Color(effectiveStrokeColor.toUInt()),
+        strokeWidth = strokeWidth ?: 0f,
+        fillRule = Path.FillRule.EVEN_ODD,
+        strokeLineCap = Path.LineCap.BUTT,
+        strokeLineJoin = Path.LineJoin.MITER,
+        strokeMiterLimit = 4f,
+        foreign = mutableMapOf(),
+    )
+}
+
+private fun parsePathCommands(bodyExpr: KtBlockExpression): List<Command> {
+    val commands = mutableListOf<Command>()
+
+    // Process each path command in the block
+    for (statement in bodyExpr.statements) {
+        if (statement is KtCallExpression) {
+            val commandName = statement.calleeExpression?.text
+            when (commandName) {
+                "moveTo" -> {
+                    val point = parsePointArguments(statement)
+                    if (point != null) {
+                        val param = Point(point.first, point.second)
+                        commands.add(MoveTo(CommandVariant.ABSOLUTE, listOf(param)))
+                    }
+                }
+                "lineTo" -> {
+                    val point = parsePointArguments(statement)
+                    if (point != null) {
+                        val param = Point(point.first, point.second)
+                        commands.add(LineTo(CommandVariant.ABSOLUTE, listOf(param)))
+                    }
+                }
+                "close" -> {
+                    commands.add(ClosePath)
+                }
+                // Add other path commands (cubicTo, quadraticTo, etc.) as needed
+            }
+        }
+    }
+
+    return commands
+}
+
+private fun parsePointArguments(callExpression: KtCallExpression): Pair<Float, Float>? {
+    val args = callExpression.valueArgumentList?.arguments ?: return null
+
+    if (args.size >= 2) {
+        val xArg = args[0].getArgumentExpression()
+        val yArg = args[1].getArgumentExpression()
+
+        val x = (xArg as? KtConstantExpression)?.text?.toFloatOrNull()
+            ?: (xArg as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+            ?: return null
+
+        val y = (yArg as? KtConstantExpression)?.text?.toFloatOrNull()
+            ?: (yArg as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+            ?: return null
+
+        return Pair(x, y)
+    }
+
+    return null
+}
+
+private fun parseColorArgument(expression: KtExpression?): Int? {
+    if (expression == null) return null
+
+    // Handle SolidColor(Color(0xFF232F34))
+    if (expression is KtCallExpression && expression.calleeExpression?.text == "SolidColor") {
+        val colorArg = expression.valueArgumentList?.arguments?.firstOrNull()?.getArgumentExpression()
+        if (colorArg is KtCallExpression && colorArg.calleeExpression?.text == "Color") {
+            val colorValueArg = colorArg.valueArgumentList?.arguments?.firstOrNull()?.getArgumentExpression()
+            if (colorValueArg is KtConstantExpression) {
+                return colorValueArg.text.toIntOrNull()
+            }
+        }
+    }
+
+    // Handle direct Color(0xFF232F34)
+    if (expression is KtCallExpression && expression.calleeExpression?.text == "Color") {
+        val colorValueArg = expression.valueArgumentList?.arguments?.firstOrNull()?.getArgumentExpression()
+        if (colorValueArg is KtConstantExpression) {
+            return colorValueArg.text.toIntOrNull()
+        }
+    }
+
+    return null
 }
 
 private fun parseAddPathCall(callExpression: KtCallExpression): Path? {
@@ -227,10 +592,10 @@ private fun parseAddPathCall(callExpression: KtCallExpression): Path? {
                     pathData = parsePathDataExpression(expression)
                 }
                 "fill" -> {
-                    fillColor = (expression as? KtConstantExpression)?.text?.toIntOrNull()
+                    fillColor = parseColorArgument(expression)
                 }
                 "stroke" -> {
-                    strokeColor = (expression as? KtConstantExpression)?.text?.toIntOrNull()
+                    strokeColor = parseColorArgument(expression)
                 }
                 "strokeLineWidth" -> {
                     val floatText = (expression as? KtConstantExpression)?.text
@@ -251,16 +616,20 @@ private fun parseAddPathCall(callExpression: KtCallExpression): Path? {
         }
     }
 
+    // Create default colors if none provided
+    val effectiveFillColor = fillColor ?: 0xFF000000.toInt()
+    val effectiveStrokeColor = strokeColor ?: 0x00000000.toInt()
+
     return Path(
-        id = null, // todo
+        id = null,
         commands = pathData,
-        fill = Color(0x00000000u), // todo
-        stroke = Color(0xFFFFFFFFu), // todo
-        strokeWidth = 1f, // todo
-        fillRule = Path.FillRule.EVEN_ODD, // todo
-        strokeLineCap = Path.LineCap.BUTT, // todo
-        strokeLineJoin = Path.LineJoin.MITER, // todo
-        strokeMiterLimit = 4f, // todo?
+        fill = Color(effectiveFillColor.toUInt()),
+        stroke = Color(effectiveStrokeColor.toUInt()),
+        strokeWidth = strokeWidth ?: 0f,
+        fillRule = Path.FillRule.EVEN_ODD,
+        strokeLineCap = Path.LineCap.BUTT,
+        strokeLineJoin = Path.LineJoin.MITER,
+        strokeMiterLimit = 4f,
         foreign = mutableMapOf(),
     )
 }
