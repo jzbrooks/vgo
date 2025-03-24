@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.composable
 
 import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
@@ -280,6 +281,8 @@ private fun parseVectorBuilderExpression(
         }
     }
 
+    // todo: handle ImageVector.Builder(...).path(...) { }.group(...) { }.build()
+
     return if (elements.isNotEmpty() || id != null) {
         ImageVectorGraphic(elements, id, foreign, propertyName, packageName)
     } else {
@@ -316,8 +319,7 @@ private fun findVectorExpressions(file: KtFile): List<PsiElement> {
                     if (selector is KtCallExpression) {
                         val calleeExpr = selector.calleeExpression
                         if (calleeExpr is KtNameReferenceExpression && calleeExpr.getReferencedName() == "apply") {
-                            val receiver = expression.receiverExpression
-                            when (receiver) {
+                            when (val receiver = expression.receiverExpression) {
                                 is KtCallExpression -> {
                                     val receiverCallee = receiver.calleeExpression
                                     if (receiverCallee is KtNameReferenceExpression &&
@@ -428,8 +430,8 @@ private fun parseVectorExpression(
 }
 
 private fun parsePathBuilderCall(callExpression: KtCallExpression): Path? {
-    var fillColor: Int? = null
-    var strokeColor: Int? = null
+    var fillColor: Color? = null
+    var strokeColor: Color? = null
     var strokeWidth: Float? = null
     var fillAlpha: Float? = null
     var strokeAlpha: Float? = null
@@ -476,15 +478,20 @@ private fun parsePathBuilderCall(callExpression: KtCallExpression): Path? {
         commands.addAll(parsePathCommands(bodyExpr))
     }
 
-    // Create a default color if none provided
-    val effectiveFillColor = fillColor ?: 0xFF000000.toInt()
-    val effectiveStrokeColor = strokeColor ?: 0x00000000.toInt()
+    var effectiveFillColor = fillColor ?: Colors.BLACK
+    fillAlpha?.let {
+        effectiveFillColor = effectiveFillColor.copy(alpha = (it * 255f).coerceIn(0f, 255f).toInt().toUByte())
+    }
+    var effectiveStrokeColor = strokeColor ?: Colors.TRANSPARENT
+    strokeAlpha?.let {
+        effectiveStrokeColor = effectiveStrokeColor.copy(alpha = (it * 255f).coerceIn(0f, 255f).toInt().toUByte())
+    }
 
     return Path(
         id = null,
         commands = commands,
-        fill = Color(effectiveFillColor.toUInt()),
-        stroke = Color(effectiveStrokeColor.toUInt()),
+        fill = effectiveFillColor,
+        stroke = effectiveStrokeColor,
         strokeWidth = strokeWidth ?: 0f,
         fillRule = Path.FillRule.EVEN_ODD,
         strokeLineCap = Path.LineCap.BUTT,
@@ -548,7 +555,7 @@ private fun parsePointArguments(callExpression: KtCallExpression): Pair<Float, F
     return null
 }
 
-private fun parseColorArgument(expression: KtExpression?): Int? {
+private fun parseColorArgument(expression: KtExpression?): Color? {
     if (expression == null) return null
 
     // Handle SolidColor(Color(0xFF232F34))
@@ -557,7 +564,7 @@ private fun parseColorArgument(expression: KtExpression?): Int? {
         if (colorArg is KtCallExpression && colorArg.calleeExpression?.text == "Color") {
             val colorValueArg = colorArg.valueArgumentList?.arguments?.firstOrNull()?.getArgumentExpression()
             if (colorValueArg is KtConstantExpression) {
-                return colorValueArg.text.toIntOrNull()
+                return colorValueArg.text.toUIntOrNull()?.let(::Color)
             }
         }
     }
@@ -566,7 +573,7 @@ private fun parseColorArgument(expression: KtExpression?): Int? {
     if (expression is KtCallExpression && expression.calleeExpression?.text == "Color") {
         val colorValueArg = expression.valueArgumentList?.arguments?.firstOrNull()?.getArgumentExpression()
         if (colorValueArg is KtConstantExpression) {
-            return colorValueArg.text.toIntOrNull()
+            return colorValueArg.text.toUIntOrNull()?.let(::Color)
         }
     }
 
@@ -575,8 +582,8 @@ private fun parseColorArgument(expression: KtExpression?): Int? {
 
 private fun parseAddPathCall(callExpression: KtCallExpression): Path? {
     var pathData: List<Command> = emptyList()
-    var fillColor: Int? = null
-    var strokeColor: Int? = null
+    var fillColor: Color? = null
+    var strokeColor: Color? = null
     var strokeWidth: Float? = null
     var fillAlpha: Float? = null
     var strokeAlpha: Float? = null
@@ -616,15 +623,20 @@ private fun parseAddPathCall(callExpression: KtCallExpression): Path? {
         }
     }
 
-    // Create default colors if none provided
-    val effectiveFillColor = fillColor ?: 0xFF000000.toInt()
-    val effectiveStrokeColor = strokeColor ?: 0x00000000.toInt()
+    var effectiveFillColor = fillColor ?: Colors.BLACK
+    fillAlpha?.let {
+        effectiveFillColor = effectiveFillColor.copy(alpha = (it * 255f).coerceIn(0f, 255f).toInt().toUByte())
+    }
+    var effectiveStrokeColor = strokeColor ?: Colors.TRANSPARENT
+    strokeAlpha?.let {
+        effectiveStrokeColor = effectiveStrokeColor.copy(alpha = (it * 255f).coerceIn(0f, 255f).toInt().toUByte())
+    }
 
     return Path(
         id = null,
         commands = pathData,
-        fill = Color(effectiveFillColor.toUInt()),
-        stroke = Color(effectiveStrokeColor.toUInt()),
+        fill = effectiveFillColor,
+        stroke = effectiveStrokeColor,
         strokeWidth = strokeWidth ?: 0f,
         fillRule = Path.FillRule.EVEN_ODD,
         strokeLineCap = Path.LineCap.BUTT,

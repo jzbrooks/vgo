@@ -24,6 +24,25 @@ value class Color(
 
     operator fun component4() = blue
 
+    fun copy(alpha: UByte? = null, red: UByte? = null, green: UByte? = null, blue: UByte? = null): Color {
+        var newArgb = argb
+
+        if (alpha != null) {
+            newArgb = (newArgb and 0x00FFFFFF.toUInt()) or (alpha.toUInt() shl 24)
+        }
+        if (red != null) {
+            newArgb = (newArgb and 0xFF00FFFF.toUInt()) or (red.toUInt() shl 16)
+        }
+        if (green != null) {
+            newArgb = (newArgb and 0xFFFF00FF.toUInt()) or (green.toUInt() shl 8)
+        }
+        if (blue != null) {
+            newArgb = (newArgb and 0xFFFFFF00.toUInt()) or blue.toUInt()
+        }
+
+        return Color(newArgb)
+    }
+
     fun toHexString(format: HexFormat): String =
         if (alpha != 0xFF.toUByte()) {
             val pattern = "#%02x%02x%02x%02x"
