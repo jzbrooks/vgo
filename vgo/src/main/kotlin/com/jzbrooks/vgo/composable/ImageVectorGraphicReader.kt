@@ -148,12 +148,12 @@ private fun parsePropertyGetter(property: KtProperty, getter: KtPropertyAccessor
         for (statement in bodyExpr.statements) {
             if (statement is KtReturnExpression) {
                 val returnValue = statement.returnedExpression
-                if (returnValue is KtBinaryExpression && returnValue.operationToken.toString() == "ELVIS") {
+                builderExpression = if (returnValue is KtBinaryExpression && returnValue.operationToken.toString() == "ELVIS") {
                     // Handle the elvis operator (_Add ?: ImageVector.Builder...)
-                    builderExpression = returnValue.right
+                    returnValue.right
                 } else {
                     // Direct return of builder expression
-                    builderExpression = returnValue
+                    returnValue
                 }
                 break
             } else if (statement is KtBinaryExpression && statement.operationToken.toString() == "ELVIS") {
@@ -217,11 +217,8 @@ private fun parseVectorBuilderExpression(
             (builderExpr is KtDotQualifiedExpression && builderExpr.selectorExpression is KtCallExpression)) {
 
             // Extract the builder arguments (name, dimensions, etc.)
-            val callExpr = if (builderExpr is KtCallExpression) {
-                builderExpr
-            } else {
-                (builderExpr as KtDotQualifiedExpression).selectorExpression as KtCallExpression
-            }
+            val callExpr = builderExpr as? KtCallExpression ?:
+            (builderExpr as KtDotQualifiedExpression).selectorExpression as KtCallExpression
 
             callExpr.valueArgumentList?.arguments?.forEach { arg ->
                 if (arg is KtValueArgument) {
