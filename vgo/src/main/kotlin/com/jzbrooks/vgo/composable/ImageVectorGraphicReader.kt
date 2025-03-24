@@ -8,8 +8,11 @@ import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
@@ -509,21 +512,62 @@ private fun parsePathCommands(bodyExpr: KtBlockExpression): List<Command> {
                 "moveTo" -> {
                     val point = parsePointArguments(statement)
                     if (point != null) {
-                        val param = Point(point.first, point.second)
-                        commands.add(MoveTo(CommandVariant.ABSOLUTE, listOf(param)))
+                        commands.add(MoveTo(CommandVariant.ABSOLUTE, listOf(point)))
                     }
                 }
                 "lineTo" -> {
                     val point = parsePointArguments(statement)
                     if (point != null) {
-                        val param = Point(point.first, point.second)
-                        commands.add(LineTo(CommandVariant.ABSOLUTE, listOf(param)))
+                        commands.add(LineTo(CommandVariant.ABSOLUTE, listOf(point)))
                     }
                 }
+                "lineToRelative" -> {
+                    val point = parsePointArguments(statement)
+                    if (point != null) {
+                        commands.add(LineTo(CommandVariant.RELATIVE, listOf(point)))
+                    }
+                }
+                "horizontalLineTo" -> {
+                    val point = parseFloatArgument(statement)
+                    if (point != null) {
+                        commands.add(HorizontalLineTo(CommandVariant.ABSOLUTE, listOf(point)))
+                    }
+                }
+                "horizontalLineToRelative" -> {
+                    val point = parseFloatArgument(statement)
+                    if (point != null) {
+                        commands.add(HorizontalLineTo(CommandVariant.RELATIVE, listOf(point)))
+                    }
+                }
+                "verticalLineTo" -> {
+                    val point = parseFloatArgument(statement)
+                    if (point != null) {
+                        commands.add(VerticalLineTo(CommandVariant.ABSOLUTE, listOf(point)))
+                    }
+                }
+                "verticalLineToRelative" -> {
+                    val point = parseFloatArgument(statement)
+                    if (point != null) {
+                        commands.add(VerticalLineTo(CommandVariant.RELATIVE, listOf(point)))
+                    }
+                }
+                "curveTo" -> {
+                    val point = parseCubicArgs(statement)
+                    if (point != null) {
+                        commands.add(CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(point)))
+                    }
+                }
+                "curveToRelative" -> {
+                    val point = parseCubicArgs(statement)
+                    if (point != null) {
+                        commands.add(CubicBezierCurve(CommandVariant.RELATIVE, listOf(point)))
+                    }
+                }
+                // todo: quad
+                // todo: arc
                 "close" -> {
                     commands.add(ClosePath)
                 }
-                // Add other path commands (cubicTo, quadraticTo, etc.) as needed
             }
         }
     }
@@ -531,7 +575,18 @@ private fun parsePathCommands(bodyExpr: KtBlockExpression): List<Command> {
     return commands
 }
 
-private fun parsePointArguments(callExpression: KtCallExpression): Pair<Float, Float>? {
+// handle PrefixExpression in addition to ktconstantexpression
+
+private fun parseFloatArgument(callExpression: KtCallExpression): Float? {
+    val args = callExpression.valueArgumentList?.arguments ?: return null
+
+    val xArg = args[0].getArgumentExpression()
+
+    return (xArg as? KtConstantExpression)?.text?.toFloatOrNull()
+        ?: (xArg as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+}
+
+private fun parsePointArguments(callExpression: KtCallExpression): Point? {
     val args = callExpression.valueArgumentList?.arguments ?: return null
 
     if (args.size >= 2) {
@@ -546,7 +601,49 @@ private fun parsePointArguments(callExpression: KtCallExpression): Pair<Float, F
             ?: (yArg as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
             ?: return null
 
-        return Pair(x, y)
+        return Point(x, y)
+    }
+
+    return null
+}
+
+private fun parseCubicArgs(callExpression: KtCallExpression): CubicBezierCurve.Parameter? {
+    val args = callExpression.valueArgumentList?.arguments ?: return null
+
+    if (args.size >= 2) {
+        val startControlX = args[0].getArgumentExpression()
+        val startControlY = args[1].getArgumentExpression()
+        val endControlX = args[2].getArgumentExpression()
+        val endControlY = args[3].getArgumentExpression()
+        val endX = args[4].getArgumentExpression()
+        val endY = args[5].getArgumentExpression()
+
+        return CubicBezierCurve.Parameter(
+            Point(
+                (startControlX as? KtConstantExpression)?.text?.toFloatOrNull()
+                    ?: (startControlX as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+                    ?: return null,
+                (startControlY as? KtConstantExpression)?.text?.toFloatOrNull()
+                    ?: (startControlY as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+                    ?: return null
+            ),
+            Point(
+                (endControlX as? KtConstantExpression)?.text?.toFloatOrNull()
+                    ?: (endControlX as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+                    ?: return null,
+                (endControlY as? KtConstantExpression)?.text?.toFloatOrNull()
+                    ?: (endControlY as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+                    ?: return null
+            ),
+            Point(
+                (endX as? KtConstantExpression)?.text?.toFloatOrNull()
+                    ?: (endX as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+                    ?: return null,
+                (endY as? KtConstantExpression)?.text?.toFloatOrNull()
+                    ?: (endY as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+                    ?: return null,
+            )
+        )
     }
 
     return null
