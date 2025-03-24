@@ -239,7 +239,7 @@ private fun parseVectorBuilderExpression(
                         }
                         "defaultWidth", "defaultHeight", "viewportWidth", "viewportHeight" -> {
                             if (argExpr != null) {
-                                foreign[argumentName] = argExpr.text
+                                foreign[argumentName] = argExpr.text.removeSuffix(".dp").removeSuffix("f")
                             }
                         }
                     }
@@ -379,7 +379,7 @@ private fun parseVectorExpression(
                             }
                             "defaultWidth", "defaultHeight", "viewportWidth", "viewportHeight" -> {
                                 if (expression != null) {
-                                    foreign[argumentName] = expression.text
+                                    foreign[argumentName] = expression.text.removeSuffix(".dp").removeSuffix("f")
                                 }
                             }
                         }
