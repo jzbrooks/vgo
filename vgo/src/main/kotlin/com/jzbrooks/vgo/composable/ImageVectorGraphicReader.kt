@@ -131,15 +131,19 @@ private fun findPropertyVectors(file: KtFile): List<ImageVectorGraphic> {
 /**
  * Parse the getter of an ImageVector property to extract the vector definition
  */
-private fun parsePropertyGetter(property: KtProperty, getter: KtPropertyAccessor): ImageVectorGraphic? {
+private fun parsePropertyGetter(
+    property: KtProperty,
+    getter: KtPropertyAccessor,
+): ImageVectorGraphic? {
     val propertyName = property.name ?: return null
 
     // Find package name from qualified property if available
-    val packageName = if (property.receiverTypeReference != null) {
-        property.receiverTypeReference!!.text
-    } else {
-        null
-    }
+    val packageName =
+        if (property.receiverTypeReference != null) {
+            property.receiverTypeReference!!.text
+        } else {
+            null
+        }
 
     // Extract the body of the getter
     val bodyExpr = getter.bodyExpression ?: return null
@@ -152,13 +156,14 @@ private fun parsePropertyGetter(property: KtProperty, getter: KtPropertyAccessor
         for (statement in bodyExpr.statements) {
             if (statement is KtReturnExpression) {
                 val returnValue = statement.returnedExpression
-                builderExpression = if (returnValue is KtBinaryExpression && returnValue.operationToken.toString() == "ELVIS") {
-                    // Handle the elvis operator (_Add ?: ImageVector.Builder...)
-                    returnValue.right
-                } else {
-                    // Direct return of builder expression
-                    returnValue
-                }
+                builderExpression =
+                    if (returnValue is KtBinaryExpression && returnValue.operationToken.toString() == "ELVIS") {
+                        // Handle the elvis operator (_Add ?: ImageVector.Builder...)
+                        returnValue.right
+                    } else {
+                        // Direct return of builder expression
+                        returnValue
+                    }
                 break
             } else if (statement is KtBinaryExpression && statement.operationToken.toString() == "ELVIS") {
                 // Handle the elvis operator without explicit return
@@ -181,14 +186,16 @@ private fun parsePropertyGetter(property: KtProperty, getter: KtPropertyAccessor
     if (builderExpression != null) {
         // If the expression ends with .build().also { _Add = it }
         if (builderExpression is KtDotQualifiedExpression &&
-            builderExpression.selectorExpression?.text?.contains("also") == true) {
+            builderExpression.selectorExpression?.text?.contains("also") == true
+        ) {
             // Extract the part before .also
             builderExpression = builderExpression.receiverExpression
         }
 
         // If the expression ends with .build()
         if (builderExpression is KtDotQualifiedExpression &&
-            builderExpression.selectorExpression?.text?.contains("build") == true) {
+            builderExpression.selectorExpression?.text?.contains("build") == true
+        ) {
             // Extract the part before .build()
             builderExpression = builderExpression.receiverExpression
         }
@@ -206,7 +213,7 @@ private fun parsePropertyGetter(property: KtProperty, getter: KtPropertyAccessor
 private fun parseVectorBuilderExpression(
     expression: KtExpression,
     propertyName: String,
-    packageName: String?
+    packageName: String?,
 ): ImageVectorGraphic? {
     val elements = mutableListOf<Element>()
     var id: String? = null
@@ -218,11 +225,12 @@ private fun parseVectorBuilderExpression(
         val builderExpr = expression.receiverExpression
 
         if (builderExpr is KtCallExpression ||
-            (builderExpr is KtDotQualifiedExpression && builderExpr.selectorExpression is KtCallExpression)) {
-
+            (builderExpr is KtDotQualifiedExpression && builderExpr.selectorExpression is KtCallExpression)
+        ) {
             // Extract the builder arguments (name, dimensions, etc.)
-            val callExpr = builderExpr as? KtCallExpression ?:
-            (builderExpr as KtDotQualifiedExpression).selectorExpression as KtCallExpression
+            val callExpr =
+                builderExpr as? KtCallExpression
+                    ?: (builderExpr as KtDotQualifiedExpression).selectorExpression as KtCallExpression
 
             callExpr.valueArgumentList?.arguments?.forEach { arg ->
                 if (arg is KtValueArgument) {
@@ -232,13 +240,14 @@ private fun parseVectorBuilderExpression(
                     when (argumentName) {
                         "name" -> {
                             if (argExpr is KtStringTemplateExpression) {
-                                id = argExpr.entries.joinToString("") {
-                                    when (it) {
-                                        is KtLiteralStringTemplateEntry -> it.text
-                                        is KtSimpleNameStringTemplateEntry -> it.text
-                                        else -> ""
+                                id =
+                                    argExpr.entries.joinToString("") {
+                                        when (it) {
+                                            is KtLiteralStringTemplateEntry -> it.text
+                                            is KtSimpleNameStringTemplateEntry -> it.text
+                                            else -> ""
+                                        }
                                     }
-                                }
                             }
                         }
                         "defaultWidth", "defaultHeight", "viewportWidth", "viewportHeight" -> {
@@ -358,8 +367,9 @@ private fun parseVectorExpression(
     when (val parent = element.parent.parent) {
         // Handle the legacy apply block pattern
         is KtDotQualifiedExpression -> {
-            val receiver = (parent.receiverExpression as? KtDotQualifiedExpression)?.selectorExpression
-                ?: parent.receiverExpression
+            val receiver =
+                (parent.receiverExpression as? KtDotQualifiedExpression)?.selectorExpression
+                    ?: parent.receiverExpression
 
             if (receiver is KtCallExpression) {
                 // Extract builder parameters
@@ -404,7 +414,7 @@ private fun parseVectorExpression(
                             when {
                                 // Handle addPath() method
                                 statement is KtCallExpression &&
-                                statement.calleeExpression?.text == "addPath" -> {
+                                    statement.calleeExpression?.text == "addPath" -> {
                                     val pathElement = parseAddPathCall(statement)
                                     if (pathElement != null) {
                                         elements.add(pathElement)
@@ -413,7 +423,7 @@ private fun parseVectorExpression(
 
                                 // Handle path {} builder pattern
                                 statement is KtCallExpression &&
-                                statement.calleeExpression?.text == "path" -> {
+                                    statement.calleeExpression?.text == "path" -> {
                                     val pathElement = parsePathBuilderCall(statement)
                                     if (pathElement != null) {
                                         elements.add(pathElement)
@@ -582,7 +592,11 @@ private fun parseFloatLiteral(expression: KtExpression?): Float? {
     return (expression as? KtConstantExpression)?.text?.toFloatOrNull()
         ?: (expression as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
         ?: (expression as? KtPrefixExpression)?.let {
-            val name = it.baseExpression?.text?.removeSuffix("f")?.toFloatOrNull()
+            val name =
+                it.baseExpression
+                    ?.text
+                    ?.removeSuffix("f")
+                    ?.toFloatOrNull()
             if (it.operationToken.toString() == "MINUS" && name != null) {
                 -name
             } else {
@@ -638,7 +652,7 @@ private fun parseCubicArgs(callExpression: KtCallExpression): CubicBezierCurve.P
             Point(
                 parseFloatLiteral(endX) ?: return null,
                 parseFloatLiteral(endY) ?: return null,
-            )
+            ),
         )
     }
 
@@ -650,9 +664,17 @@ private fun parseColorArgument(expression: KtExpression?): Color? {
 
     // Handle SolidColor(Color(0xFF232F34))
     if (expression is KtCallExpression && expression.calleeExpression?.text == "SolidColor") {
-        val colorArg = expression.valueArgumentList?.arguments?.firstOrNull()?.getArgumentExpression()
+        val colorArg =
+            expression.valueArgumentList
+                ?.arguments
+                ?.firstOrNull()
+                ?.getArgumentExpression()
         if (colorArg is KtCallExpression && colorArg.calleeExpression?.text == "Color") {
-            val colorValueArg = colorArg.valueArgumentList?.arguments?.firstOrNull()?.getArgumentExpression()
+            val colorValueArg =
+                colorArg.valueArgumentList
+                    ?.arguments
+                    ?.firstOrNull()
+                    ?.getArgumentExpression()
             if (colorValueArg is KtConstantExpression) {
                 return colorValueArg.text.toUIntOrNull()?.let(::Color)
             }
@@ -661,7 +683,11 @@ private fun parseColorArgument(expression: KtExpression?): Color? {
 
     // Handle direct Color(0xFF232F34)
     if (expression is KtCallExpression && expression.calleeExpression?.text == "Color") {
-        val colorValueArg = expression.valueArgumentList?.arguments?.firstOrNull()?.getArgumentExpression()
+        val colorValueArg =
+            expression.valueArgumentList
+                ?.arguments
+                ?.firstOrNull()
+                ?.getArgumentExpression()
         if (colorValueArg is KtConstantExpression) {
             return colorValueArg.text.toUIntOrNull()?.let(::Color)
         }
