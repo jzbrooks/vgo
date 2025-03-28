@@ -35,6 +35,7 @@ import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtLiteralStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
+import org.jetbrains.kotlin.psi.KtPrefixExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtQualifiedExpression
@@ -575,15 +576,27 @@ private fun parsePathCommands(bodyExpr: KtBlockExpression): List<Command> {
     return commands
 }
 
-// handle PrefixExpression in addition to ktconstantexpression
+private fun parseFloatLiteral(expression: KtExpression?): Float? {
+    if (expression == null) return null
+
+    return (expression as? KtConstantExpression)?.text?.toFloatOrNull()
+        ?: (expression as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+        ?: (expression as? KtPrefixExpression)?.let {
+            val name = it.baseExpression?.text?.removeSuffix("f")?.toFloatOrNull()
+            if (it.operationToken.toString() == "MINUS" && name != null) {
+                -name
+            } else {
+                name
+            }
+        }
+}
 
 private fun parseFloatArgument(callExpression: KtCallExpression): Float? {
     val args = callExpression.valueArgumentList?.arguments ?: return null
 
     val xArg = args[0].getArgumentExpression()
 
-    return (xArg as? KtConstantExpression)?.text?.toFloatOrNull()
-        ?: (xArg as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
+    return parseFloatLiteral(xArg)
 }
 
 private fun parsePointArguments(callExpression: KtCallExpression): Point? {
@@ -593,13 +606,8 @@ private fun parsePointArguments(callExpression: KtCallExpression): Point? {
         val xArg = args[0].getArgumentExpression()
         val yArg = args[1].getArgumentExpression()
 
-        val x = (xArg as? KtConstantExpression)?.text?.toFloatOrNull()
-            ?: (xArg as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
-            ?: return null
-
-        val y = (yArg as? KtConstantExpression)?.text?.toFloatOrNull()
-            ?: (yArg as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
-            ?: return null
+        val x = parseFloatLiteral(xArg) ?: return null
+        val y = parseFloatLiteral(yArg) ?: return null
 
         return Point(x, y)
     }
@@ -610,7 +618,7 @@ private fun parsePointArguments(callExpression: KtCallExpression): Point? {
 private fun parseCubicArgs(callExpression: KtCallExpression): CubicBezierCurve.Parameter? {
     val args = callExpression.valueArgumentList?.arguments ?: return null
 
-    if (args.size >= 2) {
+    if (args.size >= 6) {
         val startControlX = args[0].getArgumentExpression()
         val startControlY = args[1].getArgumentExpression()
         val endControlX = args[2].getArgumentExpression()
@@ -620,28 +628,16 @@ private fun parseCubicArgs(callExpression: KtCallExpression): CubicBezierCurve.P
 
         return CubicBezierCurve.Parameter(
             Point(
-                (startControlX as? KtConstantExpression)?.text?.toFloatOrNull()
-                    ?: (startControlX as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
-                    ?: return null,
-                (startControlY as? KtConstantExpression)?.text?.toFloatOrNull()
-                    ?: (startControlY as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
-                    ?: return null
+                parseFloatLiteral(startControlX) ?: return null,
+                parseFloatLiteral(startControlY) ?: return null,
             ),
             Point(
-                (endControlX as? KtConstantExpression)?.text?.toFloatOrNull()
-                    ?: (endControlX as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
-                    ?: return null,
-                (endControlY as? KtConstantExpression)?.text?.toFloatOrNull()
-                    ?: (endControlY as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
-                    ?: return null
+                parseFloatLiteral(endControlX) ?: return null,
+                parseFloatLiteral(endControlY) ?: return null,
             ),
             Point(
-                (endX as? KtConstantExpression)?.text?.toFloatOrNull()
-                    ?: (endX as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
-                    ?: return null,
-                (endY as? KtConstantExpression)?.text?.toFloatOrNull()
-                    ?: (endY as? KtConstantExpression)?.text?.removeSuffix("f")?.toFloatOrNull()
-                    ?: return null,
+                parseFloatLiteral(endX) ?: return null,
+                parseFloatLiteral(endY) ?: return null,
             )
         )
     }
