@@ -24,7 +24,12 @@ value class Color(
 
     operator fun component4() = blue
 
-    fun copy(alpha: UByte? = null, red: UByte? = null, green: UByte? = null, blue: UByte? = null): Color {
+    fun copy(
+        alpha: UByte? = null,
+        red: UByte? = null,
+        green: UByte? = null,
+        blue: UByte? = null,
+    ): Color {
         var newArgb = argb
 
         if (alpha != null) {
