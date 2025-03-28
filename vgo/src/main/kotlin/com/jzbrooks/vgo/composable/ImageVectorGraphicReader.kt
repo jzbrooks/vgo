@@ -670,13 +670,19 @@ private fun parseColorArgument(expression: KtExpression?): Color? {
                 ?.firstOrNull()
                 ?.getArgumentExpression()
         if (colorArg is KtCallExpression && colorArg.calleeExpression?.text == "Color") {
-            val colorValueArg =
-                colorArg.valueArgumentList
-                    ?.arguments
-                    ?.firstOrNull()
-                    ?.getArgumentExpression()
-            if (colorValueArg is KtConstantExpression) {
-                return colorValueArg.text.toUIntOrNull()?.let(::Color)
+            val colorValueArgs = colorArg.valueArgumentList?.arguments
+
+            if (colorValueArgs != null && colorValueArgs.size == 1) {
+                val colorValueArg = colorValueArgs[0].getArgumentExpression()
+                if (colorValueArg is KtConstantExpression) {
+                    return colorValueArg.text.toUIntOrNull()?.let(::Color)
+                }
+            } else if (colorValueArgs != null && colorValueArgs.size == 4) {
+                val r = colorValueArgs[0].getArgumentExpression()?.text?.toUByteOrNull() ?: return null
+                val g = colorValueArgs[1].getArgumentExpression()?.text?.toUByteOrNull() ?: return null
+                val b = colorValueArgs[2].getArgumentExpression()?.text?.toUByteOrNull() ?: return null
+                val a = colorValueArgs[3].getArgumentExpression()?.text?.toUByteOrNull() ?: return null
+                return Color(a, r, g, b)
             }
         }
     }
