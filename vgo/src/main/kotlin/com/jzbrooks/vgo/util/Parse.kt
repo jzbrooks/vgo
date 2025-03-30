@@ -6,7 +6,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
-import com.jzbrooks.vgo.composable.parse as composableParse
+import com.jzbrooks.vgo.iv.parse as composableParse
 import com.jzbrooks.vgo.svg.parse as svgParse
 import com.jzbrooks.vgo.vd.parse as vdParse
 

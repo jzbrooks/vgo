@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.composable
+package com.jzbrooks.vgo.iv
 
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
