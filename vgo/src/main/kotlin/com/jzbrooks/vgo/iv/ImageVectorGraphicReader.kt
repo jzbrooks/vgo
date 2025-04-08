@@ -4,15 +4,7 @@ import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Path
-import com.jzbrooks.vgo.core.graphic.command.ClosePath
-import com.jzbrooks.vgo.core.graphic.command.Command
-import com.jzbrooks.vgo.core.graphic.command.CommandString
-import com.jzbrooks.vgo.core.graphic.command.CommandVariant
-import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
-import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
-import com.jzbrooks.vgo.core.graphic.command.LineTo
-import com.jzbrooks.vgo.core.graphic.command.MoveTo
-import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.graphic.command.*
 import com.jzbrooks.vgo.core.util.math.Point
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
@@ -20,7 +12,6 @@ import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
-import org.jetbrains.kotlin.com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
@@ -34,11 +25,9 @@ import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtLiteralStringTemplateEntry
-import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtPrefixExpression
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
-import org.jetbrains.kotlin.psi.KtQualifiedExpression
 import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
@@ -64,7 +53,6 @@ fun parse(file: File): ImageVectorGraphic {
                 EnvironmentConfigFiles.JVM_CONFIG_FILES,
             )
 
-        val propertyNameFallback = file.nameWithoutExtension
         val project = environment.project
         val psiFile = createPsiFile(project, file.name, text)
 
@@ -73,15 +61,6 @@ fun parse(file: File): ImageVectorGraphic {
         if (propertyVectors.isNotEmpty()) {
             val first = propertyVectors.first()
             return first
-        }
-
-        // Fallback to the older pattern using direct builders
-        val vectorExpressions = findVectorExpressions(psiFile)
-        for (expr in vectorExpressions) {
-            val graphic = parseVectorExpression(expr, propertyNameFallback)
-            if (graphic != null) {
-                return graphic
-            }
         }
 
         error("Failed to parse file ${file.name}")
@@ -200,7 +179,7 @@ private fun parsePropertyGetter(
             builderExpression = builderExpression.receiverExpression
         }
 
-        // Now we should have the ImageVector.Builder(...).apply { ... } part
+        // Now we should have the calls up to .build()
         return parseVectorBuilderExpression(builderExpression, propertyName, packageName)
     }
 
@@ -298,146 +277,6 @@ private fun parseVectorBuilderExpression(
     } else {
         null
     }
-}
-
-// Previous methods for backward compatibility
-private fun findVectorExpressions(file: KtFile): List<PsiElement> {
-    val results = mutableListOf<PsiElement>()
-
-    file.accept(
-        object : KtTreeVisitorVoid() {
-            override fun visitCallExpression(expression: KtCallExpression) {
-                super.visitCallExpression(expression)
-
-                // Check if it's a direct ImageVector.Builder call
-                val calleeExpr = expression.calleeExpression
-                if (calleeExpr is KtNameReferenceExpression &&
-                    calleeExpr.getReferencedName() == "Builder" ||
-                    calleeExpr is KtDotQualifiedExpression &&
-                    calleeExpr.text.contains("ImageVector.Builder")
-                ) {
-                    results.add(expression)
-                }
-            }
-
-            override fun visitQualifiedExpression(expression: KtQualifiedExpression) {
-                super.visitQualifiedExpression(expression)
-
-                // Check for Builder().apply{} pattern
-                if (expression is KtDotQualifiedExpression) {
-                    val selector = expression.selectorExpression
-                    if (selector is KtCallExpression) {
-                        val calleeExpr = selector.calleeExpression
-                        if (calleeExpr is KtNameReferenceExpression && calleeExpr.getReferencedName() == "apply") {
-                            when (val receiver = expression.receiverExpression) {
-                                is KtCallExpression -> {
-                                    val receiverCallee = receiver.calleeExpression
-                                    if (receiverCallee is KtNameReferenceExpression &&
-                                        receiverCallee.getReferencedName() == "Builder" ||
-                                        receiverCallee is KtDotQualifiedExpression &&
-                                        receiverCallee.text.contains("ImageVector.Builder")
-                                    ) {
-                                        results.add(expression)
-                                    }
-                                }
-                                is KtDotQualifiedExpression -> {
-                                    if (receiver.text.contains("ImageVector.Builder")) {
-                                        results.add(expression)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-    )
-
-    return results
-}
-
-private fun parseVectorExpression(
-    element: PsiElement,
-    propertyName: String,
-): ImageVectorGraphic? {
-    val elements = mutableListOf<Element>()
-    var id: String? = null
-    val foreign = mutableMapOf<String, String>()
-
-    when (val parent = element.parent.parent) {
-        // Handle the legacy apply block pattern
-        is KtDotQualifiedExpression -> {
-            val receiver =
-                (parent.receiverExpression as? KtDotQualifiedExpression)?.selectorExpression
-                    ?: parent.receiverExpression
-
-            if (receiver is KtCallExpression) {
-                // Extract builder parameters
-                receiver.valueArgumentList?.arguments?.forEach { arg ->
-                    if (arg is KtValueArgument) {
-                        val argumentName = arg.getArgumentName()?.asName?.identifier
-                        val expression = arg.getArgumentExpression()
-
-                        when (argumentName) {
-                            "name" -> {
-                                if (expression is KtStringTemplateExpression) {
-                                    id =
-                                        expression.entries.joinToString("") {
-                                            when (it) {
-                                                is KtLiteralStringTemplateEntry -> it.text
-                                                is KtSimpleNameStringTemplateEntry -> it.text
-                                                else -> ""
-                                            }
-                                        }
-                                }
-                            }
-                            "defaultWidth", "defaultHeight", "viewportWidth", "viewportHeight" -> {
-                                if (expression != null) {
-                                    foreign[argumentName] = expression.text.removeSuffix(".dp").removeSuffix("f")
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Parse the apply block
-                val selector = parent.selectorExpression
-                if (selector is KtCallExpression) {
-                    val lambdaArg = selector.lambdaArguments.firstOrNull()
-                    val lambdaExpr = lambdaArg?.getLambdaExpression()
-                    val bodyExpr = lambdaExpr?.bodyExpression
-
-                    if (bodyExpr != null) {
-                        // Process all statements in the apply block
-                        for (statement in bodyExpr.statements) {
-                            // Process both addPath and path builder patterns
-                            when {
-                                // Handle addPath() method
-                                statement is KtCallExpression &&
-                                    statement.calleeExpression?.text == "addPath" -> {
-                                    val pathElement = parseAddPathCall(statement)
-                                    if (pathElement != null) {
-                                        elements.add(pathElement)
-                                    }
-                                }
-
-                                // Handle path {} builder pattern
-                                statement is KtCallExpression &&
-                                    statement.calleeExpression?.text == "path" -> {
-                                    val pathElement = parsePathBuilderCall(statement)
-                                    if (pathElement != null) {
-                                        elements.add(pathElement)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return ImageVectorGraphic(elements, id, foreign, propertyName, null)
 }
 
 private fun parsePathBuilderCall(callExpression: KtCallExpression): Path? {
