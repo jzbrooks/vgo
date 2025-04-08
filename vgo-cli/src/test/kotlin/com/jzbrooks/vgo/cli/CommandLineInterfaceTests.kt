@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.cli
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import assertk.assertions.hasLineCount
 import assertk.assertions.isEqualTo
 import assertk.assertions.matches
 import assertk.assertions.startsWith
@@ -173,6 +174,26 @@ class CommandLineInterfaceTests {
         assertThat(exitCode).isEqualTo(0)
         val output = File("build/integrationTest/format-test.svg").readText()
         assertThat(output).startsWith("<svg")
+    }
+
+    @Test
+    fun testNoOptimizationOption() {
+        val arguments =
+            arrayOf(
+                avocadoExampleRelativePath,
+                "-o",
+                "build/integrationTest/no-optimization-test.svg",
+                "--indent",
+                "2",
+                "--format",
+                "svg",
+                "--no-optimization",
+            )
+        val exitCode = CommandLineInterface().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        val output = File("build/integrationTest/no-optimization-test.svg").readText()
+        assertThat(output).startsWith("<svg")
+        assertThat(output).hasLineCount(42)
     }
 
     companion object {
