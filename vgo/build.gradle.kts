@@ -19,7 +19,7 @@ dependencies {
 
     compileOnly("com.android.tools:sdk-common:31.9.1")
 
-    testImplementation(platform("org.junit:junit-bom:5.12.1"))
+    testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("org.junit.platform:junit-platform-launcher")
