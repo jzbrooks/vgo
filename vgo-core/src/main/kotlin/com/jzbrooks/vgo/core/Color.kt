@@ -4,12 +4,11 @@ package com.jzbrooks.vgo.core
 value class Color(
     private val argb: UInt,
 ) {
-
     constructor(alpha: UByte, red: UByte, green: UByte, blue: UByte) : this(
         (alpha.toUInt() shl 24) or
-                (red.toUInt() shl 16) or
-                (green.toUInt() shl 8) or
-                blue.toUInt(),
+            (red.toUInt() shl 16) or
+            (green.toUInt() shl 8) or
+            blue.toUInt(),
     )
 
     val alpha: UByte
