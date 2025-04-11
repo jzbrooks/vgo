@@ -1,9 +1,9 @@
 package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
+import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.iv.ImageVectorGraphic
 import com.jzbrooks.vgo.iv.ImageVectorGraphicWriter
-import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry

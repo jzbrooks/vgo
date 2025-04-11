@@ -3,8 +3,17 @@ package com.jzbrooks.vgo.iv
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
-import com.jzbrooks.vgo.core.graphic.command.*
+import com.jzbrooks.vgo.core.graphic.command.ClosePath
+import com.jzbrooks.vgo.core.graphic.command.Command
+import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
+import com.jzbrooks.vgo.core.graphic.command.LineTo
+import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
@@ -14,7 +23,6 @@ import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
 import org.jetbrains.kotlin.com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.kotlin.com.intellij.psi.util.PsiUtil
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -35,9 +43,10 @@ import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
-import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
-import org.jetbrains.kotlin.psi.psiUtil.nextLeaf
 import java.io.File
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 fun parse(file: File): ImageVectorGraphic {
     val text = file.readText()
@@ -209,7 +218,7 @@ private fun parseVectorBuilderExpression(
             // Extract the builder arguments (name, dimensions, etc.)
             val callExpr =
                 builderExpr as? KtCallExpression
-                    ?: (builderExpr as KtDotQualifiedExpression).selectorExpression as KtCallExpression
+                    ?: PsiTreeUtil.findChildOfType(builderExpr, KtCallExpression::class.java)!!
 
             callExpr.valueArgumentList?.arguments?.forEach { arg ->
                 if (arg is KtValueArgument) {
@@ -241,10 +250,19 @@ private fun parseVectorBuilderExpression(
 
             var callExpression = (callExpr.parent.parent as? KtDotQualifiedExpression)?.selectorExpression as? KtCallExpression
             while (callExpression != null && callExpression.name != "build") {
-                if (callExpression.calleeExpression?.text == "path") {
-                    val path = parsePathBuilderCall(callExpression)
-                    if (path != null) {
-                        elements.add(path)
+                when (callExpression.calleeExpression?.text) {
+                    "path" -> {
+                        val path = parsePathBuilderCall(callExpression)
+                        if (path != null) {
+                            elements.add(path)
+                        }
+                    }
+
+                    "group" -> {
+                        val group = parseGroupBuilderCall(callExpression)
+                        if (group != null) {
+                            elements.add(group)
+                        }
                     }
                 }
 
@@ -258,6 +276,98 @@ private fun parseVectorBuilderExpression(
     } else {
         null
     }
+}
+
+private fun parseGroupBuilderCall(callExpression: KtCallExpression): Group? {
+    var name: String? = null
+    var rotation: Float? = null
+    var pivotX: Float? = null
+    var pivotY: Float? = null
+    var scaleX: Float? = null
+    var scaleY: Float? = null
+    var translationX: Float? = null
+    var translationY: Float? = null
+
+    callExpression.valueArgumentList?.arguments?.forEach { arg ->
+        if (arg is KtValueArgument) {
+            val argumentName = arg.getArgumentName()?.asName?.identifier
+            val expression = arg.getArgumentExpression()
+
+            when (argumentName) {
+                "name" -> {
+                    if (expression is KtStringTemplateExpression && expression.entries.size == 1) {
+                        name =
+                            when (val literalExpr = expression.entries.first()) {
+                                is KtLiteralStringTemplateEntry -> literalExpr.text
+                                is KtSimpleNameStringTemplateEntry -> literalExpr.text
+                                else -> ""
+                            }
+                    }
+                }
+
+                "rotate" -> {
+                    rotation = parseFloatLiteral(expression)
+                }
+
+                "pivotX" -> {
+                    pivotX = parseFloatLiteral(expression)
+                }
+
+                "pivotY" -> {
+                    pivotY = parseFloatLiteral(expression)
+                }
+
+                "scaleX" -> {
+                    scaleX = parseFloatLiteral(expression)
+                }
+
+                "scaleY" -> {
+                    scaleY = parseFloatLiteral(expression)
+                }
+
+                "translationX" -> {
+                    translationX = parseFloatLiteral(expression)
+                }
+
+                "translationY" -> {
+                    translationY = parseFloatLiteral(expression)
+                }
+            }
+        }
+    }
+
+    // todo: a little duplication here from VectorDrawableReader
+    val scale =
+        Matrix3.from(
+            floatArrayOf(scaleX ?: 1f, 0f, 0f, 0f, scaleY ?: 1f, 0f, 0f, 0f, 1f),
+        )
+
+    val translation =
+        Matrix3.from(
+            floatArrayOf(1f, 0f, translationX ?: 0f, 0f, 1f, translationY ?: 0f, 0f, 0f, 1f),
+        )
+
+    val pivot =
+        Matrix3.from(
+            floatArrayOf(1f, 0f, pivotX ?: 0f, 0f, 1f, pivotY ?: 0f, 0f, 0f, 1f),
+        )
+
+    val pivotInverse =
+        Matrix3.from(
+            floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1, 0f, 1f, (pivotY ?: 0f) * -1, 0f, 0f, 1f),
+        )
+
+    val rotate =
+        if (rotation != null) {
+            val radians = rotation * PI.toFloat() / 180f
+            Matrix3.from(floatArrayOf(cos(radians), -sin(radians), 0f, sin(radians), cos(radians), 0f, 0f, 0f, 1f))
+        } else {
+            Matrix3.IDENTITY
+        }
+
+    val transform = pivotInverse * translation * rotate * scale * pivot
+
+    return Group(id = name, elements = emptyList(), transform = transform, foreign = mutableMapOf())
 }
 
 private fun parsePathBuilderCall(callExpression: KtCallExpression): Path? {

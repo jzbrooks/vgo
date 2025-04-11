@@ -1,8 +1,8 @@
 package com.jzbrooks.vgo.vd
 
-import com.jzbrooks.vgo.iv.ImageVectorGraphic
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.iv.ImageVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 
 fun VectorDrawable.toSvg(): ScalableVectorGraphic {
