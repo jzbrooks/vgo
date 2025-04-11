@@ -250,21 +250,8 @@ private fun parseVectorBuilderExpression(
 
             var callExpression = (callExpr.parent.parent as? KtDotQualifiedExpression)?.selectorExpression as? KtCallExpression
             while (callExpression != null && callExpression.name != "build") {
-                when (callExpression.calleeExpression?.text) {
-                    "path" -> {
-                        val path = parsePathBuilderCall(callExpression)
-                        if (path != null) {
-                            elements.add(path)
-                        }
-                    }
-
-                    "group" -> {
-                        val group = parseGroupBuilderCall(callExpression)
-                        if (group != null) {
-                            elements.add(group)
-                        }
-                    }
-                }
+                val element = parseElement(callExpression)
+                if (element != null) elements.add(element)
 
                 callExpression = (callExpression.parent.parent as? KtDotQualifiedExpression)?.selectorExpression as? KtCallExpression
             }
@@ -277,6 +264,13 @@ private fun parseVectorBuilderExpression(
         null
     }
 }
+
+private fun parseElement(callExpression: KtCallExpression): Element? =
+    when (callExpression.calleeExpression?.text) {
+        "path" -> parsePathBuilderCall(callExpression)
+        "group" -> parseGroupBuilderCall(callExpression)
+        else -> null
+    }
 
 private fun parseGroupBuilderCall(callExpression: KtCallExpression): Group? {
     var name: String? = null
@@ -367,7 +361,27 @@ private fun parseGroupBuilderCall(callExpression: KtCallExpression): Group? {
 
     val transform = pivotInverse * translation * rotate * scale * pivot
 
-    return Group(id = name, elements = emptyList(), transform = transform, foreign = mutableMapOf())
+    val elements: List<Element> =
+        callExpression.lambdaArguments.firstOrNull()?.let { lambdaArg ->
+            val lambdaExpr = lambdaArg.getLambdaExpression()
+            val bodyExpr = lambdaExpr?.bodyExpression
+
+            val elements = mutableListOf<Element>()
+            if (bodyExpr != null) {
+                for (statement in bodyExpr.statements) {
+                    if (statement is KtCallExpression) {
+                        val element = parseElement(statement)
+                        if (element != null) {
+                            elements.add(element)
+                        }
+                    }
+                }
+            }
+
+            elements
+        } ?: emptyList()
+
+    return Group(id = name, elements = elements, transform = transform, foreign = mutableMapOf())
 }
 
 private fun parsePathBuilderCall(callExpression: KtCallExpression): Path? {
