@@ -13,6 +13,8 @@ import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
 import org.jetbrains.kotlin.com.intellij.psi.PsiManager
+import org.jetbrains.kotlin.com.intellij.psi.util.PsiTreeUtil
+import org.jetbrains.kotlin.com.intellij.psi.util.PsiUtil
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -33,6 +35,8 @@ import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
+import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
+import org.jetbrains.kotlin.psi.psiUtil.nextLeaf
 import java.io.File
 
 fun parse(file: File): ImageVectorGraphic {
@@ -186,9 +190,6 @@ private fun parsePropertyGetter(
     return null
 }
 
-/**
- * Parse a vector builder expression (ImageVector.Builder(...).apply { ... })
- */
 private fun parseVectorBuilderExpression(
     expression: KtExpression,
     propertyName: String,
@@ -198,7 +199,6 @@ private fun parseVectorBuilderExpression(
     var id: String? = null
     val foreign = mutableMapOf<String, String>()
 
-    // Handle the ImageVector.Builder(...).apply { ... } pattern
     if (expression is KtDotQualifiedExpression) {
         // Extract the Builder part
         val builderExpr = expression.receiverExpression
@@ -229,6 +229,7 @@ private fun parseVectorBuilderExpression(
                                     }
                             }
                         }
+
                         "defaultWidth", "defaultHeight", "viewportWidth", "viewportHeight" -> {
                             if (argExpr != null) {
                                 foreign[argumentName] = argExpr.text.removeSuffix(".dp").removeSuffix("f")
@@ -238,39 +239,19 @@ private fun parseVectorBuilderExpression(
                 }
             }
 
-            // Parse the apply block containing path definitions
-            val applyExpr = expression.selectorExpression
-            if (applyExpr is KtCallExpression && applyExpr.calleeExpression?.text == "apply") {
-                val lambdaArg = applyExpr.lambdaArguments.firstOrNull()
-                val lambdaExpr = lambdaArg?.getLambdaExpression()
-                val bodyExpr = lambdaExpr?.bodyExpression
-
-                if (bodyExpr != null) {
-                    // Process statements in the apply block (path calls)
-                    for (statement in bodyExpr.statements) {
-                        when {
-                            // Handle path {} builder pattern
-                            statement is KtCallExpression && statement.calleeExpression?.text == "path" -> {
-                                val pathElement = parsePathBuilderCall(statement)
-                                if (pathElement != null) {
-                                    elements.add(pathElement)
-                                }
-                            }
-                            // Handle addPath() method (backward compatibility)
-                            statement is KtCallExpression && statement.calleeExpression?.text == "addPath" -> {
-                                val pathElement = parseAddPathCall(statement)
-                                if (pathElement != null) {
-                                    elements.add(pathElement)
-                                }
-                            }
-                        }
+            var callExpression = (callExpr.parent.parent as? KtDotQualifiedExpression)?.selectorExpression as? KtCallExpression
+            while (callExpression != null && callExpression.name != "build") {
+                if (callExpression.calleeExpression?.text == "path") {
+                    val path = parsePathBuilderCall(callExpression)
+                    if (path != null) {
+                        elements.add(path)
                     }
                 }
+
+                callExpression = (callExpression.parent.parent as? KtDotQualifiedExpression)?.selectorExpression as? KtCallExpression
             }
         }
     }
-
-    // todo: handle ImageVector.Builder(...).path(...) { }.group(...) { }.build()
 
     return if (elements.isNotEmpty() || id != null) {
         ImageVectorGraphic(elements, id, foreign, propertyName, packageName)
@@ -539,102 +520,4 @@ private fun parseColorArgument(expression: KtExpression?): Color? {
     }
 
     return null
-}
-
-private fun parseAddPathCall(callExpression: KtCallExpression): Path? {
-    var pathData: List<Command> = emptyList()
-    var fillColor: Color? = null
-    var strokeColor: Color? = null
-    var strokeWidth: Float? = null
-    var fillAlpha: Float? = null
-    var strokeAlpha: Float? = null
-
-    // Extract named arguments from addPath call
-    callExpression.valueArgumentList?.arguments?.forEach { arg ->
-        if (arg is KtValueArgument) {
-            val argumentName = arg.getArgumentName()?.asName?.identifier
-            val expression = arg.getArgumentExpression()
-
-            when (argumentName) {
-                "pathData" -> {
-                    pathData = parsePathDataExpression(expression)
-                }
-                "fill" -> {
-                    fillColor = parseColorArgument(expression)
-                }
-                "stroke" -> {
-                    strokeColor = parseColorArgument(expression)
-                }
-                "strokeLineWidth" -> {
-                    val floatText = (expression as? KtConstantExpression)?.text
-                    strokeWidth = floatText?.toFloatOrNull()
-                        ?: floatText?.removeSuffix("f")?.toFloatOrNull()
-                }
-                "fillAlpha" -> {
-                    val floatText = (expression as? KtConstantExpression)?.text
-                    fillAlpha = floatText?.toFloatOrNull()
-                        ?: floatText?.removeSuffix("f")?.toFloatOrNull()
-                }
-                "strokeAlpha" -> {
-                    val floatText = (expression as? KtConstantExpression)?.text
-                    strokeAlpha = floatText?.toFloatOrNull()
-                        ?: floatText?.removeSuffix("f")?.toFloatOrNull()
-                }
-            }
-        }
-    }
-
-    var effectiveFillColor = fillColor ?: Colors.BLACK
-    fillAlpha?.let {
-        effectiveFillColor = effectiveFillColor.copy(alpha = (it * 255f).coerceIn(0f, 255f).toInt().toUByte())
-    }
-    var effectiveStrokeColor = strokeColor ?: Colors.TRANSPARENT
-    strokeAlpha?.let {
-        effectiveStrokeColor = effectiveStrokeColor.copy(alpha = (it * 255f).coerceIn(0f, 255f).toInt().toUByte())
-    }
-
-    return Path(
-        id = null,
-        commands = pathData,
-        fill = effectiveFillColor,
-        stroke = effectiveStrokeColor,
-        strokeWidth = strokeWidth ?: 0f,
-        fillRule = Path.FillRule.EVEN_ODD,
-        strokeLineCap = Path.LineCap.BUTT,
-        strokeLineJoin = Path.LineJoin.MITER,
-        strokeMiterLimit = 4f,
-        foreign = mutableMapOf(),
-    )
-}
-
-private fun parsePathDataExpression(expression: KtExpression?): List<Command> {
-    if (expression == null) {
-        return emptyList()
-    }
-
-    // PathData with string literal argument
-    if (expression is KtCallExpression && expression.calleeExpression?.text == "PathData") {
-        val argList = expression.valueArgumentList
-        if (argList != null && argList.arguments.size == 1) {
-            val argExpr = argList.arguments[0].getArgumentExpression()
-
-            // Case 1a: PathData with a single string
-            if (argExpr is KtStringTemplateExpression) {
-                return CommandString(argExpr.entries.joinToString("") { it.text }).toCommandList()
-            }
-
-            // Case 1b: PathData with a collection of strings
-            if (argExpr is KtCallExpression && argExpr.calleeExpression?.text == "listOf") {
-                return argExpr.valueArgumentList
-                    ?.arguments
-                    ?.mapNotNull { arg ->
-                        val stringExpr = arg.getArgumentExpression() as? KtStringTemplateExpression
-                        stringExpr?.entries?.joinToString("") { it.text }
-                    }?.joinToString("")
-                    ?.let { CommandString(it).toCommandList() } ?: emptyList()
-            }
-        }
-    }
-
-    return emptyList()
 }
