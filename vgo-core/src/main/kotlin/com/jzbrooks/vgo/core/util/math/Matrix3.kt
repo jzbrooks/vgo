@@ -1,6 +1,9 @@
 package com.jzbrooks.vgo.core.util.math
 
+import kotlin.math.PI
 import kotlin.math.absoluteValue
+import kotlin.math.cos
+import kotlin.math.sin
 
 interface Matrix3 {
     operator fun get(
@@ -123,4 +126,55 @@ private value class ArrayMatrix3(
         other: Matrix3,
         delta: Float,
     ) = Matrix3.contentsEqual(this, other, delta)
+}
+
+/**
+ * Computes a transformation matrix based on the provided parameters.
+ *
+ * @param scaleX The scale factor in the X direction. Default is 1.
+ * @param scaleY The scale factor in the Y direction. Default is 1.
+ * @param translationX The translation in the X direction. Default is 0.
+ * @param translationY The translation in the Y direction. Default is 0.
+ * @param rotation The rotation angle in degrees. Default is 0.
+ * @param pivotX The pivot point in the X direction. Default is 0.
+ * @param pivotY The pivot point in the Y direction. Default is 0.
+ */
+fun computeTransformation(
+    scaleX: Float? = null,
+    scaleY: Float? = null,
+    translationX: Float? = null,
+    translationY: Float? = null,
+    rotation: Float? = null,
+    pivotX: Float? = null,
+    pivotY: Float? = null,
+): Matrix3 {
+    val scale =
+        Matrix3.from(
+            floatArrayOf(scaleX ?: 1f, 0f, 0f, 0f, scaleY ?: 1f, 0f, 0f, 0f, 1f),
+        )
+
+    val translation =
+        Matrix3.from(
+            floatArrayOf(1f, 0f, translationX ?: 0f, 0f, 1f, translationY ?: 0f, 0f, 0f, 1f),
+        )
+
+    val pivot =
+        Matrix3.from(
+            floatArrayOf(1f, 0f, pivotX ?: 0f, 0f, 1f, pivotY ?: 0f, 0f, 0f, 1f),
+        )
+
+    val pivotInverse =
+        Matrix3.from(
+            floatArrayOf(1f, 0f, (pivotX ?: 0f) * -1, 0f, 1f, (pivotY ?: 0f) * -1, 0f, 0f, 1f),
+        )
+
+    val rotate =
+        if (rotation != null) {
+            val radians = rotation * PI.toFloat() / 180f
+            Matrix3.from(floatArrayOf(cos(radians), -sin(radians), 0f, sin(radians), cos(radians), 0f, 0f, 0f, 1f))
+        } else {
+            Matrix3.IDENTITY
+        }
+
+    return pivotInverse * translation * rotate * scale * pivot
 }
