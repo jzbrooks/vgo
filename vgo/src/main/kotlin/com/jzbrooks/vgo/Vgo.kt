@@ -2,8 +2,8 @@ package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
-import com.jzbrooks.vgo.iv.ImageVectorGraphic
-import com.jzbrooks.vgo.iv.ImageVectorGraphicWriter
+import com.jzbrooks.vgo.iv.ImageVector
+import com.jzbrooks.vgo.iv.ImageVectorWriter
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
@@ -147,8 +147,8 @@ class Vgo(
                     writer.write(graphic, outputStream)
                 }
 
-                if (graphic is ImageVectorGraphic) {
-                    val writer = ImageVectorGraphicWriter(writerOptions)
+                if (graphic is ImageVector) {
+                    val writer = ImageVectorWriter(writerOptions)
                     writer.write(graphic, outputStream)
                 }
 

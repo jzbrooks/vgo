@@ -29,11 +29,11 @@ import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.hypot
 
-class ImageVectorGraphicWriter(
+class ImageVectorWriter(
     override val options: Set<Writer.Option> = emptySet(),
-) : Writer<ImageVectorGraphic> {
+) : Writer<ImageVector> {
     override fun write(
-        graphic: ImageVectorGraphic,
+        graphic: ImageVector,
         stream: OutputStream,
     ) {
         val fileSpec =
@@ -59,7 +59,7 @@ class ImageVectorGraphicWriter(
         }
     }
 
-    private fun createImageVectorProperty(graphic: ImageVectorGraphic): PropertySpec {
+    private fun createImageVectorProperty(graphic: ImageVector): PropertySpec {
         val imageVector = ClassName("androidx.compose.ui.graphics.vector", "ImageVector")
 
         val imageVectorAllocation =

@@ -45,7 +45,7 @@ import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
 import java.io.File
 
-fun parse(file: File): ImageVectorGraphic {
+fun parse(file: File): ImageVector {
     val text = file.readText()
     val disposable = Disposer.newDisposable()
 
@@ -92,8 +92,8 @@ private fun createPsiFile(
  * Find property-based ImageVector definitions like:
  * val BackingIcons.Outlined.Add: ImageVector get() = _Add ?: ImageVector.Builder(...).apply { ... }.build()
  */
-private fun findPropertyVectors(file: KtFile): List<ImageVectorGraphic> {
-    val results = mutableListOf<ImageVectorGraphic>()
+private fun findPropertyVectors(file: KtFile): List<ImageVector> {
+    val results = mutableListOf<ImageVector>()
 
     file.accept(
         object : KtTreeVisitorVoid() {
@@ -123,7 +123,7 @@ private fun findPropertyVectors(file: KtFile): List<ImageVectorGraphic> {
 private fun parsePropertyGetter(
     property: KtProperty,
     getter: KtPropertyAccessor,
-): ImageVectorGraphic? {
+): ImageVector? {
     val propertyName = property.name ?: return null
 
     // Find package name from qualified property if available
@@ -200,7 +200,7 @@ private fun parseVectorBuilderExpression(
     expression: KtExpression,
     propertyName: String,
     packageName: String?,
-): ImageVectorGraphic? {
+): ImageVector? {
     val elements = mutableListOf<Element>()
     var id: String? = null
     val foreign = mutableMapOf<String, String>()
@@ -256,7 +256,7 @@ private fun parseVectorBuilderExpression(
     }
 
     return if (elements.isNotEmpty() || id != null) {
-        ImageVectorGraphic(elements, id, foreign, propertyName, packageName)
+        ImageVector(elements, id, foreign, propertyName, packageName)
     } else {
         null
     }
