@@ -2,7 +2,7 @@ package com.jzbrooks.vgo.iv
 
 import com.jzbrooks.vgo.vd.VectorDrawable
 
-fun ImageVectorGraphic.toVectorDrawable(): VectorDrawable {
+fun ImageVector.toVectorDrawable(): VectorDrawable {
     val vdElementAttributes =
         mutableMapOf(
             "xmlns:android" to "http://schemas.android.com/apk/res/android",
