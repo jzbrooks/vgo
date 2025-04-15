@@ -2,6 +2,17 @@ package com.jzbrooks.vgo.util
 
 import com.android.ide.common.vectordrawable.Svg2Vector
 import com.jzbrooks.vgo.core.graphic.Graphic
+import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
+import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
+import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
+import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
+import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
+import org.jetbrains.kotlin.com.intellij.psi.PsiManager
+import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
+import org.jetbrains.kotlin.config.CommonConfigurationKeys
+import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.idea.KotlinFileType
+import org.jetbrains.kotlin.psi.KtFile
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -18,10 +29,34 @@ internal fun parse(
 ): Graphic? {
     if (file.length() == 0L) return null
 
-    return if (file.extension == "kt") {
-        composableParse(file)
-    } else {
-        file.inputStream().use { inputStream ->
+    return file.inputStream().use { inputStream ->
+        if (file.extension == "kt") {
+            val text = file.reader().readText()
+            val disposable = Disposer.newDisposable()
+
+            try {
+                val configuration = CompilerConfiguration()
+                configuration.put(
+                    CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY,
+                    PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false),
+                )
+
+                val environment =
+                    KotlinCoreEnvironment.createForProduction(
+                        disposable,
+                        configuration,
+                        EnvironmentConfigFiles.JVM_CONFIG_FILES,
+                    )
+
+                val project = environment.project
+                val virtualFile = LightVirtualFile(file.name, KotlinFileType.INSTANCE, text)
+                val psiFile = PsiManager.getInstance(project).findFile(virtualFile) as KtFile
+
+                composableParse(psiFile)
+            } finally {
+                Disposer.dispose(disposable)
+            }
+        } else {
             val documentBuilderFactory = DocumentBuilderFactory.newInstance()
             val document = documentBuilderFactory.newDocumentBuilder().parse(inputStream)
             document.documentElement.normalize()

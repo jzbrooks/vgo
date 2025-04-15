@@ -5,80 +5,55 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.util.element.createPath
-import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
-import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
-import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
+import org.jetbrains.kotlin.com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
-import org.jetbrains.kotlin.com.intellij.psi.PsiManager
-import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
-import org.jetbrains.kotlin.config.CommonConfigurationKeys
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.idea.KotlinFileType
-import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifier
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
 class ImageVectorWriterTest {
+    private lateinit var disposable: Disposable
+
+    @BeforeEach
+    fun setup() {
+        disposable = Disposer.newDisposable()
+    }
+
+    @AfterEach
+    fun teardown() {
+        disposable.dispose()
+    }
 
     @Test
     fun testExtraChildrenWritten() {
         ByteArrayOutputStream().use { memoryStream ->
             ImageVectorWriter().write(graphic, memoryStream)
 
-            assertKotlinStructure(memoryStream) {
-                var actual: KtProperty? = null
-                it.accept(
-                    object : KtTreeVisitorVoid() {
-                        override fun visitProperty(property: KtProperty) {
-                            super.visitProperty(property)
-                            if (property.visibilityModifier()?.text == "public")
-                                actual = property
+            val inputStream = ByteArrayInputStream(memoryStream.toByteArray())
+            val psiFile = parseKotlinFile(disposable, inputStream)
+            var actual: KtProperty? = null
+            psiFile.accept(
+                object : KtTreeVisitorVoid() {
+                    override fun visitProperty(property: KtProperty) {
+                        super.visitProperty(property)
+                        if (property.visibilityModifier()?.text == "public") {
+                            actual = property
                         }
                     }
-                )
-
-                assertThat(actual).isNotNull()
-                    .transform("typeReference") { it.typeReference }
-                    .isNotNull()
-                    .transform("text") { it.text }
-                    .isEqualTo("ImageVector")
-            }
-        }
-    }
-
-    private fun assertKotlinStructure(file: ByteArrayOutputStream, assertion: (KtFile) -> Unit) {
-        val text =
-            ByteArrayInputStream(file.toByteArray())
-            .bufferedReader()
-            .use { it.readText() }
-
-        val disposable = Disposer.newDisposable()
-
-        return try {
-            val configuration = CompilerConfiguration()
-            configuration.put(
-                CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY,
-                PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false),
+                },
             )
 
-            val environment =
-                KotlinCoreEnvironment.createForProduction(
-                    disposable,
-                    configuration,
-                    EnvironmentConfigFiles.JVM_CONFIG_FILES,
-                )
-
-            val virtualFile = LightVirtualFile("test.kt", KotlinFileType.INSTANCE, text)
-            val psiFile = PsiManager.getInstance(environment.project).findFile(virtualFile) as KtFile
-
-            assertion(psiFile)
-        } finally {
-            Disposer.dispose(disposable)
+            assertThat(actual)
+                .isNotNull()
+                .transform("typeReference") { it.typeReference }
+                .isNotNull()
+                .transform("text") { it.text }
+                .isEqualTo("ImageVector")
         }
     }
 
@@ -109,7 +84,7 @@ class ImageVectorWriterTest {
                     "viewportHeight" to "24.dp",
                 ),
                 "image",
-                null
+                null,
             )
     }
 }
