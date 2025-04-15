@@ -15,18 +15,7 @@ import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.computeTransformation
-import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
-import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
-import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
-import org.jetbrains.kotlin.com.intellij.openapi.project.Project
-import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
-import org.jetbrains.kotlin.com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
-import org.jetbrains.kotlin.config.CommonConfigurationKeys
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
@@ -43,49 +32,13 @@ import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
-import java.io.File
 
-fun parse(file: File): ImageVector {
-    val text = file.readText()
-    val disposable = Disposer.newDisposable()
+fun parse(psiFile: KtFile): ImageVector {
+    val propertyVectors = findPropertyVectors(psiFile)
 
-    try {
-        val configuration = CompilerConfiguration()
-        configuration.put(
-            CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY,
-            PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false),
-        )
-
-        val environment =
-            KotlinCoreEnvironment.createForProduction(
-                disposable,
-                configuration,
-                EnvironmentConfigFiles.JVM_CONFIG_FILES,
-            )
-
-        val project = environment.project
-        val psiFile = createPsiFile(project, file.name, text)
-
-        // Find and parse property-based vector definitions
-        val propertyVectors = findPropertyVectors(psiFile)
-        if (propertyVectors.isNotEmpty()) {
-            val first = propertyVectors.first()
-            return first
-        }
-
-        error("Failed to parse file ${file.name}")
-    } finally {
-        Disposer.dispose(disposable)
+    return checkNotNull(propertyVectors.firstOrNull()) {
+        "Failed to parse ${psiFile.name}"
     }
-}
-
-private fun createPsiFile(
-    project: Project,
-    fileName: String,
-    text: String,
-): KtFile {
-    val virtualFile = LightVirtualFile(fileName, KotlinFileType.INSTANCE, text)
-    return PsiManager.getInstance(project).findFile(virtualFile) as KtFile
 }
 
 /**
