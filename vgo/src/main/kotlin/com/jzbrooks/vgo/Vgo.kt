@@ -3,6 +3,7 @@ package com.jzbrooks.vgo
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.iv.ImageVector
+import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
 import com.jzbrooks.vgo.iv.ImageVectorWriter
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
@@ -131,6 +132,7 @@ class Vgo(
                         when (graphic) {
                             is VectorDrawable -> VectorDrawableOptimizationRegistry()
                             is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                            is ImageVector -> ImageVectorOptimizationRegistry()
                             else -> null
                         }
 
