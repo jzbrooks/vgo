@@ -1,7 +1,10 @@
+@file:OptIn(ExperimentalVgoApi::class)
+
 package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
+import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.iv.ImageVector
 import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
 import com.jzbrooks.vgo.iv.ImageVectorWriter
