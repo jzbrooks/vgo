@@ -1,5 +1,7 @@
 package com.jzbrooks.vgo.core
 
+import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
+
 @JvmInline
 value class Color(
     private val argb: UInt,
@@ -31,6 +33,7 @@ value class Color(
 
     operator fun component4() = blue
 
+    @ExperimentalVgoApi
     fun copy(
         alpha: UByte? = null,
         red: UByte? = null,

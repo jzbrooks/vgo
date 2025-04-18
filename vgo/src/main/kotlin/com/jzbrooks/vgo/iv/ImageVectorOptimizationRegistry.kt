@@ -13,8 +13,10 @@ import com.jzbrooks.vgo.core.transformation.RemoveTransparentPaths
 import com.jzbrooks.vgo.core.transformation.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.transformation.SimplifyLineCommands
 import com.jzbrooks.vgo.core.transformation.TransformerSet
+import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.vd.VectorDrawableCommandPrinter
 
+@ExperimentalVgoApi
 class ImageVectorOptimizationRegistry :
     TransformerSet(
         bottomUpTransformers =

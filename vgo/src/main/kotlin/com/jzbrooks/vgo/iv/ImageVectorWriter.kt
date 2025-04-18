@@ -16,6 +16,7 @@ import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
@@ -29,6 +30,7 @@ import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.hypot
 
+@ExperimentalVgoApi
 class ImageVectorWriter(
     override val options: Set<Writer.Option> = emptySet(),
 ) : Writer<ImageVector> {

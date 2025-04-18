@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalVgoApi::class)
+
 package com.jzbrooks.vgo.iv
 
 import com.jzbrooks.vgo.core.Color
@@ -13,6 +15,7 @@ import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.computeTransformation
 import org.jetbrains.kotlin.com.intellij.psi.util.PsiTreeUtil
@@ -33,6 +36,7 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
 
+@ExperimentalVgoApi
 fun parse(psiFile: KtFile): ImageVector {
     val propertyVectors = findPropertyVectors(psiFile)
 
