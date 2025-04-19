@@ -36,6 +36,9 @@ import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
 
+internal const val FOREIGN_KEY_PROPERTY_NAME = "propertyName"
+internal const val FOREIGN_KEY_PACKAGE_NAME = "packageName"
+
 @ExperimentalVgoApi
 fun parse(psiFile: KtFile): ImageVector {
     val propertyVectors = findPropertyVectors(psiFile)
@@ -160,16 +163,22 @@ private fun parseVectorBuilderExpression(
 ): ImageVector? {
     val elements = mutableListOf<Element>()
     var id: String? = null
-    val foreign = mutableMapOf<String, String>()
+    var defaultWidthDp: Float? = null
+    var defaultHeightDp: Float? = null
+    var viewportWidth: Float? = null
+    var viewportHeight: Float? = null
+
+    val foreign = mutableMapOf(FOREIGN_KEY_PROPERTY_NAME to propertyName)
+    if (packageName != null) {
+        foreign[FOREIGN_KEY_PACKAGE_NAME] = packageName
+    }
 
     if (expression is KtDotQualifiedExpression) {
-        // Extract the Builder part
         val builderExpr = expression.receiverExpression
 
         if (builderExpr is KtCallExpression ||
             (builderExpr is KtDotQualifiedExpression && builderExpr.selectorExpression is KtCallExpression)
         ) {
-            // Extract the builder arguments (name, dimensions, etc.)
             val callExpr =
                 builderExpr as? KtCallExpression
                     ?: PsiTreeUtil.findChildOfType(builderExpr, KtCallExpression::class.java)!!
@@ -193,10 +202,28 @@ private fun parseVectorBuilderExpression(
                             }
                         }
 
-                        "defaultWidth", "defaultHeight", "viewportWidth", "viewportHeight" -> {
-                            if (argExpr != null) {
-                                foreign[argumentName] = argExpr.text.removeSuffix(".dp").removeSuffix("f")
-                            }
+                        "defaultWidth" -> {
+                            defaultWidthDp =
+                                argExpr
+                                    ?.text
+                                    ?.removeSuffix(".dp")
+                                    ?.toFloatOrNull()
+                        }
+
+                        "defaultHeight" -> {
+                            defaultHeightDp =
+                                argExpr
+                                    ?.text
+                                    ?.removeSuffix(".dp")
+                                    ?.toFloatOrNull()
+                        }
+
+                        "viewportWidth" -> {
+                            viewportWidth = argExpr?.text?.toFloatOrNull()
+                        }
+
+                        "viewportHeight" -> {
+                            viewportHeight = argExpr?.text?.toFloatOrNull()
                         }
                     }
                 }
@@ -212,8 +239,8 @@ private fun parseVectorBuilderExpression(
         }
     }
 
-    return if (elements.isNotEmpty() || id != null) {
-        ImageVector(elements, id, foreign, propertyName, packageName)
+    return if (defaultWidthDp != null && defaultHeightDp != null && viewportWidth != null && viewportHeight != null) {
+        ImageVector(elements, id, foreign, defaultWidthDp, defaultHeightDp, viewportWidth, viewportHeight)
     } else {
         null
     }

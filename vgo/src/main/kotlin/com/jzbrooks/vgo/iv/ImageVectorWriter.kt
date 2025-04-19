@@ -38,17 +38,19 @@ class ImageVectorWriter(
         graphic: ImageVector,
         stream: OutputStream,
     ) {
+        val packageName = graphic.foreign[FOREIGN_KEY_PACKAGE_NAME] ?: ""
+        val propertyName = graphic.foreign[FOREIGN_KEY_PROPERTY_NAME] ?: graphic.id ?: "vector"
         val fileSpec =
             FileSpec
                 .builder(
-                    packageName = graphic.packageName ?: "",
-                    fileName = "${graphic.propertyName}.kt",
+                    packageName = packageName,
+                    fileName = "$propertyName.kt", // todo: this should respect the output file option
                 ).addImport("androidx.compose.ui.unit", "dp")
-                .addProperty(createImageVectorProperty(graphic))
+                .addProperty(createImageVectorProperty(graphic, propertyName))
                 .addProperty(
                     PropertySpec
                         .builder(
-                            "_${graphic.propertyName}",
+                            "_$propertyName",
                             ClassName("androidx.compose.ui.graphics.vector", "ImageVector").copy(nullable = true),
                             KModifier.PRIVATE,
                         ).initializer("null")
@@ -61,7 +63,10 @@ class ImageVectorWriter(
         }
     }
 
-    private fun createImageVectorProperty(graphic: ImageVector): PropertySpec {
+    private fun createImageVectorProperty(
+        graphic: ImageVector,
+        propertyName: String,
+    ): PropertySpec {
         val imageVector = ClassName("androidx.compose.ui.graphics.vector", "ImageVector")
 
         val imageVectorAllocation =
@@ -70,10 +75,10 @@ class ImageVectorWriter(
                 .add(
                     "%T.Builder(defaultWidth = %L.dp, defaultHeight = %L.dp, viewportWidth = %Lf, viewportHeight = %Lf)\n",
                     imageVector,
-                    graphic.foreign.getValue("defaultWidth"),
-                    graphic.foreign.getValue("defaultHeight"),
-                    graphic.foreign.getValue("viewportWidth"),
-                    graphic.foreign.getValue("viewportHeight"),
+                    graphic.defaultWidthDp,
+                    graphic.defaultHeightDp,
+                    graphic.viewportWidth,
+                    graphic.viewportHeight,
                 ).indent()
 
         imageVectorAllocation.withIndent {
@@ -85,7 +90,7 @@ class ImageVectorWriter(
 
         imageVectorAllocation.add(".build()")
 
-        val backingProperty = "_${graphic.propertyName}"
+        val backingProperty = "_$propertyName"
 
         val lazyImageVectorAllocation =
             CodeBlock
@@ -98,7 +103,7 @@ class ImageVectorWriter(
                 )
 
         return PropertySpec
-            .builder(graphic.propertyName, imageVector)
+            .builder(propertyName, imageVector)
             .getter(FunSpec.getterBuilder().addCode(lazyImageVectorAllocation.build()).build())
             .build()
     }
