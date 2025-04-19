@@ -26,9 +26,26 @@ import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.withIndent
 import java.io.OutputStream
+import java.math.RoundingMode
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.hypot
+
+// todo: figure out a better way to create these
+private val decimalFormat =
+    DecimalFormat().apply {
+        maximumFractionDigits = 2
+        isDecimalSeparatorAlwaysShown = false
+        isGroupingUsed = false
+        roundingMode = RoundingMode.HALF_UP
+        minimumIntegerDigits = 0
+        decimalFormatSymbols =
+            DecimalFormatSymbols().apply {
+                decimalSeparator = '.'
+            }
+    }
 
 @ExperimentalVgoApi
 class ImageVectorWriter(
@@ -75,10 +92,10 @@ class ImageVectorWriter(
                 .add(
                     "%T.Builder(defaultWidth = %L.dp, defaultHeight = %L.dp, viewportWidth = %Lf, viewportHeight = %Lf)\n",
                     imageVector,
-                    graphic.defaultWidthDp,
-                    graphic.defaultHeightDp,
-                    graphic.viewportWidth,
-                    graphic.viewportHeight,
+                    decimalFormat.format(graphic.defaultWidthDp),
+                    decimalFormat.format(graphic.defaultHeightDp),
+                    decimalFormat.format(graphic.viewportWidth),
+                    decimalFormat.format(graphic.viewportHeight),
                 ).indent()
 
         imageVectorAllocation.withIndent {
@@ -151,43 +168,43 @@ class ImageVectorWriter(
                             is MoveTo -> {
                                 val coord = command.parameters.first()
                                 if (command.variant == CommandVariant.ABSOLUTE) {
-                                    add("moveTo(%Lf, %Lf)\n", coord.x, coord.y)
+                                    add("moveTo(%Lf, %Lf)\n", decimalFormat.format(coord.x), coord.y)
                                 } else {
-                                    add("moveToRelative(%Lf, %Lf)\n", coord.x, coord.y)
+                                    add("moveToRelative(%Lf, %Lf)\n", decimalFormat.format(coord.x), coord.y)
                                 }
 
                                 for (parameter in command.parameters.drop(1)) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add("lineTo(%Lf, %Lf)\n", parameter.x, parameter.y)
+                                        add("lineTo(%Lf, %Lf)\n", decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                     } else {
-                                        add("lineToRelative(%Lf, %Lf)\n", parameter.x, parameter.y)
+                                        add("lineToRelative(%Lf, %Lf)\n", decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                     }
                                 }
                             }
                             is LineTo -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add("lineTo(%Lf, %Lf)\n", parameter.x, parameter.y)
+                                        add("lineTo(%Lf, %Lf)\n", decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                     } else {
-                                        add("lineToRelative(%Lf, %Lf)\n", parameter.x, parameter.y)
+                                        add("lineToRelative(%Lf, %Lf)\n", decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                     }
                                 }
                             }
                             is HorizontalLineTo -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add("horizontalLineTo(%Lf)\n", parameter)
+                                        add("horizontalLineTo(%Lf)\n", decimalFormat.format(parameter))
                                     } else {
-                                        add("horizontalLineToRelative(%Lf)\n", parameter)
+                                        add("horizontalLineToRelative(%Lf)\n", decimalFormat.format(parameter))
                                     }
                                 }
                             }
                             is VerticalLineTo -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add("verticalLineTo(%Lf)\n", parameter)
+                                        add("verticalLineTo(%Lf)\n", decimalFormat.format(parameter))
                                     } else {
-                                        add("verticalLineToRelative(%Lf)\n", parameter)
+                                        add("verticalLineToRelative(%Lf)\n", decimalFormat.format(parameter))
                                     }
                                 }
                             }
@@ -196,22 +213,22 @@ class ImageVectorWriter(
                                     if (command.variant == CommandVariant.ABSOLUTE) {
                                         add(
                                             "curveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf)\n",
-                                            parameter.startControl.x,
-                                            parameter.startControl.y,
-                                            parameter.endControl.x,
-                                            parameter.endControl.y,
-                                            parameter.end.x,
-                                            parameter.end.y,
+                                            decimalFormat.format(parameter.startControl.x),
+                                            decimalFormat.format(parameter.startControl.y),
+                                            decimalFormat.format(parameter.endControl.x),
+                                            decimalFormat.format(parameter.endControl.y),
+                                            decimalFormat.format(parameter.end.x),
+                                            decimalFormat.format(parameter.end.y),
                                         )
                                     } else {
                                         add(
                                             "curveToRelative(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf)\n",
-                                            parameter.startControl.x,
-                                            parameter.startControl.y,
-                                            parameter.endControl.x,
-                                            parameter.endControl.y,
-                                            parameter.end.x,
-                                            parameter.end.y,
+                                            decimalFormat.format(parameter.startControl.x),
+                                            decimalFormat.format(parameter.startControl.y),
+                                            decimalFormat.format(parameter.endControl.x),
+                                            decimalFormat.format(parameter.endControl.y),
+                                            decimalFormat.format(parameter.end.x),
+                                            decimalFormat.format(parameter.end.y),
                                         )
                                     }
                                 }
@@ -221,18 +238,18 @@ class ImageVectorWriter(
                                     if (command.variant == CommandVariant.ABSOLUTE) {
                                         add(
                                             "reflectiveCurveTo(%Lf, %Lf, %Lf, %Lf)\n",
-                                            parameter.endControl.x,
-                                            parameter.endControl.y,
-                                            parameter.end.x,
-                                            parameter.end.y,
+                                            decimalFormat.format(parameter.endControl.x),
+                                            decimalFormat.format(parameter.endControl.y),
+                                            decimalFormat.format(parameter.end.x),
+                                            decimalFormat.format(parameter.end.y),
                                         )
                                     } else {
                                         add(
                                             "reflectiveCurveToRelative(%Lf, %Lf, %Lf, %Lf)\n",
-                                            parameter.endControl.x,
-                                            parameter.endControl.y,
-                                            parameter.end.x,
-                                            parameter.end.y,
+                                            decimalFormat.format(parameter.endControl.x),
+                                            decimalFormat.format(parameter.endControl.y),
+                                            decimalFormat.format(parameter.end.x),
+                                            decimalFormat.format(parameter.end.y),
                                         )
                                     }
                                 }
@@ -242,18 +259,18 @@ class ImageVectorWriter(
                                     if (command.variant == CommandVariant.ABSOLUTE) {
                                         add(
                                             "quadTo(%Lf, %Lf, %Lf, %Lf)\n",
-                                            parameter.control.x,
-                                            parameter.control.y,
-                                            parameter.end.x,
-                                            parameter.end.y,
+                                            decimalFormat.format(parameter.control.x),
+                                            decimalFormat.format(parameter.control.y),
+                                            decimalFormat.format(parameter.end.x),
+                                            decimalFormat.format(parameter.end.y),
                                         )
                                     } else {
                                         add(
                                             "quadToRelative(%Lf, %Lf, %Lf, %Lf)\n",
-                                            parameter.control.x,
-                                            parameter.control.y,
-                                            parameter.end.x,
-                                            parameter.end.y,
+                                            decimalFormat.format(parameter.control.x),
+                                            decimalFormat.format(parameter.control.y),
+                                            decimalFormat.format(parameter.end.x),
+                                            decimalFormat.format(parameter.end.y),
                                         )
                                     }
                                 }
@@ -263,14 +280,14 @@ class ImageVectorWriter(
                                     if (command.variant == CommandVariant.ABSOLUTE) {
                                         add(
                                             "reflectiveQuadTo(%Lf, %Lf)\n",
-                                            parameter.x,
-                                            parameter.y,
+                                            decimalFormat.format(parameter.x),
+                                            decimalFormat.format(parameter.y),
                                         )
                                     } else {
                                         add(
                                             "reflectiveQuadToRelative(%Lf, %Lf)\n",
-                                            parameter.x,
-                                            parameter.y,
+                                            decimalFormat.format(parameter.x),
+                                            decimalFormat.format(parameter.y),
                                         )
                                     }
                                 }
@@ -281,24 +298,24 @@ class ImageVectorWriter(
                                     if (command.variant == CommandVariant.ABSOLUTE) {
                                         add(
                                             "arcTo(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf)\n",
-                                            parameter.radiusX,
-                                            parameter.radiusY,
-                                            parameter.angle,
+                                            decimalFormat.format(parameter.radiusX),
+                                            decimalFormat.format(parameter.radiusY),
+                                            decimalFormat.format(parameter.angle),
                                             parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
                                             parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
-                                            parameter.end.x,
-                                            parameter.end.y,
+                                            decimalFormat.format(parameter.end.x),
+                                            decimalFormat.format(parameter.end.y),
                                         )
                                     } else {
                                         add(
                                             "arcToRelative(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf)\n",
-                                            parameter.radiusX,
-                                            parameter.radiusY,
-                                            parameter.angle,
+                                            decimalFormat.format(parameter.radiusX),
+                                            decimalFormat.format(parameter.radiusY),
+                                            decimalFormat.format(parameter.angle),
                                             parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
                                             parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
-                                            parameter.end.x,
-                                            parameter.end.y,
+                                            decimalFormat.format(parameter.end.x),
+                                            decimalFormat.format(parameter.end.y),
                                         )
                                     }
                                 }
@@ -325,11 +342,11 @@ class ImageVectorWriter(
 
                 codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "group"))
                 codeBlock.withIndent {
-                    add("rotate = %Lf,\n", rotation)
-                    add("scaleX = %Lf,\n", scaleX)
-                    add("scaleY = %Lf,\n", scaleY)
-                    add("translationX = %Lf,\n", translationX)
-                    add("translationY = %Lf,\n", translationY)
+                    add("rotate = %Lf,\n", decimalFormat.format(rotation))
+                    add("scaleX = %Lf,\n", decimalFormat.format(scaleX))
+                    add("scaleY = %Lf,\n", decimalFormat.format(scaleY))
+                    add("translationX = %Lf,\n", decimalFormat.format(translationX))
+                    add("translationY = %Lf,\n", decimalFormat.format(translationY))
                 }
                 codeBlock.add(") {\n")
                 codeBlock.withIndent {
@@ -352,43 +369,43 @@ class ImageVectorWriter(
                                 is MoveTo -> {
                                     val coord = command.parameters.first()
                                     if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add("%T.MoveTo(%Lf, %Lf),\n", pathNode, coord.x, coord.y)
+                                        add("%T.MoveTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(coord.x), coord.y)
                                     } else {
-                                        add("%T.RelativeMoveTo(%Lf, %Lf),\n", pathNode, coord.x, coord.y)
+                                        add("%T.RelativeMoveTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(coord.x), coord.y)
                                     }
 
                                     for (parameter in command.parameters.drop(1)) {
                                         if (command.variant == CommandVariant.ABSOLUTE) {
-                                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, parameter.x, parameter.y)
+                                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                         } else {
-                                            add("%T.RelativeLineTo(%Lf, %Lf),\n", pathNode, parameter.x, parameter.y)
+                                            add("%T.RelativeLineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                         }
                                     }
                                 }
                                 is LineTo -> {
                                     for (parameter in command.parameters) {
                                         if (command.variant == CommandVariant.ABSOLUTE) {
-                                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, parameter.x, parameter.y)
+                                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                         } else {
-                                            add("%T.RelativeLineTo(%Lf, %Lf),\n", pathNode, parameter.x, parameter.y)
+                                            add("%T.RelativeLineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                         }
                                     }
                                 }
                                 is HorizontalLineTo -> {
                                     for (parameter in command.parameters) {
                                         if (command.variant == CommandVariant.ABSOLUTE) {
-                                            add("%T.HorizontalLineTo(%Lf),\n", pathNode, parameter)
+                                            add("%T.HorizontalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
                                         } else {
-                                            add("%T.RelativeHorizontalLineTo(%Lf),\n", pathNode, parameter)
+                                            add("%T.RelativeHorizontalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
                                         }
                                     }
                                 }
                                 is VerticalLineTo -> {
                                     for (parameter in command.parameters) {
                                         if (command.variant == CommandVariant.ABSOLUTE) {
-                                            add("%T.VerticalLineTo(%Lf),\n", pathNode, parameter)
+                                            add("%T.VerticalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
                                         } else {
-                                            add("%T.RelativeVerticalLineTo(%Lf),\n", pathNode, parameter)
+                                            add("%T.RelativeVerticalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
                                         }
                                     }
                                 }
@@ -398,23 +415,23 @@ class ImageVectorWriter(
                                             add(
                                                 "%T.CurveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf),\n",
                                                 pathNode,
-                                                parameter.startControl.x,
-                                                parameter.startControl.y,
-                                                parameter.endControl.x,
-                                                parameter.endControl.y,
-                                                parameter.end.x,
-                                                parameter.end.y,
+                                                decimalFormat.format(parameter.startControl.x),
+                                                decimalFormat.format(parameter.startControl.y),
+                                                decimalFormat.format(parameter.endControl.x),
+                                                decimalFormat.format(parameter.endControl.y),
+                                                decimalFormat.format(parameter.end.x),
+                                                decimalFormat.format(parameter.end.y),
                                             )
                                         } else {
                                             add(
                                                 "%T.RelativeCurveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf),\n",
                                                 pathNode,
-                                                parameter.startControl.x,
-                                                parameter.startControl.y,
-                                                parameter.endControl.x,
-                                                parameter.endControl.y,
-                                                parameter.end.x,
-                                                parameter.end.y,
+                                                decimalFormat.format(parameter.startControl.x),
+                                                decimalFormat.format(parameter.startControl.y),
+                                                decimalFormat.format(parameter.endControl.x),
+                                                decimalFormat.format(parameter.endControl.y),
+                                                decimalFormat.format(parameter.end.x),
+                                                decimalFormat.format(parameter.end.y),
                                             )
                                         }
                                     }
@@ -425,19 +442,19 @@ class ImageVectorWriter(
                                             add(
                                                 "%T.ReflectiveCurveTo(%Lf, %Lf, %Lf, %Lf),\n",
                                                 pathNode,
-                                                parameter.endControl.x,
-                                                parameter.endControl.y,
-                                                parameter.end.x,
-                                                parameter.end.y,
+                                                decimalFormat.format(parameter.endControl.x),
+                                                decimalFormat.format(parameter.endControl.y),
+                                                decimalFormat.format(parameter.end.x),
+                                                decimalFormat.format(parameter.end.y),
                                             )
                                         } else {
                                             add(
                                                 "%T.RelativeReflectiveCurveTo(%Lf, %Lf, %Lf, %Lf),\n",
                                                 pathNode,
-                                                parameter.endControl.x,
-                                                parameter.endControl.y,
-                                                parameter.end.x,
-                                                parameter.end.y,
+                                                decimalFormat.format(parameter.endControl.x),
+                                                decimalFormat.format(parameter.endControl.y),
+                                                decimalFormat.format(parameter.end.x),
+                                                decimalFormat.format(parameter.end.y),
                                             )
                                         }
                                     }
@@ -448,19 +465,19 @@ class ImageVectorWriter(
                                             add(
                                                 "%T.QuadTo(%Lf, %Lf, %Lf, %Lf),\n",
                                                 pathNode,
-                                                parameter.control.x,
-                                                parameter.control.y,
-                                                parameter.end.x,
-                                                parameter.end.y,
+                                                decimalFormat.format(parameter.control.x),
+                                                decimalFormat.format(parameter.control.y),
+                                                decimalFormat.format(parameter.end.x),
+                                                decimalFormat.format(parameter.end.y),
                                             )
                                         } else {
                                             add(
                                                 "%T.RelativeQuadTo(%Lf, %Lf, %Lf, %Lf),\n",
                                                 pathNode,
-                                                parameter.control.x,
-                                                parameter.control.y,
-                                                parameter.end.x,
-                                                parameter.end.y,
+                                                decimalFormat.format(parameter.control.x),
+                                                decimalFormat.format(parameter.control.y),
+                                                decimalFormat.format(parameter.end.x),
+                                                decimalFormat.format(parameter.end.y),
                                             )
                                         }
                                     }
@@ -471,15 +488,15 @@ class ImageVectorWriter(
                                             add(
                                                 "%T.ReflectiveQuadTo(%Lf, %Lf),\n",
                                                 pathNode,
-                                                parameter.x,
-                                                parameter.y,
+                                                decimalFormat.format(parameter.x),
+                                                decimalFormat.format(parameter.y),
                                             )
                                         } else {
                                             add(
                                                 "%T.RelativeReflectiveQuadTo(%Lf, %Lf),\n",
                                                 pathNode,
-                                                parameter.x,
-                                                parameter.y,
+                                                decimalFormat.format(parameter.x),
+                                                decimalFormat.format(parameter.y),
                                             )
                                         }
                                     }
@@ -496,8 +513,8 @@ class ImageVectorWriter(
                                                 parameter.angle,
                                                 parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
                                                 parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
-                                                parameter.end.x,
-                                                parameter.end.y,
+                                                decimalFormat.format(parameter.end.x),
+                                                decimalFormat.format(parameter.end.y),
                                             )
                                         } else {
                                             add(
@@ -507,8 +524,8 @@ class ImageVectorWriter(
                                                 parameter.angle,
                                                 parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
                                                 parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
-                                                parameter.end.x,
-                                                parameter.end.y,
+                                                decimalFormat.format(parameter.end.x),
+                                                decimalFormat.format(parameter.end.y),
                                             )
                                         }
                                     }
