@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.iv.ImageVector
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 
@@ -23,6 +24,7 @@ fun VectorDrawable.toSvg(): ScalableVectorGraphic {
     return ScalableVectorGraphic(elements, id, svgElementAttributes)
 }
 
+@OptIn(ExperimentalVgoApi::class)
 fun VectorDrawable.toImageVector(): ImageVector {
     val width = foreign.remove("android:width")?.removeSuffix("dp") ?: "24"
     val height = foreign.remove("android:height")?.removeSuffix("dp") ?: "24"
@@ -40,7 +42,15 @@ fun VectorDrawable.toImageVector(): ImageVector {
     traverse(this)
     foreign.clear()
 
-    return ImageVector(elements, id, imageVectorElementAttributes, id ?: "image", null)
+    return ImageVector(
+        elements,
+        id,
+        imageVectorElementAttributes,
+        width.toFloat(),
+        height.toFloat(),
+        viewportWidth.toFloat(),
+        viewportHeight.toFloat(),
+    )
 }
 
 private fun traverse(element: Element): Element {

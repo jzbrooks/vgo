@@ -10,8 +10,10 @@ data class ImageVector(
     override var elements: List<Element>,
     override val id: String?,
     override val foreign: MutableMap<String, String>,
-    val propertyName: String,
-    val packageName: String?,
+    val defaultWidthDp: Float,
+    val defaultHeightDp: Float,
+    val viewportWidth: Float,
+    val viewportHeight: Float,
 ) : Graphic {
     override fun accept(visitor: ElementVisitor) {
         visitor.visit(this)

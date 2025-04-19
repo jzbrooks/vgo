@@ -8,6 +8,7 @@ import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.iv.ImageVector
 import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
 import com.jzbrooks.vgo.iv.ImageVectorWriter
+import com.jzbrooks.vgo.iv.toVectorDrawable
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
@@ -113,8 +114,9 @@ class Vgo(
             if (graphic != null) {
                 when (options.format) {
                     "vd" -> {
-                        if (graphic is ScalableVectorGraphic) {
-                            graphic = graphic.toVectorDrawable()
+                        when (graphic) {
+                            is ScalableVectorGraphic -> graphic.toVectorDrawable()
+                            is ImageVector -> graphic.toVectorDrawable()
                         }
                     }
                     "svg" -> {
@@ -127,7 +129,11 @@ class Vgo(
                             graphic = graphic.toImageVector()
                         }
                     }
-                    else -> System.err.println("Unknown format ${options.format}")
+                    else -> {
+                        if (options.format?.isNotEmpty() == true) {
+                            System.err.println("Unknown format ${options.format}")
+                        }
+                    }
                 }
 
                 if (!options.noOptimization) {

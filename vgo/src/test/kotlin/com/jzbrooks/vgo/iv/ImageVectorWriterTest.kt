@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.jzbrooks.vgo.core.graphic.command.CommandString
+import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.util.element.createPath
 import org.jetbrains.kotlin.com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
+@OptIn(ExperimentalVgoApi::class)
 class ImageVectorWriterTest {
     private lateinit var disposable: Disposable
 
@@ -76,15 +78,12 @@ class ImageVectorWriterTest {
                         ).toCommandList(),
                     ),
                 ),
-                null,
-                mutableMapOf(
-                    "defaultWidth" to "24.dp",
-                    "defaultHeight" to "24.dp",
-                    "viewportWidth" to "24.dp",
-                    "viewportHeight" to "24.dp",
-                ),
-                "image",
-                null,
+                id = null,
+                mutableMapOf(),
+                24f,
+                24f,
+                24f,
+                24f,
             )
     }
 }
