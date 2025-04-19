@@ -176,5 +176,5 @@ fun computeTransformation(
             Matrix3.IDENTITY
         }
 
-    return pivotInverse * translation * rotate * scale * pivot
+    return pivot * translation * rotate * scale * pivotInverse
 }
