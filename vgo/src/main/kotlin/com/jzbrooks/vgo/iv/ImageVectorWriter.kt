@@ -51,10 +51,7 @@ private val decimalFormat =
 class ImageVectorWriter(
     override val options: Set<Writer.Option> = emptySet(),
 ) : Writer<ImageVector> {
-    override fun write(
-        graphic: ImageVector,
-        stream: OutputStream,
-    ) {
+    override fun write(graphic: ImageVector, stream: OutputStream) {
         val packageName = graphic.foreign[FOREIGN_KEY_PACKAGE_NAME] ?: ""
         val propertyName = graphic.foreign[FOREIGN_KEY_PROPERTY_NAME] ?: graphic.id ?: "vector"
         val fileSpec =
@@ -96,7 +93,7 @@ class ImageVectorWriter(
                     decimalFormat.format(graphic.defaultHeightDp),
                     decimalFormat.format(graphic.viewportWidth),
                     decimalFormat.format(graphic.viewportHeight),
-                ).indent()
+                )
 
         imageVectorAllocation.withIndent {
             for (element in graphic.elements) {
