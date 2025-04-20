@@ -5,6 +5,7 @@ import com.jzbrooks.vgo.vd.VectorDrawable
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.util.Locale
 
 @ExperimentalVgoApi
 fun ImageVector.toVectorDrawable(): VectorDrawable {
@@ -15,10 +16,7 @@ fun ImageVector.toVectorDrawable(): VectorDrawable {
             isGroupingUsed = false
             roundingMode = RoundingMode.HALF_UP
             minimumIntegerDigits = 0
-            decimalFormatSymbols =
-                DecimalFormatSymbols().apply {
-                    decimalSeparator = '.'
-                }
+            decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
         }
 
     val vdElementAttributes =

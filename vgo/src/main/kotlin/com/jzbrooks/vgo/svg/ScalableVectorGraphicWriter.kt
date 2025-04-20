@@ -15,6 +15,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Collections.emptySet
+import java.util.Locale
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -33,10 +34,7 @@ class ScalableVectorGraphicWriter(
             isDecimalSeparatorAlwaysShown = false
             isGroupingUsed = false
             roundingMode = RoundingMode.HALF_UP
-            decimalFormatSymbols =
-                DecimalFormatSymbols().apply {
-                    decimalSeparator = '.'
-                }
+            decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
         }
 
     override fun write(

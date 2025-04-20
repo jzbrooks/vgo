@@ -29,28 +29,25 @@ import java.io.OutputStream
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.util.Locale
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.hypot
-
-// todo: figure out a better way to create these
-private val decimalFormat =
-    DecimalFormat().apply {
-        maximumFractionDigits = 2
-        isDecimalSeparatorAlwaysShown = false
-        isGroupingUsed = false
-        roundingMode = RoundingMode.HALF_UP
-        minimumIntegerDigits = 0
-        decimalFormatSymbols =
-            DecimalFormatSymbols().apply {
-                decimalSeparator = '.'
-            }
-    }
 
 @ExperimentalVgoApi
 class ImageVectorWriter(
     override val options: Set<Writer.Option> = emptySet(),
 ) : Writer<ImageVector> {
+    private val decimalFormat =
+        DecimalFormat().apply {
+            maximumFractionDigits = 2
+            isDecimalSeparatorAlwaysShown = false
+            isGroupingUsed = false
+            roundingMode = RoundingMode.HALF_UP
+            minimumIntegerDigits = 0
+            decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
+        }
+
     override fun write(
         graphic: ImageVector,
         stream: OutputStream,
