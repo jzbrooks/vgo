@@ -3,9 +3,11 @@
 ## Unreleased
 
 ### Added
-- An option to disable optimizations for conversion only use cases (`--no-optimization` cli flag and `com.jzbrooks.vgo.plugin.VgoPluginExtension.noOptimization` for the gradle plugin)
+- An option to disable optimizations for conversion-only use cases (`--no-optimization` cli flag and `com.jzbrooks.vgo.plugin.VgoPluginExtension.noOptimization` for the gradle plugin)
 
 - _Experimental_ support for `ImageVector` generation and optimization
+  - *No Clip Paths*: Clip paths are not supported in ImageVector generation. They will be ignored.
+  - *Overwriting files is not recommended*: Since the internal representation of ImageVectors is incomplete, overwriting source files may result in data loss.
 - `ExperimentalVgoApi` opt-in annotation for experimental portions of the API
 - `com.jzbrooks.vgo.core.util.math.computeTransformation` for computing a transformation matrix from common transform parameters
 
