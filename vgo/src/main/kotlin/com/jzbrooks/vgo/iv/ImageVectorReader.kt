@@ -14,6 +14,7 @@ import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
+import com.jzbrooks.vgo.core.graphic.command.QuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.core.util.math.Point
@@ -459,19 +460,47 @@ private fun parsePathCommands(bodyExpr: KtBlockExpression): List<Command> {
                     }
                 }
                 "curveTo" -> {
-                    val point = parseCubicArgs(statement)
-                    if (point != null) {
-                        commands.add(CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(point)))
+                    val arg = parseCubicArgs(statement)
+                    if (arg != null) {
+                        commands.add(CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(arg)))
                     }
                 }
                 "curveToRelative" -> {
-                    val point = parseCubicArgs(statement)
-                    if (point != null) {
-                        commands.add(CubicBezierCurve(CommandVariant.RELATIVE, listOf(point)))
+                    val arg = parseCubicArgs(statement)
+                    if (arg != null) {
+                        commands.add(CubicBezierCurve(CommandVariant.RELATIVE, listOf(arg)))
                     }
                 }
-                // todo: quad
-                // todo: arc
+                "reflectiveCurveTo" -> {
+                    // todo: flesh out
+                }
+                "reflectiveCurveToRelative" -> {
+
+                }
+                "quadTo" -> {
+                    val arg = parseQuadArgs(statement)
+                    if (arg != null) {
+                        commands.add(QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(arg)))
+                    }
+                }
+                "quadToRelative" -> {
+                    val arg = parseQuadArgs(statement)
+                    if (arg != null) {
+                        commands.add(QuadraticBezierCurve(CommandVariant.RELATIVE, listOf(arg)))
+                    }
+                }
+                "reflectiveQuadTo" -> {
+
+                }
+                "reflectiveQuadToRelative" -> {
+
+                }
+                "arcTo" -> {
+
+                }
+                "arcToRelative" -> {
+
+                }
                 "close" -> {
                     commands.add(ClosePath)
                 }
@@ -544,6 +573,30 @@ private fun parseCubicArgs(callExpression: KtCallExpression): CubicBezierCurve.P
             Point(
                 parseFloatLiteral(endControlX) ?: return null,
                 parseFloatLiteral(endControlY) ?: return null,
+            ),
+            Point(
+                parseFloatLiteral(endX) ?: return null,
+                parseFloatLiteral(endY) ?: return null,
+            ),
+        )
+    }
+
+    return null
+}
+
+private fun parseQuadArgs(callExpression: KtCallExpression): QuadraticBezierCurve.Parameter? {
+    val args = callExpression.valueArgumentList?.arguments ?: return null
+
+    if (args.size >= 4) {
+        val controlX = args[0].getArgumentExpression()
+        val controlY = args[1].getArgumentExpression()
+        val endX = args[2].getArgumentExpression()
+        val endY = args[3].getArgumentExpression()
+
+        return QuadraticBezierCurve.Parameter(
+            Point(
+                parseFloatLiteral(controlX) ?: return null,
+                parseFloatLiteral(controlY) ?: return null,
             ),
             Point(
                 parseFloatLiteral(endX) ?: return null,
