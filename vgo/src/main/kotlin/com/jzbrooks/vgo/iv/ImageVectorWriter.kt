@@ -51,7 +51,10 @@ private val decimalFormat =
 class ImageVectorWriter(
     override val options: Set<Writer.Option> = emptySet(),
 ) : Writer<ImageVector> {
-    override fun write(graphic: ImageVector, stream: OutputStream) {
+    override fun write(
+        graphic: ImageVector,
+        stream: OutputStream,
+    ) {
         val packageName = graphic.foreign[FOREIGN_KEY_PACKAGE_NAME] ?: ""
         val propertyName = graphic.foreign[FOREIGN_KEY_PROPERTY_NAME] ?: graphic.id ?: "vector"
         val fileSpec =
@@ -174,7 +177,11 @@ class ImageVectorWriter(
                                     if (command.variant == CommandVariant.ABSOLUTE) {
                                         add("lineTo(%Lf, %Lf)\n", decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                     } else {
-                                        add("lineToRelative(%Lf, %Lf)\n", decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
+                                        add(
+                                            "lineToRelative(%Lf, %Lf)\n",
+                                            decimalFormat.format(parameter.x),
+                                            decimalFormat.format(parameter.y),
+                                        )
                                     }
                                 }
                             }
@@ -183,7 +190,11 @@ class ImageVectorWriter(
                                     if (command.variant == CommandVariant.ABSOLUTE) {
                                         add("lineTo(%Lf, %Lf)\n", decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
                                     } else {
-                                        add("lineToRelative(%Lf, %Lf)\n", decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
+                                        add(
+                                            "lineToRelative(%Lf, %Lf)\n",
+                                            decimalFormat.format(parameter.x),
+                                            decimalFormat.format(parameter.y),
+                                        )
                                     }
                                 }
                             }
@@ -373,18 +384,38 @@ class ImageVectorWriter(
 
                                     for (parameter in command.parameters.drop(1)) {
                                         if (command.variant == CommandVariant.ABSOLUTE) {
-                                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
+                                            add(
+                                                "%T.LineTo(%Lf, %Lf),\n",
+                                                pathNode,
+                                                decimalFormat.format(parameter.x),
+                                                decimalFormat.format(parameter.y),
+                                            )
                                         } else {
-                                            add("%T.RelativeLineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
+                                            add(
+                                                "%T.RelativeLineTo(%Lf, %Lf),\n",
+                                                pathNode,
+                                                decimalFormat.format(parameter.x),
+                                                decimalFormat.format(parameter.y),
+                                            )
                                         }
                                     }
                                 }
                                 is LineTo -> {
                                     for (parameter in command.parameters) {
                                         if (command.variant == CommandVariant.ABSOLUTE) {
-                                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
+                                            add(
+                                                "%T.LineTo(%Lf, %Lf),\n",
+                                                pathNode,
+                                                decimalFormat.format(parameter.x),
+                                                decimalFormat.format(parameter.y),
+                                            )
                                         } else {
-                                            add("%T.RelativeLineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
+                                            add(
+                                                "%T.RelativeLineTo(%Lf, %Lf),\n",
+                                                pathNode,
+                                                decimalFormat.format(parameter.x),
+                                                decimalFormat.format(parameter.y),
+                                            )
                                         }
                                     }
                                 }
