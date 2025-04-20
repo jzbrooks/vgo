@@ -34,7 +34,7 @@ class ImageVectorWriterTest {
     @Test
     fun testExtraChildrenWritten() {
         ByteArrayOutputStream().use { memoryStream ->
-            ImageVectorWriter().write(graphic, memoryStream)
+            ImageVectorWriter("test").write(graphic, memoryStream)
 
             val inputStream = ByteArrayInputStream(memoryStream.toByteArray())
             val psiFile = parseKotlinFile(disposable, inputStream)

@@ -36,6 +36,7 @@ import kotlin.math.hypot
 
 @ExperimentalVgoApi
 class ImageVectorWriter(
+    private val fileName: String,
     override val options: Set<Writer.Option> = emptySet(),
 ) : Writer<ImageVector> {
     private val decimalFormat =
@@ -56,10 +57,8 @@ class ImageVectorWriter(
         val propertyName = graphic.foreign[FOREIGN_KEY_PROPERTY_NAME] ?: graphic.id ?: "vector"
         val fileSpec =
             FileSpec
-                .builder(
-                    packageName = packageName,
-                    fileName = "$propertyName.kt", // todo: this should respect the output file option
-                ).addImport("androidx.compose.ui.unit", "dp")
+                .builder(packageName, fileName)
+                .addImport("androidx.compose.ui.unit", "dp")
                 .addProperty(createImageVectorProperty(graphic, propertyName))
                 .addProperty(
                     PropertySpec
@@ -369,6 +368,10 @@ class ImageVectorWriter(
                     add("clipPathData = listOf(\n")
                     withIndent {
                         // todo: This might be wrong? Can these commands be flatmapped?
+                        //  I think the answer is likely no, because merging paths this way
+                        //  can alter the semantics of the paths (e.g. the big merge path bug involving
+                        //  path intersections), but this bit of functionality is only very badly supported
+                        //  right now anyways.
                         for (command in element.elements.filterIsInstance<Path>().flatMap { it.commands }) {
                             when (command) {
                                 is MoveTo -> {

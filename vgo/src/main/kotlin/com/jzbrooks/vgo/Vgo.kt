@@ -159,7 +159,7 @@ class Vgo(
                 }
 
                 if (graphic is ImageVector) {
-                    val writer = ImageVectorWriter(writerOptions)
+                    val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
                     writer.write(graphic, outputStream)
                 }
 
