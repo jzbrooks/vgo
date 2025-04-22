@@ -83,7 +83,7 @@ val r8: Configuration by configurations.creating
 dependencies {
     implementation(project(":vgo"))
 
-    implementation("com.android.tools:sdk-common:31.9.1")
+    implementation("com.android.tools:sdk-common:31.9.2")
 
     r8("com.android.tools:r8:8.7.18")
 
