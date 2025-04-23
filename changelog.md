@@ -6,8 +6,20 @@
 - An option to disable optimizations for conversion-only use cases (`--no-optimization` cli flag and `com.jzbrooks.vgo.plugin.VgoPluginExtension.noOptimization` for the gradle plugin)
 
 - _Experimental_ support for `ImageVector` generation and optimization
-  - *No Clip Paths*: Clip paths are not supported in ImageVector generation. They will be ignored.
-  - *Overwriting files is not recommended*: Since the internal representation of ImageVectors is incomplete, overwriting source files may result in data loss.
+  - _No Clip Paths_: Clip paths are not supported in ImageVector generation. They will be ignored. 
+  - _Overwriting files is not recommended_: Since the internal representation of ImageVectors is incomplete, overwriting source files may result in data loss.
+  - _Suboptimal thread safety_: The generated image vectors could be created multiple times during their initialization if the first two reads happen simultaneously.
+  - _Specific parsing constraints_: The ImageVector parser only parses image vector properties of the form output by the vgo. A sketch of the shape of the output format:  
+    ```kotlin
+    val vector: ImageVector
+        get() = _vector ?: ImageVector.Builder(/* ... */)
+            .path(/* ... */) { /* ... */ }
+            .group(/* ... */) { /* ... */ }
+            // ...
+            .build().also { _vector = it }
+
+    private var _vector: ImageVector? = null
+    ```
 - `ExperimentalVgoApi` opt-in annotation for experimental portions of the API
 - `com.jzbrooks.vgo.core.util.math.computeTransformation` for computing a transformation matrix from common transform parameters
 
