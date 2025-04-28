@@ -13,7 +13,6 @@ import com.jzbrooks.vgo.core.transformation.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.transformation.SimplifyLineCommands
 import com.jzbrooks.vgo.core.transformation.TransformerSet
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
-import com.jzbrooks.vgo.vd.VectorDrawableCommandPrinter
 
 @ExperimentalVgoApi
 class ImageVectorOptimizationRegistry :
@@ -31,7 +30,7 @@ class ImageVectorOptimizationRegistry :
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(1e-3f),
-                ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)),
+                ConvertCurvesToArcs(ConvertCurvesToArcs.Criterion.FewestCommands),
                 SimplifyBezierCurveCommands(1e-3f),
                 RemoveRedundantCommands(),
                 CommandVariant(CommandVariant.Mode.Absolute),

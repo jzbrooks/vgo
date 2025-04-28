@@ -30,7 +30,7 @@ class VectorDrawableOptimizationRegistry :
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(1e-3f),
-                ConvertCurvesToArcs(VectorDrawableCommandPrinter(3)),
+                ConvertCurvesToArcs(ConvertCurvesToArcs.Criterion.ShortestPath(VectorDrawableCommandPrinter(3))),
                 SimplifyBezierCurveCommands(1e-3f),
                 RemoveRedundantCommands(),
                 CommandVariant(CommandVariant.Mode.Compact(VectorDrawableCommandPrinter(3))),

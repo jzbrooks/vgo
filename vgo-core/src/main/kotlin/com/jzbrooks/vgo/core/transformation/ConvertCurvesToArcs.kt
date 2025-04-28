@@ -21,11 +21,14 @@ import com.jzbrooks.vgo.core.util.math.liesOnCircle
 import com.jzbrooks.vgo.core.util.math.toCubicBezierCurve
 
 /**
- * Converts cubic Bézier curves to arcs, when they are shorter.
+ * Converts cubic Bézier curves to arcs when they are shorter.
  */
 class ConvertCurvesToArcs(
-    private val printer: CommandPrinter,
+    private val criterion: Criterion,
 ) : TopDownTransformer {
+    @Deprecated("Use the constructor with criteria instead.")
+    constructor(printer: CommandPrinter) : this(Criterion.ShortestPath(printer))
+
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}
@@ -36,8 +39,12 @@ class ConvertCurvesToArcs(
 
     override fun visit(path: Path) {
         val multiCurvePass = collapseMultipleCurves(path.commands)
-        val singleCurvePass = convertSingleArcs(multiCurvePass)
-        path.commands = singleCurvePass
+        if (criterion is Criterion.ShortestPath) {
+            val singleCurvePass = criterion.convertSingleArcs(multiCurvePass)
+            path.commands = singleCurvePass
+        } else {
+            path.commands = multiCurvePass
+        }
     }
 
     private fun collapseMultipleCurves(commands: List<Command>): List<Command> {
@@ -151,16 +158,38 @@ class ConvertCurvesToArcs(
                         }
                     }
 
-                    // If the next curve is a shorthand, it must be converted
-                    // to longhand if it is the previous curve is replaced with an
+                    // If the next curve is shorthand, it must be converted
+                    // to longhand if it is, the previous curve is replaced with an
                     // elliptical arc.
                     if (nextCommand is SmoothCubicBezierCurve) {
                         ellipticalArcs.add(nextCommand.toCubicBezierCurve(pendingCurves.last()))
                         pendingCurves.add(nextCommand)
                     }
 
-                    val originalSize = pendingCurves.joinToString(separator = "", transform = printer::print).length
-                    val alternativeSize = ellipticalArcs.joinToString(separator = "", transform = printer::print).length
+                    val (originalSize, alternativeSize) =
+                        when (criterion) {
+                            is Criterion.ShortestPath -> {
+                                val originalSize =
+                                    pendingCurves
+                                        .joinToString(
+                                            separator = "",
+                                            transform = criterion.printer::print,
+                                        ).length
+                                val alternativeSize =
+                                    ellipticalArcs
+                                        .joinToString(
+                                            separator = "",
+                                            transform = criterion.printer::print,
+                                        ).length
+                                originalSize to alternativeSize
+                            }
+                            is Criterion.FewestCommands -> {
+                                val originalSize = pendingCurves.size
+                                val alternativeSize = ellipticalArcs.size
+                                originalSize to alternativeSize
+                            }
+                        }
+
                     if (alternativeSize < originalSize) {
                         newCommands.addAll(ellipticalArcs)
 
@@ -183,7 +212,7 @@ class ConvertCurvesToArcs(
         return newCommands
     }
 
-    private fun convertSingleArcs(commands: List<Command>): List<Command> {
+    private fun Criterion.ShortestPath.convertSingleArcs(commands: List<Command>): List<Command> {
         val newCommands = mutableListOf<Command>()
         var fixedUpCurve: CubicBezierCurve? = null
 
@@ -258,4 +287,20 @@ class ConvertCurvesToArcs(
             is SmoothCubicBezierCurve -> command.toCubicBezierCurve(previousCurve!!)
             else -> null
         }?.takeIf { it.isConvex() && it.liesOnCircle(relativeCircle) }
+
+    sealed interface Criterion {
+        /*
+         * The preference is determined by the length of the command string
+         * when printed using the provided printer.
+         */
+        data class ShortestPath(
+            val printer: CommandPrinter,
+        ) : Criterion
+
+        /*
+         * The preference is determined by the number of commands in the
+         * command list.
+         */
+        data object FewestCommands : Criterion
+    }
 }
