@@ -23,8 +23,7 @@ class ImageVectorOptimizationRegistry :
                 BakeTransformations(),
                 CollapseGroups(),
                 RemoveEmptyGroups(),
-                // https://cs.android.com/android/platform/superproject/main/+/2e48e15a8097916063eacc023044bc90bb93c73e:frameworks/base/libs/androidfw/StringPool.cpp;l=328
-                MergePaths(MergePaths.Constraints.PathLength(VectorDrawableCommandPrinter(3), (1 shl 15) - 1)),
+                MergePaths(MergePaths.Constraints.None),
             ),
         topDownTransformers =
             listOf(
