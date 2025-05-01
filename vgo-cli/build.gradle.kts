@@ -19,6 +19,35 @@ tasks {
         inputs.files(sourceClasses)
         destinationDirectory.set(layout.buildDirectory.dir("libs/debug"))
 
+        exclude(
+            "META-INF/*.SF",
+            "META-INF/*.DSA",
+            "META-INF/*.RSA",
+            "META-INF/*.EC",
+            "META-INF/*.SF.*",
+            "META-INF/*.DSA.*",
+            "META-INF/*.RSA.*",
+            "META-INF/*.EC.*",
+            "META-INF/BCKEY.DSA",
+            "META-INF/BC2048KE.DSA",
+            "META-INF/BCKEY.SF",
+            "META-INF/BC2048KE.SF",
+            "**/*.kotlin_metadata",
+            "**/*.kotlin_module",
+            "**/*.kotlin_builtins",
+            "**/module-info.class",
+            "META-INF/maven/**",
+            "META-INF/versions/**",
+            "META-INF/*.version",
+            "META-INF/LICENSE*",
+            "META-INF/LGPL2.1",
+            "META-INF/DEPENDENCIES",
+            "META-INF/AL2.0",
+            "**/NOTICE*",
+            "javax/activation/**",
+            "xsd/catalog.xml",
+        )
+
         doFirst {
             from(files(sourceClasses))
             from(
@@ -34,8 +63,8 @@ tasks {
         description = "Runs r8 on the jar application."
         group = "build"
 
-        inputs.file("build/libs/debug/vgo-cli.jar")
-        outputs.file("build/libs/vgo.jar")
+        inputs.file(layout.buildDirectory.file("libs/debug/vgo-cli.jar"))
+        outputs.file(layout.buildDirectory.file("libs/vgo.jar"))
 
         val javaHome = System.getProperty("java.home")
 
@@ -48,10 +77,10 @@ tasks {
             "--lib",
             javaHome,
             "--output",
-            "build/libs/vgo.jar",
+            layout.buildDirectory.file("libs/vgo.jar").get(),
             "--pg-conf",
             "optimize.pro",
-            "build/libs/debug/vgo-cli.jar",
+            layout.buildDirectory.file("libs/debug/vgo-cli.jar").get(),
         )
 
         dependsOn(getByName("jar"))
@@ -64,7 +93,7 @@ tasks {
 
         dependsOn(optimize)
 
-        inputs.file("build/libs/vgo.jar")
+        inputs.file(layout.buildDirectory.file("libs/vgo.jar"))
         outputs.file(binaryFileProp)
 
         doLast {
@@ -72,7 +101,9 @@ tasks {
             binaryFile.parentFile.mkdirs()
             binaryFile.delete()
             binaryFile.appendText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
-            file("build/libs/vgo.jar").inputStream().use { binaryFile.appendBytes(it.readBytes()) }
+            layout.buildDirectory.file("libs/vgo.jar").get().asFile.inputStream().use {
+                binaryFile.appendBytes(it.readBytes())
+            }
             binaryFile.setExecutable(true, false)
         }
     }
@@ -85,7 +116,7 @@ dependencies {
 
     implementation("com.android.tools:sdk-common:31.9.2")
 
-    r8("com.android.tools:r8:8.9.35")
+    r8("com.android.tools:r8:8.7.18")
 
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
