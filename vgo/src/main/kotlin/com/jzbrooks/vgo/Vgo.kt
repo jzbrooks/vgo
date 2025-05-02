@@ -1,14 +1,23 @@
+@file:OptIn(ExperimentalVgoApi::class)
+
 package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.Writer
+import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
+import com.jzbrooks.vgo.iv.ImageVector
+import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
+import com.jzbrooks.vgo.iv.ImageVectorWriter
+import com.jzbrooks.vgo.iv.toVectorDrawable
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
+import com.jzbrooks.vgo.svg.toVectorDrawable
 import com.jzbrooks.vgo.util.parse
 import com.jzbrooks.vgo.vd.VectorDrawable
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter
+import com.jzbrooks.vgo.vd.toImageVector
 import com.jzbrooks.vgo.vd.toSvg
 import java.io.File
 import java.nio.file.Path
@@ -83,6 +92,7 @@ class Vgo(
                 when (options.format) {
                     "vd" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.xml")
                     "svg" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.svg")
+                    "iv" -> outputPath.resolveSibling("${outputPath.nameWithoutExtension}.kt")
                     else -> outputPath
                 }
             } else {
@@ -102,8 +112,28 @@ class Vgo(
 
         output.outputStream().use { outputStream ->
             if (graphic != null) {
-                if (graphic is VectorDrawable && options.format == "svg") {
-                    graphic = graphic.toSvg()
+                when (options.format) {
+                    "vd" -> {
+                        when (graphic) {
+                            is ScalableVectorGraphic -> graphic.toVectorDrawable()
+                            is ImageVector -> graphic.toVectorDrawable()
+                        }
+                    }
+                    "svg" -> {
+                        if (graphic is VectorDrawable) {
+                            graphic = graphic.toSvg()
+                        }
+                    }
+                    "iv" -> {
+                        if (graphic is VectorDrawable) {
+                            graphic = graphic.toImageVector()
+                        }
+                    }
+                    else -> {
+                        if (options.format?.isNotEmpty() == true) {
+                            System.err.println("Unknown format ${options.format}")
+                        }
+                    }
                 }
 
                 if (!options.noOptimization) {
@@ -111,6 +141,7 @@ class Vgo(
                         when (graphic) {
                             is VectorDrawable -> VectorDrawableOptimizationRegistry()
                             is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                            is ImageVector -> ImageVectorOptimizationRegistry()
                             else -> null
                         }
 
@@ -124,6 +155,11 @@ class Vgo(
 
                 if (graphic is ScalableVectorGraphic) {
                     val writer = ScalableVectorGraphicWriter(writerOptions)
+                    writer.write(graphic, outputStream)
+                }
+
+                if (graphic is ImageVector) {
+                    val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
                     writer.write(graphic, outputStream)
                 }
 

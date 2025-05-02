@@ -29,7 +29,7 @@ class SvgOptimizationRegistry :
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(1e-3f),
-                ConvertCurvesToArcs(ScalableVectorGraphicCommandPrinter(3)),
+                ConvertCurvesToArcs(ConvertCurvesToArcs.Criterion.ShortestPath(ScalableVectorGraphicCommandPrinter(3))),
                 SimplifyBezierCurveCommands(1e-3f),
                 RemoveRedundantCommands(),
                 CommandVariant(CommandVariant.Mode.Compact(ScalableVectorGraphicCommandPrinter(3))),

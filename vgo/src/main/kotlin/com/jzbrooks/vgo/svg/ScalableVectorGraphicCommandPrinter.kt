@@ -17,6 +17,7 @@ import com.jzbrooks.vgo.core.util.math.Point
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.util.Locale
 import kotlin.math.sign
 
 class ScalableVectorGraphicCommandPrinter(
@@ -29,10 +30,7 @@ class ScalableVectorGraphicCommandPrinter(
             isGroupingUsed = false
             roundingMode = RoundingMode.HALF_UP
             minimumIntegerDigits = 0
-            decimalFormatSymbols =
-                DecimalFormatSymbols().apply {
-                    decimalSeparator = '.'
-                }
+            decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
         }
 
     override fun print(command: Command): String =

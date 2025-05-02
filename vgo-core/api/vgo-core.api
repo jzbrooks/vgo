@@ -4,7 +4,10 @@ public final class com/jzbrooks/vgo/core/Color {
 	public static final fun component2-w2LRezQ (I)B
 	public static final fun component3-w2LRezQ (I)B
 	public static final fun component4-w2LRezQ (I)B
+	public static fun constructor-impl (BBBB)I
 	public static fun constructor-impl (I)I
+	public static final fun copy-FLL-fE8 (ILkotlin/UByte;Lkotlin/UByte;Lkotlin/UByte;Lkotlin/UByte;)I
+	public static synthetic fun copy-FLL-fE8$default (ILkotlin/UByte;Lkotlin/UByte;Lkotlin/UByte;Lkotlin/UByte;ILjava/lang/Object;)I
 	public fun equals (Ljava/lang/Object;)Z
 	public static fun equals-impl (ILjava/lang/Object;)Z
 	public static final fun equals-impl0 (II)Z
@@ -715,11 +718,33 @@ public final class com/jzbrooks/vgo/core/transformation/CommandVariant$Mode$Rela
 
 public final class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;)V
+	public fun <init> (Lcom/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+}
+
+public abstract interface class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion {
+}
+
+public final class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion$FewestCommands : com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion {
+	public static final field INSTANCE Lcom/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion$FewestCommands;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion$ShortestPath : com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion {
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;)Lcom/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion$ShortestPath;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion$ShortestPath;Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion$ShortestPath;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPrinter ()Lcom/jzbrooks/vgo/core/graphic/command/CommandPrinter;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/jzbrooks/vgo/core/transformation/MergePaths : com/jzbrooks/vgo/core/transformation/BottomUpTransformer {
@@ -821,6 +846,9 @@ public abstract class com/jzbrooks/vgo/core/transformation/TransformerSet {
 	public final fun apply (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 }
 
+public abstract interface annotation class com/jzbrooks/vgo/core/util/ExperimentalVgoApi : java/lang/annotation/Annotation {
+}
+
 public final class com/jzbrooks/vgo/core/util/element/TraverseKt {
 	public static final fun traverseBottomUp (Lcom/jzbrooks/vgo/core/graphic/Element;Lkotlin/jvm/functions/Function1;)Lcom/jzbrooks/vgo/core/graphic/Element;
 	public static final fun traverseTopDown (Lcom/jzbrooks/vgo/core/graphic/Element;Lkotlin/jvm/functions/Function1;)Lcom/jzbrooks/vgo/core/graphic/Element;
@@ -913,6 +941,11 @@ public final class com/jzbrooks/vgo/core/util/math/Matrix3$Companion {
 
 public final class com/jzbrooks/vgo/core/util/math/Matrix3$DefaultImpls {
 	public static synthetic fun contentsEqual$default (Lcom/jzbrooks/vgo/core/util/math/Matrix3;Lcom/jzbrooks/vgo/core/util/math/Matrix3;FILjava/lang/Object;)Z
+}
+
+public final class com/jzbrooks/vgo/core/util/math/Matrix3Kt {
+	public static final fun computeTransformation (Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;)Lcom/jzbrooks/vgo/core/util/math/Matrix3;
+	public static synthetic fun computeTransformation$default (Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;Ljava/lang/Float;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Matrix3;
 }
 
 public abstract interface class com/jzbrooks/vgo/core/util/math/MutableMatrix3 : com/jzbrooks/vgo/core/util/math/Matrix3 {

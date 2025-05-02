@@ -1,9 +1,18 @@
 package com.jzbrooks.vgo.core
 
+import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
+
 @JvmInline
 value class Color(
     private val argb: UInt,
 ) {
+    constructor(alpha: UByte, red: UByte, green: UByte, blue: UByte) : this(
+        (alpha.toUInt() shl 24) or
+            (red.toUInt() shl 16) or
+            (green.toUInt() shl 8) or
+            blue.toUInt(),
+    )
+
     val alpha: UByte
         get() = (argb shr 24).toUByte()
 
@@ -23,6 +32,31 @@ value class Color(
     operator fun component3() = green
 
     operator fun component4() = blue
+
+    @ExperimentalVgoApi
+    fun copy(
+        alpha: UByte? = null,
+        red: UByte? = null,
+        green: UByte? = null,
+        blue: UByte? = null,
+    ): Color {
+        var newArgb = argb
+
+        if (alpha != null) {
+            newArgb = (newArgb and 0x00FFFFFF.toUInt()) or (alpha.toUInt() shl 24)
+        }
+        if (red != null) {
+            newArgb = (newArgb and 0xFF00FFFF.toUInt()) or (red.toUInt() shl 16)
+        }
+        if (green != null) {
+            newArgb = (newArgb and 0xFFFF00FF.toUInt()) or (green.toUInt() shl 8)
+        }
+        if (blue != null) {
+            newArgb = (newArgb and 0xFFFFFF00.toUInt()) or blue.toUInt()
+        }
+
+        return Color(newArgb)
+    }
 
     fun toHexString(format: HexFormat): String =
         if (alpha != 0xFF.toUByte()) {
