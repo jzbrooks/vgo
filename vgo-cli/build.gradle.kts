@@ -15,6 +15,29 @@ tasks {
                 "META-INF/*.SF",
                 "META-INF/*.DSA",
                 "META-INF/*.RSA",
+                "META-INF/*.EC",
+                "META-INF/*.SF.*",
+                "META-INF/*.DSA.*",
+                "META-INF/*.RSA.*",
+                "META-INF/*.EC.*",
+                "META-INF/BCKEY.DSA",
+                "META-INF/BC2048KE.DSA",
+                "META-INF/BCKEY.SF",
+                "META-INF/BC2048KE.SF",
+                "**/*.kotlin_metadata",
+                "**/*.kotlin_module",
+                "**/*.kotlin_builtins",
+                "**/module-info.class",
+                "META-INF/maven/**",
+                "META-INF/versions/**",
+                "META-INF/*.version",
+                "META-INF/LICENSE*",
+                "META-INF/LGPL2.1",
+                "META-INF/DEPENDENCIES",
+                "META-INF/AL2.0",
+                "**/NOTICE*",
+                "javax/activation/**",
+                "xsd/catalog.xml",
             )
         }
 
@@ -24,35 +47,6 @@ tasks {
                 .output.classesDirs
         inputs.files(sourceClasses)
         destinationDirectory.set(layout.buildDirectory.dir("libs/debug"))
-
-        exclude(
-            "META-INF/*.SF",
-            "META-INF/*.DSA",
-            "META-INF/*.RSA",
-            "META-INF/*.EC",
-            "META-INF/*.SF.*",
-            "META-INF/*.DSA.*",
-            "META-INF/*.RSA.*",
-            "META-INF/*.EC.*",
-            "META-INF/BCKEY.DSA",
-            "META-INF/BC2048KE.DSA",
-            "META-INF/BCKEY.SF",
-            "META-INF/BC2048KE.SF",
-            "**/*.kotlin_metadata",
-            "**/*.kotlin_module",
-            "**/*.kotlin_builtins",
-            "**/module-info.class",
-            "META-INF/maven/**",
-            "META-INF/versions/**",
-            "META-INF/*.version",
-            "META-INF/LICENSE*",
-            "META-INF/LGPL2.1",
-            "META-INF/DEPENDENCIES",
-            "META-INF/AL2.0",
-            "**/NOTICE*",
-            "javax/activation/**",
-            "xsd/catalog.xml",
-        )
 
         doFirst {
             from(files(sourceClasses))
