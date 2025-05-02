@@ -116,7 +116,7 @@ dependencies {
 
     implementation("com.android.tools:sdk-common:31.9.2")
 
-    r8("com.android.tools:r8:8.7.18")
+    r8("com.android.tools:r8:8.9.35")
 
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
