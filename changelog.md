@@ -23,16 +23,6 @@
 - `ExperimentalVgoApi` opt-in annotation for experimental portions of the API
 - `com.jzbrooks.vgo.core.util.math.computeTransformation` for computing a transformation matrix from common transform parameters
 
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
-
 ## 3.1.0 - 2025-03-13
 
 ### Added
