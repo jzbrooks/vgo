@@ -3,8 +3,22 @@
 ## Unreleased
 
 ### Added
-- An option to disable optimizations for conversion-only use cases (`--no-optimization` cli flag and `com.jzbrooks.vgo.plugin.VgoPluginExtension.noOptimization` for the gradle plugin)
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 3.2.0 - 2025-05-03
+
+### Added
+
+- An option to disable optimizations for conversion-only use cases (`--no-optimization` cli flag and `com.jzbrooks.vgo.plugin.VgoPluginExtension.noOptimization` for the gradle plugin)
 - _Experimental_ support for `ImageVector` generation and optimization
   - _No Clip Paths_: Clip paths are not supported in ImageVector generation. They will be ignored. 
   - _Overwriting files is not recommended_: Since the internal representation of ImageVectors is incomplete, overwriting source files may result in data loss.
