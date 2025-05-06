@@ -17,7 +17,7 @@ kotlin.sourceSets
 dependencies {
     implementation(project(":vgo-core"))
 
-    compileOnly("com.android.tools:sdk-common:31.9.2")
+    compileOnly("com.android.tools:sdk-common:31.10.0")
 
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.20")
     implementation("com.squareup:kotlinpoet:2.1.0")
