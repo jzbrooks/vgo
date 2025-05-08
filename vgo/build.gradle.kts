@@ -31,6 +31,8 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
+    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.20")
+
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
 }
 
