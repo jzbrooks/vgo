@@ -4,7 +4,7 @@ import org.gradle.api.file.FileTree
 
 open class VgoPluginExtension {
     var inputs: FileTree? = null
-    var outputs: FileTree? = inputs
+    var outputs: FileTree? = null
     var showStatistics = true
     var format = OutputFormat.UNCHANGED
     var noOptimization = false

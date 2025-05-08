@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.plugin
 import com.jzbrooks.vgo.Vgo
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
@@ -23,6 +24,9 @@ open class ShrinkVectorArtwork : DefaultTask() {
     @get:Input
     val files: List<String> = (extension.inputs ?: defaultTree).files.map(File::getAbsolutePath)
 
+    @get:OutputFiles
+    val outputFiles: List<String> = (extension.outputs ?: extension.inputs)?.files.orEmpty().map(File::getAbsolutePath)
+
     @get:Input
     val showStatistics = extension.showStatistics
 
@@ -37,12 +41,19 @@ open class ShrinkVectorArtwork : DefaultTask() {
 
     @TaskAction
     fun shrink() {
+        logger.lifecycle("Extension outputs: ${extension.outputs?.files}")
+        logger.lifecycle("Outputs: $outputFiles")
+
+        for (file in extension.outputs?.files ?: emptyList()) {
+            file.mkdirs()
+        }
+
         val options =
             Vgo.Options(
                 printVersion = false,
                 printStats = showStatistics,
                 indent = indent.takeIf { it > 0 }?.toInt(),
-                output = emptyList(),
+                output = outputFiles,
                 format = outputFormat.cliName,
                 input = files,
                 noOptimization = noOptimization,
