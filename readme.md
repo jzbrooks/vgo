@@ -5,7 +5,8 @@
 [![Maven Central: vgo-core](https://img.shields.io/maven-central/v/com.jzbrooks/vgo-core?label=vgo-core)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo-core)
 [![Maven Central: vgo-plugin](https://img.shields.io/maven-central/v/com.jzbrooks/vgo-plugin?label=vgo-plugin)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo-plugin)
 
-vgo optimizes vector graphics through a format-agnostic approach by leveraging vgo-core's intermediate representation. It not only optimizes the graphic but also converts between formats like SVG and Android Vector Drawables—with potential to support more formats in the future.
+vgo optimizes vector graphics through a format-agnostic approach by leveraging vgo-core's intermediate representation.
+It can convert between common vector formats, including SVG, Android Vector Drawables, and Jetpack Compose ImageVector _and_ optimize them to boot.
 
 ## Installation
 
@@ -13,12 +14,12 @@ vgo optimizes vector graphics through a format-agnostic approach by leveraging v
 `brew install jzbrooks/repo/vgo`
 
 #### Manually
-Download the distribution from the releases page and ensure it has execute permission. On macOS & Linux run `chmod u+x vgo`.
+Download the distribution from the release page and ensure it has execute permission. On macOS & Linux run `chmod u+x vgo`.
 
 vgo requires Java 17.
 
 ## Gradle Plugin
-The plugin aims to be fast and small by leveraging the JVM your gradle build is already using-no node-based tools are incorporated into your build.
+The plugin aims to be fast and small by leveraging (for the entire tool) the JVM your Gradle build is already using.
 
 The `shrinkVectorArtwork` task is added to your project on plugin application.
 
@@ -37,6 +38,8 @@ Then, in the relevant project, add the plugin.
 > [!NOTE]
 > You must have the android tools sdk on your build classpath if you are converting SVGs to vector drawables. 
 > This is typically done by applying the Android Gradle Plugin.
+> You must have the kotlin compiler on your build classpath if you are using the `ImageVector` format.
+> This is typically done by applying the Kotlin Gradle Plugin.
 
 ```groovy
 plugins {
@@ -70,7 +73,7 @@ Options:
   -s --stats      print statistics on processed files to standard out
   -v --version    print the version number
   --indent [value]  write files with value columns of indentation
-  --format [value]  output format (svg, vd, etc) - ALPHA
+  --format [value]  output format (svg, vd, iv)
   --no-optimiation  skip graphic optimization
 ```
 
@@ -78,6 +81,7 @@ Options:
 
 ## Examples
 
+### CLI
 ```
 # Optimize files specified from standard in
 > find ./**/ic_*.xml | vgo
@@ -90,6 +94,26 @@ Options:
 
 # Optimize multiple input sources write results to the
 > vgo vector.xml -o new_vector.xml ./assets -o ./new_assets
+```
+
+### Gradle Plugin
+```kotlin
+// Optimize and convert svgs to vector drawables at build time
+vgo {
+    format = OutputFormat.VECTOR_DRAWABLE
+    outputs = files(project.fileTree(project.projectDir) {
+        include("icons/**/*.svg")
+    }.map {
+        val file = file("src/main/res/drawable/${it.nameWithoutExtension}.xml")
+        file.parentFile?.mkdirs()
+        file.createNewFile()
+        file
+    }).asFileTree
+}
+
+tasks.getByName("processDebugResources").configureEach {
+    dependsOn("shrinkVectorArtwork")
+}
 ```
 
 ## Build instructions
