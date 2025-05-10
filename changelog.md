@@ -2,17 +2,9 @@
 
 ## Unreleased
 
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
 ### Fixed
-
-### Security
+- Removed the kotlin compiler from the build classpath to avoid undefined behavior when the Gradle plugin is applied
+- The `vgo` Gradle extension's `outputs` property are honored
 
 ## 3.2.0 - 2025-05-03
 
