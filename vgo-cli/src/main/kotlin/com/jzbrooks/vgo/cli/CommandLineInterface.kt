@@ -62,7 +62,7 @@ Options:
   -s --stats         print statistics on processed files to standard out
   -v --version       print the version number
   --indent value     write files with value columns of indentation
-  --format value     write specified output format (svg, vd)
+  --format value     write specified output format (svg, vd, iv)
   --no-optimization  skip graphic optimization
             """.trimIndent()
 

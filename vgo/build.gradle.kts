@@ -17,9 +17,12 @@ kotlin.sourceSets
 dependencies {
     implementation(project(":vgo-core"))
 
+    // Provided by the android gradle plugin
     compileOnly("com.android.tools:sdk-common:31.10.0")
 
-    implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.20")
+    // Provided by kotlin gradle plugin
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.20")
+
     implementation("com.squareup:kotlinpoet:2.1.0")
 
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
@@ -27,6 +30,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.20")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
 }

@@ -5,5 +5,6 @@ enum class OutputFormat(
 ) {
     SVG("svg"),
     VECTOR_DRAWABLE("vd"),
+    IMAGE_VECTOR("iv"),
     UNCHANGED("unchanged"),
 }
