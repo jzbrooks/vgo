@@ -23,7 +23,7 @@ dependencies {
     // Provided by kotlin gradle plugin
     compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.20")
 
-    implementation("com.squareup:kotlinpoet:2.1.0")
+    implementation("com.squareup:kotlinpoet:2.2.0")
 
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
