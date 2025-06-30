@@ -38,8 +38,8 @@ jobs:
 
       - name: Publish to MavenCentral
         env:
-          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_TOKEN_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_TOKEN_PASSWORD }}
           SONATYPE_PROFILE_ID: ${{ secrets.SONATYPE_PROFILE_ID }}
         run: ./gradlew -Psigning.keyId=${{ secrets.SIGNING_KEY_ID}} -Psigning.password=${{ secrets.SIGNING_KEY_PASSWORD }} -Psigning.secretKeyRingFile=${{ secrets.SIGNING_KEY_FILE_PATH }} --no-configuration-cache publishAndReleaseToMavenCentral
 
