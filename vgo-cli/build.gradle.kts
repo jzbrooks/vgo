@@ -117,7 +117,7 @@ dependencies {
     implementation("com.android.tools:sdk-common:31.11.0")
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.1.21")
 
-    r8("com.android.tools:r8:8.7.18")
+    r8("com.android.tools:r8:8.11.18")
 
     testImplementation(platform("org.junit:junit-bom:5.13.3"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
