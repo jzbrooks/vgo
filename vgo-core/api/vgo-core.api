@@ -927,6 +927,7 @@ public abstract interface class com/jzbrooks/vgo/core/util/math/Matrix3 {
 	public abstract fun clone ()Lcom/jzbrooks/vgo/core/util/math/Matrix3;
 	public abstract fun contentsEqual (Lcom/jzbrooks/vgo/core/util/math/Matrix3;F)Z
 	public static fun contentsEqual (Lcom/jzbrooks/vgo/core/util/math/Matrix3;Lcom/jzbrooks/vgo/core/util/math/Matrix3;F)Z
+	public static synthetic fun contentsEqual$default (Lcom/jzbrooks/vgo/core/util/math/Matrix3;Lcom/jzbrooks/vgo/core/util/math/Matrix3;FILjava/lang/Object;)Z
 	public static fun from ([F)Lcom/jzbrooks/vgo/core/util/math/Matrix3;
 	public abstract fun get (II)F
 	public abstract fun times (Lcom/jzbrooks/vgo/core/util/math/Matrix3;)Lcom/jzbrooks/vgo/core/util/math/Matrix3;
