@@ -2,7 +2,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm")
     id("java-gradle-plugin")
     id("com.vanniktech.maven.publish")
-    id("org.gradle.kotlin.kotlin-dsl") version "6.2.0"
+    id("org.gradle.kotlin.kotlin-dsl") version "6.4.1"
 }
 
 dependencies {
