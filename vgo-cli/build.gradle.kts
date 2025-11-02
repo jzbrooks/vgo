@@ -115,7 +115,7 @@ dependencies {
     implementation(project(":vgo"))
 
     implementation("com.android.tools:sdk-common:31.13.0")
-    implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.20")
+    implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.21")
 
     r8("com.android.tools:r8:8.7.18")
 
