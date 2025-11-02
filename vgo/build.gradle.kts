@@ -21,7 +21,7 @@ dependencies {
     compileOnly("com.android.tools:sdk-common:31.13.0")
 
     // Provided by kotlin gradle plugin
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.0")
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.21")
 
     implementation("com.squareup:kotlinpoet:2.2.0")
 
@@ -31,7 +31,7 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.21")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
 }
