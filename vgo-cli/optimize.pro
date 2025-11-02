@@ -23,3 +23,4 @@
 -dontwarn org.jetbrains.kotlin.com.google.errorprone.**
 -dontwarn org.jetbrains.kotlin.com.google.j2objc.**
 -dontwarn org.kxml2.io.**
+-dontwarn kotlinx.serialization.**

@@ -5,10 +5,10 @@ import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jlleitschuh.gradle.ktlint.KtlintPlugin
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.1.21"
+    id("org.jetbrains.changelog") version "2.4.0"
+    id("org.jetbrains.kotlin.jvm") version "2.2.20"
     id("org.jlleitschuh.gradle.ktlint") version "13.1.0"
     id("com.vanniktech.maven.publish") version "0.34.0"
-    id("org.jetbrains.changelog") version "2.4.0"
 }
 
 version = property("VERSION_NAME").toString()
