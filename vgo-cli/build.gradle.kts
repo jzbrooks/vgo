@@ -119,7 +119,7 @@ dependencies {
 
     r8("com.android.tools:r8:8.13.17")
 
-    testImplementation(platform("org.junit:junit-bom:5.14.1"))
+    testImplementation(platform("org.junit:junit-bom:6.0.1"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("org.junit.platform:junit-platform-launcher")
