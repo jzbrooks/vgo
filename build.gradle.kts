@@ -8,7 +8,7 @@ plugins {
     id("org.jetbrains.changelog") version "2.4.0"
     id("org.jetbrains.kotlin.jvm") version "2.2.21"
     id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
-    id("com.vanniktech.maven.publish") version "0.34.0"
+    id("com.vanniktech.maven.publish") version "0.35.0"
 }
 
 version = property("VERSION_NAME").toString()
