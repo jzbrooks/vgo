@@ -26,9 +26,6 @@ import com.jzbrooks.vgo.core.util.math.toCubicBezierCurve
 class ConvertCurvesToArcs(
     private val criterion: Criterion,
 ) : TopDownTransformer {
-    @Deprecated("Use the constructor with criteria instead.")
-    constructor(printer: CommandPrinter) : this(Criterion.ShortestPath(printer))
-
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}
