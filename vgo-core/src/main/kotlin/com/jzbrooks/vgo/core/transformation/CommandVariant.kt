@@ -382,10 +382,21 @@ class CommandVariant(
                 }
             }
             is Mode.Compact -> {
-                return if (mode.printer.print(convertedCommand).length < mode.printer.print(command).length) {
+                val convertedLength = mode.printer.print(convertedCommand).length
+                val originalLength = mode.printer.print(command).length
+
+                return if (convertedLength < originalLength) {
                     convertedCommand
-                } else {
+                } else if (convertedLength > originalLength) {
                     command
+                } else {
+                    // When lengths are equal, always prefer relative commands for deterministic behavior
+                    // This ensures consistent output regardless of input state
+                    if (convertedCommand.variant == CommandVariant.RELATIVE) {
+                        convertedCommand
+                    } else {
+                        command
+                    }
                 }
             }
         }

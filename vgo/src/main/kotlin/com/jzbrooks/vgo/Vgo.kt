@@ -13,6 +13,7 @@ import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
 import com.jzbrooks.vgo.svg.toVectorDrawable
+import com.jzbrooks.vgo.util.CountingOutputStream
 import com.jzbrooks.vgo.util.parse
 import com.jzbrooks.vgo.vd.VectorDrawable
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
@@ -110,44 +111,72 @@ class Vgo(
         // it is unable to be parsed.
         if (graphic == null && outputPath.isSameFileAs(input.toPath())) return
 
+        if (graphic != null) {
+            when (options.format) {
+                "vd" -> {
+                    when (graphic) {
+                        is ScalableVectorGraphic -> graphic.toVectorDrawable()
+                        is ImageVector -> graphic.toVectorDrawable()
+                    }
+                }
+                "svg" -> {
+                    if (graphic is VectorDrawable) {
+                        graphic = graphic.toSvg()
+                    }
+                }
+                "iv" -> {
+                    if (graphic is VectorDrawable) {
+                        graphic = graphic.toImageVector()
+                    }
+                }
+                else -> {
+                    if (options.format?.isNotEmpty() == true) {
+                        System.err.println("Unknown format ${options.format}")
+                    }
+                }
+            }
+
+            if (!options.noOptimization) {
+                val optimizationRegistry =
+                    when (graphic) {
+                        is VectorDrawable -> VectorDrawableOptimizationRegistry()
+                        is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                        is ImageVector -> ImageVectorOptimizationRegistry()
+                        else -> null
+                    }
+
+                optimizationRegistry?.apply(graphic)
+            }
+        }
+
+        val graphicSize =
+            CountingOutputStream().use { outputStream ->
+                when (graphic) {
+                    is VectorDrawable -> {
+                        val writer = VectorDrawableWriter(writerOptions)
+                        writer.write(graphic, outputStream)
+                    }
+
+                    is ScalableVectorGraphic -> {
+                        val writer = ScalableVectorGraphicWriter(writerOptions)
+                        writer.write(graphic, outputStream)
+                    }
+
+                    is ImageVector -> {
+                        val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
+                        writer.write(graphic, outputStream)
+                    }
+                }
+
+                outputStream.size
+            }
+
+        if (input == output && input.length().toULong() <= graphicSize) return
+
         output.outputStream().use { outputStream ->
-            if (graphic != null) {
-                when (options.format) {
-                    "vd" -> {
-                        when (graphic) {
-                            is ScalableVectorGraphic -> graphic.toVectorDrawable()
-                            is ImageVector -> graphic.toVectorDrawable()
-                        }
-                    }
-                    "svg" -> {
-                        if (graphic is VectorDrawable) {
-                            graphic = graphic.toSvg()
-                        }
-                    }
-                    "iv" -> {
-                        if (graphic is VectorDrawable) {
-                            graphic = graphic.toImageVector()
-                        }
-                    }
-                    else -> {
-                        if (options.format?.isNotEmpty() == true) {
-                            System.err.println("Unknown format ${options.format}")
-                        }
-                    }
-                }
-
-                if (!options.noOptimization) {
-                    val optimizationRegistry =
-                        when (graphic) {
-                            is VectorDrawable -> VectorDrawableOptimizationRegistry()
-                            is ScalableVectorGraphic -> SvgOptimizationRegistry()
-                            is ImageVector -> ImageVectorOptimizationRegistry()
-                            else -> null
-                        }
-
-                    optimizationRegistry?.apply(graphic)
-                }
-
+            if (graphic == null && input != output) {
+                input.inputStream().use { it.copyTo(outputStream) }
+            } else {
                 if (graphic is VectorDrawable) {
                     val writer = VectorDrawableWriter(writerOptions)
                     writer.write(graphic, outputStream)
@@ -176,8 +205,6 @@ class Vgo(
                         println("Percent saved: $percentSaved")
                     }
                 }
-            } else if (input != output) {
-                input.inputStream().use { it.copyTo(outputStream) }
             }
         }
     }
