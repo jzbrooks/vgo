@@ -6,6 +6,10 @@
 
 ### Changed
 
+- Only write modified graphics if the output is smaller
+  - Previously, in some rare circumstances, vgo could write an output that was the same size as the input with path modifications and ultimately oscillate between those two representations on each subsequent run. 
+- When the `CommandVariant` transformation is applied with `CommandVariant.Mode.Compact`, prefer relative coordinates over absolute if the two representations are the same size to encourage image data stability.
+
 ### Deprecated
 
 ### Removed
