@@ -135,7 +135,7 @@ class VgoTests {
     }
 
     @Test
-    fun `sequential runs do not mutate files more than once`() {
+    fun `sequential runs on optimized files don't change the file unless the size is smaller`() {
         val targetPath = "build/test-results/bug_117.xml"
 
         File("src/test/resources/bug_117.xml")
