@@ -149,6 +149,10 @@ class Vgo(
             }
         }
 
+        // Avoid oscillating between two image representations of the same size
+        // where path commands are swapped for different commands of the same length
+        // to avoid noise in vcs history and to enable a dry run "are these vectors
+        // shrunk?" check
         val graphicSize =
             CountingOutputStream().use { outputStream ->
                 when (graphic) {
