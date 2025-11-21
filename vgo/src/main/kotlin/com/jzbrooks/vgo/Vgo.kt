@@ -171,7 +171,17 @@ class Vgo(
                 outputStream.size
             }
 
-        if (input == output && input.length().toULong() <= graphicSize) return
+        if (input.length().toULong() <= graphicSize) {
+            if (input != output) {
+                input.inputStream().use { inputStream ->
+                    output.outputStream().use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                }
+            } else {
+                return
+            }
+        }
 
         output.outputStream().use { outputStream ->
             if (graphic == null && input != output) {
