@@ -114,7 +114,7 @@ val r8: Configuration by configurations.creating
 dependencies {
     implementation(project(":vgo"))
 
-    implementation("com.android.tools:sdk-common:31.13.1")
+    implementation("com.android.tools:sdk-common:31.13.2")
     implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.2.21")
 
     r8("com.android.tools:r8:8.13.17")
