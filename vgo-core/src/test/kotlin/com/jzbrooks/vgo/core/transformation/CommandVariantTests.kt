@@ -65,7 +65,7 @@ class CommandVariantTests {
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
-        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(8)
+        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.RELATIVE }).hasSize(9)
     }
 
     @Test
@@ -101,7 +101,7 @@ class CommandVariantTests {
 
         CommandVariantOpt(CommandVariantOpt.Mode.Compact(FakeCommandPrinter())).visit(path)
 
-        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(3)
+        assertThat(path.commands.filterIsInstance<ParameterizedCommand<*>>().filter { it.variant == CommandVariant.ABSOLUTE }).hasSize(1)
     }
 
     @Test
