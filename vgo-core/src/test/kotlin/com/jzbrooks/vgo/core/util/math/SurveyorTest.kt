@@ -3,6 +3,8 @@ package com.jzbrooks.vgo.core.util.math
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.isCloseTo
+import assertk.assertions.isFalse
+import assertk.assertions.isTrue
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -18,6 +20,43 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import org.junit.jupiter.api.Test
 
 class SurveyorTest {
+    @Test
+    fun `bounding boxes overlap but shapes do not intersect`() {
+        // Two right triangles positioned diagonally:
+        // Shape 1: bottom-left triangle (0,0) -> (100,0) -> (0,100)
+        //   - hypotenuse lies on line x + y = 100
+        // Shape 2: top-right triangle (100,100) -> (100,50) -> (50,100)
+        //   - hypotenuse lies on line x + y = 150
+        // Bounding boxes overlap in region (50,50) to (100,100)
+        // but the actual triangles don't touch
+
+        val commands1 =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 0f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 100f))),
+            )
+
+        val commands2 =
+            listOf<Command>(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 100f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 50f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 100f))),
+            )
+
+        val surveyor = Surveyor()
+
+        val box1 = surveyor.findBoundingBox(commands1)
+        val box2 = surveyor.findBoundingBox(commands2)
+
+        assertThat(box1.intersects(box2)).isTrue()
+
+        val hull1 = surveyor.sampleConvexHull(commands1)
+        val hull2 = surveyor.sampleConvexHull(commands2)
+
+        assertThat(intersects(hull1, hull2)).isFalse()
+    }
+
     @Test
     fun `line bounding box`() {
         val commands =

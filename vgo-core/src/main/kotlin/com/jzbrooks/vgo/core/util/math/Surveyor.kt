@@ -17,16 +17,6 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
  * Makes determinations based on the boundaries of a given set of path data
  */
 class Surveyor {
-    private val pathStart = ArrayDeque<Point>()
-
-    // Updated once per process call when computing
-    // the other variant of the command. This works
-    // because the coordinates are accurate regardless
-    // of their absolute or relative nature.
-    private lateinit var currentPoint: Point
-    private lateinit var previousControlPoint: Point
-    private lateinit var rectangle: Rectangle
-
     private val Command.shouldResetPreviousControlPoint: Boolean
         get() =
             when (this) {
@@ -45,253 +35,226 @@ class Surveyor {
                 -> false
             }
 
-    fun findBoundingBox(commands: List<Command>): Rectangle {
-        pathStart.clear()
-        currentPoint = Point(0f, 0f)
+    /**
+     * Samples points along the path commands for use in collision detection.
+     * Returns the convex hull of all sampled points.
+     */
+    fun sampleConvexHull(commands: List<Command>): List<Point> {
+        val sampledPoints = traversePoints(commands).toList()
+        return convexHull(sampledPoints)
+    }
 
-        (commands.firstOrNull() as MoveTo?)?.let { firstMoveTo ->
+    fun findBoundingBox(commands: List<Command>): Rectangle {
+        val iter = traversePoints(commands).iterator()
+        if (!iter.hasNext()) return Rectangle(0f, 0f, 0f, 0f)
+
+        val first = iter.next()
+        var box = Rectangle(first.x, first.y, first.x, first.y)
+        while (iter.hasNext()) {
+            val point = iter.next()
+            box =
+                Rectangle(
+                    left = minOf(box.left, point.x),
+                    top = maxOf(box.top, point.y),
+                    right = maxOf(box.right, point.x),
+                    bottom = minOf(box.bottom, point.y),
+                )
+        }
+        return box
+    }
+
+    private fun traversePoints(commands: List<Command>): Sequence<Point> =
+        sequence {
+            val pathStart = ArrayDeque<Point>()
+            var currentPoint = Point(0f, 0f)
+            var previousControlPoint = currentPoint
+
+            val firstMoveTo = commands.firstOrNull() as? MoveTo ?: return@sequence
             currentPoint = firstMoveTo.parameters.first()
             previousControlPoint = currentPoint
             pathStart.addFirst(currentPoint.copy())
-            rectangle = Rectangle(currentPoint.x, currentPoint.y, currentPoint.x, currentPoint.y)
+            yield(currentPoint)
 
-            updateBoundingBoxForLineParameters(firstMoveTo.variant, firstMoveTo.parameters.drop(1))
-        }
-
-        for (i in commands.indices.drop(1)) {
-            val command = commands[i]
-            val previousCommand = commands.getOrNull(i - 1)
-
-            if (previousCommand is ClosePath && command !is MoveTo) {
-                pathStart.addFirst(currentPoint.copy())
-            }
-
-            if (command.shouldResetPreviousControlPoint) {
-                previousControlPoint = currentPoint
-            }
-
-            when (command) {
-                is MoveTo -> {
-                    if (command.variant == CommandVariant.RELATIVE) {
-                        currentPoint += command.parameters.first()
+            for (param in firstMoveTo.parameters.drop(1)) {
+                currentPoint =
+                    if (firstMoveTo.variant == CommandVariant.RELATIVE) {
+                        currentPoint + param
                     } else {
-                        currentPoint = command.parameters.first()
+                        param
                     }
+                yield(currentPoint)
+            }
 
+            for (i in commands.indices.drop(1)) {
+                val command = commands[i]
+                val previousCommand = commands.getOrNull(i - 1)
+
+                if (previousCommand is ClosePath && command !is MoveTo) {
                     pathStart.addFirst(currentPoint.copy())
-
-                    updateBoundingBoxForLineParameters(command.variant, command.parameters.drop(1))
                 }
 
-                is LineTo -> {
-                    updateBoundingBoxForLineParameters(command.variant, command.parameters)
+                if (command.shouldResetPreviousControlPoint) {
+                    previousControlPoint = currentPoint
                 }
 
-                is HorizontalLineTo -> {
-                    for (parameter in command.parameters) {
+                when (command) {
+                    is MoveTo -> {
                         currentPoint =
                             if (command.variant == CommandVariant.RELATIVE) {
-                                currentPoint.copy(x = currentPoint.x + parameter)
+                                currentPoint + command.parameters.first()
                             } else {
-                                currentPoint.copy(x = parameter)
+                                command.parameters.first()
                             }
+                        yield(currentPoint)
+                        pathStart.addFirst(currentPoint.copy())
 
-                        if (currentPoint.x < rectangle.left) {
-                            rectangle = rectangle.copy(left = currentPoint.x)
-                        }
-
-                        if (currentPoint.x > rectangle.right) {
-                            rectangle = rectangle.copy(right = currentPoint.x)
+                        for (param in command.parameters.drop(1)) {
+                            currentPoint =
+                                if (command.variant == CommandVariant.RELATIVE) {
+                                    currentPoint + param
+                                } else {
+                                    param
+                                }
+                            yield(currentPoint)
                         }
                     }
-                }
 
-                is VerticalLineTo -> {
-                    for (parameter in command.parameters) {
-                        currentPoint =
+                    is LineTo -> {
+                        for (param in command.parameters) {
+                            currentPoint =
+                                if (command.variant == CommandVariant.RELATIVE) {
+                                    currentPoint + param
+                                } else {
+                                    param
+                                }
+                            yield(currentPoint)
+                        }
+                    }
+
+                    is HorizontalLineTo -> {
+                        for (parameter in command.parameters) {
+                            currentPoint =
+                                if (command.variant == CommandVariant.RELATIVE) {
+                                    currentPoint.copy(x = currentPoint.x + parameter)
+                                } else {
+                                    currentPoint.copy(x = parameter)
+                                }
+                            yield(currentPoint)
+                        }
+                    }
+
+                    is VerticalLineTo -> {
+                        for (parameter in command.parameters) {
+                            currentPoint =
+                                if (command.variant == CommandVariant.RELATIVE) {
+                                    currentPoint.copy(y = currentPoint.y + parameter)
+                                } else {
+                                    currentPoint.copy(y = parameter)
+                                }
+                            yield(currentPoint)
+                        }
+                    }
+
+                    is CubicBezierCurve -> {
+                        for (parameter in command.parameters) {
                             if (command.variant == CommandVariant.RELATIVE) {
-                                currentPoint.copy(y = currentPoint.y + parameter)
+                                for (t in interpolationResolution) {
+                                    yield(parameter.interpolate(Point.ZERO, t) + currentPoint)
+                                }
+                                previousControlPoint = currentPoint + parameter.endControl
+                                currentPoint += parameter.end
                             } else {
-                                currentPoint.copy(y = parameter)
+                                for (t in interpolationResolution) {
+                                    yield(parameter.interpolate(currentPoint, t))
+                                }
+                                previousControlPoint = parameter.endControl
+                                currentPoint = parameter.end
                             }
-
-                        if (currentPoint.y > rectangle.top) {
-                            rectangle = rectangle.copy(top = currentPoint.y)
-                        }
-
-                        if (currentPoint.y < rectangle.bottom) {
-                            rectangle = rectangle.copy(bottom = currentPoint.y)
                         }
                     }
-                }
 
-                is CubicBezierCurve -> {
-                    for (parameter in command.parameters) {
-                        if (command.variant == CommandVariant.RELATIVE) {
-                            for (t in interpolationResolution) {
-                                val interpolatedPoint = parameter.interpolate(Point.ZERO, t) + currentPoint
-                                expandBoundingBoxForPoint(interpolatedPoint)
+                    is SmoothCubicBezierCurve -> {
+                        for (parameter in command.parameters) {
+                            if (command.variant == CommandVariant.RELATIVE) {
+                                for (t in interpolationResolution) {
+                                    yield(parameter.interpolate(Point.ZERO, previousControlPoint - currentPoint, t) + currentPoint)
+                                }
+                                previousControlPoint = currentPoint + parameter.endControl
+                                currentPoint += parameter.end
+                            } else {
+                                for (t in interpolationResolution) {
+                                    yield(parameter.interpolate(currentPoint, previousControlPoint, t))
+                                }
+                                previousControlPoint = parameter.endControl
+                                currentPoint = parameter.end
                             }
-
-                            previousControlPoint = currentPoint + parameter.endControl
-                            currentPoint += parameter.end
-                        } else {
-                            for (t in interpolationResolution) {
-                                val interpolatedPoint = parameter.interpolate(currentPoint, t)
-                                expandBoundingBoxForPoint(interpolatedPoint)
-                            }
-
-                            previousControlPoint = parameter.endControl
-                            currentPoint = parameter.end
                         }
                     }
-                }
 
-                is SmoothCubicBezierCurve -> {
-                    for (parameter in command.parameters) {
-                        if (command.variant == CommandVariant.RELATIVE) {
-                            for (t in interpolationResolution) {
-                                val interpolatedPoint =
-                                    parameter.interpolate(Point.ZERO, previousControlPoint - currentPoint, t) + currentPoint
-                                expandBoundingBoxForPoint(interpolatedPoint)
+                    is QuadraticBezierCurve -> {
+                        for (parameter in command.parameters) {
+                            if (command.variant == CommandVariant.RELATIVE) {
+                                for (t in interpolationResolution) {
+                                    yield(parameter.interpolate(Point.ZERO, t) + currentPoint)
+                                }
+                                previousControlPoint = currentPoint + parameter.control
+                                currentPoint += parameter.end
+                            } else {
+                                for (t in interpolationResolution) {
+                                    yield(parameter.interpolate(currentPoint, t))
+                                }
+                                previousControlPoint = parameter.control
+                                currentPoint = parameter.end
                             }
-
-                            previousControlPoint = currentPoint + parameter.endControl
-                            currentPoint += parameter.end
-                        } else {
-                            for (t in interpolationResolution) {
-                                val interpolatedPoint = parameter.interpolate(currentPoint, previousControlPoint, t)
-                                expandBoundingBoxForPoint(interpolatedPoint)
-                            }
-
-                            previousControlPoint = parameter.endControl
-                            currentPoint = parameter.end
                         }
                     }
-                }
 
-                is QuadraticBezierCurve -> {
-                    for (parameter in command.parameters) {
-                        if (command.variant == CommandVariant.RELATIVE) {
-                            for (t in interpolationResolution) {
-                                val interpolatedPoint = parameter.interpolate(Point.ZERO, t) + currentPoint
-                                expandBoundingBoxForPoint(interpolatedPoint)
+                    is SmoothQuadraticBezierCurve -> {
+                        for (parameter in command.parameters) {
+                            val control = currentPoint * 2f - previousControlPoint
+
+                            if (command.variant == CommandVariant.RELATIVE) {
+                                for (t in interpolationResolution) {
+                                    yield(
+                                        parameter.interpolateSmoothQuadraticBezierCurve(Point.ZERO, control - currentPoint, t) +
+                                            currentPoint,
+                                    )
+                                }
+                                previousControlPoint = control
+                                currentPoint += parameter
+                            } else {
+                                for (t in interpolationResolution) {
+                                    yield(parameter.interpolateSmoothQuadraticBezierCurve(currentPoint, control, t))
+                                }
+                                previousControlPoint = control
+                                currentPoint = parameter
                             }
-
-                            previousControlPoint = currentPoint + parameter.control
-                            currentPoint += parameter.end
-                        } else {
-                            for (t in interpolationResolution) {
-                                val interpolatedPoint = parameter.interpolate(currentPoint, t)
-                                expandBoundingBoxForPoint(interpolatedPoint)
-                            }
-
-                            previousControlPoint = parameter.control
-                            currentPoint = parameter.end
                         }
                     }
-                }
 
-                is SmoothQuadraticBezierCurve -> {
-                    for (parameter in command.parameters) {
-                        val control = currentPoint * 2f - previousControlPoint
+                    is EllipticalArcCurve -> {
+                        for (arcParameter in command.parameters) {
+                            val box = arcParameter.computeBoundingBox(command.variant, currentPoint)
+                            yield(Point(box.left, box.top))
+                            yield(Point(box.right, box.top))
+                            yield(Point(box.right, box.bottom))
+                            yield(Point(box.left, box.bottom))
 
-                        if (command.variant == CommandVariant.RELATIVE) {
-                            for (t in interpolationResolution) {
-                                val interpolatedPoint =
-                                    parameter.interpolateSmoothQuadraticBezierCurve(Point.ZERO, control - currentPoint, t) + currentPoint
-                                expandBoundingBoxForPoint(interpolatedPoint)
-                            }
-
-                            previousControlPoint = control
-                            currentPoint += parameter
-                        } else {
-                            for (t in interpolationResolution) {
-                                val interpolatedPoint = parameter.interpolateSmoothQuadraticBezierCurve(currentPoint, control, t)
-                                expandBoundingBoxForPoint(interpolatedPoint)
-                            }
-
-                            previousControlPoint = control
-                            currentPoint = parameter
+                            currentPoint =
+                                if (command.variant == CommandVariant.RELATIVE) {
+                                    currentPoint + arcParameter.end
+                                } else {
+                                    arcParameter.end
+                                }
                         }
                     }
-                }
 
-                is EllipticalArcCurve -> {
-                    for (arcParameter in command.parameters) {
-                        val box = arcParameter.computeBoundingBox(command.variant, currentPoint)
-
-                        expandBoundingBoxForBox(box)
-
-                        if (command.variant == CommandVariant.RELATIVE) {
-                            currentPoint += arcParameter.end
-                        } else {
-                            currentPoint = arcParameter.end
-                        }
+                    is ClosePath -> {
+                        currentPoint = pathStart.removeFirst()
                     }
-                }
-
-                is ClosePath -> {
-                    // If there is a close path, there should be a corresponding path start entry on the stack
-                    currentPoint = pathStart.removeFirst()
-                    command
                 }
             }
         }
-
-        return rectangle
-    }
-
-    private fun updateBoundingBoxForLineParameters(
-        variant: CommandVariant,
-        linesTo: List<Point>,
-    ) {
-        for (lineToParameter in linesTo) {
-            if (variant == CommandVariant.RELATIVE) {
-                currentPoint += lineToParameter
-            } else {
-                currentPoint = lineToParameter
-            }
-
-            expandBoundingBoxForPoint(currentPoint)
-        }
-    }
-
-    private fun expandBoundingBoxForPoint(point: Point) {
-        if (point.x < rectangle.left) {
-            rectangle = rectangle.copy(left = point.x)
-        }
-
-        if (point.x > rectangle.right) {
-            rectangle = rectangle.copy(right = point.x)
-        }
-
-        if (point.y > rectangle.top) {
-            rectangle = rectangle.copy(top = point.y)
-        }
-
-        if (point.y < rectangle.bottom) {
-            rectangle = rectangle.copy(bottom = point.y)
-        }
-    }
-
-    private fun expandBoundingBoxForBox(box: Rectangle) {
-        if (box.left < rectangle.left) {
-            rectangle = rectangle.copy(left = box.left)
-        }
-
-        if (box.right > rectangle.right) {
-            rectangle = rectangle.copy(right = box.right)
-        }
-
-        if (box.top > rectangle.top) {
-            rectangle = rectangle.copy(top = box.top)
-        }
-
-        if (box.bottom < rectangle.bottom) {
-            rectangle = rectangle.copy(bottom = box.bottom)
-        }
-    }
 
     private companion object {
         private const val RESOLUTION = 10
