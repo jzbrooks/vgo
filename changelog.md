@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- `com.jzbrooks.vgo.core.transformation.MergePaths` more precisely checks if two paths overlap, which encourages merging
 
 ### Deprecated
 
