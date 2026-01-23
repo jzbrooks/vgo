@@ -885,6 +885,11 @@ public final class com/jzbrooks/vgo/core/util/math/Circle {
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class com/jzbrooks/vgo/core/util/math/CollisionKt {
+	public static final fun convexHull (Ljava/util/List;)Ljava/util/List;
+	public static final fun intersects (Ljava/util/List;Ljava/util/List;)Z
+}
+
 public final class com/jzbrooks/vgo/core/util/math/CommandsKt {
 	public static final fun computeAbsoluteCoordinates (Ljava/util/List;)Lcom/jzbrooks/vgo/core/util/math/Point;
 }
@@ -969,6 +974,7 @@ public final class com/jzbrooks/vgo/core/util/math/Point {
 	public final fun copy (FF)Lcom/jzbrooks/vgo/core/util/math/Point;
 	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/util/math/Point;FFILjava/lang/Object;)Lcom/jzbrooks/vgo/core/util/math/Point;
 	public final fun distanceTo (Lcom/jzbrooks/vgo/core/util/math/Point;)F
+	public final fun dot (Lcom/jzbrooks/vgo/core/util/math/Point;)F
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getX ()F
 	public final fun getY ()F
@@ -980,6 +986,7 @@ public final class com/jzbrooks/vgo/core/util/math/Point {
 	public final fun times (F)Lcom/jzbrooks/vgo/core/util/math/Point;
 	public final fun times (Lcom/jzbrooks/vgo/core/util/math/Point;)Lcom/jzbrooks/vgo/core/util/math/Point;
 	public fun toString ()Ljava/lang/String;
+	public final fun unaryMinus ()Lcom/jzbrooks/vgo/core/util/math/Point;
 }
 
 public final class com/jzbrooks/vgo/core/util/math/Point$Companion {
@@ -1010,6 +1017,7 @@ public final class com/jzbrooks/vgo/core/util/math/RectangleKt {
 public final class com/jzbrooks/vgo/core/util/math/Surveyor {
 	public fun <init> ()V
 	public final fun findBoundingBox (Ljava/util/List;)Lcom/jzbrooks/vgo/core/util/math/Rectangle;
+	public final fun sampleConvexHull (Ljava/util/List;)Ljava/util/List;
 }
 
 public final class com/jzbrooks/vgo/core/util/math/Vector3 {

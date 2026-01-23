@@ -15,7 +15,11 @@ data class Point(
 
     operator fun times(scalar: Float): Point = Point(x * scalar, y * scalar)
 
+    operator fun unaryMinus(): Point = Point(-x, -y)
+
     fun distanceTo(other: Point): Float = hypot(x - other.x, y - other.y)
+
+    fun dot(other: Point): Float = x * other.x + y * other.y
 
     fun isApproximately(
         other: Point,

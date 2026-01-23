@@ -134,9 +134,25 @@ class MergePaths(
     private fun unableToMerge(
         previous: Path,
         current: Path,
-    ): Boolean =
-        !haveSameAttributes(current, previous) ||
-            surveyor.findBoundingBox(previous.commands) intersects surveyor.findBoundingBox(current.commands)
+    ): Boolean {
+        if (!haveSameAttributes(current, previous)) {
+            return true
+        }
+
+        val previousBounds = surveyor.findBoundingBox(previous.commands)
+        val currentBounds = surveyor.findBoundingBox(current.commands)
+
+        // Cheap bounding box check: if boxes don't intersect, paths definitely don't overlap
+        if (!(previousBounds intersects currentBounds)) {
+            return false
+        }
+
+        // Bounding boxes intersect, use GJK on convex hulls for precise check
+        val previousHull = surveyor.sampleConvexHull(previous.commands)
+        val currentHull = surveyor.sampleConvexHull(current.commands)
+
+        return intersects(previousHull, currentHull)
+    }
 
     private fun haveSameAttributes(
         first: Path,

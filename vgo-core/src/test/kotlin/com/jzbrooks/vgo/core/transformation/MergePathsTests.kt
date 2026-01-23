@@ -51,14 +51,16 @@ class MergePathsTests {
 
         traverseBottomUp(graphic) { it.accept(optimization) }
 
-        assertThat(graphic::elements).index(0).isEqualTo(
+        assertThat(graphic::elements).containsExactly(
             createPath(
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(40f, 40f))),
-                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f))),
                 ),
+            ),
+            createPath(
+                listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f), Point(10f, 10f), Point(20f, 30f), Point(40f, 0f)))),
             ),
         )
     }
@@ -108,6 +110,10 @@ class MergePathsTests {
                         listOf(
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                        ),
+                    ),
+                    createPath(
+                        listOf(
                             MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                             SmoothCubicBezierCurve(
                                 CommandVariant.RELATIVE,
@@ -177,6 +183,10 @@ class MergePathsTests {
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                ),
+            ),
+            createPath(
+                listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                     SmoothCubicBezierCurve(
                         CommandVariant.RELATIVE,
@@ -245,6 +255,10 @@ class MergePathsTests {
                 listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                ),
+            ),
+            createPath(
+                listOf(
                     MoveTo(CommandVariant.ABSOLUTE, listOf(Point(20f, 20f))),
                     SmoothCubicBezierCurve(
                         CommandVariant.RELATIVE,
