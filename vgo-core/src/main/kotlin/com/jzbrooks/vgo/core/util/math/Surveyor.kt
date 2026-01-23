@@ -66,12 +66,11 @@ class Surveyor {
     private fun traversePoints(commands: List<Command>): Sequence<Point> =
         sequence {
             val pathStart = ArrayDeque<Point>()
-            var currentPoint = Point(0f, 0f)
-            var previousControlPoint = currentPoint
 
             val firstMoveTo = commands.firstOrNull() as? MoveTo ?: return@sequence
-            currentPoint = firstMoveTo.parameters.first()
-            previousControlPoint = currentPoint
+            var currentPoint = firstMoveTo.parameters.first()
+            var previousControlPoint = currentPoint
+
             pathStart.addFirst(currentPoint.copy())
             yield(currentPoint)
 
