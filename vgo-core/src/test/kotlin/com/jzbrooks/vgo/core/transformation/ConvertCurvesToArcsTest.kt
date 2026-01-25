@@ -33,7 +33,7 @@ class ConvertCurvesToArcsTest {
                 ),
             )
 
-        ConvertCurvesToArcs(FakeCommandPrinter()).visit(path)
+        ConvertCurvesToArcs(ConvertCurvesToArcs.Criterion.ShortestPath(FakeCommandPrinter())).visit(path)
 
         assertThat(path.commands[1]).isEqualTo(
             EllipticalArcCurve(
@@ -54,7 +54,7 @@ class ConvertCurvesToArcsTest {
 
     @Test
     fun `Sharp corners disqualify curves from arc collapse`() {
-        // This data is taken from the first the first commands
+        // This data is taken from the first commands
         // in visibility_strike.xml. It presented tolerance challenges
         // w.r.t. over-smoothing sharp edges into ellipses.
 
@@ -87,7 +87,7 @@ class ConvertCurvesToArcsTest {
 
         val before = path.copy()
 
-        ConvertCurvesToArcs(FakeCommandPrinter()).visit(path)
+        ConvertCurvesToArcs(ConvertCurvesToArcs.Criterion.ShortestPath(FakeCommandPrinter())).visit(path)
 
         assertThat(path).isEqualTo(before)
     }
@@ -147,7 +147,7 @@ class ConvertCurvesToArcsTest {
                 ),
             )
 
-        ConvertCurvesToArcs(FakeCommandPrinter()).visit(path)
+        ConvertCurvesToArcs(ConvertCurvesToArcs.Criterion.ShortestPath(FakeCommandPrinter())).visit(path)
 
         assertThat(path.commands.filterIsInstance<EllipticalArcCurve>()).hasSize(2)
         assertThat(path.commands.filterIsInstance<CubicBezierCurve>()).isEmpty()
