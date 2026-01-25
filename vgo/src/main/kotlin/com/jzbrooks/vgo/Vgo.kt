@@ -182,9 +182,9 @@ class Vgo(
                         inputStream.copyTo(outputStream)
                     }
                 }
-            } else {
-                return
             }
+
+            return
         }
 
         output.outputStream().use { outputStream ->
