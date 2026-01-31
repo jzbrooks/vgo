@@ -8,6 +8,7 @@ import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.iv.ImageVector
 import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
 import com.jzbrooks.vgo.iv.ImageVectorWriter
+import com.jzbrooks.vgo.iv.toFileSpec
 import com.jzbrooks.vgo.iv.toVectorDrawable
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicCommandPrinter
@@ -25,8 +26,12 @@ import com.jzbrooks.vgo.vd.toDocument
 import com.jzbrooks.vgo.vd.toImageVector
 import com.jzbrooks.vgo.vd.toSvg
 import java.io.File
+import java.math.RoundingMode
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
@@ -214,9 +219,20 @@ class Vgo(
                 }
 
                 is ImageVector -> {
+                    val decimalFormat =
+                        DecimalFormat().apply {
+                            maximumFractionDigits = 2
+                            isDecimalSeparatorAlwaysShown = false
+                            isGroupingUsed = false
+                            roundingMode = RoundingMode.HALF_UP
+                            minimumIntegerDigits = 0
+                            decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
+                        }
+
                     val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
+                    val fileSpec = graphic.toFileSpec(output.nameWithoutExtension, decimalFormat)
                     val countingStream = CountingOutputStream()
-                    writer.write(graphic, countingStream)
+                    writer.write(fileSpec, countingStream)
 
                     if (input.length().toULong() <= countingStream.size) {
                         if (input != output) {
