@@ -172,7 +172,11 @@ class Vgo(
                     val countingStream = CountingOutputStream()
                     writer.write(document, countingStream)
 
-                    if (input.length().toULong() <= countingStream.size) {
+                    if (input.length().toULong() > countingStream.size) {
+                        output.outputStream().use { outputStream ->
+                            writer.write(document, outputStream)
+                        }
+                    } else {
                         if (input != output) {
                             input.inputStream().use { inputStream ->
                                 output.outputStream().use { outputStream ->
@@ -182,10 +186,6 @@ class Vgo(
                         } else {
                             return
                         }
-                    }
-
-                    output.outputStream().use { outputStream ->
-                        writer.write(document, outputStream)
                     }
 
                     countingStream.size
@@ -199,7 +199,11 @@ class Vgo(
                     val countingStream = CountingOutputStream()
                     writer.write(document, countingStream)
 
-                    if (input.length().toULong() <= countingStream.size) {
+                    if (input.length().toULong() > countingStream.size) {
+                        output.outputStream().use { outputStream ->
+                            writer.write(document, outputStream)
+                        }
+                    } else {
                         if (input != output) {
                             input.inputStream().use { inputStream ->
                                 output.outputStream().use { outputStream ->
@@ -209,10 +213,6 @@ class Vgo(
                         } else {
                             return
                         }
-                    }
-
-                    output.outputStream().use { outputStream ->
-                        writer.write(document, outputStream)
                     }
 
                     countingStream.size
@@ -234,7 +234,11 @@ class Vgo(
                     val countingStream = CountingOutputStream()
                     writer.write(fileSpec, countingStream)
 
-                    if (input.length().toULong() <= countingStream.size) {
+                    if (input.length().toULong() > countingStream.size) {
+                        output.outputStream().use { outputStream ->
+                            writer.write(fileSpec, outputStream)
+                        }
+                    } else {
                         if (input != output) {
                             input.inputStream().use { inputStream ->
                                 output.outputStream().use { outputStream ->
@@ -244,10 +248,6 @@ class Vgo(
                         } else {
                             return
                         }
-                    }
-
-                    output.outputStream().use { outputStream ->
-                        writer.write(graphic, outputStream)
                     }
 
                     countingStream.size
