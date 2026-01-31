@@ -11,11 +11,7 @@ import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import org.w3c.dom.Document
 import java.io.OutputStream
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
 import java.util.Collections.emptySet
-import java.util.Locale
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -94,50 +90,51 @@ private fun Document.createChildElement(
                             val color = Colors.NAMES_BY_COLORS[element.fill] ?: element.fill.toHexString(Color.HexFormat.RGBA)
                             setAttribute("fill", color)
                         }
+                    }
 
-                        if (element.fillRule != Path.FillRule.NON_ZERO) {
-                            val fillRule =
-                                when (element.fillRule) {
-                                    Path.FillRule.EVEN_ODD -> "evenodd"
-                                    Path.FillRule.NON_ZERO -> throw IllegalStateException(
-                                        "Default fill rule ('nonzero') should never be written",
-                                    )
-                                }
-                            setAttribute("fill-rule", fillRule)
-                        }
+                    if (element.fillRule != Path.FillRule.NON_ZERO) {
+                        val fillRule =
+                            when (element.fillRule) {
+                                Path.FillRule.EVEN_ODD -> "evenodd"
+                                Path.FillRule.NON_ZERO -> throw IllegalStateException(
+                                    "Default fill rule ('nonzero') should never be written",
+                                )
+                            }
+                        setAttribute("fill-rule", fillRule)
+                    }
 
-                        if (element.stroke.alpha != 0.toUByte()) {
-                            val color = Colors.NAMES_BY_COLORS[element.stroke] ?: element.stroke.toHexString(Color.HexFormat.RGBA)
-                            setAttribute("stroke", color)
-                        }
+                    if (element.stroke.alpha != 0.toUByte()) {
+                        val color = Colors.NAMES_BY_COLORS[element.stroke] ?: element.stroke.toHexString(Color.HexFormat.RGBA)
+                        setAttribute("stroke", color)
+                    }
 
                     if (element.strokeWidth != 1f) {
                         setAttribute("stroke-width", commandPrinter.formatter.format(element.strokeWidth))
                     }
 
-                        if (element.strokeLineCap != Path.LineCap.BUTT) {
-                            val lineCap =
-                                when (element.strokeLineCap) {
-                                    Path.LineCap.SQUARE -> "square"
-                                    Path.LineCap.ROUND -> "round"
-                                    else -> throw IllegalStateException("Default linecap ('butt') shouldn't ever be written.")
-                                }
-                            setAttribute("stroke-linecap", lineCap)
-                        }
+                    if (element.strokeLineCap != Path.LineCap.BUTT) {
+                        val lineCap =
+                            when (element.strokeLineCap) {
+                                Path.LineCap.SQUARE -> "square"
+                                Path.LineCap.ROUND -> "round"
+                                else -> throw IllegalStateException("Default linecap ('butt') shouldn't ever be written.")
+                            }
+                        setAttribute("stroke-linecap", lineCap)
+                    }
 
-                        if (element.strokeLineJoin != Path.LineJoin.MITER) {
-                            val lineJoin =
-                                when (element.strokeLineJoin) {
-                                    Path.LineJoin.ROUND -> "round"
-                                    Path.LineJoin.BEVEL -> "bevel"
-                                    Path.LineJoin.MITER_CLIP -> "miter-clip"
-                                    Path.LineJoin.ARCS -> "arcs"
-                                    Path.LineJoin.MITER -> throw IllegalStateException(
-                                        "Default linejoin ('miter') shouldn't ever be written.",
-                                    )
-                                }
-                            setAttribute("stroke-linejoin", lineJoin)
-                        }
+                    if (element.strokeLineJoin != Path.LineJoin.MITER) {
+                        val lineJoin =
+                            when (element.strokeLineJoin) {
+                                Path.LineJoin.ROUND -> "round"
+                                Path.LineJoin.BEVEL -> "bevel"
+                                Path.LineJoin.MITER_CLIP -> "miter-clip"
+                                Path.LineJoin.ARCS -> "arcs"
+                                Path.LineJoin.MITER -> throw IllegalStateException(
+                                    "Default linejoin ('miter') shouldn't ever be written.",
+                                )
+                            }
+                        setAttribute("stroke-linejoin", lineJoin)
+                    }
 
                     if (element.strokeMiterLimit != 4f) {
                         setAttribute("stroke-miterlimit", commandPrinter.formatter.format(element.strokeMiterLimit))
@@ -179,18 +176,14 @@ private fun Document.createChildElement(
                         createChildElement(commandPrinter, it, child)
                     }
                 }
-                else -> null
             }
+            else -> null
+        }
 
-        if (node != null) {
-            val elementName = element.id
-            if (elementName != null) {
-                node.setAttribute("id", elementName)
-            }
-            for (item in element.foreign) {
-                node.setAttribute(item.key, item.value)
-            }
-            parent.appendChild(node)
+    if (node != null) {
+        val elementName = element.id
+        if (elementName != null) {
+            node.setAttribute("id", elementName)
         }
         for (item in element.foreign) {
             node.setAttribute(item.key, item.value)

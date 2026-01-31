@@ -24,7 +24,6 @@ class VectorDrawableWriter(
     override val options: Set<Writer.Option> = emptySet(),
     private val commandPrinter: VectorDrawableCommandPrinter = VectorDrawableCommandPrinter(3),
 ) : Writer<VectorDrawable> {
-
     override fun write(
         graphic: VectorDrawable,
         stream: OutputStream,
@@ -157,20 +156,45 @@ private fun Document.createChildElement(
                         setAttribute("android:strokeLineJoin", commandPrinter.formatter.format(element.strokeMiterLimit))
                     }
                 }
-                else -> null
             }
+            is Group -> {
+                createElement("group").also { node ->
+                    // There's no reason to output the transforms if the
+                    // value of the transform is referentially equal to the
+                    // identity matrix constant
+                    if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
+                        writeTransforms(commandPrinter, element, node)
+                    }
 
-        if (node != null) {
-            val elementName = element.id
-            if (elementName != null) {
-                node.setAttribute("android:name", elementName)
+                    for (child in element.elements) {
+                        createChildElement(commandPrinter, node, child)
+                    }
+                }
             }
+            is ClipPath -> {
+                createElement("clip-path").apply {
+                    val data =
+                        (element.elements[0] as Path)
+                            .commands
+                            .joinToString(separator = "", transform = commandPrinter::print)
 
-            for ((key, value) in element.foreign.filter { (k, v) -> DEFAULT_PATH_ATTRIBUTES[k] != v }) {
-                node.setAttribute(key, value)
+                    setAttribute("android:pathData", data)
+                }
             }
+            is Extra -> {
+                createElement(element.name).also {
+                    for (child in element.elements) {
+                        createChildElement(commandPrinter, it, child)
+                    }
+                }
+            }
+            else -> null
+        }
 
-            parent.appendChild(node)
+    if (node != null) {
+        val elementName = element.id
+        if (elementName != null) {
+            node.setAttribute("android:name", elementName)
         }
 
         for ((key, value) in element.foreign.filter { (k, v) -> DEFAULT_PATH_ATTRIBUTES[k] != v }) {
@@ -195,23 +219,23 @@ private fun writeTransforms(
     val e = group.transform[0, 2]
     val f = group.transform[1, 2]
 
-        if (abs(e) >= 0.01f) {
-            node.setAttribute("android:translateX", formatter.format(e))
-        }
+    if (abs(e) >= 0.01f) {
+        node.setAttribute("android:translateX", formatter.format(e))
+    }
 
-        if (abs(f) >= 0.01f) {
-            node.setAttribute("android:translateY", formatter.format(f))
-        }
+    if (abs(f) >= 0.01f) {
+        node.setAttribute("android:translateY", formatter.format(f))
+    }
 
-        val scaleX = hypot(a, c)
-        if (abs(scaleX) >= 1.01f) {
-            node.setAttribute("android:scaleX", formatter.format(scaleX))
-        }
+    val scaleX = hypot(a, c)
+    if (abs(scaleX) >= 1.01f) {
+        node.setAttribute("android:scaleX", formatter.format(scaleX))
+    }
 
-        val scaleY = hypot(b, d)
-        if (abs(scaleY) >= 1.01f) {
-            node.setAttribute("android:scaleY", formatter.format(scaleY))
-        }
+    val scaleY = hypot(b, d)
+    if (abs(scaleY) >= 1.01f) {
+        node.setAttribute("android:scaleY", formatter.format(scaleY))
+    }
 
     val rotation = atan(c / d)
     if (abs(rotation) >= 0.01f) {
