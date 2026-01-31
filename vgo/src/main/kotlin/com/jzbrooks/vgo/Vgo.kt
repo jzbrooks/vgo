@@ -16,10 +16,13 @@ import com.jzbrooks.vgo.svg.toVectorDrawable
 import com.jzbrooks.vgo.util.CountingOutputStream
 import com.jzbrooks.vgo.util.parse
 import com.jzbrooks.vgo.vd.VectorDrawable
+import com.jzbrooks.vgo.vd.VectorDrawableCommandPrinter
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter
+import com.jzbrooks.vgo.vd.toDocument
 import com.jzbrooks.vgo.vd.toImageVector
 import com.jzbrooks.vgo.vd.toSvg
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -151,74 +154,105 @@ class Vgo(
 
         // Avoid oscillating between two image representations of the same size
         // where path commands are swapped for different commands of the same length
-        // to avoid noise in vcs history and to enable a dry run "are these vectors
-        // shrunk?" check
-        val graphicSize =
-            CountingOutputStream().use { outputStream ->
-                when (graphic) {
-                    is VectorDrawable -> {
-                        val writer = VectorDrawableWriter(writerOptions)
-                        writer.write(graphic, outputStream)
-                    }
+        // to avoid noise in vcs history by counting the bytes we're going to write
+        // before writing them. Only write files that actually improve the size.
+        val graphicSize = when (graphic) {
+            is VectorDrawable -> {
+                val printer = VectorDrawableCommandPrinter(3)
+                val document = graphic.toDocument(printer)
+                val writer = VectorDrawableWriter(writerOptions, printer)
 
-                    is ScalableVectorGraphic -> {
-                        val writer = ScalableVectorGraphicWriter(writerOptions)
-                        writer.write(graphic, outputStream)
-                    }
+                val countingStream = CountingOutputStream()
+                writer.write(document, countingStream)
 
-                    is ImageVector -> {
-                        val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
-                        writer.write(graphic, outputStream)
+                if (input.length().toULong() <= countingStream.size) {
+                    if (input != output) {
+                        input.inputStream().use { inputStream ->
+                            output.outputStream().use { outputStream ->
+                                inputStream.copyTo(outputStream)
+                            }
+                        }
+                    } else {
+                        return
+                    }
+                }
+
+                output.outputStream().use { outputStream ->
+                    writer.write(document, outputStream)
+                }
+
+                countingStream.size
+            }
+
+            is ScalableVectorGraphic -> {
+                val writer = ScalableVectorGraphicWriter(writerOptions)
+                val countingStream = CountingOutputStream()
+                writer.write(graphic, countingStream)
+
+                if (input.length().toULong() <= countingStream.size) {
+                    if (input != output) {
+                        input.inputStream().use { inputStream ->
+                            output.outputStream().use { outputStream ->
+                                inputStream.copyTo(outputStream)
+                            }
+                        }
+                    } else {
+                        return
                     }
                 }
 
-                outputStream.size
+                output.outputStream().use { outputStream ->
+                    writer.write(graphic, outputStream)
+                }
+
+                countingStream.size
             }
 
-        if (input.length().toULong() <= graphicSize) {
-            if (input != output) {
-                input.inputStream().use { inputStream ->
-                    output.outputStream().use { outputStream ->
-                        inputStream.copyTo(outputStream)
+            is ImageVector -> {
+                val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
+                val countingStream = CountingOutputStream()
+                writer.write(graphic, countingStream)
+
+                if (input.length().toULong() <= countingStream.size) {
+                    if (input != output) {
+                        input.inputStream().use { inputStream ->
+                            output.outputStream().use { outputStream ->
+                                inputStream.copyTo(outputStream)
+                            }
+                        }
+                    } else {
+                        return
                     }
+                }
+
+                output.outputStream().use { outputStream ->
+                    writer.write(graphic, outputStream)
+                }
+
+                countingStream.size
+            }
+
+            null if input != output -> {
+                output.outputStream().use { outputStream ->
+                    input.inputStream().use { it.copyTo(outputStream) }
+                    outputStream.channel.size().toULong()
                 }
             }
 
-            return
+            else -> return
         }
 
-        output.outputStream().use { outputStream ->
-            if (graphic == null && input != output) {
-                input.inputStream().use { it.copyTo(outputStream) }
-            } else {
-                if (graphic is VectorDrawable) {
-                    val writer = VectorDrawableWriter(writerOptions)
-                    writer.write(graphic, outputStream)
-                }
+        if (options.printStats) {
+            val sizeAfter = graphicSize.toLong()
+            val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
+            totalBytesBefore += sizeBefore
+            totalBytesAfter += sizeAfter
 
-                if (graphic is ScalableVectorGraphic) {
-                    val writer = ScalableVectorGraphicWriter(writerOptions)
-                    writer.write(graphic, outputStream)
-                }
-
-                if (graphic is ImageVector) {
-                    val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
-                    writer.write(graphic, outputStream)
-                }
-
-                if (options.printStats) {
-                    val sizeAfter = outputStream.channel.size()
-                    val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
-                    totalBytesBefore += sizeBefore
-                    totalBytesAfter += sizeAfter
-
-                    if (percentSaved.absoluteValue > 1e-3) {
-                        if (printFileNames) println("\n${input.path}")
-                        println("Size before: " + formatByteDescription(sizeBefore))
-                        println("Size after: " + formatByteDescription(sizeAfter))
-                        println("Percent saved: $percentSaved")
-                    }
-                }
+            if (percentSaved.absoluteValue > 1e-3) {
+                if (printFileNames) println("\n${input.path}")
+                println("Size before: " + formatByteDescription(sizeBefore))
+                println("Size after: " + formatByteDescription(sizeAfter))
+                println("Percent saved: $percentSaved")
             }
         }
     }
