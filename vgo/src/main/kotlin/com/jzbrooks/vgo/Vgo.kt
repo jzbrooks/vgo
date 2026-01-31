@@ -10,8 +10,10 @@ import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
 import com.jzbrooks.vgo.iv.ImageVectorWriter
 import com.jzbrooks.vgo.iv.toVectorDrawable
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
+import com.jzbrooks.vgo.svg.ScalableVectorGraphicCommandPrinter
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
+import com.jzbrooks.vgo.svg.toDocument
 import com.jzbrooks.vgo.svg.toVectorDrawable
 import com.jzbrooks.vgo.util.CountingOutputStream
 import com.jzbrooks.vgo.util.parse
@@ -185,9 +187,12 @@ class Vgo(
             }
 
             is ScalableVectorGraphic -> {
+                val printer = ScalableVectorGraphicCommandPrinter(3)
                 val writer = ScalableVectorGraphicWriter(writerOptions)
+                val document = graphic.toDocument(printer)
+
                 val countingStream = CountingOutputStream()
-                writer.write(graphic, countingStream)
+                writer.write(document, countingStream)
 
                 if (input.length().toULong() <= countingStream.size) {
                     if (input != output) {
@@ -202,7 +207,7 @@ class Vgo(
                 }
 
                 output.outputStream().use { outputStream ->
-                    writer.write(graphic, outputStream)
+                    writer.write(document, outputStream)
                 }
 
                 countingStream.size

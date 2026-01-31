@@ -27,59 +27,72 @@ class ScalableVectorGraphicWriter(
 ) : Writer<ScalableVectorGraphic> {
     private val commandPrinter = ScalableVectorGraphicCommandPrinter(3)
 
-    private val formatter =
-        DecimalFormat().apply {
-            maximumFractionDigits = 2 // todo: parameterize?
-            minimumIntegerDigits = 0
-            isDecimalSeparatorAlwaysShown = false
-            isGroupingUsed = false
-            roundingMode = RoundingMode.HALF_UP
-            decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
-        }
-
     override fun write(
         graphic: ScalableVectorGraphic,
         stream: OutputStream,
     ) {
-        val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-        val document = builder.newDocument()
-
-        val root = document.createElement("svg")
-        val elementName = graphic.id
-        if (elementName != null) {
-            root.setAttribute("id", elementName)
-        }
-        for (item in graphic.foreign) {
-            root.setAttribute(item.key, item.value)
-        }
-        document.appendChild(root)
-
-        for (element in graphic.elements) {
-            write(root, element, document)
-        }
-
+        val document = graphic.toDocument(commandPrinter)
         write(document, stream)
     }
 
-    private fun write(
-        parent: org.w3c.dom.Element,
-        element: Element,
+    fun write(
         document: Document,
+        outputStream: OutputStream,
     ) {
-        val node =
-            when (element) {
-                is Path -> {
-                    document.createElement("path").apply {
-                        val data = element.commands.joinToString(separator = "", transform = commandPrinter::print)
-                        setAttribute("d", data)
+        val transformer = TransformerFactory.newInstance().newTransformer()
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
 
-                        if (element.fill != Colors.BLACK) {
-                            if (element.fill.alpha == 0.toUByte()) {
-                                setAttribute("fill", "none")
-                            } else {
-                                val color = Colors.NAMES_BY_COLORS[element.fill] ?: element.fill.toHexString(Color.HexFormat.RGBA)
-                                setAttribute("fill", color)
-                            }
+        val indent = options.filterIsInstance<Writer.Option.Indent>().singleOrNull()?.columns
+        if (indent != null) {
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", indent.toString())
+        }
+
+        val source = DOMSource(document)
+        val result = StreamResult(outputStream)
+        transformer.transform(source, result)
+    }
+}
+
+fun ScalableVectorGraphic.toDocument(commandPrinter: ScalableVectorGraphicCommandPrinter): Document {
+    val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+    val document = builder.newDocument()
+
+    val root = document.createElement("svg")
+    val elementName = id
+    if (elementName != null) {
+        root.setAttribute("id", elementName)
+    }
+    for (item in foreign) {
+        root.setAttribute(item.key, item.value)
+    }
+    document.appendChild(root)
+
+    for (element in elements) {
+        document.createChildElement(commandPrinter, root, element)
+    }
+
+    return document
+}
+
+private fun Document.createChildElement(
+    commandPrinter: ScalableVectorGraphicCommandPrinter,
+    parent: org.w3c.dom.Element,
+    element: Element,
+) {
+    val node =
+        when (element) {
+            is Path -> {
+                createElement("path").apply {
+                    val data = element.commands.joinToString(separator = "", transform = commandPrinter::print)
+                    setAttribute("d", data)
+
+                    if (element.fill != Colors.BLACK) {
+                        if (element.fill.alpha == 0.toUByte()) {
+                            setAttribute("fill", "none")
+                        } else {
+                            val color = Colors.NAMES_BY_COLORS[element.fill] ?: element.fill.toHexString(Color.HexFormat.RGBA)
+                            setAttribute("fill", color)
                         }
 
                         if (element.fillRule != Path.FillRule.NON_ZERO) {
@@ -98,9 +111,9 @@ class ScalableVectorGraphicWriter(
                             setAttribute("stroke", color)
                         }
 
-                        if (element.strokeWidth != 1f) {
-                            setAttribute("stroke-width", formatter.format(element.strokeWidth))
-                        }
+                    if (element.strokeWidth != 1f) {
+                        setAttribute("stroke-width", commandPrinter.formatter.format(element.strokeWidth))
+                    }
 
                         if (element.strokeLineCap != Path.LineCap.BUTT) {
                             val lineCap =
@@ -126,45 +139,44 @@ class ScalableVectorGraphicWriter(
                             setAttribute("stroke-linejoin", lineJoin)
                         }
 
-                        if (element.strokeMiterLimit != 4f) {
-                            setAttribute("stroke-miterlimit", formatter.format(element.strokeMiterLimit))
-                        }
+                    if (element.strokeMiterLimit != 4f) {
+                        setAttribute("stroke-miterlimit", commandPrinter.formatter.format(element.strokeMiterLimit))
                     }
                 }
-                is Group -> {
-                    document.createElement("g").also { node ->
-                        if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
-                            val matrix = element.transform
-                            val matrixElements =
-                                listOf(
-                                    formatter.format(matrix[0, 0]),
-                                    formatter.format(matrix[1, 0]),
-                                    formatter.format(matrix[0, 1]),
-                                    formatter.format(matrix[1, 1]),
-                                    formatter.format(matrix[0, 2]),
-                                    formatter.format(matrix[1, 2]),
-                                ).joinToString(separator = ",")
+            }
+            is Group -> {
+                createElement("g").also { node ->
+                    if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
+                        val matrix = element.transform
+                        val matrixElements =
+                            listOf(
+                                commandPrinter.formatter.format(matrix[0, 0]),
+                                commandPrinter.formatter.format(matrix[1, 0]),
+                                commandPrinter.formatter.format(matrix[0, 1]),
+                                commandPrinter.formatter.format(matrix[1, 1]),
+                                commandPrinter.formatter.format(matrix[0, 2]),
+                                commandPrinter.formatter.format(matrix[1, 2]),
+                            ).joinToString(separator = ",")
 
-                            node.setAttribute("transform", "matrix($matrixElements)")
-                        }
+                        node.setAttribute("transform", "matrix($matrixElements)")
+                    }
 
-                        for (child in element.elements) {
-                            write(node, child, document)
-                        }
+                    for (child in element.elements) {
+                        createChildElement(commandPrinter, node, child)
                     }
                 }
-                is ClipPath -> {
-                    document.createElement("clipPath").also {
-                        for (child in element.elements) {
-                            write(it, child, document)
-                        }
+            }
+            is ClipPath -> {
+                createElement("clipPath").also {
+                    for (child in element.elements) {
+                        createChildElement(commandPrinter, it, child)
                     }
                 }
-                is Extra -> {
-                    document.createElement(element.name).also {
-                        for (child in element.elements) {
-                            write(it, child, document)
-                        }
+            }
+            is Extra -> {
+                createElement(element.name).also {
+                    for (child in element.elements) {
+                        createChildElement(commandPrinter, it, child)
                     }
                 }
                 else -> null
@@ -180,23 +192,9 @@ class ScalableVectorGraphicWriter(
             }
             parent.appendChild(node)
         }
-    }
-
-    private fun write(
-        document: Document,
-        outputStream: OutputStream,
-    ) {
-        val transformer = TransformerFactory.newInstance().newTransformer()
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-
-        val indent = options.filterIsInstance<Writer.Option.Indent>().singleOrNull()?.columns
-        if (indent != null) {
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes")
-            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", indent.toString())
+        for (item in element.foreign) {
+            node.setAttribute(item.key, item.value)
         }
-
-        val source = DOMSource(document)
-        val result = StreamResult(outputStream)
-        transformer.transform(source, result)
+        parent.appendChild(node)
     }
 }
