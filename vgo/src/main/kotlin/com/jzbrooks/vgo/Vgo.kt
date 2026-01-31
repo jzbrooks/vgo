@@ -237,10 +237,14 @@ class Vgo(
                 countingStream.size
             }
 
-            null if input != output -> {
-                output.outputStream().use { outputStream ->
-                    input.inputStream().use { it.copyTo(outputStream) }
-                    outputStream.channel.size().toULong()
+            null -> {
+                if (input != output) {
+                    output.outputStream().use { outputStream ->
+                        input.inputStream().use { it.copyTo(outputStream) }
+                        outputStream.channel.size().toULong()
+                    }
+                } else {
+                    return
                 }
             }
 
