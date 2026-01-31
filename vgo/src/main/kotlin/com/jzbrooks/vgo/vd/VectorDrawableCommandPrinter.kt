@@ -23,7 +23,7 @@ import kotlin.math.sign
 class VectorDrawableCommandPrinter(
     private val decimalDigits: Int,
 ) : CommandPrinter {
-    private val formatter =
+    val formatter =
         DecimalFormat().apply {
             maximumFractionDigits = decimalDigits
             isDecimalSeparatorAlwaysShown = false
