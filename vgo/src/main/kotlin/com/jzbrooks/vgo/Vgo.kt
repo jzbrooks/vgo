@@ -24,7 +24,6 @@ import com.jzbrooks.vgo.vd.VectorDrawableWriter
 import com.jzbrooks.vgo.vd.toDocument
 import com.jzbrooks.vgo.vd.toImageVector
 import com.jzbrooks.vgo.vd.toSvg
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -158,98 +157,99 @@ class Vgo(
         // where path commands are swapped for different commands of the same length
         // to avoid noise in vcs history by counting the bytes we're going to write
         // before writing them. Only write files that actually improve the size.
-        val graphicSize = when (graphic) {
-            is VectorDrawable -> {
-                val printer = VectorDrawableCommandPrinter(3)
-                val document = graphic.toDocument(printer)
-                val writer = VectorDrawableWriter(writerOptions, printer)
+        val graphicSize =
+            when (graphic) {
+                is VectorDrawable -> {
+                    val printer = VectorDrawableCommandPrinter(3)
+                    val document = graphic.toDocument(printer)
+                    val writer = VectorDrawableWriter(writerOptions, printer)
 
-                val countingStream = CountingOutputStream()
-                writer.write(document, countingStream)
+                    val countingStream = CountingOutputStream()
+                    writer.write(document, countingStream)
 
-                if (input.length().toULong() <= countingStream.size) {
-                    if (input != output) {
-                        input.inputStream().use { inputStream ->
-                            output.outputStream().use { outputStream ->
-                                inputStream.copyTo(outputStream)
+                    if (input.length().toULong() <= countingStream.size) {
+                        if (input != output) {
+                            input.inputStream().use { inputStream ->
+                                output.outputStream().use { outputStream ->
+                                    inputStream.copyTo(outputStream)
+                                }
                             }
+                        } else {
+                            return
                         }
-                    } else {
-                        return
                     }
-                }
 
-                output.outputStream().use { outputStream ->
-                    writer.write(document, outputStream)
-                }
-
-                countingStream.size
-            }
-
-            is ScalableVectorGraphic -> {
-                val printer = ScalableVectorGraphicCommandPrinter(3)
-                val writer = ScalableVectorGraphicWriter(writerOptions)
-                val document = graphic.toDocument(printer)
-
-                val countingStream = CountingOutputStream()
-                writer.write(document, countingStream)
-
-                if (input.length().toULong() <= countingStream.size) {
-                    if (input != output) {
-                        input.inputStream().use { inputStream ->
-                            output.outputStream().use { outputStream ->
-                                inputStream.copyTo(outputStream)
-                            }
-                        }
-                    } else {
-                        return
-                    }
-                }
-
-                output.outputStream().use { outputStream ->
-                    writer.write(document, outputStream)
-                }
-
-                countingStream.size
-            }
-
-            is ImageVector -> {
-                val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
-                val countingStream = CountingOutputStream()
-                writer.write(graphic, countingStream)
-
-                if (input.length().toULong() <= countingStream.size) {
-                    if (input != output) {
-                        input.inputStream().use { inputStream ->
-                            output.outputStream().use { outputStream ->
-                                inputStream.copyTo(outputStream)
-                            }
-                        }
-                    } else {
-                        return
-                    }
-                }
-
-                output.outputStream().use { outputStream ->
-                    writer.write(graphic, outputStream)
-                }
-
-                countingStream.size
-            }
-
-            null -> {
-                if (input != output) {
                     output.outputStream().use { outputStream ->
-                        input.inputStream().use { it.copyTo(outputStream) }
-                        outputStream.channel.size().toULong()
+                        writer.write(document, outputStream)
                     }
-                } else {
-                    return
-                }
-            }
 
-            else -> return
-        }
+                    countingStream.size
+                }
+
+                is ScalableVectorGraphic -> {
+                    val printer = ScalableVectorGraphicCommandPrinter(3)
+                    val writer = ScalableVectorGraphicWriter(writerOptions)
+                    val document = graphic.toDocument(printer)
+
+                    val countingStream = CountingOutputStream()
+                    writer.write(document, countingStream)
+
+                    if (input.length().toULong() <= countingStream.size) {
+                        if (input != output) {
+                            input.inputStream().use { inputStream ->
+                                output.outputStream().use { outputStream ->
+                                    inputStream.copyTo(outputStream)
+                                }
+                            }
+                        } else {
+                            return
+                        }
+                    }
+
+                    output.outputStream().use { outputStream ->
+                        writer.write(document, outputStream)
+                    }
+
+                    countingStream.size
+                }
+
+                is ImageVector -> {
+                    val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
+                    val countingStream = CountingOutputStream()
+                    writer.write(graphic, countingStream)
+
+                    if (input.length().toULong() <= countingStream.size) {
+                        if (input != output) {
+                            input.inputStream().use { inputStream ->
+                                output.outputStream().use { outputStream ->
+                                    inputStream.copyTo(outputStream)
+                                }
+                            }
+                        } else {
+                            return
+                        }
+                    }
+
+                    output.outputStream().use { outputStream ->
+                        writer.write(graphic, outputStream)
+                    }
+
+                    countingStream.size
+                }
+
+                null -> {
+                    if (input != output) {
+                        output.outputStream().use { outputStream ->
+                            input.inputStream().use { it.copyTo(outputStream) }
+                            outputStream.channel.size().toULong()
+                        }
+                    } else {
+                        return
+                    }
+                }
+
+                else -> return
+            }
 
         if (options.printStats) {
             val sizeAfter = graphicSize.toLong()
