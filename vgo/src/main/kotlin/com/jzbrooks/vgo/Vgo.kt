@@ -180,6 +180,7 @@ class Vgo(
                         output.outputStream().use { outputStream ->
                             writer.write(document, outputStream)
                         }
+                        countingStream.size
                     } else {
                         if (input != output) {
                             input.inputStream().use { inputStream ->
@@ -190,9 +191,8 @@ class Vgo(
                         } else {
                             return
                         }
+                        sizeBefore.toULong()
                     }
-
-                    countingStream.size
                 }
 
                 is ScalableVectorGraphic -> {
@@ -207,6 +207,7 @@ class Vgo(
                         output.outputStream().use { outputStream ->
                             writer.write(document, outputStream)
                         }
+                        countingStream.size
                     } else {
                         if (input != output) {
                             input.inputStream().use { inputStream ->
@@ -217,9 +218,8 @@ class Vgo(
                         } else {
                             return
                         }
+                        sizeBefore.toULong()
                     }
-
-                    countingStream.size
                 }
 
                 is ImageVector -> {
@@ -242,6 +242,7 @@ class Vgo(
                         output.outputStream().use { outputStream ->
                             writer.write(fileSpec, outputStream)
                         }
+                        countingStream.size
                     } else {
                         if (input != output) {
                             input.inputStream().use { inputStream ->
@@ -252,9 +253,8 @@ class Vgo(
                         } else {
                             return
                         }
+                        sizeBefore.toULong()
                     }
-
-                    countingStream.size
                 }
 
                 null -> {
