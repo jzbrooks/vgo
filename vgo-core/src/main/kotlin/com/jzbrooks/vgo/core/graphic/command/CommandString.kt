@@ -26,6 +26,7 @@ value class CommandString(
 
                         MoveTo(variant, parameters)
                     }
+
                     command.startsWith('L', true) -> {
                         val parameters =
                             number
@@ -38,6 +39,7 @@ value class CommandString(
 
                         LineTo(variant, parameters)
                     }
+
                     command.startsWith('V', true) -> {
                         val parameters =
                             number
@@ -47,6 +49,7 @@ value class CommandString(
 
                         VerticalLineTo(variant, parameters)
                     }
+
                     command.startsWith('H', true) -> {
                         val parameters =
                             number
@@ -56,6 +59,7 @@ value class CommandString(
 
                         HorizontalLineTo(variant, parameters)
                     }
+
                     command.startsWith('Q', true) -> {
                         val parameters =
                             number
@@ -68,6 +72,7 @@ value class CommandString(
 
                         QuadraticBezierCurve(variant, parameters)
                     }
+
                     command.startsWith('T', true) -> {
                         val parameters =
                             number
@@ -80,6 +85,7 @@ value class CommandString(
 
                         SmoothQuadraticBezierCurve(variant, parameters)
                     }
+
                     command.startsWith('C', true) -> {
                         val parameters =
                             number
@@ -92,6 +98,7 @@ value class CommandString(
 
                         CubicBezierCurve(variant, parameters)
                     }
+
                     command.startsWith('S', true) -> {
                         val parameters =
                             number
@@ -104,6 +111,7 @@ value class CommandString(
 
                         SmoothCubicBezierCurve(variant, parameters)
                     }
+
                     command.startsWith('A', true) -> {
                         val parameters =
                             buildList {
@@ -152,8 +160,14 @@ value class CommandString(
 
                         EllipticalArcCurve(variant, parameters)
                     }
-                    command.startsWith('Z', true) -> ClosePath
-                    else -> throw IllegalStateException("Expected one of $commandRegex but was $command")
+
+                    command.startsWith('Z', true) -> {
+                        ClosePath
+                    }
+
+                    else -> {
+                        throw IllegalStateException("Expected one of $commandRegex but was $command")
+                    }
                 }
             }.toList()
 

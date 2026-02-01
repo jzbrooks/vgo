@@ -379,6 +379,7 @@ class CommandVariant(
                     command
                 }
             }
+
             is Mode.Relative -> {
                 if (convertedCommand.variant == CommandVariant.RELATIVE) {
                     convertedCommand
@@ -386,6 +387,7 @@ class CommandVariant(
                     command
                 }
             }
+
             is Mode.Compact -> {
                 return if (mode.printer.print(convertedCommand).length < mode.printer.print(command).length) {
                     convertedCommand

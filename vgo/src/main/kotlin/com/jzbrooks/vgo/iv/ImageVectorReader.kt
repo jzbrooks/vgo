@@ -359,19 +359,23 @@ private fun parsePathBuilderCall(callExpression: KtCallExpression): Path? {
                 "fill" -> {
                     fillColor = parseColorArgument(expression)
                 }
+
                 "stroke" -> {
                     strokeColor = parseColorArgument(expression)
                 }
+
                 "strokeWidth", "strokeLineWidth" -> {
                     val floatText = (expression as? KtConstantExpression)?.text
                     strokeWidth = floatText?.toFloatOrNull()
                         ?: floatText?.removeSuffix("f")?.toFloatOrNull()
                 }
+
                 "fillAlpha" -> {
                     val floatText = (expression as? KtConstantExpression)?.text
                     fillAlpha = floatText?.toFloatOrNull()
                         ?: floatText?.removeSuffix("f")?.toFloatOrNull()
                 }
+
                 "strokeAlpha" -> {
                     val floatText = (expression as? KtConstantExpression)?.text
                     strokeAlpha = floatText?.toFloatOrNull()
@@ -425,102 +429,119 @@ private fun parsePathCommands(bodyExpr: KtBlockExpression): List<Command> {
                     commands.add(MoveTo(CommandVariant.ABSOLUTE, listOf(point)))
                 }
             }
+
             "lineTo" -> {
                 val point = parsePointArguments(callExpression)
                 if (point != null) {
                     commands.add(LineTo(CommandVariant.ABSOLUTE, listOf(point)))
                 }
             }
+
             "lineToRelative" -> {
                 val point = parsePointArguments(callExpression)
                 if (point != null) {
                     commands.add(LineTo(CommandVariant.RELATIVE, listOf(point)))
                 }
             }
+
             "horizontalLineTo" -> {
                 val point = parseFloatArgument(callExpression)
                 if (point != null) {
                     commands.add(HorizontalLineTo(CommandVariant.ABSOLUTE, listOf(point)))
                 }
             }
+
             "horizontalLineToRelative" -> {
                 val point = parseFloatArgument(callExpression)
                 if (point != null) {
                     commands.add(HorizontalLineTo(CommandVariant.RELATIVE, listOf(point)))
                 }
             }
+
             "verticalLineTo" -> {
                 val point = parseFloatArgument(callExpression)
                 if (point != null) {
                     commands.add(VerticalLineTo(CommandVariant.ABSOLUTE, listOf(point)))
                 }
             }
+
             "verticalLineToRelative" -> {
                 val point = parseFloatArgument(callExpression)
                 if (point != null) {
                     commands.add(VerticalLineTo(CommandVariant.RELATIVE, listOf(point)))
                 }
             }
+
             "curveTo" -> {
                 val arg = parseCubicArgs(callExpression)
                 if (arg != null) {
                     commands.add(CubicBezierCurve(CommandVariant.ABSOLUTE, listOf(arg)))
                 }
             }
+
             "curveToRelative" -> {
                 val arg = parseCubicArgs(callExpression)
                 if (arg != null) {
                     commands.add(CubicBezierCurve(CommandVariant.RELATIVE, listOf(arg)))
                 }
             }
+
             "reflectiveCurveTo" -> {
                 val arg = parseReflectiveCubicArgs(callExpression)
                 if (arg != null) {
                     commands.add(SmoothCubicBezierCurve(CommandVariant.ABSOLUTE, listOf(arg)))
                 }
             }
+
             "reflectiveCurveToRelative" -> {
                 val arg = parseReflectiveCubicArgs(callExpression)
                 if (arg != null) {
                     commands.add(SmoothCubicBezierCurve(CommandVariant.RELATIVE, listOf(arg)))
                 }
             }
+
             "quadTo" -> {
                 val arg = parseQuadArgs(callExpression)
                 if (arg != null) {
                     commands.add(QuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(arg)))
                 }
             }
+
             "quadToRelative" -> {
                 val arg = parseQuadArgs(callExpression)
                 if (arg != null) {
                     commands.add(QuadraticBezierCurve(CommandVariant.RELATIVE, listOf(arg)))
                 }
             }
+
             "reflectiveQuadTo" -> {
                 val arg = parsePointArguments(callExpression)
                 if (arg != null) {
                     commands.add(SmoothQuadraticBezierCurve(CommandVariant.ABSOLUTE, listOf(arg)))
                 }
             }
+
             "reflectiveQuadToRelative" -> {
                 val arg = parsePointArguments(callExpression)
                 if (arg != null) {
                     commands.add(SmoothQuadraticBezierCurve(CommandVariant.RELATIVE, listOf(arg)))
                 }
             }
+
             "arcTo" -> {
                 val arg = parseArcArgument(callExpression)
                 if (arg != null) {
                     commands.add(EllipticalArcCurve(CommandVariant.ABSOLUTE, listOf(arg)))
                 }
             }
+
             "arcToRelative" -> {
                 val arg = parseArcArgument(callExpression)
                 if (arg != null) {
                     commands.add(EllipticalArcCurve(CommandVariant.RELATIVE, listOf(arg)))
                 }
             }
+
             "close" -> {
                 commands.add(ClosePath)
             }

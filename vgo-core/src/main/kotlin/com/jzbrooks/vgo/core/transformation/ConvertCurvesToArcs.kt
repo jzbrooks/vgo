@@ -183,6 +183,7 @@ class ConvertCurvesToArcs(
                                         ).length
                                 originalSize to alternativeSize
                             }
+
                             is Criterion.FewestCommands -> {
                                 val originalSize = pendingCurves.size
                                 val alternativeSize = ellipticalArcs.size

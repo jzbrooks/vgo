@@ -62,20 +62,23 @@ value class Color(
         if (alpha != 0xFF.toUByte()) {
             val pattern = "#%02x%02x%02x%02x"
             when (format) {
-                HexFormat.ARGB ->
+                HexFormat.ARGB -> {
                     pattern.format(
                         alpha.toInt(),
                         red.toInt(),
                         green.toInt(),
                         blue.toInt(),
                     )
-                HexFormat.RGBA ->
+                }
+
+                HexFormat.RGBA -> {
                     pattern.format(
                         red.toInt(),
                         green.toInt(),
                         blue.toInt(),
                         alpha.toInt(),
                     )
+                }
             }
         } else {
             val hexColor = "#%02x%02x%02x".format(red.toInt(), green.toInt(), blue.toInt())

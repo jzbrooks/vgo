@@ -374,6 +374,7 @@ class CommandVariant(
                     command
                 }
             }
+
             is Mode.Relative -> {
                 if (convertedCommand.variant == CommandVariant.RELATIVE) {
                     convertedCommand
@@ -381,6 +382,7 @@ class CommandVariant(
                     command
                 }
             }
+
             is Mode.Compact -> {
                 val convertedLength = mode.printer.print(convertedCommand).length
                 val originalLength = mode.printer.print(command).length

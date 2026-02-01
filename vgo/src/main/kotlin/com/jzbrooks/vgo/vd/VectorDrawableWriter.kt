@@ -109,6 +109,7 @@ private fun Document.createChildElement(
                         val fillType =
                             when (element.fillRule) {
                                 Path.FillRule.EVEN_ODD -> "evenOdd"
+
                                 Path.FillRule.NON_ZERO -> throw IllegalStateException(
                                     "Default fill type ('nonZero') should never be written",
                                 )
@@ -129,7 +130,9 @@ private fun Document.createChildElement(
                         val lineCap =
                             when (element.strokeLineCap) {
                                 Path.LineCap.SQUARE -> "square"
+
                                 Path.LineCap.ROUND -> "round"
+
                                 Path.LineCap.BUTT -> throw IllegalStateException(
                                     "Default linecap ('butt') shouldn't ever be written.",
                                 )
@@ -141,10 +144,13 @@ private fun Document.createChildElement(
                         val lineJoin =
                             when (val lineJoin = element.strokeLineJoin) {
                                 Path.LineJoin.ROUND -> "round"
+
                                 Path.LineJoin.BEVEL -> "bevel"
+
                                 Path.LineJoin.MITER -> throw IllegalStateException(
                                     "Default linejoin ('miter') shouldn't ever be written.",
                                 )
+
                                 Path.LineJoin.MITER_CLIP, Path.LineJoin.ARCS -> throw IllegalStateException(
                                     "VectorDrawable does not support line join: $lineJoin",
                                 )
@@ -157,6 +163,7 @@ private fun Document.createChildElement(
                     }
                 }
             }
+
             is Group -> {
                 createElement("group").also { node ->
                     // There's no reason to output the transforms if the
@@ -171,6 +178,7 @@ private fun Document.createChildElement(
                     }
                 }
             }
+
             is ClipPath -> {
                 createElement("clip-path").apply {
                     val data =
@@ -181,6 +189,7 @@ private fun Document.createChildElement(
                     setAttribute("android:pathData", data)
                 }
             }
+
             is Extra -> {
                 createElement(element.name).also {
                     for (child in element.elements) {
@@ -188,7 +197,10 @@ private fun Document.createChildElement(
                     }
                 }
             }
-            else -> null
+
+            else -> {
+                null
+            }
         }
 
     if (node != null) {

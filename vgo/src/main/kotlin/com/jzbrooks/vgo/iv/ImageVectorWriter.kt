@@ -196,6 +196,7 @@ private fun emitElement(
                                 }
                             }
                         }
+
                         is LineTo -> {
                             for (parameter in command.parameters) {
                                 if (command.variant == CommandVariant.ABSOLUTE) {
@@ -209,6 +210,7 @@ private fun emitElement(
                                 }
                             }
                         }
+
                         is HorizontalLineTo -> {
                             for (parameter in command.parameters) {
                                 if (command.variant == CommandVariant.ABSOLUTE) {
@@ -218,6 +220,7 @@ private fun emitElement(
                                 }
                             }
                         }
+
                         is VerticalLineTo -> {
                             for (parameter in command.parameters) {
                                 if (command.variant == CommandVariant.ABSOLUTE) {
@@ -227,6 +230,7 @@ private fun emitElement(
                                 }
                             }
                         }
+
                         is CubicBezierCurve -> {
                             for (parameter in command.parameters) {
                                 if (command.variant == CommandVariant.ABSOLUTE) {
@@ -252,6 +256,7 @@ private fun emitElement(
                                 }
                             }
                         }
+
                         is SmoothCubicBezierCurve -> {
                             for (parameter in command.parameters) {
                                 if (command.variant == CommandVariant.ABSOLUTE) {
@@ -273,6 +278,7 @@ private fun emitElement(
                                 }
                             }
                         }
+
                         is QuadraticBezierCurve -> {
                             for (parameter in command.parameters) {
                                 if (command.variant == CommandVariant.ABSOLUTE) {
@@ -294,6 +300,7 @@ private fun emitElement(
                                 }
                             }
                         }
+
                         is SmoothQuadraticBezierCurve -> {
                             for (parameter in command.parameters) {
                                 if (command.variant == CommandVariant.ABSOLUTE) {
@@ -348,6 +355,7 @@ private fun emitElement(
             }
             codeBlock.add("}\n")
         }
+
         is Group -> {
             val matrix = element.transform
 
@@ -375,6 +383,7 @@ private fun emitElement(
             }
             codeBlock.add("}\n")
         }
+
         is ClipPath -> {
             val pathNode = ClassName("androidx.compose.ui.graphics.vector", "PathNode")
 
@@ -415,6 +424,7 @@ private fun emitElement(
                                     }
                                 }
                             }
+
                             is LineTo -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
@@ -434,6 +444,7 @@ private fun emitElement(
                                     }
                                 }
                             }
+
                             is HorizontalLineTo -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
@@ -443,6 +454,7 @@ private fun emitElement(
                                     }
                                 }
                             }
+
                             is VerticalLineTo -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
@@ -452,6 +464,7 @@ private fun emitElement(
                                     }
                                 }
                             }
+
                             is CubicBezierCurve -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
@@ -479,6 +492,7 @@ private fun emitElement(
                                     }
                                 }
                             }
+
                             is SmoothCubicBezierCurve -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
@@ -502,6 +516,7 @@ private fun emitElement(
                                     }
                                 }
                             }
+
                             is QuadraticBezierCurve -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {
@@ -525,6 +540,7 @@ private fun emitElement(
                                     }
                                 }
                             }
+
                             is SmoothQuadraticBezierCurve -> {
                                 for (parameter in command.parameters) {
                                     if (command.variant == CommandVariant.ABSOLUTE) {

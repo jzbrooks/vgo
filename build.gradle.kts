@@ -18,7 +18,7 @@ changelog.path.set("changelog.md")
 subprojects {
     apply<KtlintPlugin>()
     configure<KtlintExtension> {
-        version.set("1.3.1")
+        version.set("1.8.0")
     }
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {

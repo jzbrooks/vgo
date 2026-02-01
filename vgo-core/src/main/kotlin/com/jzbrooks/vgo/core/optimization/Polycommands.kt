@@ -53,30 +53,37 @@ class Polycommands : TopDownOptimization {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
+
                         lastAdded is LineTo && current is LineTo -> {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
+
                         lastAdded is VerticalLineTo && current is VerticalLineTo -> {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
+
                         lastAdded is HorizontalLineTo && current is HorizontalLineTo -> {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
+
                         lastAdded is CubicBezierCurve && current is CubicBezierCurve -> {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
+
                         lastAdded is SmoothCubicBezierCurve && current is SmoothCubicBezierCurve -> {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
+
                         lastAdded is QuadraticBezierCurve && current is QuadraticBezierCurve -> {
                             lastAdded.parameters += current.parameters
                             continue@loop
                         }
+
                         lastAdded is SmoothQuadraticBezierCurve && current is SmoothQuadraticBezierCurve -> {
                             lastAdded.parameters += current.parameters
                             continue@loop

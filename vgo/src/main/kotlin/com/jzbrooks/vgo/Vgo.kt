@@ -128,16 +128,19 @@ class Vgo(
                         is ImageVector -> graphic.toVectorDrawable()
                     }
                 }
+
                 "svg" -> {
                     if (graphic is VectorDrawable) {
                         graphic = graphic.toSvg()
                     }
                 }
+
                 "iv" -> {
                     if (graphic is VectorDrawable) {
                         graphic = graphic.toImageVector()
                     }
                 }
+
                 else -> {
                     if (options.format?.isNotEmpty() == true) {
                         System.err.println("Unknown format ${options.format}")
@@ -268,7 +271,9 @@ class Vgo(
                     }
                 }
 
-                else -> return
+                else -> {
+                    return
+                }
             }
 
         if (options.printStats) {
@@ -294,12 +299,19 @@ class Vgo(
             val (input, output) = entry
 
             when {
-                entry.isFilePair -> handleFile(input, output, writerOptions)
-                entry.isDirectoryPair -> handleDirectory(input, output, writerOptions)
+                entry.isFilePair -> {
+                    handleFile(input, output, writerOptions)
+                }
+
+                entry.isDirectoryPair -> {
+                    handleDirectory(input, output, writerOptions)
+                }
+
                 !entry.inputExists -> {
                     System.err.println("${input.path} does not exist.")
                     return 65
                 }
+
                 else -> {
                     val output = output.toFile()
                     System.err.println(
@@ -359,15 +371,20 @@ class Vgo(
                 val gigabytes = bytes / (1024.0 * 1024.0 * 1024.0)
                 "%.2f GiB".format(gigabytes)
             }
+
             bytes >= 1024 * 1024 -> {
                 val megabytes = bytes / (1024.0 * 1024.0)
                 "%.2f MiB".format(megabytes)
             }
+
             bytes >= 1024 -> {
                 val kilobytes = bytes / 1024.0
                 "%.2f KiB".format(kilobytes)
             }
-            else -> "$bytes B"
+
+            else -> {
+                "$bytes B"
+            }
         }
 
     private val Map.Entry<File, Path>.inputExists

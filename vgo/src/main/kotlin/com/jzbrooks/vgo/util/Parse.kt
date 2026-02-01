@@ -91,8 +91,13 @@ internal fun parse(
                         }
                     }
 
-                    document.documentElement.nodeName == "vector" && file.extension == "xml" -> vdParse(document.documentElement)
-                    else -> null
+                    document.documentElement.nodeName == "vector" && file.extension == "xml" -> {
+                        vdParse(document.documentElement)
+                    }
+
+                    else -> {
+                        null
+                    }
                 }
 
             graphic

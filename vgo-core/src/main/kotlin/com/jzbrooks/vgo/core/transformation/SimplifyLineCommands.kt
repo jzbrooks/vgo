@@ -61,6 +61,7 @@ class SimplifyLineCommands(
                     else -> command
                 }
             }
+
             is HorizontalLineTo -> {
                 val lastAdded = commands.last()
                 when {
@@ -68,9 +69,13 @@ class SimplifyLineCommands(
                         lastAdded.parameters = listOf(lastAdded.parameters.last() + command.parameters.last())
                         null
                     }
-                    else -> command
+
+                    else -> {
+                        command
+                    }
                 }
             }
+
             is VerticalLineTo -> {
                 val lastAdded = commands.last()
                 when {
@@ -78,9 +83,15 @@ class SimplifyLineCommands(
                         lastAdded.parameters = listOf(lastAdded.parameters.last() + command.parameters.last())
                         null
                     }
-                    else -> command
+
+                    else -> {
+                        command
+                    }
                 }
             }
-            else -> command
+
+            else -> {
+                command
+            }
         }
 }

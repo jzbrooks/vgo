@@ -96,6 +96,7 @@ private fun Document.createChildElement(
                         val fillRule =
                             when (element.fillRule) {
                                 Path.FillRule.EVEN_ODD -> "evenodd"
+
                                 Path.FillRule.NON_ZERO -> throw IllegalStateException(
                                     "Default fill rule ('nonzero') should never be written",
                                 )
@@ -126,9 +127,13 @@ private fun Document.createChildElement(
                         val lineJoin =
                             when (element.strokeLineJoin) {
                                 Path.LineJoin.ROUND -> "round"
+
                                 Path.LineJoin.BEVEL -> "bevel"
+
                                 Path.LineJoin.MITER_CLIP -> "miter-clip"
+
                                 Path.LineJoin.ARCS -> "arcs"
+
                                 Path.LineJoin.MITER -> throw IllegalStateException(
                                     "Default linejoin ('miter') shouldn't ever be written.",
                                 )
@@ -141,6 +146,7 @@ private fun Document.createChildElement(
                     }
                 }
             }
+
             is Group -> {
                 createElement("g").also { node ->
                     if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
@@ -163,6 +169,7 @@ private fun Document.createChildElement(
                     }
                 }
             }
+
             is ClipPath -> {
                 createElement("clipPath").also {
                     for (child in element.elements) {
@@ -170,6 +177,7 @@ private fun Document.createChildElement(
                     }
                 }
             }
+
             is Extra -> {
                 createElement(element.name).also {
                     for (child in element.elements) {
@@ -177,7 +185,10 @@ private fun Document.createChildElement(
                     }
                 }
             }
-            else -> null
+
+            else -> {
+                null
+            }
         }
 
     if (node != null) {

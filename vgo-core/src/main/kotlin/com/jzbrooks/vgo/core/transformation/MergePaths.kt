@@ -181,18 +181,21 @@ class MergePaths(
                             (point + currentPoint).also { point -> currentPoint = point }
                         }
                 }
+
                 is HorizontalLineTo -> {
                     firstCommand.parameters =
                         firstCommand.parameters.map { x ->
                             (x + currentPoint.x).also { x -> currentPoint = currentPoint.copy(x = x) }
                         }
                 }
+
                 is VerticalLineTo -> {
                     firstCommand.parameters =
                         firstCommand.parameters.map { x ->
                             (x + currentPoint.x).also { x -> currentPoint = currentPoint.copy(x = x) }
                         }
                 }
+
                 is CubicBezierCurve -> {
                     firstCommand.parameters =
                         firstCommand.parameters.map { parameter ->
@@ -205,6 +208,7 @@ class MergePaths(
                                 ).also { currentPoint = newEnd }
                         }
                 }
+
                 is SmoothCubicBezierCurve -> {
                     firstCommand.parameters =
                         firstCommand.parameters.map { parameter ->
@@ -216,6 +220,7 @@ class MergePaths(
                                 ).also { currentPoint = newEnd }
                         }
                 }
+
                 is QuadraticBezierCurve -> {
                     firstCommand.parameters =
                         firstCommand.parameters.map { parameter ->
@@ -227,6 +232,7 @@ class MergePaths(
                                 ).also { currentPoint = newEnd }
                         }
                 }
+
                 is EllipticalArcCurve -> {
                     firstCommand.parameters =
                         firstCommand.parameters.map { parameter ->

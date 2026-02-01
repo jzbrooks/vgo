@@ -53,17 +53,42 @@ class BreakoutImplicitCommands : TopDownOptimization {
 
     private fun divideParameters(first: ParameterizedCommand<*>): List<Command> =
         when (first) {
-            is MoveTo ->
+            is MoveTo -> {
                 first.parameters.mapIndexed { i, it ->
                     if (i == 0) first.copy(parameters = listOf(it)) else LineTo(first.variant, listOf(it))
                 }
-            is LineTo -> first.parameters.map { first.copy(parameters = listOf(it)) }
-            is SmoothQuadraticBezierCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
-            is HorizontalLineTo -> first.parameters.map { first.copy(parameters = listOf(it)) }
-            is VerticalLineTo -> first.parameters.map { first.copy(parameters = listOf(it)) }
-            is QuadraticBezierCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
-            is CubicBezierCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
-            is SmoothCubicBezierCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
-            is EllipticalArcCurve -> first.parameters.map { first.copy(parameters = listOf(it)) }
+            }
+
+            is LineTo -> {
+                first.parameters.map { first.copy(parameters = listOf(it)) }
+            }
+
+            is SmoothQuadraticBezierCurve -> {
+                first.parameters.map { first.copy(parameters = listOf(it)) }
+            }
+
+            is HorizontalLineTo -> {
+                first.parameters.map { first.copy(parameters = listOf(it)) }
+            }
+
+            is VerticalLineTo -> {
+                first.parameters.map { first.copy(parameters = listOf(it)) }
+            }
+
+            is QuadraticBezierCurve -> {
+                first.parameters.map { first.copy(parameters = listOf(it)) }
+            }
+
+            is CubicBezierCurve -> {
+                first.parameters.map { first.copy(parameters = listOf(it)) }
+            }
+
+            is SmoothCubicBezierCurve -> {
+                first.parameters.map { first.copy(parameters = listOf(it)) }
+            }
+
+            is EllipticalArcCurve -> {
+                first.parameters.map { first.copy(parameters = listOf(it)) }
+            }
         }
 }

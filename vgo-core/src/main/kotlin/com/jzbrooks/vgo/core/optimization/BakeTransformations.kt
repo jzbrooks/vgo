@@ -115,6 +115,7 @@ class BakeTransformations :
                             subPathStart.push(currentPoint)
                         }
                     }
+
                     is LineTo -> {
                         command.apply {
                             val newCurrentPoint =
@@ -140,6 +141,7 @@ class BakeTransformations :
                             currentPoint = newCurrentPoint
                         }
                     }
+
                     is HorizontalLineTo -> {
                         command.run {
                             val newCurrentPoint =
@@ -166,6 +168,7 @@ class BakeTransformations :
                             LineTo(CommandVariant.ABSOLUTE, newParameters)
                         }
                     }
+
                     is VerticalLineTo -> {
                         command.run {
                             val newCurrentPoint =
@@ -192,6 +195,7 @@ class BakeTransformations :
                             LineTo(CommandVariant.ABSOLUTE, newParameters)
                         }
                     }
+
                     is QuadraticBezierCurve -> {
                         command.apply {
                             val newCurrentPoint =
@@ -224,6 +228,7 @@ class BakeTransformations :
                             currentPoint = newCurrentPoint
                         }
                     }
+
                     is SmoothQuadraticBezierCurve -> {
                         command.apply {
                             val newCurrentPoint =
@@ -249,6 +254,7 @@ class BakeTransformations :
                             currentPoint = newCurrentPoint
                         }
                     }
+
                     is CubicBezierCurve -> {
                         command.apply {
                             val newCurrentPoint =
@@ -289,6 +295,7 @@ class BakeTransformations :
                             currentPoint = newCurrentPoint
                         }
                     }
+
                     is SmoothCubicBezierCurve -> {
                         command.apply {
                             val newCurrentPoint =
@@ -321,6 +328,7 @@ class BakeTransformations :
                             currentPoint = newCurrentPoint
                         }
                     }
+
                     is EllipticalArcCurve -> {
                         command.apply {
                             val newCurrentPoint =
@@ -345,6 +353,7 @@ class BakeTransformations :
                             currentPoint = newCurrentPoint
                         }
                     }
+
                     is ClosePath -> {
                         if (subPathStart.isNotEmpty()) {
                             currentPoint = subPathStart.pop()
