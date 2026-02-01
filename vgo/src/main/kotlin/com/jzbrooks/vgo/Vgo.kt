@@ -158,6 +158,10 @@ class Vgo(
             }
         }
 
+        // Format conversions should always write the converted output regardless of size,
+        // since the original file is in a different format and can't be used as-is.
+        val isFormatConversion = input.extension != output.extension
+
         // Avoid oscillating between two image representations of the same size
         // where path commands are swapped for different commands of the same length
         // to avoid noise in vcs history by counting the bytes we're going to write
@@ -172,7 +176,7 @@ class Vgo(
                     val countingStream = CountingOutputStream()
                     writer.write(document, countingStream)
 
-                    if (input.length().toULong() > countingStream.size) {
+                    if (isFormatConversion || input.length().toULong() > countingStream.size) {
                         output.outputStream().use { outputStream ->
                             writer.write(document, outputStream)
                         }
@@ -199,7 +203,7 @@ class Vgo(
                     val countingStream = CountingOutputStream()
                     writer.write(document, countingStream)
 
-                    if (input.length().toULong() > countingStream.size) {
+                    if (isFormatConversion || input.length().toULong() > countingStream.size) {
                         output.outputStream().use { outputStream ->
                             writer.write(document, outputStream)
                         }
@@ -234,7 +238,7 @@ class Vgo(
                     val countingStream = CountingOutputStream()
                     writer.write(fileSpec, countingStream)
 
-                    if (input.length().toULong() > countingStream.size) {
+                    if (isFormatConversion || input.length().toULong() > countingStream.size) {
                         output.outputStream().use { outputStream ->
                             writer.write(fileSpec, outputStream)
                         }
