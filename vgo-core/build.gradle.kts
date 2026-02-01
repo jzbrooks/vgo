@@ -1,7 +1,13 @@
 plugins {
     id("org.jetbrains.kotlin.jvm")
     id("com.vanniktech.maven.publish")
-    id("org.jetbrains.kotlinx.binary-compatibility-validator") version "0.18.1"
+}
+
+kotlin {
+    @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
+    abiValidation {
+        enabled.set(true)
+    }
 }
 
 dependencies {
