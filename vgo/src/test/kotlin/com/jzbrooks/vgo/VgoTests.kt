@@ -133,4 +133,26 @@ class VgoTests {
                 it.exists()
             }.isFalse() // todo: replace this with doesNotExists() when assertk is updated
     }
+
+    @Test
+    fun `optimized file is not modified when re-run produces same or larger output`() {
+        val targetPath = "build/test-results/bug_117.xml"
+
+        File("src/test/resources/bug_117.xml")
+            .copyTo(File(targetPath), overwrite = true)
+
+        val startTime = File(targetPath).lastModified()
+
+        val options =
+            Vgo.Options(
+                input = listOf(targetPath),
+                indent = 2,
+            )
+
+        Vgo(options).run()
+
+        val lastModification = File(targetPath).lastModified()
+
+        assertThat(lastModification, "lastModification").isEqualTo(startTime)
+    }
 }

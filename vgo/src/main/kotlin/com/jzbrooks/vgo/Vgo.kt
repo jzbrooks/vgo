@@ -8,20 +8,30 @@ import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.iv.ImageVector
 import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
 import com.jzbrooks.vgo.iv.ImageVectorWriter
+import com.jzbrooks.vgo.iv.toFileSpec
 import com.jzbrooks.vgo.iv.toVectorDrawable
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
+import com.jzbrooks.vgo.svg.ScalableVectorGraphicCommandPrinter
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
+import com.jzbrooks.vgo.svg.toDocument
 import com.jzbrooks.vgo.svg.toVectorDrawable
+import com.jzbrooks.vgo.util.CountingOutputStream
 import com.jzbrooks.vgo.util.parse
 import com.jzbrooks.vgo.vd.VectorDrawable
+import com.jzbrooks.vgo.vd.VectorDrawableCommandPrinter
 import com.jzbrooks.vgo.vd.VectorDrawableOptimizationRegistry
 import com.jzbrooks.vgo.vd.VectorDrawableWriter
+import com.jzbrooks.vgo.vd.toDocument
 import com.jzbrooks.vgo.vd.toImageVector
 import com.jzbrooks.vgo.vd.toSvg
 import java.io.File
+import java.math.RoundingMode
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.util.Locale
 import kotlin.io.path.exists
 import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
@@ -110,74 +120,168 @@ class Vgo(
         // it is unable to be parsed.
         if (graphic == null && outputPath.isSameFileAs(input.toPath())) return
 
-        output.outputStream().use { outputStream ->
-            if (graphic != null) {
-                when (options.format) {
-                    "vd" -> {
-                        when (graphic) {
-                            is ScalableVectorGraphic -> graphic.toVectorDrawable()
-                            is ImageVector -> graphic.toVectorDrawable()
-                        }
+        if (graphic != null) {
+            when (options.format) {
+                "vd" -> {
+                    when (graphic) {
+                        is ScalableVectorGraphic -> graphic.toVectorDrawable()
+                        is ImageVector -> graphic.toVectorDrawable()
                     }
-                    "svg" -> {
-                        if (graphic is VectorDrawable) {
-                            graphic = graphic.toSvg()
-                        }
+                }
+                "svg" -> {
+                    if (graphic is VectorDrawable) {
+                        graphic = graphic.toSvg()
                     }
-                    "iv" -> {
-                        if (graphic is VectorDrawable) {
-                            graphic = graphic.toImageVector()
-                        }
+                }
+                "iv" -> {
+                    if (graphic is VectorDrawable) {
+                        graphic = graphic.toImageVector()
                     }
-                    else -> {
-                        if (options.format?.isNotEmpty() == true) {
-                            System.err.println("Unknown format ${options.format}")
+                }
+                else -> {
+                    if (options.format?.isNotEmpty() == true) {
+                        System.err.println("Unknown format ${options.format}")
+                    }
+                }
+            }
+
+            if (!options.noOptimization) {
+                val optimizationRegistry =
+                    when (graphic) {
+                        is VectorDrawable -> VectorDrawableOptimizationRegistry()
+                        is ScalableVectorGraphic -> SvgOptimizationRegistry()
+                        is ImageVector -> ImageVectorOptimizationRegistry()
+                        else -> null
+                    }
+
+                optimizationRegistry?.apply(graphic)
+            }
+        }
+
+        // Format conversions should always write the converted output regardless of size,
+        // since the original file is in a different format and can't be used as-is.
+        val isFormatConversion = input.extension != output.extension
+
+        // Avoid oscillating between two image representations of the same size
+        // where path commands are swapped for different commands of the same length
+        // to avoid noise in vcs history by counting the bytes we're going to write
+        // before writing them. Only write files that actually improve the size.
+        val graphicSize =
+            when (graphic) {
+                is VectorDrawable -> {
+                    val printer = VectorDrawableCommandPrinter(3)
+                    val document = graphic.toDocument(printer)
+                    val writer = VectorDrawableWriter(writerOptions, printer)
+
+                    val countingStream = CountingOutputStream()
+                    writer.write(document, countingStream)
+
+                    if (isFormatConversion || input.length().toULong() > countingStream.size) {
+                        output.outputStream().use { outputStream ->
+                            writer.write(document, outputStream)
                         }
+                        countingStream.size
+                    } else {
+                        if (input != output) {
+                            input.inputStream().use { inputStream ->
+                                output.outputStream().use { outputStream ->
+                                    inputStream.copyTo(outputStream)
+                                }
+                            }
+                        } else {
+                            return
+                        }
+                        sizeBefore.toULong()
                     }
                 }
 
-                if (!options.noOptimization) {
-                    val optimizationRegistry =
-                        when (graphic) {
-                            is VectorDrawable -> VectorDrawableOptimizationRegistry()
-                            is ScalableVectorGraphic -> SvgOptimizationRegistry()
-                            is ImageVector -> ImageVectorOptimizationRegistry()
-                            else -> null
-                        }
-
-                    optimizationRegistry?.apply(graphic)
-                }
-
-                if (graphic is VectorDrawable) {
-                    val writer = VectorDrawableWriter(writerOptions)
-                    writer.write(graphic, outputStream)
-                }
-
-                if (graphic is ScalableVectorGraphic) {
+                is ScalableVectorGraphic -> {
+                    val printer = ScalableVectorGraphicCommandPrinter(3)
                     val writer = ScalableVectorGraphicWriter(writerOptions)
-                    writer.write(graphic, outputStream)
-                }
+                    val document = graphic.toDocument(printer)
 
-                if (graphic is ImageVector) {
-                    val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
-                    writer.write(graphic, outputStream)
-                }
+                    val countingStream = CountingOutputStream()
+                    writer.write(document, countingStream)
 
-                if (options.printStats) {
-                    val sizeAfter = outputStream.channel.size()
-                    val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
-                    totalBytesBefore += sizeBefore
-                    totalBytesAfter += sizeAfter
-
-                    if (percentSaved.absoluteValue > 1e-3) {
-                        if (printFileNames) println("\n${input.path}")
-                        println("Size before: " + formatByteDescription(sizeBefore))
-                        println("Size after: " + formatByteDescription(sizeAfter))
-                        println("Percent saved: $percentSaved")
+                    if (isFormatConversion || input.length().toULong() > countingStream.size) {
+                        output.outputStream().use { outputStream ->
+                            writer.write(document, outputStream)
+                        }
+                        countingStream.size
+                    } else {
+                        if (input != output) {
+                            input.inputStream().use { inputStream ->
+                                output.outputStream().use { outputStream ->
+                                    inputStream.copyTo(outputStream)
+                                }
+                            }
+                        } else {
+                            return
+                        }
+                        sizeBefore.toULong()
                     }
                 }
-            } else if (input != output) {
-                input.inputStream().use { it.copyTo(outputStream) }
+
+                is ImageVector -> {
+                    val decimalFormat =
+                        DecimalFormat().apply {
+                            maximumFractionDigits = 2
+                            isDecimalSeparatorAlwaysShown = false
+                            isGroupingUsed = false
+                            roundingMode = RoundingMode.HALF_UP
+                            minimumIntegerDigits = 0
+                            decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
+                        }
+
+                    val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
+                    val fileSpec = graphic.toFileSpec(output.nameWithoutExtension, decimalFormat)
+                    val countingStream = CountingOutputStream()
+                    writer.write(fileSpec, countingStream)
+
+                    if (isFormatConversion || input.length().toULong() > countingStream.size) {
+                        output.outputStream().use { outputStream ->
+                            writer.write(fileSpec, outputStream)
+                        }
+                        countingStream.size
+                    } else {
+                        if (input != output) {
+                            input.inputStream().use { inputStream ->
+                                output.outputStream().use { outputStream ->
+                                    inputStream.copyTo(outputStream)
+                                }
+                            }
+                        } else {
+                            return
+                        }
+                        sizeBefore.toULong()
+                    }
+                }
+
+                null -> {
+                    if (input != output) {
+                        output.outputStream().use { outputStream ->
+                            input.inputStream().use { it.copyTo(outputStream) }
+                            outputStream.channel.size().toULong()
+                        }
+                    } else {
+                        return
+                    }
+                }
+
+                else -> return
+            }
+
+        if (options.printStats) {
+            val sizeAfter = graphicSize.toLong()
+            val percentSaved = ((sizeBefore - sizeAfter) / sizeBefore.toDouble()) * 100
+            totalBytesBefore += sizeBefore
+            totalBytesAfter += sizeAfter
+
+            if (percentSaved.absoluteValue > 1e-3) {
+                if (printFileNames) println("\n${input.path}")
+                println("Size before: " + formatByteDescription(sizeBefore))
+                println("Size after: " + formatByteDescription(sizeAfter))
+                println("Percent saved: $percentSaved")
             }
         }
     }
