@@ -9,10 +9,17 @@ plugins {
     id("com.vanniktech.maven.publish")
 }
 
-kotlin.sourceSets
-    .getByName("main")
-    .kotlin
-    .srcDir("src/generated/kotlin")
+kotlin {
+    @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
+    abiValidation {
+        enabled.set(true)
+    }
+
+    sourceSets
+        .getByName("main")
+        .kotlin
+        .srcDir("src/generated/kotlin")
+}
 
 dependencies {
     implementation(project(":vgo-core"))

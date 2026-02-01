@@ -4,6 +4,7 @@
 
 ### Added
 - `toDocument` and `toFileSpec` methods for respective `Graphic` implementations to convert the IR into the data format that is ultimately written to an output stream
+- Verify `:vgo`'s public API stability
 
 ### Changed
 - `com.jzbrooks.vgo.core.transformation.MergePaths` more precisely checks if two paths overlap, which encourages merging
@@ -14,12 +15,6 @@
 
 ### Deprecated
 - `com.jzbrooks.vgo.core.Writer` accepted the internediate representation of the vector graphic as a parameter. The new file size check before writing required the IR to be rendered into the file representation that's written to an output stream. If it needs to be written, the IR needs to be rendered into the file representation _again_, which is not a cheap operation. Instead of using this interface, use format-specifc writers instead, which transact in the relevant data format that is directly written to the output stream.
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 3.2.1 - 2025-05-10
 
