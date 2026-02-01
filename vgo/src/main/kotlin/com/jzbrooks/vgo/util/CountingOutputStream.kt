@@ -8,4 +8,12 @@ class CountingOutputStream : OutputStream() {
     override fun write(b: Int) {
         size++
     }
+
+    override fun write(
+        b: ByteArray,
+        off: Int,
+        len: Int,
+    ) {
+        size += len.toULong()
+    }
 }
