@@ -260,14 +260,10 @@ class Vgo(
                     }
                 }
 
-                null -> {
-                    if (input != output) {
-                        output.outputStream().use { outputStream ->
-                            input.inputStream().use { it.copyTo(outputStream) }
-                            outputStream.channel.size().toULong()
-                        }
-                    } else {
-                        return
+                null if input != output -> {
+                    output.outputStream().use { outputStream ->
+                        input.inputStream().use { it.copyTo(outputStream) }
+                        sizeBefore.toULong()
                     }
                 }
 
