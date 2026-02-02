@@ -12,9 +12,7 @@ open class ShrinkVectorGraphic : DefaultTask() {
     private val extension = project.extensions.getByType<VgoPluginExtension>()
 
     private val defaultTree =
-        project.fileTree(project.projectDir) {
-            include("**/res/drawable*/*.xml")
-        }
+        project.fileTree(project.projectDir).apply { include("**/res/drawable*/*.xml") }
 
     init {
         group = "resource"

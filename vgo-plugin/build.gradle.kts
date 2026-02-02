@@ -2,10 +2,10 @@ plugins {
     id("org.jetbrains.kotlin.jvm")
     id("java-gradle-plugin")
     id("com.vanniktech.maven.publish")
-    id("org.gradle.kotlin.kotlin-dsl") version "6.5.2"
 }
 
 dependencies {
+    implementation(gradleKotlinDsl())
     implementation(project(":vgo"))
 
     testImplementation(platform("org.junit:junit-bom:6.0.2"))
