@@ -8,8 +8,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 
-@Deprecated("Renamed: Use ShrinkVectorGraphic instead.")
-open class ShrinkVectorArtwork : DefaultTask() {
+open class ShrinkVectorGraphic : DefaultTask() {
     private val extension = project.extensions.getByType<VgoPluginExtension>()
 
     private val defaultTree =
