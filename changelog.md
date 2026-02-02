@@ -3,10 +3,26 @@
 ## Unreleased
 
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 3.3.0 - 2026-02-02
+
+### Added
+
 - `toDocument` and `toFileSpec` methods for respective `Graphic` implementations to convert the IR into the data format that is ultimately written to an output stream
 - Verify `:vgo`'s public API stability
 
 ### Changed
+
 - `com.jzbrooks.vgo.core.transformation.MergePaths` more precisely checks if two paths overlap, which encourages merging
 - Only write modified graphics if the output is smaller
   - Previously, in some rare circumstances, vgo could write an output that was the same size as the input with path modifications and ultimately oscillate between those two representations on each subsequent run. 
@@ -15,6 +31,7 @@
 - Use the version of kotlin gradle dsl coupled to the current gradle version
 
 ### Deprecated
+
 - `com.jzbrooks.vgo.core.Writer` accepted the internediate representation of the vector graphic as a parameter. The new file size check before writing required the IR to be rendered into the file representation that's written to an output stream. If it needs to be written, the IR needs to be rendered into the file representation _again_, which is not a cheap operation. Instead of using this interface, use format-specifc writers instead, which transact in the relevant data format that is directly written to the output stream.
 - `com.jzbrooks.vgo.plugin.ShrinkVectorArtwork` is renamed to `com.jzbrooks.vgo.plugin.ShrinkVectorGraphic`
 - The `shrinkVectorArtwork` gradle task created by the vgo plugin is renamed to `shrinkVectorGraphic`
