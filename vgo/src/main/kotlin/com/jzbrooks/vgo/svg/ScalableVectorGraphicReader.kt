@@ -52,6 +52,8 @@ private fun parseClipPath(node: Node): ClipPath {
             .mapNotNull(::parseElement)
             .toList()
 
+    node.attributes.removeOrNull("style")
+
     return ClipPath(
         childElements,
         node.attributes.removeOrNull("id")?.nodeValue,
@@ -66,6 +68,8 @@ private fun parseGroupElement(node: Node): Group {
             .mapNotNull(::parseElement)
             .toList()
 
+    node.attributes.removeOrNull("style")
+
     // This has to happen before foreign property collection
     val transform = node.attributes.extractTransformMatrix()
     return Group(
@@ -77,6 +81,12 @@ private fun parseGroupElement(node: Node): Group {
 }
 
 private fun parsePathElement(node: Node): Path {
+    val styleProperties =
+        node.attributes
+            .removeOrNull("style")
+            ?.nodeValue
+            ?.parseStyleAttribute() ?: emptyMap()
+
     val commands =
         CommandString(
             node.attributes
@@ -85,13 +95,28 @@ private fun parsePathElement(node: Node): Path {
                 .toString(),
         ).toCommandList()
     val id = node.attributes.removeOrNull("id")?.nodeValue
-    val fill = node.attributes.extractColor("fill", Colors.BLACK)
-    val fillRule = node.attributes.extractFillRule("fill-rule")
-    val stroke = node.attributes.extractColor("stroke", Colors.TRANSPARENT)
-    val strokeWidth = node.attributes.removeFloatOrNull("stroke-width") ?: 1f
-    val strokeLineCap = node.attributes.extractLineCap("stroke-linecap")
-    val strokeLineJoin = node.attributes.extractLineJoin("stroke-linejoin")
-    val strokeMiterLimit = node.attributes.removeFloatOrNull("stroke-miterlimit") ?: 4f
+
+    val fill =
+        styleProperties.extractColor("fill", Colors.BLACK)
+            ?: node.attributes.extractColor("fill", Colors.BLACK)
+    val fillRule =
+        styleProperties.extractFillRule("fill-rule")
+            ?: node.attributes.extractFillRule("fill-rule")
+    val stroke =
+        styleProperties.extractColor("stroke", Colors.TRANSPARENT)
+            ?: node.attributes.extractColor("stroke", Colors.TRANSPARENT)
+    val strokeWidth =
+        styleProperties["stroke-width"]?.toFloatOrNull()
+            ?: node.attributes.removeFloatOrNull("stroke-width") ?: 1f
+    val strokeLineCap =
+        styleProperties.extractLineCap("stroke-linecap")
+            ?: node.attributes.extractLineCap("stroke-linecap")
+    val strokeLineJoin =
+        styleProperties.extractLineJoin("stroke-linejoin")
+            ?: node.attributes.extractLineJoin("stroke-linejoin")
+    val strokeMiterLimit =
+        styleProperties["stroke-miterlimit"]?.toFloatOrNull()
+            ?: node.attributes.removeFloatOrNull("stroke-miterlimit") ?: 4f
 
     return Path(
         id,
@@ -137,12 +162,10 @@ private fun NamedNodeMap.extractTransformMatrix(): Matrix3 {
     )
 }
 
-private fun NamedNodeMap.extractColor(
-    key: String,
+private fun parseColorValue(
+    value: String,
     default: Color,
 ): Color {
-    val value = removeOrNull(key)?.nodeValue ?: return default
-
     if (value == "none") return Color(0x00000000u)
 
     val hex =
@@ -165,8 +188,60 @@ private fun NamedNodeMap.extractColor(
     return Color(hex.toUInt(radix = 16) or 0xFF000000u)
 }
 
+private fun NamedNodeMap.extractColor(
+    key: String,
+    default: Color,
+): Color {
+    val value = removeOrNull(key)?.nodeValue ?: return default
+    return parseColorValue(value, default)
+}
+
+private fun Map<String, String>.extractColor(
+    key: String,
+    default: Color,
+): Color? {
+    val value = this[key] ?: return null
+    return parseColorValue(value, default)
+}
+
 private fun NamedNodeMap.extractFillRule(key: String) =
     when (removeOrNull(key)?.nodeValue) {
         "evenodd" -> Path.FillRule.EVEN_ODD
         else -> Path.FillRule.NON_ZERO
     }
+
+private fun Map<String, String>.extractFillRule(key: String): Path.FillRule? =
+    when (this[key]) {
+        "evenodd" -> Path.FillRule.EVEN_ODD
+        "nonzero" -> Path.FillRule.NON_ZERO
+        else -> null
+    }
+
+private fun Map<String, String>.extractLineCap(key: String): Path.LineCap? =
+    when (this[key]) {
+        "round" -> Path.LineCap.ROUND
+        "square" -> Path.LineCap.SQUARE
+        "butt" -> Path.LineCap.BUTT
+        else -> null
+    }
+
+private fun Map<String, String>.extractLineJoin(key: String): Path.LineJoin? =
+    when (this[key]) {
+        "round" -> Path.LineJoin.ROUND
+        "bevel" -> Path.LineJoin.BEVEL
+        "arcs" -> Path.LineJoin.ARCS
+        "miter-clip" -> Path.LineJoin.MITER_CLIP
+        "miter" -> Path.LineJoin.MITER
+        else -> null
+    }
+
+private fun String.parseStyleAttribute(): Map<String, String> =
+    split(';')
+        .mapNotNull { property ->
+            val colonIndex = property.indexOf(':')
+            if (colonIndex > 0) {
+                property.substring(0, colonIndex).trim() to property.substring(colonIndex + 1).trim()
+            } else {
+                null
+            }
+        }.toMap()

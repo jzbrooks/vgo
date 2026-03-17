@@ -167,6 +167,133 @@ class ScalableVectorGraphicReaderTests {
     }
 
     @Test
+    fun testParseFillFromStyleAttribute() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <path style="fill:#ff0000" d="M0,0l2,3Z" />
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val path = graphic.elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0xFFFF0000u))
+    }
+
+    @Test
+    fun testParseStrokeFromStyleAttribute() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <path style="stroke:rgb(0,255,0);stroke-width:2" d="M0,0l2,3Z" />
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val path = graphic.elements.first() as Path
+
+        assertThat(path::stroke).isEqualTo(Color(0xFF00FF00u))
+        assertThat(path::strokeWidth).isEqualTo(2f)
+    }
+
+    @Test
+    fun testStyleAttributeWinsOverPresentationAttribute() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <path fill="blue" style="fill:red" d="M0,0l2,3Z" />
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val path = graphic.elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0xFFFF0000u))
+    }
+
+    @Test
+    fun testStyleAttributeRemovedFromForeign() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <path style="fill:red;opacity:0.5" d="M0,0l2,3Z" />
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val path = graphic.elements.first() as Path
+
+        assertThat(path.foreign.keys, "foreign keys").containsNone("style")
+    }
+
+    @Test
+    fun testIgnoreUnknownStyleProperties() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <path style="opacity:0.5;display:inline" d="M0,0l2,3Z" />
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val path = graphic.elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(com.jzbrooks.vgo.core.Colors.BLACK)
+        assertThat(path::stroke).isEqualTo(com.jzbrooks.vgo.core.Colors.TRANSPARENT)
+    }
+
+    @Test
     fun testParseUnknownElementWithChildren() {
         val vectorText =
             """
