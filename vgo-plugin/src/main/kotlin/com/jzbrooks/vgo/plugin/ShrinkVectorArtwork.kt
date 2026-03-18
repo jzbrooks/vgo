@@ -2,12 +2,14 @@ package com.jzbrooks.vgo.plugin
 
 import com.jzbrooks.vgo.Vgo
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.kotlin.dsl.getByType
 import java.io.File
 
+@CacheableTask
 @Deprecated("Renamed: Use ShrinkVectorGraphic instead.")
 open class ShrinkVectorArtwork : DefaultTask() {
     private val extension = project.extensions.getByType<VgoPluginExtension>()
