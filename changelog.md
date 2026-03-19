@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- SVG: `style` attributes that are represented in the IR are parsed
 
 ### Deprecated
 
