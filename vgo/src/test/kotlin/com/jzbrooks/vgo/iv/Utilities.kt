@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.iv
 
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
@@ -13,6 +14,7 @@ import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.psi.KtFile
 import java.io.InputStream
 
+@OptIn(K1Deprecation::class)
 fun parseKotlinFile(
     disposable: Disposable,
     input: InputStream,
