@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.util
 import com.android.ide.common.vectordrawable.Svg2Vector
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
+import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
@@ -24,7 +25,7 @@ import com.jzbrooks.vgo.vd.parse as vdParse
 
 fun parse(file: File): Graphic? = parse(file, null)
 
-@OptIn(ExperimentalVgoApi::class)
+@OptIn(ExperimentalVgoApi::class, K1Deprecation::class)
 internal fun parse(
     file: File,
     format: String? = null,
