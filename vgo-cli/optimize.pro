@@ -17,10 +17,12 @@
 }
 
 -dontwarn com.google.auto.service.**
+-dontwarn gnu.trove.TObjectHashingStrategy
 -dontwarn kotlin.annotations.jvm.**
 -dontwarn kotlinx.coroutines.future.**
+-dontwarn kotlinx.coroutines.internal.intellij.IntellijCoroutines
+-dontwarn kotlinx.serialization.**
 -dontwarn org.jetbrains.annotations.**
 -dontwarn org.jetbrains.kotlin.com.google.errorprone.**
 -dontwarn org.jetbrains.kotlin.com.google.j2objc.**
 -dontwarn org.kxml2.io.**
--dontwarn kotlinx.serialization.**

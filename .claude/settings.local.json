@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//private/tmp/kotlin_inspect/**)",
+      "Bash(jar xf:*)",
+      "Bash(javap -p -c org/jetbrains/kotlin/com/intellij/ide/plugins/DisabledPluginsState.class)",
+      "Bash(javap -p -c org/jetbrains/kotlin/com/intellij/openapi/util/registry/EarlyAccessRegistryManager.class)",
+      "Bash(javap -p -c org/jetbrains/kotlin/com/intellij/openapi/util/registry/EarlyAccessRegistryManagerKt.class)",
+      "Bash(javap -p org/jetbrains/kotlin/cli/jvm/compiler/KotlinCoreEnvironment.class)",
+      "Bash(javap -p -c \"org/jetbrains/kotlin/cli/jvm/compiler/KotlinCoreEnvironment$Companion.class\")",
+      "Bash(javap -p -c org/jetbrains/kotlin/cli/jvm/compiler/CompatKt.class)",
+      "Bash(javap -p -c org/jetbrains/kotlin/cli/jvm/compiler/IdeaStandaloneExecutionSetup.class)"
+    ]
+  }
+}
