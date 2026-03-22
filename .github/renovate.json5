@@ -1,16 +1,23 @@
 {
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: [ "config:recommended" ],
-  automergeType: "pr",
-  automergeStrategy: "rebase",
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'config:recommended',
+  ],
+  automergeType: 'pr',
+  automergeStrategy: 'rebase',
   packageRules: [
     {
-      matchUpdateTypes: ["minor", "patch"],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+      ],
       automerge: true,
     },
     {
-      groupName: "kotlin",
-      matchPackagePrefixes: ["org.jetbrains.kotlin"],
+      groupName: 'kotlin',
+      matchPackageNames: [
+        'org.jetbrains.kotlin{/,}**',
+      ],
     },
-  ]
+  ],
 }
