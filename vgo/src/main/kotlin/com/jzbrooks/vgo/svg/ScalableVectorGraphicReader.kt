@@ -10,9 +10,6 @@ import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.util.xml.asSequence
-import com.jzbrooks.vgo.util.xml.extractLineCap
-import com.jzbrooks.vgo.util.xml.extractLineJoin
-import com.jzbrooks.vgo.util.xml.removeFloatOrNull
 import com.jzbrooks.vgo.util.xml.removeOrNull
 import com.jzbrooks.vgo.util.xml.toMutableMap
 import org.w3c.dom.Comment
@@ -20,11 +17,24 @@ import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 
+private val PRESENTATION_ATTRIBUTES: Set<String> =
+    hashSetOf("fill", "fill-rule", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit")
+
 fun parse(root: Node): ScalableVectorGraphic {
+    val rootStyleProperties =
+        root.attributes
+            .getNamedItem("style")
+            ?.nodeValue
+            ?.parseStyleAttribute() ?: emptyMap()
+    val rootAttrs = root.attributes.asSequence().associate { it.nodeName to it.nodeValue }
+
+    // Style properties should overwrite inherited attributes
+    val inherited = rootAttrs + rootStyleProperties
+
     val elements =
         root.childNodes
             .asSequence()
-            .mapNotNull(::parseElement)
+            .mapNotNull { parseElement(it, inherited) }
             .toList()
 
     return ScalableVectorGraphic(
@@ -34,22 +44,30 @@ fun parse(root: Node): ScalableVectorGraphic {
     )
 }
 
-private fun parseElement(node: Node): Element? {
+private fun parseElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Element? {
     if (node is Text || node is Comment) return null
 
     return when (node.nodeName) {
-        "g" -> parseGroupElement(node)
-        "clipPath" -> parseClipPath(node)
-        "path" -> parsePathElement(node)
-        else -> parseExtraElement(node)
+        "g" -> parseGroupElement(node, inherited)
+        "clipPath" -> parseClipPath(node, inherited)
+        "path" -> parsePathElement(node, inherited)
+        else -> parseExtraElement(node, inherited)
     }
 }
 
-private fun parseClipPath(node: Node): ClipPath {
+private fun parseClipPath(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): ClipPath {
+    val childInherited = collectStyleInheritance(node, inherited)
+
     val childElements =
         node.childNodes
             .asSequence()
-            .mapNotNull(::parseElement)
+            .mapNotNull { parseElement(it, childInherited) }
             .toList()
 
     node.attributes.removeOrNull("style")
@@ -61,11 +79,16 @@ private fun parseClipPath(node: Node): ClipPath {
     )
 }
 
-private fun parseGroupElement(node: Node): Group {
+private fun parseGroupElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Group {
+    val childInherited = collectStyleInheritance(node, inherited)
+
     val childElements =
         node.childNodes
             .asSequence()
-            .mapNotNull(::parseElement)
+            .mapNotNull { parseElement(it, childInherited) }
             .toList()
 
     node.attributes.removeOrNull("style")
@@ -80,7 +103,29 @@ private fun parseGroupElement(node: Node): Group {
     )
 }
 
-private fun parsePathElement(node: Node): Path {
+/**
+ * Builds the inherited presentation attribute context for children of [node].
+ * Precedence: ancestor inherited < node's own presentation attributes < node's style attribute
+ */
+private fun collectStyleInheritance(
+    node: Node,
+    inherited: Map<String, String>,
+): Map<String, String> {
+    val styleProperties =
+        node.attributes
+            .getNamedItem("style")
+            ?.nodeValue
+            ?.parseStyleAttribute() ?: emptyMap()
+    val nodeAttrs = node.attributes.asSequence().associate { it.nodeName to it.nodeValue }
+
+    // The order of concatenation is important for precedence.
+    return inherited + nodeAttrs + styleProperties
+}
+
+private fun parsePathElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Path {
     val styleProperties =
         node.attributes
             .removeOrNull("style")
@@ -96,27 +141,28 @@ private fun parsePathElement(node: Node): Path {
         ).toCommandList()
     val id = node.attributes.removeOrNull("id")?.nodeValue
 
-    val fill =
-        styleProperties.extractColor("fill", Colors.BLACK)
-            ?: node.attributes.extractColor("fill", Colors.BLACK)
-    val fillRule =
-        styleProperties.extractFillRule("fill-rule")
-            ?: node.attributes.extractFillRule("fill-rule")
-    val stroke =
-        styleProperties.extractColor("stroke", Colors.TRANSPARENT)
-            ?: node.attributes.extractColor("stroke", Colors.TRANSPARENT)
-    val strokeWidth =
-        styleProperties["stroke-width"]?.toFloatOrNull()
-            ?: node.attributes.removeFloatOrNull("stroke-width") ?: 1f
-    val strokeLineCap =
-        styleProperties.extractLineCap("stroke-linecap")
-            ?: node.attributes.extractLineCap("stroke-linecap")
-    val strokeLineJoin =
-        styleProperties.extractLineJoin("stroke-linejoin")
-            ?: node.attributes.extractLineJoin("stroke-linejoin")
-    val strokeMiterLimit =
-        styleProperties["stroke-miterlimit"]?.toFloatOrNull()
-            ?: node.attributes.removeFloatOrNull("stroke-miterlimit") ?: 4f
+    // Snapshot presentation attrs before removing them so they don't appear in foreign
+    val nodeAttrMap =
+        node.attributes
+            .asSequence()
+            .filter { it.nodeName in PRESENTATION_ATTRIBUTES }
+            .associate { it.nodeName to it.nodeValue }
+
+    for (attr in PRESENTATION_ATTRIBUTES) {
+        node.attributes.removeOrNull(attr)
+    }
+
+    // The order of concatenation is important for precedence.
+    // style > node attrs > inherited > CSS initial value
+    val merged = inherited + nodeAttrMap + styleProperties
+
+    val fill = merged.extractColor("fill", Colors.BLACK) ?: Colors.BLACK
+    val fillRule = merged.extractFillRule("fill-rule") ?: Path.FillRule.NON_ZERO
+    val stroke = merged.extractColor("stroke", Colors.TRANSPARENT) ?: Colors.TRANSPARENT
+    val strokeWidth = merged["stroke-width"]?.toFloatOrNull() ?: 1f
+    val strokeLineCap = merged.extractLineCap("stroke-linecap") ?: Path.LineCap.BUTT
+    val strokeLineJoin = merged.extractLineJoin("stroke-linejoin") ?: Path.LineJoin.MITER
+    val strokeMiterLimit = merged["stroke-miterlimit"]?.toFloatOrNull() ?: 4f
 
     return Path(
         id,
@@ -132,11 +178,16 @@ private fun parsePathElement(node: Node): Path {
     )
 }
 
-private fun parseExtraElement(node: Node): Extra {
+private fun parseExtraElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Extra {
+    val childInherited = collectStyleInheritance(node, inherited)
+
     val containedElements =
         node.childNodes
             .asSequence()
-            .mapNotNull(::parseElement)
+            .mapNotNull { parseElement(it, childInherited) }
             .toList()
 
     return Extra(
@@ -188,14 +239,6 @@ private fun parseColorValue(
     return Color(hex.toUInt(radix = 16) or 0xFF000000u)
 }
 
-private fun NamedNodeMap.extractColor(
-    key: String,
-    default: Color,
-): Color {
-    val value = removeOrNull(key)?.nodeValue ?: return default
-    return parseColorValue(value, default)
-}
-
 private fun Map<String, String>.extractColor(
     key: String,
     default: Color,
@@ -203,12 +246,6 @@ private fun Map<String, String>.extractColor(
     val value = this[key] ?: return null
     return parseColorValue(value, default)
 }
-
-private fun NamedNodeMap.extractFillRule(key: String) =
-    when (removeOrNull(key)?.nodeValue) {
-        "evenodd" -> Path.FillRule.EVEN_ODD
-        else -> Path.FillRule.NON_ZERO
-    }
 
 private fun Map<String, String>.extractFillRule(key: String): Path.FillRule? =
     when (this[key]) {

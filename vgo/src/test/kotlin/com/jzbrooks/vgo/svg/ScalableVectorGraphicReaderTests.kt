@@ -14,6 +14,7 @@ import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -291,6 +292,121 @@ class ScalableVectorGraphicReaderTests {
 
         assertThat(path::fill).isEqualTo(com.jzbrooks.vgo.core.Colors.BLACK)
         assertThat(path::stroke).isEqualTo(com.jzbrooks.vgo.core.Colors.TRANSPARENT)
+    }
+
+    @Test
+    fun testPathInheritsFillFromGroup() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <g fill="#ffffff">
+            |    <path d="M0,0l2,3Z" />
+            |  </g>
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val group = graphic.elements.first() as Group
+        val path = group.elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0xFFFFFFFFu))
+    }
+
+    @Test
+    fun testPathInheritsFillFromGrandparentGroup() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <g fill="#ff0000">
+            |    <g>
+            |      <path d="M0,0l2,3Z" />
+            |    </g>
+            |  </g>
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val outerGroup = graphic.elements.first() as Group
+        val innerGroup = outerGroup.elements.first() as Group
+        val path = innerGroup.elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0xFFFF0000u))
+    }
+
+    @Test
+    fun testPathAttributeOverridesGroupFill() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <g fill="#ff0000">
+            |    <path fill="#00ff00" d="M0,0l2,3Z" />
+            |  </g>
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val group = graphic.elements.first() as Group
+        val path = group.elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0xFF00FF00u))
+    }
+
+    @Test
+    fun testPathStyleOverridesGroupFill() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <g fill="#ff0000">
+            |    <path style="fill:#0000ff" d="M0,0l2,3Z" />
+            |  </g>
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val group = graphic.elements.first() as Group
+        val path = group.elements.first() as Path
+
+        assertThat(path::fill).isEqualTo(Color(0xFF0000FFu))
     }
 
     @Test
