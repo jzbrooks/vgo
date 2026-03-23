@@ -14,6 +14,7 @@
 ### Fixed
 - `BakeTransformations` warps relative path commands with multiple parameters
 - `BakeTransformations` does not apply transforms to child paths in a group that contains groups
+- SVG: cascading style attributes are correctly propagated to children
 
 ### Security
 
