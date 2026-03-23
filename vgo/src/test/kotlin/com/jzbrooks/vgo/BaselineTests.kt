@@ -18,7 +18,10 @@ import kotlin.streams.asSequence
 class BaselineTests {
     @ParameterizedTest
     @MethodSource("provideUnoptimizedAssets")
-    fun testOptimizationFinishes(unoptimizedAsset: Path, testReporter: TestReporter) {
+    fun testOptimizationFinishes(
+        unoptimizedAsset: Path,
+        testReporter: TestReporter,
+    ) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizationFinishes.${inputFile.extension}"
@@ -92,7 +95,10 @@ class BaselineTests {
 
     @ParameterizedTest
     @MethodSource("provideUnoptimizedAssets")
-    fun testOptimizedAssetIsNotLargerThanOriginal(unoptimizedAsset: Path, testReporter: TestReporter) {
+    fun testOptimizedAssetIsNotLargerThanOriginal(
+        unoptimizedAsset: Path,
+        testReporter: TestReporter,
+    ) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsNotLargerThanOriginal.${inputFile.extension}"
