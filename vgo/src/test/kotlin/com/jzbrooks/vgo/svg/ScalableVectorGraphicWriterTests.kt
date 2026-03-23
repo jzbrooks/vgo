@@ -4,6 +4,9 @@ import assertk.assertThat
 import assertk.assertions.hasSameSizeAs
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNull
+import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.CommandString
@@ -150,6 +153,78 @@ class ScalableVectorGraphicWriterTests {
                     .toList()
 
             assertThat(extraChildren).index(0).hasName("g")
+        }
+    }
+
+    @Test
+    fun testRedundantFillOmittedWhenMatchesParentGroup() {
+        val graphicWithGroup =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(createPath(fill = Color(0xFFFF0000u))),
+                        foreign = mutableMapOf("fill" to "red"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val pathNode = output.firstChild.firstChild.firstChild
+
+            assertThat(pathNode.attributes.getNamedItem("fill")).isNull()
+        }
+    }
+
+    @Test
+    fun testFillWrittenWhenDiffersFromParentGroup() {
+        val graphicWithGroup =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(createPath(fill = Colors.BLACK)),
+                        foreign = mutableMapOf("fill" to "red"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val pathNode = output.firstChild.firstChild.firstChild
+
+            assertThat(pathNode.attributes.getNamedItem("fill")).hasValue("black")
+        }
+    }
+
+    @Test
+    fun testStrokeNoneWrittenWhenParentGroupHasStroke() {
+        val graphicWithGroup =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(createPath(stroke = Colors.TRANSPARENT)),
+                        foreign = mutableMapOf("stroke" to "red"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val pathNode = output.firstChild.firstChild.firstChild
+
+            assertThat(pathNode.attributes.getNamedItem("stroke")).hasValue("none")
         }
     }
 
