@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.hasText
 import assertk.assertions.isEqualTo
 import assertk.assertions.isLessThanOrEqualTo
+import org.junit.jupiter.api.MediaType
+import org.junit.jupiter.api.TestReporter
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -16,7 +18,7 @@ import kotlin.streams.asSequence
 class BaselineTests {
     @ParameterizedTest
     @MethodSource("provideUnoptimizedAssets")
-    fun testOptimizationFinishes(unoptimizedAsset: Path) {
+    fun testOptimizationFinishes(unoptimizedAsset: Path, testReporter: TestReporter) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizationFinishes.${inputFile.extension}"
@@ -31,6 +33,8 @@ class BaselineTests {
         val exitCode = Vgo(options).run()
 
         assertThat(exitCode).isEqualTo(0)
+
+        testReporter.publishFile(Path.of(outputFilePath), mediaTypeFor(inputFile.extension))
     }
 
     @ParameterizedTest
@@ -38,6 +42,7 @@ class BaselineTests {
     fun testOptimizedAssetIsEquivalentToBaseline(
         unoptimizedAsset: Path,
         baselineAsset: Path,
+        testReporter: TestReporter,
     ) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
@@ -51,6 +56,8 @@ class BaselineTests {
 
         Vgo(options).run()
 
+        testReporter.publishFile(Path.of(outputFilePath), mediaTypeFor(inputFile.extension))
+
         val content = File(outputFilePath)
         val baselineContent = baselineAsset.toFile()
         assertThat(content, "optimized asset").hasText(baselineContent.readText())
@@ -61,6 +68,7 @@ class BaselineTests {
     fun testOptimizedAssetIsNotLargerThanBaseline(
         unoptimizedAsset: Path,
         baselineAsset: Path,
+        testReporter: TestReporter,
     ) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
@@ -74,6 +82,8 @@ class BaselineTests {
 
         Vgo(options).run()
 
+        testReporter.publishFile(Path.of(outputFilePath), mediaTypeFor(inputFile.extension))
+
         val optimizedAssetSize = File(outputFilePath).length()
         val baselineAssetSize = baselineAsset.toFile().length()
 
@@ -82,7 +92,7 @@ class BaselineTests {
 
     @ParameterizedTest
     @MethodSource("provideUnoptimizedAssets")
-    fun testOptimizedAssetIsNotLargerThanOriginal(unoptimizedAsset: Path) {
+    fun testOptimizedAssetIsNotLargerThanOriginal(unoptimizedAsset: Path, testReporter: TestReporter) {
         val inputFile = unoptimizedAsset.toFile()
         val inputFileName = inputFile.name.substring(0, inputFile.name.lastIndexOf('.'))
         val outputFilePath = "build/test-results/${inputFileName}_testOptimizedAssetIsNotLargerThanOriginal.${inputFile.extension}"
@@ -95,6 +105,8 @@ class BaselineTests {
 
         Vgo(options).run()
 
+        testReporter.publishFile(Path.of(outputFilePath), mediaTypeFor(inputFile.extension))
+
         val optimizedAssetSize = File(outputFilePath).length()
         val unoptimizedAssetSize = unoptimizedAsset.toFile().length()
 
@@ -102,6 +114,13 @@ class BaselineTests {
     }
 
     companion object {
+        private fun mediaTypeFor(extension: String): MediaType =
+            when (extension) {
+                "svg" -> MediaType.parse("image/svg+xml")
+                "xml" -> MediaType.create("application", "xml")
+                else -> MediaType.TEXT_PLAIN
+            }
+
         // Loads the files based on the convention that optimized files
         // live in src/test/resources/baseline and are suffixed with _optimized
         private val assets: List<Pair<Path, Path>> =
