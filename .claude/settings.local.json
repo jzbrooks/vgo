@@ -1,15 +1,49 @@
 {
   "permissions": {
     "allow": [
-      "Read(//private/tmp/kotlin_inspect/**)",
-      "Bash(jar xf:*)",
-      "Bash(javap -p -c org/jetbrains/kotlin/com/intellij/ide/plugins/DisabledPluginsState.class)",
-      "Bash(javap -p -c org/jetbrains/kotlin/com/intellij/openapi/util/registry/EarlyAccessRegistryManager.class)",
-      "Bash(javap -p -c org/jetbrains/kotlin/com/intellij/openapi/util/registry/EarlyAccessRegistryManagerKt.class)",
-      "Bash(javap -p org/jetbrains/kotlin/cli/jvm/compiler/KotlinCoreEnvironment.class)",
-      "Bash(javap -p -c \"org/jetbrains/kotlin/cli/jvm/compiler/KotlinCoreEnvironment$Companion.class\")",
-      "Bash(javap -p -c org/jetbrains/kotlin/cli/jvm/compiler/CompatKt.class)",
-      "Bash(javap -p -c org/jetbrains/kotlin/cli/jvm/compiler/IdeaStandaloneExecutionSetup.class)"
+      "Bash(./gradlew build)",
+      "Bash(./gradlew test)",
+      "Bash(./gradlew check)",
+      "Bash(./gradlew assemble)",
+      "Bash(./gradlew classes)",
+      "Bash(./gradlew testClasses)",
+      "Bash(./gradlew compileKotlin)",
+      "Bash(./gradlew compileTestKotlin)",
+      "Bash(./gradlew dependencies)",
+      "Bash(./gradlew dependencyInsight*)",
+      "Bash(./gradlew tasks)",
+      "Bash(./gradlew projects)",
+      "Bash(./gradlew properties)",
+      "Bash(./gradlew lint)",
+      "Bash(./gradlew ktlintCheck)",
+      "Bash(grep *)",
+      "Bash(rg *)",
+      "Bash(find *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(ls *)",
+      "Bash(diff *)",
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git show*)",
+      "Bash(git branch*)"
+    ],
+    "deny": [
+      "Bash(./gradlew clean)",
+      "Bash(./gradlew publish*)",
+      "Bash(find * -delete*)",
+      "Bash(find * -exec rm*)",
+      "Bash(find * -exec shred*)",
+      "Bash(find * | xargs rm*)",
+      "Bash(rm *)",
+      "Bash(git push*)",
+      "Bash(git commit*)",
+      "Bash(git checkout*)",
+      "Bash(git reset*)",
+      "Bash(git rebase*)"
     ]
   }
 }
