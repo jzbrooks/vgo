@@ -60,16 +60,33 @@ private data class InheritedStyle(
     val strokeMiterLimit: Float = 4f,
 )
 
-private fun Map<String, String>.toChildInheritedStyle(current: InheritedStyle): InheritedStyle =
-    InheritedStyle(
-        fill = extractColor("fill", current.fill) ?: current.fill,
-        fillRule = extractFillRule("fill-rule") ?: current.fillRule,
-        stroke = extractColor("stroke", current.stroke) ?: current.stroke,
-        strokeWidth = this["stroke-width"]?.toFloatOrNull() ?: current.strokeWidth,
-        strokeLineCap = extractLineCap("stroke-linecap") ?: current.strokeLineCap,
-        strokeLineJoin = extractLineJoin("stroke-linejoin") ?: current.strokeLineJoin,
-        strokeMiterLimit = this["stroke-miterlimit"]?.toFloatOrNull() ?: current.strokeMiterLimit,
+private fun Map<String, String>.withoutImpliedPresentationAttrs(inherited: InheritedStyle): Map<String, String> =
+    filter { (key, _) ->
+        when (key) {
+            "fill" -> (extractColor("fill", inherited.fill) ?: inherited.fill) != inherited.fill
+            "fill-rule" -> (extractFillRule("fill-rule") ?: inherited.fillRule) != inherited.fillRule
+            "stroke" -> (extractColor("stroke", inherited.stroke) ?: inherited.stroke) != inherited.stroke
+            "stroke-width" -> this["stroke-width"]?.toFloatOrNull() != inherited.strokeWidth
+            "stroke-linecap" -> (extractLineCap("stroke-linecap") ?: inherited.strokeLineCap) != inherited.strokeLineCap
+            "stroke-linejoin" -> (extractLineJoin("stroke-linejoin") ?: inherited.strokeLineJoin) != inherited.strokeLineJoin
+            "stroke-miterlimit" -> this["stroke-miterlimit"]?.toFloatOrNull() != inherited.strokeMiterLimit
+            else -> true
+        }
+    }
+
+private fun Map<String, String>.toChildInheritedStyle(current: InheritedStyle): InheritedStyle {
+    val styleAttrs = this["style"]?.parseStyleAttribute() ?: emptyMap()
+    val merged = this + styleAttrs
+    return InheritedStyle(
+        fill = merged.extractColor("fill", current.fill) ?: current.fill,
+        fillRule = merged.extractFillRule("fill-rule") ?: current.fillRule,
+        stroke = merged.extractColor("stroke", current.stroke) ?: current.stroke,
+        strokeWidth = merged["stroke-width"]?.toFloatOrNull() ?: current.strokeWidth,
+        strokeLineCap = merged.extractLineCap("stroke-linecap") ?: current.strokeLineCap,
+        strokeLineJoin = merged.extractLineJoin("stroke-linejoin") ?: current.strokeLineJoin,
+        strokeMiterLimit = merged["stroke-miterlimit"]?.toFloatOrNull() ?: current.strokeMiterLimit,
     )
+}
 
 fun ScalableVectorGraphic.toDocument(commandPrinter: ScalableVectorGraphicCommandPrinter): Document {
     val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
@@ -80,7 +97,8 @@ fun ScalableVectorGraphic.toDocument(commandPrinter: ScalableVectorGraphicComman
     if (elementName != null) {
         root.setAttribute("id", elementName)
     }
-    for (item in foreign) {
+    val writtenRootForeign = foreign.withoutImpliedPresentationAttrs(InheritedStyle())
+    for (item in writtenRootForeign) {
         root.setAttribute(item.key, item.value)
     }
     document.appendChild(root)
@@ -99,6 +117,7 @@ private fun Document.createChildElement(
     element: Element,
     inherited: InheritedStyle = InheritedStyle(),
 ) {
+    val writtenForeign = element.foreign.withoutImpliedPresentationAttrs(inherited)
     val node =
         when (element) {
             is Path -> {
@@ -182,7 +201,7 @@ private fun Document.createChildElement(
                         node.setAttribute("transform", "matrix($matrixElements)")
                     }
 
-                    val childInherited = element.foreign.toChildInheritedStyle(inherited)
+                    val childInherited = writtenForeign.toChildInheritedStyle(inherited)
                     for (child in element.elements) {
                         createChildElement(commandPrinter, node, child, childInherited)
                     }
@@ -191,7 +210,7 @@ private fun Document.createChildElement(
 
             is ClipPath -> {
                 createElement("clipPath").also {
-                    val childInherited = element.foreign.toChildInheritedStyle(inherited)
+                    val childInherited = writtenForeign.toChildInheritedStyle(inherited)
                     for (child in element.elements) {
                         createChildElement(commandPrinter, it, child, childInherited)
                     }
@@ -200,7 +219,7 @@ private fun Document.createChildElement(
 
             is Extra -> {
                 createElement(element.name).also {
-                    val childInherited = element.foreign.toChildInheritedStyle(inherited)
+                    val childInherited = writtenForeign.toChildInheritedStyle(inherited)
                     for (child in element.elements) {
                         createChildElement(commandPrinter, it, child, childInherited)
                     }
@@ -217,7 +236,7 @@ private fun Document.createChildElement(
         if (elementName != null) {
             node.setAttribute("id", elementName)
         }
-        for (item in element.foreign) {
+        for (item in writtenForeign) {
             node.setAttribute(item.key, item.value)
         }
         parent.appendChild(node)

@@ -205,6 +205,30 @@ class ScalableVectorGraphicWriterTests {
     }
 
     @Test
+    fun testDefaultFillOmittedOnGroup() {
+        val graphicWithGroup =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(createPath()),
+                        foreign = mutableMapOf("fill" to "black"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val groupNode = output.firstChild.firstChild
+
+            assertThat(groupNode.attributes.getNamedItem("fill")).isNull()
+        }
+    }
+
+    @Test
     fun testStrokeNoneWrittenWhenParentGroupHasStroke() {
         val graphicWithGroup =
             ScalableVectorGraphic(

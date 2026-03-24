@@ -16,7 +16,6 @@ import org.w3c.dom.NamedNodeMap
 import org.w3c.dom.Node
 import org.w3c.dom.Text
 
-
 fun parse(root: Node): ScalableVectorGraphic {
     val rootStyleProperties =
         root.attributes
@@ -209,15 +208,3 @@ private fun NamedNodeMap.extractTransformMatrix(): Matrix3 {
         floatArrayOf(entries[0], entries[2], entries[4], entries[1], entries[3], entries[5], 0f, 0f, 1f),
     )
 }
-
-
-private fun String.parseStyleAttribute(): Map<String, String> =
-    split(';')
-        .mapNotNull { property ->
-            val colonIndex = property.indexOf(':')
-            if (colonIndex > 0) {
-                property.substring(0, colonIndex).trim() to property.substring(colonIndex + 1).trim()
-            } else {
-                null
-            }
-        }.toMap()

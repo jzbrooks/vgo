@@ -4,6 +4,17 @@ import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Path
 
+internal fun String.parseStyleAttribute(): Map<String, String> =
+    split(';')
+        .mapNotNull { property ->
+            val colonIndex = property.indexOf(':')
+            if (colonIndex > 0) {
+                property.substring(0, colonIndex).trim() to property.substring(colonIndex + 1).trim()
+            } else {
+                null
+            }
+        }.toMap()
+
 internal val PRESENTATION_ATTRIBUTES: Set<String> =
     hashSetOf("fill", "fill-rule", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit")
 
