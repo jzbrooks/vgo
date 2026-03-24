@@ -201,6 +201,37 @@ class BakeTransformationsTests {
     }
 
     @Test
+    fun `relative commands with multiple parameters resolve each against the previous endpoint`() {
+        val transform = Matrix3.from(floatArrayOf(1f, 0f, 14f, 0f, 1f, 14f, 0f, 0f, 1f))
+
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            LineTo(CommandVariant.RELATIVE, listOf(Point(5f, 5f), Point(10f, 10f))),
+                        ),
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
+
+        bake.visit(group)
+
+        assertThat(group::elements)
+            .index(0)
+            .isInstanceOf(Path::class)
+            .prop(Path::commands)
+            .containsExactly(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(24f, 24f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(29f, 29f), Point(39f, 39f))),
+            )
+    }
+
+    @Test
     fun testGroupRotationApplied() {
         val rad = (90.0 * PI / 180.0).toFloat()
         val rotationMatrix = Matrix3.from(floatArrayOf(cos(rad), -sin(rad), 0f, sin(rad), cos(rad), 0f, 0f, 0f, 1f))
