@@ -86,19 +86,16 @@ class BakeTransformations :
                 when (command) {
                     is MoveTo -> {
                         command.apply {
-                            val newCurrentPoint =
-                                if (variant == CommandVariant.RELATIVE) {
-                                    currentPoint + parameters.reduce(Point::plus)
-                                } else {
-                                    parameters.last()
-                                }
-
+                            var intermediatePoint = currentPoint
                             parameters =
                                 parameters.map { parameter ->
                                     val point =
                                         if (variant == CommandVariant.RELATIVE) {
-                                            currentPoint + parameter
+                                            val absPoint = intermediatePoint + parameter
+                                            intermediatePoint = absPoint
+                                            absPoint
                                         } else {
+                                            intermediatePoint = parameter
                                             parameter
                                         }
 
@@ -106,26 +103,23 @@ class BakeTransformations :
                                 }
                             variant = CommandVariant.ABSOLUTE
 
-                            currentPoint = newCurrentPoint
+                            currentPoint = intermediatePoint
                             subPathStart.push(currentPoint)
                         }
                     }
 
                     is LineTo -> {
                         command.apply {
-                            val newCurrentPoint =
-                                if (variant == CommandVariant.RELATIVE) {
-                                    currentPoint + parameters.reduce(Point::plus)
-                                } else {
-                                    parameters.last()
-                                }
-
+                            var intermediatePoint = currentPoint
                             parameters =
                                 parameters.map { parameter ->
                                     val point =
                                         if (variant == CommandVariant.RELATIVE) {
-                                            currentPoint + parameter
+                                            val absPoint = intermediatePoint + parameter
+                                            intermediatePoint = absPoint
+                                            absPoint
                                         } else {
+                                            intermediatePoint = parameter
                                             parameter
                                         }
 
@@ -133,25 +127,21 @@ class BakeTransformations :
                                 }
                             variant = CommandVariant.ABSOLUTE
 
-                            currentPoint = newCurrentPoint
+                            currentPoint = intermediatePoint
                         }
                     }
 
                     is HorizontalLineTo -> {
                         command.run {
-                            val newCurrentPoint =
-                                if (variant == CommandVariant.RELATIVE) {
-                                    currentPoint.x + parameters.reduce(Float::plus)
-                                } else {
-                                    parameters.last()
-                                }
-
+                            var intermediateX = currentPoint.x
                             val newParameters =
                                 parameters.map { parameter ->
                                     val x =
                                         if (variant == CommandVariant.RELATIVE) {
-                                            currentPoint.x + parameter
+                                            intermediateX += parameter
+                                            intermediateX
                                         } else {
+                                            intermediateX = parameter
                                             parameter
                                         }
                                     val point = Point(x, currentPoint.y)
@@ -159,26 +149,22 @@ class BakeTransformations :
                                     (transform * Vector3(point)).toPoint()
                                 }
 
-                            currentPoint = currentPoint.copy(x = newCurrentPoint)
+                            currentPoint = currentPoint.copy(x = intermediateX)
                             LineTo(CommandVariant.ABSOLUTE, newParameters)
                         }
                     }
 
                     is VerticalLineTo -> {
                         command.run {
-                            val newCurrentPoint =
-                                if (variant == CommandVariant.RELATIVE) {
-                                    currentPoint.y + parameters.reduce(Float::plus)
-                                } else {
-                                    parameters.last()
-                                }
-
+                            var intermediateY = currentPoint.y
                             val newParameters =
                                 parameters.map { parameter ->
                                     val y =
                                         if (variant == CommandVariant.RELATIVE) {
-                                            currentPoint.y + parameter
+                                            intermediateY += parameter
+                                            intermediateY
                                         } else {
+                                            intermediateY = parameter
                                             parameter
                                         }
                                     val point = Point(currentPoint.x, y)
@@ -186,33 +172,24 @@ class BakeTransformations :
                                     (transform * Vector3(point)).toPoint()
                                 }
 
-                            currentPoint = currentPoint.copy(y = newCurrentPoint)
+                            currentPoint = currentPoint.copy(y = intermediateY)
                             LineTo(CommandVariant.ABSOLUTE, newParameters)
                         }
                     }
 
                     is QuadraticBezierCurve -> {
                         command.apply {
-                            val newCurrentPoint =
-                                if (variant == CommandVariant.RELATIVE) {
-                                    currentPoint + parameters.map(QuadraticBezierCurve.Parameter::end).reduce(Point::plus)
-                                } else {
-                                    parameters.last().end
-                                }
-
+                            var intermediatePoint = currentPoint
                             for (parameter in parameters) {
-                                val control =
+                                val (control, end) =
                                     if (variant == CommandVariant.RELATIVE) {
-                                        currentPoint + parameter.control
+                                        val absControl = intermediatePoint + parameter.control
+                                        val absEnd = intermediatePoint + parameter.end
+                                        intermediatePoint = absEnd
+                                        absControl to absEnd
                                     } else {
-                                        parameter.control
-                                    }
-
-                                val end =
-                                    if (variant == CommandVariant.RELATIVE) {
-                                        currentPoint + parameter.end
-                                    } else {
-                                        parameter.end
+                                        intermediatePoint = parameter.end
+                                        parameter.control to parameter.end
                                     }
 
                                 parameter.control = (transform * Vector3(control)).toPoint()
@@ -220,25 +197,22 @@ class BakeTransformations :
                             }
                             variant = CommandVariant.ABSOLUTE
 
-                            currentPoint = newCurrentPoint
+                            currentPoint = intermediatePoint
                         }
                     }
 
                     is SmoothQuadraticBezierCurve -> {
                         command.apply {
-                            val newCurrentPoint =
-                                if (variant == CommandVariant.RELATIVE) {
-                                    currentPoint + parameters.reduce(Point::plus)
-                                } else {
-                                    parameters.last()
-                                }
-
+                            var intermediatePoint = currentPoint
                             parameters =
                                 parameters.map { parameter ->
                                     val point =
                                         if (variant == CommandVariant.RELATIVE) {
-                                            currentPoint + parameter
+                                            val absPoint = intermediatePoint + parameter
+                                            intermediatePoint = absPoint
+                                            absPoint
                                         } else {
+                                            intermediatePoint = parameter
                                             parameter
                                         }
 
@@ -246,39 +220,24 @@ class BakeTransformations :
                                 }
                             variant = CommandVariant.ABSOLUTE
 
-                            currentPoint = newCurrentPoint
+                            currentPoint = intermediatePoint
                         }
                     }
 
                     is CubicBezierCurve -> {
                         command.apply {
-                            val newCurrentPoint =
-                                if (variant == CommandVariant.RELATIVE) {
-                                    currentPoint + parameters.map(CubicBezierCurve.Parameter::end).reduce(Point::plus)
-                                } else {
-                                    parameters.last().end
-                                }
-
+                            var intermediatePoint = currentPoint
                             for (parameter in parameters) {
-                                val startControl =
+                                val (startControl, endControl, end) =
                                     if (variant == CommandVariant.RELATIVE) {
-                                        currentPoint + parameter.startControl
+                                        val absStartControl = intermediatePoint + parameter.startControl
+                                        val absEndControl = intermediatePoint + parameter.endControl
+                                        val absEnd = intermediatePoint + parameter.end
+                                        intermediatePoint = absEnd
+                                        Triple(absStartControl, absEndControl, absEnd)
                                     } else {
-                                        parameter.startControl
-                                    }
-
-                                val endControl =
-                                    if (variant == CommandVariant.RELATIVE) {
-                                        currentPoint + parameter.endControl
-                                    } else {
-                                        parameter.endControl
-                                    }
-
-                                val end =
-                                    if (variant == CommandVariant.RELATIVE) {
-                                        currentPoint + parameter.end
-                                    } else {
-                                        parameter.end
+                                        intermediatePoint = parameter.end
+                                        Triple(parameter.startControl, parameter.endControl, parameter.end)
                                     }
 
                                 parameter.startControl = (transform * Vector3(startControl)).toPoint()
@@ -287,32 +246,23 @@ class BakeTransformations :
                             }
                             variant = CommandVariant.ABSOLUTE
 
-                            currentPoint = newCurrentPoint
+                            currentPoint = intermediatePoint
                         }
                     }
 
                     is SmoothCubicBezierCurve -> {
                         command.apply {
-                            val newCurrentPoint =
-                                if (variant == CommandVariant.RELATIVE) {
-                                    currentPoint + parameters.map(SmoothCubicBezierCurve.Parameter::end).reduce(Point::plus)
-                                } else {
-                                    parameters.last().end
-                                }
-
+                            var intermediatePoint = currentPoint
                             for (parameter in parameters) {
-                                val endControl =
+                                val (endControl, end) =
                                     if (variant == CommandVariant.RELATIVE) {
-                                        currentPoint + parameter.endControl
+                                        val absEndControl = intermediatePoint + parameter.endControl
+                                        val absEnd = intermediatePoint + parameter.end
+                                        intermediatePoint = absEnd
+                                        absEndControl to absEnd
                                     } else {
-                                        parameter.endControl
-                                    }
-
-                                val end =
-                                    if (variant == CommandVariant.RELATIVE) {
-                                        currentPoint + parameter.end
-                                    } else {
-                                        parameter.end
+                                        intermediatePoint = parameter.end
+                                        parameter.endControl to parameter.end
                                     }
 
                                 parameter.endControl = (transform * Vector3(endControl)).toPoint()
@@ -320,24 +270,21 @@ class BakeTransformations :
                             }
                             variant = CommandVariant.ABSOLUTE
 
-                            currentPoint = newCurrentPoint
+                            currentPoint = intermediatePoint
                         }
                     }
 
                     is EllipticalArcCurve -> {
                         command.apply {
-                            val newCurrentPoint =
-                                if (variant == CommandVariant.RELATIVE) {
-                                    currentPoint + parameters.map(EllipticalArcCurve.Parameter::end).reduce(Point::plus)
-                                } else {
-                                    parameters.last().end
-                                }
-
+                            var intermediatePoint = currentPoint
                             for (parameter in parameters) {
                                 val end =
                                     if (variant == CommandVariant.RELATIVE) {
-                                        currentPoint + parameter.end
+                                        val absEnd = intermediatePoint + parameter.end
+                                        intermediatePoint = absEnd
+                                        absEnd
                                     } else {
+                                        intermediatePoint = parameter.end
                                         parameter.end
                                     }
 
@@ -345,7 +292,7 @@ class BakeTransformations :
                             }
                             variant = CommandVariant.ABSOLUTE
 
-                            currentPoint = newCurrentPoint
+                            currentPoint = intermediatePoint
                         }
                     }
 

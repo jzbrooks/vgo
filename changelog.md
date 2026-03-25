@@ -12,6 +12,7 @@
 ### Removed
 
 ### Fixed
+- `BakeTransformations` warps relative path commands with multiple parameters
 
 ### Security
 
