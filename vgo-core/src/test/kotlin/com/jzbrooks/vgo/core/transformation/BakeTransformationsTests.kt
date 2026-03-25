@@ -20,6 +20,7 @@ import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
+import com.jzbrooks.vgo.core.util.assertk.isEqualTo
 import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
@@ -274,7 +275,6 @@ class BakeTransformationsTests {
     fun `transform is applied to path children when group also contains non-relocatable nested groups`() {
         val transform = Matrix3.from(floatArrayOf(2f, 0f, 0f, 0f, 2f, 0f, 0f, 0f, 1f))
 
-        // This inner group is non-relocatable because it has an id
         val innerGroup =
             Group(
                 listOf(
@@ -309,18 +309,59 @@ class BakeTransformationsTests {
         bake.visit(innerGroup)
         bake.visit(outerGroup)
 
-        // Path sibling should have transform applied
         assertThat(outerGroup::elements)
             .index(0)
-            .isInstanceOf(Path::class)
+            .isInstanceOf<Path>()
             .prop(Path::commands)
             .containsExactly(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(6f, 6f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(8f, 8f))),
             )
+    }
 
-        // Group sibling should have transform composed into its own transform
-        assertThat((outerGroup.elements[1] as Group).transform.contentsEqual(transform)).isEqualTo(true)
+    @Test
+    fun `group children compose baked transformations of parent groups`() {
+        val transform = Matrix3.from(floatArrayOf(2f, 0f, 0f, 0f, 2f, 0f, 0f, 0f, 1f))
+
+        val innerGroup =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 1f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 2f))),
+                        ),
+                    ),
+                ),
+                "inner",
+                mutableMapOf(),
+                Matrix3.IDENTITY,
+            )
+
+        val outerGroup =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(3f, 3f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
+                        ),
+                    ),
+                    innerGroup,
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
+
+        bake.visit(innerGroup)
+        bake.visit(outerGroup)
+
+        assertThat(outerGroup::elements)
+            .index(1)
+            .isInstanceOf<Group>()
+            .prop(Group::transform)
+            .isEqualTo(transform)
     }
 
     @Test
