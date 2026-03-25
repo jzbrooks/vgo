@@ -13,6 +13,7 @@
 
 ### Fixed
 - `BakeTransformations` warps relative path commands with multiple parameters
+- `BakeTransformations` does not apply transforms to child paths in a group that contains groups
 
 ### Security
 

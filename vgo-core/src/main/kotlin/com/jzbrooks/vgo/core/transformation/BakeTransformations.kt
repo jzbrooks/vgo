@@ -48,12 +48,16 @@ class BakeTransformations :
 
         val groupTransform = group.transform
 
-        if (group.elements.any { it !is Path } || groupTransform.contentsEqual(Matrix3.IDENTITY)) {
+        if (groupTransform.contentsEqual(Matrix3.IDENTITY)) {
             return
         }
 
         for (child in group.elements) {
-            applyTransform(child as Path, groupTransform)
+            when (child) {
+                is Path -> applyTransform(child, groupTransform)
+                is Group -> child.transform = groupTransform * child.transform
+                else -> return
+            }
         }
 
         // Transform is baked. We don't want to apply it twice.
