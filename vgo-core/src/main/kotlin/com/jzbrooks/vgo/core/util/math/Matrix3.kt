@@ -71,7 +71,7 @@ interface MutableMatrix3 : Matrix3 {
 
     companion object {
         @JvmStatic
-        fun identity(): MutableMatrix3 = ArrayMatrix3(floatArrayOf(1f, 0f, 0f, 1f, 1f, 0f, 1f, 0f, 1f))
+        fun identity(): MutableMatrix3 = ArrayMatrix3(floatArrayOf(1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f))
 
         @JvmStatic
         fun from(data: FloatArray): MutableMatrix3 = ArrayMatrix3(data)
