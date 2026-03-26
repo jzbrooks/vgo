@@ -10,12 +10,14 @@ import assertk.assertions.index
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
@@ -244,11 +246,11 @@ class ScalableVectorGraphicReaderTests {
     }
 
     @Test
-    fun testStyleAttributeRemovedFromForeign() {
+    fun testExtractedStylePropertiesRemovedFromForeign() {
         val vectorText =
             """
             |<svg viewBox="0 0 100 100">
-            |  <path style="fill:red;opacity:0.5" d="M0,0l2,3Z" />
+            |  <path style="fill:red" d="M0,0l2,3Z" />
             |</svg>
             |
             """.trimMargin().toByteArray()
@@ -443,5 +445,62 @@ class ScalableVectorGraphicReaderTests {
             prop(Extra::name).isEqualTo("bicycle")
             prop(Extra::elements).containsExactly(expectedChild)
         }
+    }
+
+    @Test
+    fun testUnextractedStylePropertiesPreservedInForeignOnShape() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <rect x="0" y="0" width="10" height="10" style="opacity:0.5;fill:red;display:inline" />
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val rect = graphic.elements.first() as Rect
+
+        assertThat(rect::fill).isEqualTo(Color(0xFFFF0000u))
+        val style = rect.foreign["style"]
+        assertThat(style).isNotNull()
+        val styleProps = style!!.split(';').map { it.trim() }.toSet()
+        assertThat(styleProps).contains("opacity:0.5")
+        assertThat(styleProps).contains("display:inline")
+        assertThat(styleProps).containsNone("fill:red")
+    }
+
+    @Test
+    fun testUnextractedStylePropertiesPreservedInForeignOnPath() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <path d="M0,0l2,3Z" style="opacity:0.75;stroke:blue" />
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val path = graphic.elements.first() as Path
+
+        assertThat(path::stroke).isEqualTo(Color(0xFF0000FFu))
+        assertThat(path.foreign["style"]).isEqualTo("opacity:0.75")
     }
 }

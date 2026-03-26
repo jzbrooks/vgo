@@ -6,6 +6,7 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.Shape
 import com.jzbrooks.vgo.core.util.math.Matrix3
 
 /**
@@ -30,6 +31,8 @@ class CollapseGroups : BottomUpTransformer {
     override fun visit(clipPath: ClipPath) {}
 
     override fun visit(extra: Extra) {}
+
+    override fun visit(shape: Shape) {}
 
     override fun visit(path: Path) {}
 

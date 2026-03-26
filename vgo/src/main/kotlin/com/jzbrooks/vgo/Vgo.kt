@@ -14,7 +14,6 @@ import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicCommandPrinter
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
-import com.jzbrooks.vgo.svg.toDocument
 import com.jzbrooks.vgo.svg.toVectorDrawable
 import com.jzbrooks.vgo.util.CountingOutputStream
 import com.jzbrooks.vgo.util.parse
@@ -199,9 +198,8 @@ class Vgo(
                 }
 
                 is ScalableVectorGraphic -> {
-                    val printer = ScalableVectorGraphicCommandPrinter(3)
                     val writer = ScalableVectorGraphicWriter(writerOptions)
-                    val document = graphic.toDocument(printer)
+                    val document = writer.createDocument(graphic)
 
                     val countingStream = CountingOutputStream()
                     writer.write(document, countingStream)

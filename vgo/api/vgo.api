@@ -107,16 +107,13 @@ public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicReaderKt {
 
 public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicWriter : com/jzbrooks/vgo/core/Writer {
 	public fun <init> ()V
-	public fun <init> (Ljava/util/Set;)V
-	public synthetic fun <init> (Ljava/util/Set;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/util/Set;Lcom/jzbrooks/vgo/svg/ScalableVectorGraphicCommandPrinter;)V
+	public synthetic fun <init> (Ljava/util/Set;Lcom/jzbrooks/vgo/svg/ScalableVectorGraphicCommandPrinter;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun createDocument (Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;)Lorg/w3c/dom/Document;
 	public fun getOptions ()Ljava/util/Set;
 	public synthetic fun write (Lcom/jzbrooks/vgo/core/graphic/Graphic;Ljava/io/OutputStream;)V
 	public fun write (Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;Ljava/io/OutputStream;)V
 	public final fun write (Lorg/w3c/dom/Document;Ljava/io/OutputStream;)V
-}
-
-public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicWriterKt {
-	public static final fun toDocument (Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;Lcom/jzbrooks/vgo/svg/ScalableVectorGraphicCommandPrinter;)Lorg/w3c/dom/Document;
 }
 
 public final class com/jzbrooks/vgo/svg/SvgOptimizationRegistry : com/jzbrooks/vgo/core/transformation/TransformerSet {

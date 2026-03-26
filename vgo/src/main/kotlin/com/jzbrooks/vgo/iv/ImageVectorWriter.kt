@@ -611,5 +611,7 @@ private fun emitElement(
             }
             codeBlock.add("}\n")
         }
+
+        else -> {}
     }
 }

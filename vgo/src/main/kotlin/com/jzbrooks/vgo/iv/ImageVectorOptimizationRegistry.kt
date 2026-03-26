@@ -5,6 +5,7 @@ import com.jzbrooks.vgo.core.transformation.BreakoutImplicitCommands
 import com.jzbrooks.vgo.core.transformation.CollapseGroups
 import com.jzbrooks.vgo.core.transformation.CommandVariant
 import com.jzbrooks.vgo.core.transformation.ConvertCurvesToArcs
+import com.jzbrooks.vgo.core.transformation.ConvertShapesToPaths
 import com.jzbrooks.vgo.core.transformation.MergePaths
 import com.jzbrooks.vgo.core.transformation.RemoveEmptyGroups
 import com.jzbrooks.vgo.core.transformation.RemoveRedundantCommands
@@ -25,6 +26,7 @@ class ImageVectorOptimizationRegistry :
             ),
         topDownTransformers =
             listOf(
+                ConvertShapesToPaths(),
                 BakeTransformations(),
                 RemoveTransparentPaths(),
                 BreakoutImplicitCommands(),

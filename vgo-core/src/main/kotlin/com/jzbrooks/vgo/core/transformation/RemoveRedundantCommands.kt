@@ -5,6 +5,7 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.Shape
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.Command
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -34,6 +35,8 @@ class RemoveRedundantCommands : TopDownTransformer {
     override fun visit(group: Group) {}
 
     override fun visit(extra: Extra) {}
+
+    override fun visit(shape: Shape) {}
 
     override fun visit(path: Path) {
         if (path.commands.isEmpty()) return
