@@ -10,4 +10,6 @@ interface ElementVisitor {
     fun visit(extra: Extra)
 
     fun visit(path: Path)
+
+    fun visit(shape: Shape)
 }

@@ -1,14 +1,22 @@
 package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
+import com.jzbrooks.vgo.core.graphic.Ellipse
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Line
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.Polygon
+import com.jzbrooks.vgo.core.graphic.Polyline
+import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
+import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.util.xml.asSequence
+import com.jzbrooks.vgo.util.xml.removeFloatOrNull
 import com.jzbrooks.vgo.util.xml.removeOrNull
 import com.jzbrooks.vgo.util.xml.toMutableMap
 import org.w3c.dom.Comment
@@ -50,6 +58,12 @@ private fun parseElement(
         "g" -> parseGroupElement(node, inherited)
         "clipPath" -> parseClipPath(node, inherited)
         "path" -> parsePathElement(node, inherited)
+        "circle" -> parseCircleElement(node, inherited)
+        "ellipse" -> parseEllipseElement(node, inherited)
+        "rect" -> parseRectElement(node, inherited)
+        "line" -> parseLineElement(node, inherited)
+        "polyline" -> parsePolylineElement(node, inherited)
+        "polygon" -> parsePolygonElement(node, inherited)
         else -> parseExtraElement(node, inherited)
     }
 }
@@ -118,24 +132,19 @@ private fun collectStyleInheritance(
     return inherited + nodeAttrs + styleProperties
 }
 
-private fun parsePathElement(
+/**
+ * Merges inherited, node-level, and style presentation attributes, removes them
+ * from the DOM node (so they don't leak into [foreign]), and returns the resolved values.
+ */
+private fun extractMergedPresentationAttributes(
     node: Node,
-    inherited: Map<String, String> = emptyMap(),
-): Path {
+    inherited: Map<String, String>,
+): PresentationAttributes {
     val styleProperties =
         node.attributes
             .removeOrNull("style")
             ?.nodeValue
             ?.parseStyleAttribute() ?: emptyMap()
-
-    val commands =
-        CommandString(
-            node.attributes
-                .removeNamedItem("d")
-                .nodeValue
-                .toString(),
-        ).toCommandList()
-    val id = node.attributes.removeOrNull("id")?.nodeValue
 
     // Snapshot presentation attrs before removing them so they don't appear in foreign
     val nodeAttrMap =
@@ -148,30 +157,237 @@ private fun parsePathElement(
         node.attributes.removeOrNull(attr)
     }
 
+    // Style properties outside PRESENTATION_ATTRIBUTES (e.g. opacity, display,
+    // stroke-dasharray) aren't lifted into typed fields; re-attach them so the
+    // shape parser captures them in foreign and the writer emits them verbatim.
+    val unextractedStyle = styleProperties.filterKeys { it !in PRESENTATION_ATTRIBUTES }
+    if (unextractedStyle.isNotEmpty()) {
+        val serialized = unextractedStyle.entries.joinToString(";") { (k, v) -> "$k:$v" }
+        val attr = node.ownerDocument.createAttribute("style")
+        attr.value = serialized
+        node.attributes.setNamedItem(attr)
+    }
+
     // The order of concatenation is important for precedence.
     // style > node attrs > inherited > CSS initial value
     val merged = inherited + nodeAttrMap + styleProperties
 
-    val fill = merged.extractColor("fill", Colors.BLACK) ?: Colors.BLACK
-    val fillRule = merged.extractFillRule("fill-rule") ?: Path.FillRule.NON_ZERO
-    val stroke = merged.extractColor("stroke", Colors.TRANSPARENT) ?: Colors.TRANSPARENT
-    val strokeWidth = merged["stroke-width"]?.toFloatOrNull() ?: 1f
-    val strokeLineCap = merged.extractLineCap("stroke-linecap") ?: Path.LineCap.BUTT
-    val strokeLineJoin = merged.extractLineJoin("stroke-linejoin") ?: Path.LineJoin.MITER
-    val strokeMiterLimit = merged["stroke-miterlimit"]?.toFloatOrNull() ?: 4f
+    return PresentationAttributes(
+        fill = merged.extractColor("fill", Colors.BLACK) ?: Colors.BLACK,
+        fillRule = merged.extractFillRule("fill-rule") ?: Path.FillRule.NON_ZERO,
+        stroke = merged.extractColor("stroke", Colors.TRANSPARENT) ?: Colors.TRANSPARENT,
+        strokeWidth = merged["stroke-width"]?.toFloatOrNull() ?: 1f,
+        strokeLineCap = merged.extractLineCap("stroke-linecap") ?: Path.LineCap.BUTT,
+        strokeLineJoin = merged.extractLineJoin("stroke-linejoin") ?: Path.LineJoin.MITER,
+        strokeMiterLimit = merged["stroke-miterlimit"]?.toFloatOrNull() ?: 4f,
+    )
+}
+
+private data class PresentationAttributes(
+    val fill: com.jzbrooks.vgo.core.Color,
+    val fillRule: Path.FillRule,
+    val stroke: com.jzbrooks.vgo.core.Color,
+    val strokeWidth: Float,
+    val strokeLineCap: Path.LineCap,
+    val strokeLineJoin: Path.LineJoin,
+    val strokeMiterLimit: Float,
+)
+
+private fun parsePathElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Path {
+    val commands =
+        CommandString(
+            node.attributes
+                .removeNamedItem("d")
+                .nodeValue
+                .toString(),
+        ).toCommandList()
+    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val presentation = extractMergedPresentationAttributes(node, inherited)
 
     return Path(
         id,
         node.attributes.toMutableMap(),
         commands,
-        fill,
-        fillRule,
-        stroke,
-        strokeWidth,
-        strokeLineCap,
-        strokeLineJoin,
-        strokeMiterLimit,
+        presentation.fill,
+        presentation.fillRule,
+        presentation.stroke,
+        presentation.strokeWidth,
+        presentation.strokeLineCap,
+        presentation.strokeLineJoin,
+        presentation.strokeMiterLimit,
     )
+}
+
+private fun parseCircleElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Circle {
+    val cx = node.attributes.removeFloatOrNull("cx") ?: 0f
+    val cy = node.attributes.removeFloatOrNull("cy") ?: 0f
+    val r = node.attributes.removeFloatOrNull("r") ?: 0f
+    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val presentation = extractMergedPresentationAttributes(node, inherited)
+
+    return Circle(
+        id,
+        node.attributes.toMutableMap(),
+        cx,
+        cy,
+        r,
+        presentation.fill,
+        presentation.fillRule,
+        presentation.stroke,
+        presentation.strokeWidth,
+        presentation.strokeLineCap,
+        presentation.strokeLineJoin,
+        presentation.strokeMiterLimit,
+    )
+}
+
+private fun parseEllipseElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Ellipse {
+    val cx = node.attributes.removeFloatOrNull("cx") ?: 0f
+    val cy = node.attributes.removeFloatOrNull("cy") ?: 0f
+    val rx = node.attributes.removeFloatOrNull("rx") ?: 0f
+    val ry = node.attributes.removeFloatOrNull("ry") ?: 0f
+    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val presentation = extractMergedPresentationAttributes(node, inherited)
+
+    return Ellipse(
+        id,
+        node.attributes.toMutableMap(),
+        cx,
+        cy,
+        rx,
+        ry,
+        presentation.fill,
+        presentation.fillRule,
+        presentation.stroke,
+        presentation.strokeWidth,
+        presentation.strokeLineCap,
+        presentation.strokeLineJoin,
+        presentation.strokeMiterLimit,
+    )
+}
+
+private fun parseRectElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Rect {
+    val x = node.attributes.removeFloatOrNull("x") ?: 0f
+    val y = node.attributes.removeFloatOrNull("y") ?: 0f
+    val width = node.attributes.removeFloatOrNull("width") ?: 0f
+    val height = node.attributes.removeFloatOrNull("height") ?: 0f
+    val rawRx = node.attributes.removeFloatOrNull("rx")
+    val rawRy = node.attributes.removeFloatOrNull("ry")
+    val rx = (rawRx ?: rawRy ?: 0f).coerceAtMost(width / 2)
+    val ry = (rawRy ?: rawRx ?: 0f).coerceAtMost(height / 2)
+    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val presentation = extractMergedPresentationAttributes(node, inherited)
+
+    return Rect(
+        id,
+        node.attributes.toMutableMap(),
+        x,
+        y,
+        width,
+        height,
+        rx,
+        ry,
+        presentation.fill,
+        presentation.fillRule,
+        presentation.stroke,
+        presentation.strokeWidth,
+        presentation.strokeLineCap,
+        presentation.strokeLineJoin,
+        presentation.strokeMiterLimit,
+    )
+}
+
+private fun parseLineElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Line {
+    val x1 = node.attributes.removeFloatOrNull("x1") ?: 0f
+    val y1 = node.attributes.removeFloatOrNull("y1") ?: 0f
+    val x2 = node.attributes.removeFloatOrNull("x2") ?: 0f
+    val y2 = node.attributes.removeFloatOrNull("y2") ?: 0f
+    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val presentation = extractMergedPresentationAttributes(node, inherited)
+
+    return Line(
+        id,
+        node.attributes.toMutableMap(),
+        x1,
+        y1,
+        x2,
+        y2,
+        presentation.fill,
+        presentation.fillRule,
+        presentation.stroke,
+        presentation.strokeWidth,
+        presentation.strokeLineCap,
+        presentation.strokeLineJoin,
+        presentation.strokeMiterLimit,
+    )
+}
+
+private fun parsePolylineElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Polyline {
+    val points = parsePoints(node.attributes.removeOrNull("points")?.nodeValue ?: "")
+    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val presentation = extractMergedPresentationAttributes(node, inherited)
+
+    return Polyline(
+        id,
+        node.attributes.toMutableMap(),
+        points,
+        presentation.fill,
+        presentation.fillRule,
+        presentation.stroke,
+        presentation.strokeWidth,
+        presentation.strokeLineCap,
+        presentation.strokeLineJoin,
+        presentation.strokeMiterLimit,
+    )
+}
+
+private fun parsePolygonElement(
+    node: Node,
+    inherited: Map<String, String> = emptyMap(),
+): Polygon {
+    val points = parsePoints(node.attributes.removeOrNull("points")?.nodeValue ?: "")
+    val id = node.attributes.removeOrNull("id")?.nodeValue
+    val presentation = extractMergedPresentationAttributes(node, inherited)
+
+    return Polygon(
+        id,
+        node.attributes.toMutableMap(),
+        points,
+        presentation.fill,
+        presentation.fillRule,
+        presentation.stroke,
+        presentation.strokeWidth,
+        presentation.strokeLineCap,
+        presentation.strokeLineJoin,
+        presentation.strokeMiterLimit,
+    )
+}
+
+private val numberPattern = Regex("[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?")
+
+private fun parsePoints(value: String): List<Point> {
+    val numbers = numberPattern.findAll(value).map { it.value.toFloat() }.toList()
+    return numbers.chunked(2).mapNotNull { pair ->
+        if (pair.size == 2) Point(pair[0], pair[1]) else null
+    }
 }
 
 private fun parseExtraElement(

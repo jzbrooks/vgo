@@ -7,9 +7,14 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNull
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.Polygon
+import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.command.CommandString
+import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.util.assertk.hasName
 import com.jzbrooks.vgo.util.assertk.hasNames
 import com.jzbrooks.vgo.util.assertk.hasValue
@@ -249,6 +254,118 @@ class ScalableVectorGraphicWriterTests {
             val pathNode = output.firstChild.firstChild.firstChild
 
             assertThat(pathNode.attributes.getNamedItem("stroke")).hasValue("none")
+        }
+    }
+
+    @Test
+    fun testCirclePaintAttributesWritten() {
+        val circle =
+            Circle(
+                id = null,
+                foreign = mutableMapOf(),
+                cx = 5f,
+                cy = 5f,
+                r = 3f,
+                fill = Color(0xFFFF0000u),
+                fillRule = Path.FillRule.NON_ZERO,
+                stroke = Color(0xFF0000FFu),
+                strokeWidth = 2f,
+                strokeLineCap = Path.LineCap.BUTT,
+                strokeLineJoin = Path.LineJoin.MITER,
+                strokeMiterLimit = 4f,
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(circle),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val circleNode = output.firstChild.firstChild
+
+            assertThat(circleNode).hasName("circle")
+            assertThat(circleNode.attributes.getNamedItem("fill")).hasValue("red")
+            assertThat(circleNode.attributes.getNamedItem("stroke")).hasValue("blue")
+            assertThat(circleNode.attributes.getNamedItem("stroke-width")).hasValue("2")
+        }
+    }
+
+    @Test
+    fun testRectTransparentFillWrittenAsNone() {
+        val rect =
+            Rect(
+                id = null,
+                foreign = mutableMapOf(),
+                x = 0f,
+                y = 0f,
+                width = 10f,
+                height = 10f,
+                rx = 0f,
+                ry = 0f,
+                fill = Colors.TRANSPARENT,
+                fillRule = Path.FillRule.NON_ZERO,
+                stroke = Colors.BLACK,
+                strokeWidth = 1f,
+                strokeLineCap = Path.LineCap.BUTT,
+                strokeLineJoin = Path.LineJoin.MITER,
+                strokeMiterLimit = 4f,
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(rect),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val rectNode = output.firstChild.firstChild
+
+            assertThat(rectNode.attributes.getNamedItem("fill")).hasValue("none")
+        }
+    }
+
+    @Test
+    fun testPolygonInheritsFillFromParentGroup() {
+        val polygon =
+            Polygon(
+                id = null,
+                foreign = mutableMapOf(),
+                points = listOf(Point(0f, 0f), Point(5f, 0f), Point(5f, 5f)),
+                fill = Color(0xFFFF0000u),
+                fillRule = Path.FillRule.NON_ZERO,
+                stroke = Colors.TRANSPARENT,
+                strokeWidth = 1f,
+                strokeLineCap = Path.LineCap.BUTT,
+                strokeLineJoin = Path.LineJoin.MITER,
+                strokeMiterLimit = 4f,
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(polygon),
+                        foreign = mutableMapOf("fill" to "red"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val polygonNode = output.firstChild.firstChild.firstChild
+
+            assertThat(polygonNode).hasName("polygon")
+            assertThat(polygonNode.attributes.getNamedItem("fill")).isNull()
         }
     }
 
