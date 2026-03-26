@@ -15,6 +15,7 @@ import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.Shape
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import org.w3c.dom.Document
 import java.io.OutputStream
@@ -212,6 +213,10 @@ private fun Document.createChildElement(
                         createChildElement(commandPrinter, it, child)
                     }
                 }
+            }
+
+            is Shape -> {
+                null
             }
 
             else -> {

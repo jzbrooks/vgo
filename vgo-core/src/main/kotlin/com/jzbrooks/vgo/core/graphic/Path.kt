@@ -7,14 +7,14 @@ data class Path(
     override val id: String?,
     override val foreign: MutableMap<String, String>,
     var commands: List<Command>,
-    val fill: Paint,
-    val fillRule: FillRule,
-    val stroke: Paint,
-    val strokeWidth: Float,
-    val strokeLineCap: LineCap,
-    val strokeLineJoin: LineJoin,
-    val strokeMiterLimit: Float,
-) : Element {
+    override val fill: Paint,
+    override val fillRule: FillRule,
+    override val stroke: Paint,
+    override val strokeWidth: Float,
+    override val strokeLineCap: LineCap,
+    override val strokeLineJoin: LineJoin,
+    override val strokeMiterLimit: Float,
+) : PaintedElement {
     override fun accept(visitor: ElementVisitor) = visitor.visit(this)
 
     enum class FillRule {
