@@ -2,22 +2,14 @@
 
 ## Unreleased
 
-### Added
-
 ### Changed
 - SVG: `style` attributes that are represented in the IR are parsed
 - Disable JVM DOM schema validation during parsing to avoid onerous errors and avoid performance penalties
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - `BakeTransformations` warps relative path commands with multiple parameters
 - `BakeTransformations` does not apply transforms to child paths in a group that contains groups
 - SVG: cascading style attributes are correctly propagated to children
-
-### Security
 
 ## 3.3.0 - 2026-02-02
 
