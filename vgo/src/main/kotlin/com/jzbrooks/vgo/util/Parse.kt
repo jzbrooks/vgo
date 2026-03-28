@@ -60,11 +60,12 @@ internal fun parse(
                 Disposer.dispose(disposable)
             }
         } else {
-            val factory = DocumentBuilderFactory.newInstance().apply {
-                isIgnoringElementContentWhitespace = true
-                setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-                setFeature("http://xml.org/sax/features/validation", false)
-            }
+            val factory =
+                DocumentBuilderFactory.newInstance().apply {
+                    isIgnoringElementContentWhitespace = true
+                    setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+                    setFeature("http://xml.org/sax/features/validation", false)
+                }
 
             val document = factory.newDocumentBuilder().parse(inputStream)
             document.documentElement.normalize()
