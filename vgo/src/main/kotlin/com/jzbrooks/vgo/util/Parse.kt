@@ -60,8 +60,13 @@ internal fun parse(
                 Disposer.dispose(disposable)
             }
         } else {
-            val documentBuilderFactory = DocumentBuilderFactory.newInstance()
-            val document = documentBuilderFactory.newDocumentBuilder().parse(inputStream)
+            val factory = DocumentBuilderFactory.newInstance().apply {
+                isIgnoringElementContentWhitespace = true
+                setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
+                setFeature("http://xml.org/sax/features/validation", false)
+            }
+
+            val document = factory.newDocumentBuilder().parse(inputStream)
             document.documentElement.normalize()
 
             val graphic =
@@ -81,7 +86,7 @@ internal fun parse(
                                 } else {
                                     val pipeTerminal = ByteArrayInputStream(pipeOrigin.toByteArray())
                                     val convertedDocument =
-                                        documentBuilderFactory.newDocumentBuilder().parse(pipeTerminal)
+                                        factory.newDocumentBuilder().parse(pipeTerminal)
                                     convertedDocument.documentElement.normalize()
 
                                     vdParse(convertedDocument.documentElement)

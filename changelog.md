@@ -6,6 +6,7 @@
 
 ### Changed
 - SVG: `style` attributes that are represented in the IR are parsed
+- Disable JVM DOM schema validation during parsing to avoid onerous errors and avoid performance penalties
 
 ### Deprecated
 

@@ -42,6 +42,7 @@ class ScalableVectorGraphicWriter(
         if (indent != null) {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes")
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", indent.toString())
+            transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", indent.toString())
         }
 
         val source = DOMSource(document)
