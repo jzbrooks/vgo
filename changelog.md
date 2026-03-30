@@ -2,17 +2,8 @@
 
 ## Unreleased
 
-### Added
-
-### Changed
-
-### Deprecated
-
-### Removed
-
 ### Fixed
-
-### Security
+- Clip paths inside transformed groups are sometimes not transformed
 
 ## 3.4.0 - 2026-03-29
 

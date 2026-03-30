@@ -64,11 +64,9 @@ class BakeTransformations :
         group.transform = Matrix3.IDENTITY
     }
 
+    // TODO: handle clip paths and shapes when those are finished
     private fun areElementsRelocatable(group: Group): Boolean =
-        group.id == null &&
-            group.transform.contentsEqual(Matrix3.IDENTITY) &&
-            group.foreign.isEmpty() &&
-            group.elements.all { it is Path }
+        group.id == null && group.foreign.isEmpty() && group.elements.all { it is Path || it is Group }
 
     private fun applyTransform(
         path: Path,
