@@ -27,7 +27,7 @@ import java.util.Stack
  */
 class BakeTransformations :
     ElementVisitor,
-    BottomUpTransformer {
+    TopDownTransformer {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}
@@ -54,9 +54,27 @@ class BakeTransformations :
 
         for (child in group.elements) {
             when (child) {
-                is Path -> applyTransform(child, groupTransform)
-                is Group -> child.transform = groupTransform * child.transform
-                else -> return
+                is Path -> {
+                    applyTransform(child, groupTransform)
+                }
+
+                is Group -> {
+                    child.transform = groupTransform * child.transform
+                }
+
+                is ClipPath -> {
+                    for (clipChild in child.elements) {
+                        if (clipChild is Path) {
+                            applyTransform(clipChild, groupTransform)
+                        } else {
+                            return
+                        }
+                    }
+                }
+
+                else -> {
+                    return
+                }
             }
         }
 
@@ -64,9 +82,11 @@ class BakeTransformations :
         group.transform = Matrix3.IDENTITY
     }
 
-    // TODO: handle clip paths and shapes when those are finished
     private fun areElementsRelocatable(group: Group): Boolean =
-        group.id == null && group.foreign.isEmpty() && group.elements.all { it is Path || it is Group }
+        group.id == null &&
+            group.transform.contentsEqual(Matrix3.IDENTITY) &&
+            group.foreign.isEmpty() &&
+            group.elements.all { it is Path || it is Group }
 
     private fun applyTransform(
         path: Path,
