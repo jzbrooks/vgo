@@ -25,8 +25,8 @@ class VectorDrawableOptimizationRegistry :
             ),
         topDownTransformers =
             listOf(
-                BakeTransformations(),
                 RemoveTransparentPaths(),
+                BakeTransformations(),
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(1e-3f),
