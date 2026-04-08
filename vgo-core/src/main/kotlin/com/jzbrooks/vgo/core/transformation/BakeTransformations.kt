@@ -23,7 +23,7 @@ import com.jzbrooks.vgo.core.util.math.Vector3
 import java.util.Stack
 
 /**
- * Apply transformations to paths command coordinates in a group
+ * Apply transformations to path command coordinates in a group
  */
 class BakeTransformations :
     ElementVisitor,
