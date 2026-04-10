@@ -37,56 +37,37 @@ class BakeTransformations :
     override fun visit(path: Path) {}
 
     override fun visit(group: Group) {
-        group.elements =
-            group.elements.flatMap {
-                if (it is Group && areElementsRelocatable(it)) {
-                    it.elements
-                } else {
-                    listOf(it)
-                }
-            }
-
         val groupTransform = group.transform
 
-        if (groupTransform.contentsEqual(Matrix3.IDENTITY)) {
-            return
-        }
-
-        for (child in group.elements) {
-            when (child) {
-                is Path -> {
-                    applyTransform(child, groupTransform)
-                }
-
-                is Group -> {
-                    child.transform = groupTransform * child.transform
-                }
-
-                is ClipPath -> {
-                    for (clipChild in child.elements) {
-                        if (clipChild is Path) {
-                            applyTransform(clipChild, groupTransform)
-                        } else {
-                            return
-                        }
+        val shouldBakeTransform = !groupTransform.contentsEqual(Matrix3.IDENTITY) &&
+                group.elements.all { element ->
+                    when (element) {
+                        is Path -> true
+                        is Group -> true
+                        is ClipPath -> element.elements.all { it is Path }
+                        else -> false
                     }
                 }
 
-                else -> {
-                    return
+        if (shouldBakeTransform) {
+            for (child in group.elements) {
+                when (child) {
+                    is Path -> applyTransform(child, groupTransform)
+                    is Group -> child.transform = groupTransform * child.transform
+                    is ClipPath -> {
+                        for (clipChild in child.elements) {
+                            applyTransform(clipChild as Path, groupTransform)
+                        }
+                    }
+
+                    else -> error("Unexpected element type: ${child::class}")
                 }
             }
+
+            // Transform is baked. We don't want to apply it twice.
+            group.transform = Matrix3.IDENTITY
         }
-
-        // Transform is baked. We don't want to apply it twice.
-        group.transform = Matrix3.IDENTITY
     }
-
-    private fun areElementsRelocatable(group: Group): Boolean =
-        group.id == null &&
-            group.transform.contentsEqual(Matrix3.IDENTITY) &&
-            group.foreign.isEmpty() &&
-            group.elements.all { it is Path || it is Group }
 
     private fun applyTransform(
         path: Path,
