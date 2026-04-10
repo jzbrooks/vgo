@@ -2,8 +2,12 @@
 
 ## Unreleased
 
+### Changed
+- Top-down transformations are applied before bottom-up transformations
+
 ### Fixed
 - Clip paths inside transformed groups are sometimes not transformed
+  - *Breaking*: `com.jzbrooks.vgo.core.transformation.BakeTransformations` is now a `com.jzbrooks.vgo.core.transformation.TopDownTransformer`
 
 ## 3.4.0 - 2026-03-29
 

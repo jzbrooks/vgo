@@ -18,13 +18,13 @@ class SvgOptimizationRegistry :
     TransformerSet(
         bottomUpTransformers =
             listOf(
-                BakeTransformations(),
                 CollapseGroups(),
                 RemoveEmptyGroups(),
                 MergePaths(MergePaths.Constraints.None),
             ),
         topDownTransformers =
             listOf(
+                BakeTransformations(),
                 RemoveTransparentPaths(),
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),

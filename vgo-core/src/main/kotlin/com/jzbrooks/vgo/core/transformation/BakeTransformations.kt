@@ -23,11 +23,11 @@ import com.jzbrooks.vgo.core.util.math.Vector3
 import java.util.Stack
 
 /**
- * Apply transformations to paths command coordinates in a group
+ * Apply transformations to path command coordinates in a group
  */
 class BakeTransformations :
     ElementVisitor,
-    BottomUpTransformer {
+    TopDownTransformer {
     override fun visit(graphic: Graphic) {}
 
     override fun visit(clipPath: ClipPath) {}
@@ -37,36 +37,46 @@ class BakeTransformations :
     override fun visit(path: Path) {}
 
     override fun visit(group: Group) {
-        group.elements =
-            group.elements.flatMap {
-                if (it is Group && areElementsRelocatable(it)) {
-                    it.elements
-                } else {
-                    listOf(it)
+        val groupTransform = group.transform
+
+        val shouldBakeTransform =
+            !groupTransform.contentsEqual(Matrix3.IDENTITY) &&
+                group.elements.all { element ->
+                    when (element) {
+                        is Path -> true
+                        is Group -> true
+                        is ClipPath -> element.elements.all { it is Path }
+                        else -> false
+                    }
+                }
+
+        if (shouldBakeTransform) {
+            for (child in group.elements) {
+                when (child) {
+                    is Path -> {
+                        applyTransform(child, groupTransform)
+                    }
+
+                    is Group -> {
+                        child.transform = groupTransform * child.transform
+                    }
+
+                    is ClipPath -> {
+                        for (clipChild in child.elements) {
+                            applyTransform(clipChild as Path, groupTransform)
+                        }
+                    }
+
+                    else -> {
+                        error("Unexpected element type: ${child::class}")
+                    }
                 }
             }
 
-        val groupTransform = group.transform
-
-        if (groupTransform.contentsEqual(Matrix3.IDENTITY)) {
-            return
+            // Transform is baked. We don't want to apply it twice.
+            group.transform = Matrix3.IDENTITY
         }
-
-        for (child in group.elements) {
-            when (child) {
-                is Path -> applyTransform(child, groupTransform)
-                is Group -> child.transform = groupTransform * child.transform
-                else -> return
-            }
-        }
-
-        // Transform is baked. We don't want to apply it twice.
-        group.transform = Matrix3.IDENTITY
     }
-
-    // TODO: handle clip paths and shapes when those are finished
-    private fun areElementsRelocatable(group: Group): Boolean =
-        group.id == null && group.foreign.isEmpty() && group.elements.all { it is Path || it is Group }
 
     private fun applyTransform(
         path: Path,
