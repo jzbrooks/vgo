@@ -9,17 +9,17 @@ abstract class TransformerSet(
     private val topDownTransformers: List<TopDownTransformer>,
 ) {
     fun apply(graphic: Graphic) {
-        if (bottomUpTransformers.isNotEmpty()) {
-            traverseBottomUp(graphic) { element ->
-                for (optimization in bottomUpTransformers) {
+        if (topDownTransformers.isNotEmpty()) {
+            traverseTopDown(graphic) { element ->
+                for (optimization in topDownTransformers) {
                     element.accept(optimization)
                 }
             }
         }
 
-        if (topDownTransformers.isNotEmpty()) {
-            traverseTopDown(graphic) { element ->
-                for (optimization in topDownTransformers) {
+        if (bottomUpTransformers.isNotEmpty()) {
+            traverseBottomUp(graphic) { element ->
+                for (optimization in bottomUpTransformers) {
                     element.accept(optimization)
                 }
             }
