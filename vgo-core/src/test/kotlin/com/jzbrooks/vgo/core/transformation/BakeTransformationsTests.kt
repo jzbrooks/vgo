@@ -12,6 +12,8 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.key
 import assertk.assertions.prop
+import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
@@ -96,8 +98,9 @@ class BakeTransformationsTests {
                 transform,
             )
 
-        bake.visit(group.elements.first() as Group)
+        // Top-down: visit outer first, then inner
         bake.visit(group)
+        bake.visit(group.elements.first() as Group)
 
         val originalNestedGroup = group.elements.first() as Group
 
@@ -306,8 +309,9 @@ class BakeTransformationsTests {
                 transform,
             )
 
-        bake.visit(innerGroup)
+        // Top-down: visit outer first, then inner
         bake.visit(outerGroup)
+        bake.visit(innerGroup)
 
         assertThat(outerGroup::elements)
             .index(0)
@@ -316,6 +320,15 @@ class BakeTransformationsTests {
             .containsExactly(
                 MoveTo(CommandVariant.ABSOLUTE, listOf(Point(6f, 6f))),
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(8f, 8f))),
+            )
+
+        assertThat(innerGroup::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .containsExactly(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 2f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
             )
     }
 
@@ -354,7 +367,7 @@ class BakeTransformationsTests {
                 transform,
             )
 
-        bake.visit(innerGroup)
+        // Top-down: visit outer first, composing transform onto inner
         bake.visit(outerGroup)
 
         assertThat(outerGroup::elements)
@@ -362,6 +375,238 @@ class BakeTransformationsTests {
             .isInstanceOf<Group>()
             .prop(Group::transform)
             .isEqualTo(transform)
+
+        // Then visit inner, baking the composed transform into paths
+        bake.visit(innerGroup)
+
+        assertThat(innerGroup::transform).isEqualTo(Matrix3.IDENTITY)
+
+        assertThat(innerGroup::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .containsExactly(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 2f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(4f, 4f))),
+            )
+    }
+
+    @Test
+    fun `transform is baked through nested group with identity transform`() {
+        val translate = Matrix3.from(floatArrayOf(1f, 0f, 50f, 0f, 1f, 50f, 0f, 0f, 1f))
+
+        val innerGroup =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 0f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 10f))),
+                            ClosePath,
+                        ),
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                Matrix3.IDENTITY,
+            )
+
+        val outerGroup =
+            Group(
+                listOf(innerGroup),
+                null,
+                mutableMapOf(),
+                translate,
+            )
+
+        // Top-down: visit outer first, then inner
+        bake.visit(outerGroup)
+        bake.visit(innerGroup)
+
+        assertThat(outerGroup::transform).isEqualTo(Matrix3.IDENTITY)
+        assertThat(innerGroup::transform).isEqualTo(Matrix3.IDENTITY)
+
+        assertThat(innerGroup::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .containsExactly(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 50f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(60f, 50f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(60f, 60f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 60f))),
+                ClosePath,
+            )
+    }
+
+    @Test
+    fun `nested group transforms are fully baked with top-down traversal`() {
+        val outerTransform = Matrix3.from(floatArrayOf(1f, 0f, 10f, 0f, 1f, 10f, 0f, 0f, 1f))
+        val innerTransform = Matrix3.from(floatArrayOf(2f, 0f, 0f, 0f, 2f, 0f, 0f, 0f, 1f))
+
+        val innerGroup =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 1f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 2f))),
+                        ),
+                    ),
+                ),
+                "inner",
+                mutableMapOf(),
+                innerTransform,
+            )
+
+        val outerGroup =
+            Group(
+                listOf(innerGroup),
+                null,
+                mutableMapOf(),
+                outerTransform,
+            )
+
+        // Top-down: outer first, then inner
+        bake.visit(outerGroup)
+        bake.visit(innerGroup)
+
+        assertThat(outerGroup::transform).isEqualTo(Matrix3.IDENTITY)
+        assertThat(innerGroup::transform).isEqualTo(Matrix3.IDENTITY)
+
+        // Path should have innerTransform applied first, then outerTransform composed on:
+        // Original point (1,1) * scale(2) = (2,2), then * translate(10,10) = (12,12)
+        // But composition: outerTransform * innerTransform * point
+        // = translate(10,10) * scale(2) * (1,1)
+        // = translate(10,10) * (2,2) = (12,12)
+        assertThat(innerGroup::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .containsExactly(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(12f, 12f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(14f, 14f))),
+            )
+    }
+
+    @Test
+    fun `clip path children receive parent group transform`() {
+        val transform = Matrix3.from(floatArrayOf(1f, 0f, 5f, 0f, 1f, 5f, 0f, 0f, 1f))
+
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 1f))),
+                        ),
+                    ),
+                    ClipPath(
+                        listOf(
+                            createPath(
+                                listOf(
+                                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 2f))),
+                                ),
+                            ),
+                        ),
+                        null,
+                        mutableMapOf(),
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
+
+        bake.visit(group)
+
+        assertThat(group::transform).isEqualTo(Matrix3.IDENTITY)
+
+        assertThat(group::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .containsExactly(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(5f, 5f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(6f, 6f))),
+            )
+
+        val clipPath = group.elements[1] as ClipPath
+        assertThat(clipPath::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .containsExactly(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(5f, 5f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(7f, 7f))),
+            )
+    }
+
+    @Test
+    fun `clip path with non-path children prevents baking`() {
+        val transform = Matrix3.from(floatArrayOf(1f, 0f, 5f, 0f, 1f, 5f, 0f, 0f, 1f))
+
+        val group =
+            Group(
+                listOf(
+                    ClipPath(
+                        listOf(
+                            Group(
+                                listOf(createPath()),
+                                null,
+                                mutableMapOf(),
+                                Matrix3.IDENTITY,
+                            ),
+                        ),
+                        null,
+                        mutableMapOf(),
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
+
+        bake.visit(group)
+
+        assertThat(group::transform).isEqualTo(transform)
+    }
+
+    @Test
+    fun `relocatable child group with non-identity transform is not flattened`() {
+        val childTransform = Matrix3.from(floatArrayOf(2f, 0f, 0f, 0f, 2f, 0f, 0f, 0f, 1f))
+
+        val group =
+            Group(
+                listOf(
+                    Group(
+                        listOf(
+                            createPath(
+                                listOf(
+                                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 1f))),
+                                ),
+                            ),
+                        ),
+                        null,
+                        mutableMapOf(),
+                        childTransform,
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                Matrix3.IDENTITY,
+            )
+
+        bake.visit(group)
+
+        // The child group should not be flattened because it has a non-identity transform
+        assertThat(group::elements)
+            .index(0)
+            .isInstanceOf<Group>()
     }
 
     @Test

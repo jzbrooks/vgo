@@ -649,7 +649,7 @@ public final class com/jzbrooks/vgo/core/optimization/SimplifyLineCommands : com
 public abstract interface class com/jzbrooks/vgo/core/optimization/TopDownOptimization : com/jzbrooks/vgo/core/graphic/ElementVisitor {
 }
 
-public final class com/jzbrooks/vgo/core/transformation/BakeTransformations : com/jzbrooks/vgo/core/graphic/ElementVisitor, com/jzbrooks/vgo/core/transformation/BottomUpTransformer {
+public final class com/jzbrooks/vgo/core/transformation/BakeTransformations : com/jzbrooks/vgo/core/graphic/ElementVisitor, com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
