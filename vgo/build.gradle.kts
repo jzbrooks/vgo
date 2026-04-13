@@ -25,7 +25,7 @@ dependencies {
     implementation(project(":vgo-core"))
 
     // Provided by the android gradle plugin
-    compileOnly("com.android.tools:sdk-common:32.1.0")
+    compileOnly("com.android.tools:sdk-common:32.1.1")
 
     // Provided by kotlin gradle plugin
     compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.3.20")
