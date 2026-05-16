@@ -1,4 +1,4 @@
-## vgo
+<img width="256" alt="vgo" src="https://github.com/user-attachments/assets/96047506-42f5-48cd-8ed1-fc87906fc621" style="object-align:center"/>
 
 [![Build Status](https://github.com/jzbrooks/vgo/actions/workflows/build.yml/badge.svg?event=push)](https://github.com/jzbrooks/vgo/actions/workflows/build.yml)
 [![Maven Central: vgo](https://img.shields.io/maven-central/v/com.jzbrooks/vgo?label=vgo)](https://ossindex.sonatype.org/component/pkg:maven/com.jzbrooks/vgo)
