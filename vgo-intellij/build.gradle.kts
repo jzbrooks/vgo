@@ -33,4 +33,14 @@ intellijPlatform {
         }
         description = "Optimize SVG and Android VectorDrawable files with vgo from the Project view context menu."
     }
+
+    signing {
+        certificateChain.set(providers.gradleProperty("intellijCertificateChain"))
+        privateKey.set(providers.gradleProperty("intellijPrivateKey"))
+        password.set(providers.gradleProperty("intellijPrivateKeyPassword"))
+    }
+
+    publishing {
+        token.set(providers.gradleProperty("intellijPublishToken"))
+    }
 }
