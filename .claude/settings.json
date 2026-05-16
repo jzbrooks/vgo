@@ -16,6 +16,7 @@
       "Bash(./gradlew properties)",
       "Bash(./gradlew lint)",
       "Bash(./gradlew ktlintCheck)",
+      "Bash(./gradlew :vgo-intellij:buildPlugin*)",
       "Bash(grep *)",
       "Bash(rg *)",
       "Bash(find *)",
