@@ -67,6 +67,12 @@ jobs:
         name: vgo
         path: vgo-cli/build/libs/vgo
 
+    - name: archive vgo intellij plugin
+      uses: actions/upload-artifact@v7
+      with:
+        name: vgo-intellij
+        path: vgo-intellij/build/distributions/vgo-intellij.zip
+
   # Run plugin structure verification along with IntelliJ Plugin Verifier
   verify-plugin:
     name: Verify plugin
@@ -124,16 +130,11 @@ jobs:
       - name: Fetch Sources
         uses: actions/checkout@v6
 
-      - name: archive vgo
+      - name: Fetch vgo
         uses: actions/download-artifact@v8
         with:
           name: vgo
           path: ${{ github.workspace }}/dist
-
-      - name: Generate checksum
-        run: |
-            cd ${{ github.workspace }}/dist
-            sha256sum vgo > vgo.sha256
 
       # Remove old release drafts by using the curl request for the available releases with draft flag
       - name: Remove Old Release Drafts
@@ -149,7 +150,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v${{ needs.build.outputs.version }} ${{ github.workspace }}/dist/vgo ${{ github.workspace }}/dist/vgo.sha256 \
+          gh release create v${{ needs.build.outputs.version }} ${{ github.workspace }}/dist/vgo \
             --draft \
             --title "v${{ needs.build.outputs.version }}" \
             --notes "$(cat << 'EOM'
