@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 
-include("vgo-core", "vgo", "vgo-plugin", "vgo-cli", "vgo-intellij")
+include("vgo-core", "vgo", "vgo-gradle", "vgo-cli", "vgo-intellij")
