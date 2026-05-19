@@ -2,6 +2,8 @@ package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.HexFormat
+import com.jzbrooks.vgo.core.Paint
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
@@ -52,21 +54,23 @@ class ScalableVectorGraphicWriter(
 }
 
 private data class InheritedStyle(
-    val fill: Color = Colors.BLACK,
+    val fill: Paint = Colors.BLACK,
     val fillRule: Path.FillRule = Path.FillRule.NON_ZERO,
-    val stroke: Color = Colors.TRANSPARENT,
+    val stroke: Paint = Colors.TRANSPARENT,
     val strokeWidth: Float = 1f,
     val strokeLineCap: Path.LineCap = Path.LineCap.BUTT,
     val strokeLineJoin: Path.LineJoin = Path.LineJoin.MITER,
     val strokeMiterLimit: Float = 4f,
 )
 
-private fun Map<String, String>.withoutImpliedPresentationAttrs(inherited: InheritedStyle): Map<String, String> =
-    filter { (key, _) ->
+private fun Map<String, String>.withoutImpliedPresentationAttrs(inherited: InheritedStyle): Map<String, String> {
+    val inheritedFillColor = inherited.fill as? Color ?: Colors.BLACK
+    val inheritedStrokeColor = inherited.stroke as? Color ?: Colors.TRANSPARENT
+    return filter { (key, _) ->
         when (key) {
-            "fill" -> (extractColor("fill", inherited.fill) ?: inherited.fill) != inherited.fill
+            "fill" -> (extractColor("fill", inheritedFillColor) ?: inherited.fill) != inherited.fill
             "fill-rule" -> (extractFillRule("fill-rule") ?: inherited.fillRule) != inherited.fillRule
-            "stroke" -> (extractColor("stroke", inherited.stroke) ?: inherited.stroke) != inherited.stroke
+            "stroke" -> (extractColor("stroke", inheritedStrokeColor) ?: inherited.stroke) != inherited.stroke
             "stroke-width" -> this["stroke-width"]?.toFloatOrNull() != inherited.strokeWidth
             "stroke-linecap" -> (extractLineCap("stroke-linecap") ?: inherited.strokeLineCap) != inherited.strokeLineCap
             "stroke-linejoin" -> (extractLineJoin("stroke-linejoin") ?: inherited.strokeLineJoin) != inherited.strokeLineJoin
@@ -74,14 +78,17 @@ private fun Map<String, String>.withoutImpliedPresentationAttrs(inherited: Inher
             else -> true
         }
     }
+}
 
 private fun Map<String, String>.toChildInheritedStyle(current: InheritedStyle): InheritedStyle {
     val styleAttrs = this["style"]?.parseStyleAttribute() ?: emptyMap()
     val merged = this + styleAttrs
+    val currentFillColor = current.fill as? Color ?: Colors.BLACK
+    val currentStrokeColor = current.stroke as? Color ?: Colors.TRANSPARENT
     return InheritedStyle(
-        fill = merged.extractColor("fill", current.fill) ?: current.fill,
+        fill = merged.extractColor("fill", currentFillColor) ?: current.fill,
         fillRule = merged.extractFillRule("fill-rule") ?: current.fillRule,
-        stroke = merged.extractColor("stroke", current.stroke) ?: current.stroke,
+        stroke = merged.extractColor("stroke", currentStrokeColor) ?: current.stroke,
         strokeWidth = merged["stroke-width"]?.toFloatOrNull() ?: current.strokeWidth,
         strokeLineCap = merged.extractLineCap("stroke-linecap") ?: current.strokeLineCap,
         strokeLineJoin = merged.extractLineJoin("stroke-linejoin") ?: current.strokeLineJoin,
@@ -127,10 +134,12 @@ private fun Document.createChildElement(
                     setAttribute("d", data)
 
                     if (element.fill != inherited.fill) {
-                        if (element.fill.alpha == 0.toUByte()) {
+                        val fill = element.fill
+                        check(fill is Color) { "SVG gradient output is not supported" }
+                        if (fill.alpha == 0.toUByte()) {
                             setAttribute("fill", "none")
                         } else {
-                            val color = Colors.NAMES_BY_COLORS[element.fill] ?: element.fill.toHexString(Color.HexFormat.RGBA)
+                            val color = Colors.NAMES_BY_COLORS[fill] ?: fill.toHexString(HexFormat.RGBA)
                             setAttribute("fill", color)
                         }
                     }
@@ -145,10 +154,12 @@ private fun Document.createChildElement(
                     }
 
                     if (element.stroke != inherited.stroke) {
-                        if (element.stroke.alpha == 0.toUByte()) {
+                        val stroke = element.stroke
+                        check(stroke is Color) { "SVG gradient output is not supported" }
+                        if (stroke.alpha == 0.toUByte()) {
                             setAttribute("stroke", "none")
                         } else {
-                            val color = Colors.NAMES_BY_COLORS[element.stroke] ?: element.stroke.toHexString(Color.HexFormat.RGBA)
+                            val color = Colors.NAMES_BY_COLORS[stroke] ?: stroke.toHexString(HexFormat.RGBA)
                             setAttribute("stroke", color)
                         }
                     }

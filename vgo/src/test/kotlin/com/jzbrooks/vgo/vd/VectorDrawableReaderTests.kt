@@ -15,6 +15,8 @@ import assertk.assertions.key
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.GradientStop
+import com.jzbrooks.vgo.core.LinearGradient
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Path
@@ -341,6 +343,35 @@ class VectorDrawableReaderTests {
         val path = parse(unknownElementDocument.firstChild).elements.first() as Path
 
         assertThat(path::fill).isEqualTo(Color(0x1AFF9988u))
+    }
+
+    @Test
+    fun testLinearGradientFillParsed() {
+        val document =
+            javaClass.getResourceAsStream("/gradient_linear.xml").use { input ->
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input).apply {
+                    normalize()
+                }
+            }
+
+        val graphic: Graphic = parse(document.firstChild)
+        val path = graphic.elements.first() as Path
+
+        val expected =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(0.5f, Color(0xFF833FEFu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+
+        assertThat(path::fill).isEqualTo(expected)
     }
 
     @Test

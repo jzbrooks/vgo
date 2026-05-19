@@ -1,5 +1,7 @@
 package com.jzbrooks.vgo.core.transformation
 
+import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Paint
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -26,8 +28,12 @@ class RemoveTransparentPaths : TopDownTransformer {
                     element.id != null ||
                     // Colors that aren't able to be parsed may remain in the foreign map
                     element.foreign.keys.any { it.contains("color", ignoreCase = true) } ||
-                    // If a path isn't transparent, allow it
-                    (element.fill.alpha != 0.toUByte() || element.stroke.alpha != 0.toUByte())
+                    // If a path isn't transparent, allow it. Gradient paints are never
+                    // considered transparent here — we don't introspect their stops.
+                    !element.fill.isTransparentColor() ||
+                    !element.stroke.isTransparentColor()
             }
     }
+
+    private fun Paint.isTransparentColor(): Boolean = this is Color && alpha == 0.toUByte()
 }
