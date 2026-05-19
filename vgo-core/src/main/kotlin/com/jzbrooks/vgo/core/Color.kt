@@ -5,7 +5,7 @@ import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 @JvmInline
 value class Color(
     private val argb: UInt,
-) {
+) : Paint {
     constructor(alpha: UByte, red: UByte, green: UByte, blue: UByte) : this(
         (alpha.toUInt() shl 24) or
             (red.toUInt() shl 16) or
