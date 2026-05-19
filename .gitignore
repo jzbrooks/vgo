@@ -1,5 +1,9 @@
 .gradle/
+.idea/
+.intellijPlatform/
+.kotlin/
 
 build/
 
-.idea/
+.claude/CLAUDE.local.md
+.claude/settings.local.json

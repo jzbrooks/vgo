@@ -1,0 +1,17 @@
+<idea-plugin>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.xml</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="vgo" displayType="BALLOON"/>
+    </extensions>
+
+    <actions>
+        <action id="com.jzbrooks.vgo.OptimizeWithVgoAction"
+                class="com.jzbrooks.vgo.OptimizeWithVgoAction"
+                text="Optimize with vgo"
+                description="Run vgo on the selected file with 2-space indent.">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
