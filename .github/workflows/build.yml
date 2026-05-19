@@ -23,8 +23,8 @@ jobs:
 
     - uses: actions/setup-java@v5
       with:
-        java-version: 21
         distribution: zulu
+        java-version: 21
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v6
@@ -67,12 +67,61 @@ jobs:
         name: vgo
         path: vgo-cli/build/libs/vgo
 
+    - name: archive vgo intellij plugin
+      uses: actions/upload-artifact@v7
+      with:
+        name: vgo-intellij
+        path: vgo-intellij/build/distributions/vgo-intellij.zip
+
+  # Run plugin structure verification along with IntelliJ Plugin Verifier
+  verify-plugin:
+    name: Verify plugin
+    needs: [ build ]
+    runs-on: ubuntu-latest
+    steps:
+
+      # Free GitHub Actions Environment Disk Space
+      - name: Maximize Build Space
+        uses: jlumbroso/free-disk-space@v1.3.1
+        with:
+          tool-cache: false
+          large-packages: false
+
+      # Check out the current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v6
+
+      # Set up the Java environment for the next steps
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 21
+
+      # Setup Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: true
+
+      # Run Verify Plugin task and IntelliJ Plugin Verifier tool
+      - name: Run Plugin Verification tasks
+        run: ./gradlew verifyPlugin
+
+      # Collect Plugin Verifier Result
+      - name: Collect Plugin Verifier Result
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: pluginVerifier-result
+          path: ${{ github.workspace }}/build/reports/pluginVerifier
+
   # Prepare a draft release for GitHub Releases page for the manual verification
   # If accepted and published, release workflow would be triggered
   releaseDraft:
     name: Release Draft
     if: github.event_name != 'pull_request'
-    needs: build
+    needs: [ build, verify-plugin ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -81,16 +130,11 @@ jobs:
       - name: Fetch Sources
         uses: actions/checkout@v6
 
-      - name: archive vgo
+      - name: Fetch vgo
         uses: actions/download-artifact@v8
         with:
           name: vgo
           path: ${{ github.workspace }}/dist
-
-      - name: Generate checksum
-        run: |
-            cd ${{ github.workspace }}/dist
-            sha256sum vgo > vgo.sha256
 
       # Remove old release drafts by using the curl request for the available releases with draft flag
       - name: Remove Old Release Drafts
@@ -106,7 +150,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v${{ needs.build.outputs.version }} ${{ github.workspace }}/dist/vgo ${{ github.workspace }}/dist/vgo.sha256 \
+          gh release create v${{ needs.build.outputs.version }} ${{ github.workspace }}/dist/vgo \
             --draft \
             --title "v${{ needs.build.outputs.version }}" \
             --notes "$(cat << 'EOM'
