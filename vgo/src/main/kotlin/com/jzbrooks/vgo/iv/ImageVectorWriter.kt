@@ -147,27 +147,31 @@ private fun emitElement(
         is Path -> {
             codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "path"))
             codeBlock.withIndent {
-                if (element.fill.alpha > 0u) {
+                val fill = element.fill
+                check(fill is com.jzbrooks.vgo.core.Color) { "ImageVector gradient output is not supported" }
+                if (fill.alpha > 0u) {
                     add(
                         "fill = %T(%M(%L, %L, %L, %L)),\n",
                         solidColorBrush,
                         composeColor,
-                        element.fill.red,
-                        element.fill.green,
-                        element.fill.blue,
-                        element.fill.alpha,
+                        fill.red,
+                        fill.green,
+                        fill.blue,
+                        fill.alpha,
                     )
                 }
 
-                if (element.stroke.alpha > 0u && element.strokeWidth > 0f) {
+                val stroke = element.stroke
+                check(stroke is com.jzbrooks.vgo.core.Color) { "ImageVector gradient output is not supported" }
+                if (stroke.alpha > 0u && element.strokeWidth > 0f) {
                     add(
                         "stroke = %T(%M(%L, %L, %L, %L)),\n",
                         solidColorBrush,
                         composeColor,
-                        element.stroke.red,
-                        element.stroke.green,
-                        element.stroke.blue,
-                        element.stroke.alpha,
+                        stroke.red,
+                        stroke.green,
+                        stroke.blue,
+                        stroke.alpha,
                     )
                     add("strokeLineWidth = %Lf\n", element.strokeWidth)
                 }

@@ -1,8 +1,16 @@
 package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Gradient
+import com.jzbrooks.vgo.core.HexFormat
+import com.jzbrooks.vgo.core.LinearGradient
+import com.jzbrooks.vgo.core.Paint
+import com.jzbrooks.vgo.core.RadialGradient
+import com.jzbrooks.vgo.core.SweepGradient
+import com.jzbrooks.vgo.core.TileMode
 import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
@@ -79,6 +87,11 @@ fun VectorDrawable.toDocument(commandPrinter: VectorDrawableCommandPrinter): Doc
     for (item in foreign.filter { (k, v) -> DEFAULT_ROOT_ATTRIBUTES[k] != v }) {
         root.setAttribute(item.key, item.value)
     }
+
+    if (containsGradientPaint() && !root.hasAttribute("xmlns:aapt")) {
+        root.setAttribute("xmlns:aapt", "http://schemas.android.com/aapt")
+    }
+
     document.appendChild(root)
 
     for (element in elements) {
@@ -87,6 +100,15 @@ fun VectorDrawable.toDocument(commandPrinter: VectorDrawableCommandPrinter): Doc
 
     return document
 }
+
+private fun ContainerElement.containsGradientPaint(): Boolean =
+    elements.any {
+        when (it) {
+            is Path -> it.fill is Gradient || it.stroke is Gradient
+            is ContainerElement -> it.containsGradientPaint()
+            else -> false
+        }
+    }
 
 private fun Document.createChildElement(
     commandPrinter: VectorDrawableCommandPrinter,
@@ -100,10 +122,7 @@ private fun Document.createChildElement(
                     val data = element.commands.joinToString(separator = "", transform = commandPrinter::print)
                     setAttribute("android:pathData", data)
 
-                    if (element.fill.alpha != 0.toUByte()) {
-                        val color = element.fill.toHexString(Color.HexFormat.ARGB)
-                        setAttribute("android:fillColor", color)
-                    }
+                    writePaintAttribute(commandPrinter, "android:fillColor", element.fill)
 
                     if (element.fillRule != Path.FillRule.NON_ZERO) {
                         val fillType =
@@ -117,10 +136,7 @@ private fun Document.createChildElement(
                         setAttribute("android:fillType", fillType)
                     }
 
-                    if (element.stroke.alpha != 0.toUByte()) {
-                        val color = element.stroke.toHexString(Color.HexFormat.ARGB)
-                        setAttribute("android:strokeColor", color)
-                    }
+                    writePaintAttribute(commandPrinter, "android:strokeColor", element.stroke)
 
                     if (element.strokeWidth != 0f) {
                         setAttribute("android:strokeWidth", commandPrinter.formatter.format(element.strokeWidth))
@@ -254,3 +270,75 @@ private fun writeTransforms(
         node.setAttribute("android:rotation", formatter.format(rotation))
     }
 }
+
+private fun org.w3c.dom.Element.writePaintAttribute(
+    commandPrinter: VectorDrawableCommandPrinter,
+    attrName: String,
+    paint: Paint,
+) {
+    when (paint) {
+        is Color -> {
+            if (paint.alpha != 0.toUByte()) {
+                setAttribute(attrName, paint.toHexString(HexFormat.ARGB))
+            }
+        }
+
+        is Gradient -> {
+            appendChild(buildGradientAaptAttr(commandPrinter, ownerDocument, attrName, paint))
+        }
+    }
+}
+
+private fun buildGradientAaptAttr(
+    commandPrinter: VectorDrawableCommandPrinter,
+    document: Document,
+    attrName: String,
+    paint: Gradient,
+): org.w3c.dom.Element {
+    val formatter = commandPrinter.formatter
+    val aaptAttr = document.createElement("aapt:attr")
+    aaptAttr.setAttribute("name", attrName)
+
+    val gradient = document.createElement("gradient")
+    when (paint) {
+        is LinearGradient -> {
+            gradient.setAttribute("android:startX", formatter.format(paint.startX))
+            gradient.setAttribute("android:startY", formatter.format(paint.startY))
+            gradient.setAttribute("android:endX", formatter.format(paint.endX))
+            gradient.setAttribute("android:endY", formatter.format(paint.endY))
+            gradient.setAttribute("android:type", "linear")
+            paint.tileMode.toAaptString()?.let { gradient.setAttribute("android:tileMode", it) }
+        }
+
+        is RadialGradient -> {
+            gradient.setAttribute("android:centerX", formatter.format(paint.centerX))
+            gradient.setAttribute("android:centerY", formatter.format(paint.centerY))
+            gradient.setAttribute("android:gradientRadius", formatter.format(paint.radius))
+            gradient.setAttribute("android:type", "radial")
+            paint.tileMode.toAaptString()?.let { gradient.setAttribute("android:tileMode", it) }
+        }
+
+        is SweepGradient -> {
+            gradient.setAttribute("android:centerX", formatter.format(paint.centerX))
+            gradient.setAttribute("android:centerY", formatter.format(paint.centerY))
+            gradient.setAttribute("android:type", "sweep")
+        }
+    }
+
+    for (stop in paint.stops) {
+        val item = document.createElement("item")
+        item.setAttribute("android:offset", formatter.format(stop.offset))
+        item.setAttribute("android:color", stop.color.toHexString(HexFormat.ARGB))
+        gradient.appendChild(item)
+    }
+
+    aaptAttr.appendChild(gradient)
+    return aaptAttr
+}
+
+private fun TileMode.toAaptString(): String? =
+    when (this) {
+        TileMode.CLAMP -> null
+        TileMode.REPEAT -> "repeat"
+        TileMode.MIRROR -> "mirror"
+    }
