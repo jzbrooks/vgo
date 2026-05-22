@@ -2,6 +2,12 @@ package com.jzbrooks.vgo.vd
 
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.GradientStop
+import com.jzbrooks.vgo.core.LinearGradient
+import com.jzbrooks.vgo.core.Paint
+import com.jzbrooks.vgo.core.RadialGradient
+import com.jzbrooks.vgo.core.SweepGradient
+import com.jzbrooks.vgo.core.TileMode
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -68,9 +74,18 @@ private fun parsePath(node: Node): Path {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
 
     val id = node.attributes.removeOrNull("android:name")?.nodeValue
-    val fill = node.attributes.extractColor("android:fillColor", "android:fillAlpha", Colors.TRANSPARENT)
+    val fill: Paint =
+        node.attributes.extractColor("android:fillColor", "android:fillAlpha")
+            ?: node.parseAaptGradient("android:fillColor")
+            ?: Colors.TRANSPARENT
+
     val fillRule = node.attributes.extractFillRule("android:fillType")
-    val stroke = node.attributes.extractColor("android:strokeColor", "android:strokeAlpha", Colors.TRANSPARENT)
+
+    val stroke: Paint =
+        node.attributes.extractColor("android:strokeColor", "android:strokeAlpha")
+            ?: node.parseAaptGradient("android:strokeColor")
+            ?: Colors.TRANSPARENT
+
     val strokeWidth = node.attributes.removeFloatOrNull("android:strokeWidth") ?: 0f
     val strokeLineCap = node.attributes.extractLineCap("android:strokeLineCap")
     val strokeLineJoin = node.attributes.extractLineJoin("android:strokeLineJoin")
@@ -197,30 +212,24 @@ private fun NamedNodeMap.computeTransformationMatrix(): Matrix3 {
 private fun NamedNodeMap.extractColor(
     key: String,
     alphaKey: String,
-    default: Color,
-): Color {
+): Color? {
     // This will be overwritten at the end of path writing as a foreign property
     if (getNamedItem(key)?.nodeValue?.startsWith('@') == true ||
         getNamedItem(alphaKey)?.nodeValue?.startsWith('@') == true ||
         getNamedItem(key)?.nodeValue?.startsWith('?') == true ||
         getNamedItem(alphaKey)?.nodeValue?.startsWith('?') == true
     ) {
-        return default
+        return null
     }
 
-    val value = removeOrNull(key)?.nodeValue ?: return default
+    val value = removeOrNull(key)?.nodeValue ?: return null
 
     val alpha =
         removeFloatOrNull(alphaKey)?.let { alpha ->
             (alpha * 255).roundToInt().toUInt()
         }
 
-    var colorInt =
-        when (value.length) {
-            9 -> value.trimStart('#').toUInt(radix = 16)
-            4 -> ("${value[1]}" + value[1] + value[2] + value[2] + value[3] + value[3]).toUInt(radix = 16) or 0xFF000000u
-            else -> value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
-        }
+    var colorInt = parseColorInt(value)
 
     // Alpha is determined by min(color MSB, alpha attribute)
     if (alpha != null && alpha < (colorInt shr 24)) {
@@ -228,6 +237,82 @@ private fun NamedNodeMap.extractColor(
     }
 
     return Color(colorInt)
+}
+
+private fun parseColorInt(value: String): UInt =
+    when (value.length) {
+        9 -> value.trimStart('#').toUInt(radix = 16)
+        4 -> ("${value[1]}" + value[1] + value[2] + value[2] + value[3] + value[3]).toUInt(radix = 16) or 0xFF000000u
+        else -> value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
+    }
+
+private fun Node.parseAaptGradient(attrName: String): Paint? {
+    val aaptAttr =
+        childNodes
+            .asSequence()
+            .filterIsInstance<org.w3c.dom.Element>()
+            .firstOrNull { it.nodeName == "aapt:attr" && it.getAttribute("name") == attrName }
+            ?: return null
+
+    val gradientNode =
+        aaptAttr
+            .childNodes
+            .asSequence()
+            .filterIsInstance<org.w3c.dom.Element>()
+            .firstOrNull { it.nodeName == "gradient" } ?: return null
+
+    val stops =
+        gradientNode
+            .childNodes
+            .asSequence()
+            .filterIsInstance<org.w3c.dom.Element>()
+            .filter { it.nodeName == "item" }
+            .map { item ->
+                val offset = item.getAttribute("android:offset").toFloatOrNull() ?: 0f
+                val color = Color(parseColorInt(item.getAttribute("android:color")))
+                GradientStop(offset, color)
+            }.toList()
+
+    val tileMode =
+        when (gradientNode.getAttribute("android:tileMode")) {
+            "repeat" -> TileMode.REPEAT
+            "mirror" -> TileMode.MIRROR
+            else -> TileMode.CLAMP
+        }
+
+    // Remove the consumed aapt:attr so it doesn't leak into a downstream serializer.
+    removeChild(aaptAttr)
+
+    return when (gradientNode.getAttribute("android:type").ifEmpty { "linear" }) {
+        "radial" -> {
+            RadialGradient(
+                centerX = gradientNode.getAttribute("android:centerX").toFloat(),
+                centerY = gradientNode.getAttribute("android:centerY").toFloat(),
+                radius = gradientNode.getAttribute("android:gradientRadius").toFloat(),
+                stops = stops,
+                tileMode = tileMode,
+            )
+        }
+
+        "sweep" -> {
+            SweepGradient(
+                centerX = gradientNode.getAttribute("android:centerX").toFloat(),
+                centerY = gradientNode.getAttribute("android:centerY").toFloat(),
+                stops = stops,
+            )
+        }
+
+        else -> {
+            LinearGradient(
+                startX = gradientNode.getAttribute("android:startX").toFloat(),
+                startY = gradientNode.getAttribute("android:startY").toFloat(),
+                endX = gradientNode.getAttribute("android:endX").toFloat(),
+                endY = gradientNode.getAttribute("android:endY").toFloat(),
+                stops = stops,
+                tileMode = tileMode,
+            )
+        }
+    }
 }
 
 fun NamedNodeMap.extractFillRule(key: String) =

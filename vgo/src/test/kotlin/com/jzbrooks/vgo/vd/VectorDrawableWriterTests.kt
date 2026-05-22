@@ -5,6 +5,9 @@ import assertk.assertions.endsWith
 import assertk.assertions.hasSameSizeAs
 import assertk.assertions.isEqualTo
 import assertk.assertions.startsWith
+import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.GradientStop
+import com.jzbrooks.vgo.core.LinearGradient
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
@@ -163,6 +166,69 @@ class VectorDrawableWriterTests {
                     .item(1)
 
             assertThat(extraNode).hasName("bicycle")
+        }
+    }
+
+    @Test
+    fun testLinearGradientFillWritten() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(0.5f, Color(0xFF833FEFu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+
+        val gradientGraphic =
+            VectorDrawable(
+                listOf(
+                    createPath(
+                        CommandString("M 0 0 L 24 0 L 24 24 L 0 24 Z").toCommandList(),
+                        fill = gradient,
+                    ),
+                ),
+                "gradient",
+                mutableMapOf(
+                    "xmlns:android" to "http://schemas.android.com/apk/res/android",
+                    "android:viewportWidth" to "24",
+                    "android:viewportHeight" to "24",
+                ),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            VectorDrawableWriter().write(gradientGraphic, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val root = output.firstChild
+
+            assertThat(root.attributes.getNamedItem("xmlns:aapt")).hasValue("http://schemas.android.com/aapt")
+
+            val pathNode = root.firstChild
+            val aaptAttr = pathNode.childNodes.toList().single { it.nodeName == "aapt:attr" }
+            assertThat(aaptAttr.attributes.getNamedItem("name")).hasValue("android:fillColor")
+
+            val gradientNode = aaptAttr.firstChild
+            assertThat(gradientNode).hasName("gradient")
+            assertThat(gradientNode.attributes.getNamedItem("android:type")).hasValue("linear")
+            assertThat(gradientNode.attributes.getNamedItem("android:startX").nodeValue).startsWith("0")
+            assertThat(gradientNode.attributes.getNamedItem("android:endX").nodeValue).startsWith("24")
+
+            val items = gradientNode.childNodes.toList().filter { it.nodeName == "item" }
+            assertThat(items).transform("item count") { it.size }.isEqualTo(3)
+            assertThat(
+                items[0]
+                    .attributes
+                    .getNamedItem("android:color")
+                    .nodeValue
+                    .lowercase(),
+            ).isEqualTo("#b125ea")
+            assertThat(items[2].attributes.getNamedItem("android:offset").nodeValue).startsWith("1")
         }
     }
 

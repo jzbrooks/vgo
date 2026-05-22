@@ -2,10 +2,17 @@ package com.jzbrooks.vgo.core
 
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 
+sealed interface Paint
+
+enum class HexFormat {
+    RGBA,
+    ARGB,
+}
+
 @JvmInline
 value class Color(
     private val argb: UInt,
-) {
+) : Paint {
     constructor(alpha: UByte, red: UByte, green: UByte, blue: UByte) : this(
         (alpha.toUInt() shl 24) or
             (red.toUInt() shl 16) or
@@ -89,12 +96,45 @@ value class Color(
                 hexColor
             }
         }
-
-    enum class HexFormat {
-        RGBA,
-        ARGB,
-    }
 }
+
+sealed interface Gradient : Paint {
+    val stops: List<GradientStop>
+}
+
+data class GradientStop(
+    val offset: Float,
+    val color: Color,
+)
+
+enum class TileMode {
+    CLAMP,
+    REPEAT,
+    MIRROR,
+}
+
+data class LinearGradient(
+    val startX: Float,
+    val startY: Float,
+    val endX: Float,
+    val endY: Float,
+    override val stops: List<GradientStop>,
+    val tileMode: TileMode = TileMode.CLAMP,
+) : Gradient
+
+data class RadialGradient(
+    val centerX: Float,
+    val centerY: Float,
+    val radius: Float,
+    override val stops: List<GradientStop>,
+    val tileMode: TileMode = TileMode.CLAMP,
+) : Gradient
+
+data class SweepGradient(
+    val centerX: Float,
+    val centerY: Float,
+    override val stops: List<GradientStop>,
+) : Gradient
 
 object Colors {
     val BLACK = Color(0xFF000000u)

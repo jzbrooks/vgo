@@ -3,7 +3,8 @@
 ## Unreleased
 
 ### Added
-- An intelij plugin offers vgo optimization in the project explorer context menu for supported files (vector drawables and svgs)
+- An IntelliJ plugin offers vgo optimization in the project explorer context menu for supported files (vector drawables and svgs)
+- Gradients are supported for vector drawables
 
 ### Changed
 - Top-down transformations are applied before bottom-up transformations

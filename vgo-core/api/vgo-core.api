@@ -1,4 +1,4 @@
-public final class com/jzbrooks/vgo/core/Color {
+public final class com/jzbrooks/vgo/core/Color : com/jzbrooks/vgo/core/Paint {
 	public static final synthetic fun box-impl (I)Lcom/jzbrooks/vgo/core/Color;
 	public static final fun component1-w2LRezQ (I)B
 	public static final fun component2-w2LRezQ (I)B
@@ -17,18 +17,10 @@ public final class com/jzbrooks/vgo/core/Color {
 	public static final fun getRed-w2LRezQ (I)B
 	public fun hashCode ()I
 	public static fun hashCode-impl (I)I
-	public static final fun toHexString-impl (ILcom/jzbrooks/vgo/core/Color$HexFormat;)Ljava/lang/String;
+	public static final fun toHexString-impl (ILcom/jzbrooks/vgo/core/HexFormat;)Ljava/lang/String;
 	public fun toString ()Ljava/lang/String;
 	public static fun toString-impl (I)Ljava/lang/String;
 	public final synthetic fun unbox-impl ()I
-}
-
-public final class com/jzbrooks/vgo/core/Color$HexFormat : java/lang/Enum {
-	public static final field ARGB Lcom/jzbrooks/vgo/core/Color$HexFormat;
-	public static final field RGBA Lcom/jzbrooks/vgo/core/Color$HexFormat;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/Color$HexFormat;
-	public static fun values ()[Lcom/jzbrooks/vgo/core/Color$HexFormat;
 }
 
 public final class com/jzbrooks/vgo/core/Colors {
@@ -37,6 +29,100 @@ public final class com/jzbrooks/vgo/core/Colors {
 	public final fun getCOLORS_BY_NAMES ()Ljava/util/Map;
 	public final fun getNAMES_BY_COLORS ()Ljava/util/Map;
 	public final fun getTRANSPARENT-3SA-Bs8 ()I
+}
+
+public abstract interface class com/jzbrooks/vgo/core/Gradient : com/jzbrooks/vgo/core/Paint {
+	public abstract fun getStops ()Ljava/util/List;
+}
+
+public final class com/jzbrooks/vgo/core/GradientStop {
+	public synthetic fun <init> (FILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()F
+	public final fun component2-3SA-Bs8 ()I
+	public final fun copy-0mimyfM (FI)Lcom/jzbrooks/vgo/core/GradientStop;
+	public static synthetic fun copy-0mimyfM$default (Lcom/jzbrooks/vgo/core/GradientStop;FIILjava/lang/Object;)Lcom/jzbrooks/vgo/core/GradientStop;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getColor-3SA-Bs8 ()I
+	public final fun getOffset ()F
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/HexFormat : java/lang/Enum {
+	public static final field ARGB Lcom/jzbrooks/vgo/core/HexFormat;
+	public static final field RGBA Lcom/jzbrooks/vgo/core/HexFormat;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/HexFormat;
+	public static fun values ()[Lcom/jzbrooks/vgo/core/HexFormat;
+}
+
+public final class com/jzbrooks/vgo/core/LinearGradient : com/jzbrooks/vgo/core/Gradient {
+	public fun <init> (FFFFLjava/util/List;Lcom/jzbrooks/vgo/core/TileMode;)V
+	public synthetic fun <init> (FFFFLjava/util/List;Lcom/jzbrooks/vgo/core/TileMode;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun component3 ()F
+	public final fun component4 ()F
+	public final fun component5 ()Ljava/util/List;
+	public final fun component6 ()Lcom/jzbrooks/vgo/core/TileMode;
+	public final fun copy (FFFFLjava/util/List;Lcom/jzbrooks/vgo/core/TileMode;)Lcom/jzbrooks/vgo/core/LinearGradient;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/LinearGradient;FFFFLjava/util/List;Lcom/jzbrooks/vgo/core/TileMode;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/LinearGradient;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEndX ()F
+	public final fun getEndY ()F
+	public final fun getStartX ()F
+	public final fun getStartY ()F
+	public fun getStops ()Ljava/util/List;
+	public final fun getTileMode ()Lcom/jzbrooks/vgo/core/TileMode;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/jzbrooks/vgo/core/Paint {
+}
+
+public final class com/jzbrooks/vgo/core/RadialGradient : com/jzbrooks/vgo/core/Gradient {
+	public fun <init> (FFFLjava/util/List;Lcom/jzbrooks/vgo/core/TileMode;)V
+	public synthetic fun <init> (FFFLjava/util/List;Lcom/jzbrooks/vgo/core/TileMode;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun component3 ()F
+	public final fun component4 ()Ljava/util/List;
+	public final fun component5 ()Lcom/jzbrooks/vgo/core/TileMode;
+	public final fun copy (FFFLjava/util/List;Lcom/jzbrooks/vgo/core/TileMode;)Lcom/jzbrooks/vgo/core/RadialGradient;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/RadialGradient;FFFLjava/util/List;Lcom/jzbrooks/vgo/core/TileMode;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/RadialGradient;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCenterX ()F
+	public final fun getCenterY ()F
+	public final fun getRadius ()F
+	public fun getStops ()Ljava/util/List;
+	public final fun getTileMode ()Lcom/jzbrooks/vgo/core/TileMode;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/SweepGradient : com/jzbrooks/vgo/core/Gradient {
+	public fun <init> (FFLjava/util/List;)V
+	public final fun component1 ()F
+	public final fun component2 ()F
+	public final fun component3 ()Ljava/util/List;
+	public final fun copy (FFLjava/util/List;)Lcom/jzbrooks/vgo/core/SweepGradient;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/SweepGradient;FFLjava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/SweepGradient;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCenterX ()F
+	public final fun getCenterY ()F
+	public fun getStops ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/core/TileMode : java/lang/Enum {
+	public static final field CLAMP Lcom/jzbrooks/vgo/core/TileMode;
+	public static final field MIRROR Lcom/jzbrooks/vgo/core/TileMode;
+	public static final field REPEAT Lcom/jzbrooks/vgo/core/TileMode;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/jzbrooks/vgo/core/TileMode;
+	public static fun values ()[Lcom/jzbrooks/vgo/core/TileMode;
 }
 
 public abstract interface class com/jzbrooks/vgo/core/Writer {
@@ -133,27 +219,27 @@ public final class com/jzbrooks/vgo/core/graphic/Group : com/jzbrooks/vgo/core/g
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Path : com/jzbrooks/vgo/core/graphic/Element {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;Lcom/jzbrooks/vgo/core/Paint;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Paint;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)V
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component10 ()F
 	public final fun component2 ()Ljava/util/Map;
 	public final fun component3 ()Ljava/util/List;
-	public final fun component4-3SA-Bs8 ()I
+	public final fun component4 ()Lcom/jzbrooks/vgo/core/Paint;
 	public final fun component5 ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
-	public final fun component6-3SA-Bs8 ()I
+	public final fun component6 ()Lcom/jzbrooks/vgo/core/Paint;
 	public final fun component7 ()F
 	public final fun component8 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public final fun component9 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
-	public final fun copy-Bc2dgtw (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Path;
-	public static synthetic fun copy-Bc2dgtw$default (Lcom/jzbrooks/vgo/core/graphic/Path;Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Path;
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;Lcom/jzbrooks/vgo/core/Paint;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Paint;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Path;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Path;Ljava/lang/String;Ljava/util/Map;Ljava/util/List;Lcom/jzbrooks/vgo/core/Paint;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Paint;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Path;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCommands ()Ljava/util/List;
-	public final fun getFill-3SA-Bs8 ()I
+	public final fun getFill ()Lcom/jzbrooks/vgo/core/Paint;
 	public final fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
-	public final fun getStroke-3SA-Bs8 ()I
+	public final fun getStroke ()Lcom/jzbrooks/vgo/core/Paint;
 	public final fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public final fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public final fun getStrokeMiterLimit ()F
