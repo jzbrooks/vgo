@@ -18,6 +18,7 @@ import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
 import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
@@ -670,5 +671,205 @@ class BakeTransformationsTests {
                     }
                 }
             }
+    }
+
+    @Test
+    fun `arc parameters are preserved under identity transform`() {
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 5f))),
+                            EllipticalArcCurve(
+                                CommandVariant.ABSOLUTE,
+                                listOf(
+                                    EllipticalArcCurve.Parameter(
+                                        radiusX = 5f,
+                                        radiusY = 3f,
+                                        angle = 30f,
+                                        arc = EllipticalArcCurve.ArcFlag.LARGE,
+                                        sweep = EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                        end = Point(10f, 5f),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                Matrix3.IDENTITY,
+            )
+
+        bake.visit(group)
+
+        val arc = (group.elements[0] as Path).commands[1] as EllipticalArcCurve
+        assertThat(arc.parameters[0].radiusX).isCloseTo(5f, 0.001f)
+        assertThat(arc.parameters[0].radiusY).isCloseTo(3f, 0.001f)
+        assertThat(arc.parameters[0].angle).isCloseTo(30f, 0.001f)
+        assertThat(arc.parameters[0].sweep).isEqualTo(EllipticalArcCurve.SweepFlag.CLOCKWISE)
+    }
+
+    @Test
+    fun `arc radii scale with uniform scale transform`() {
+        val transform = Matrix3.from(floatArrayOf(2f, 0f, 0f, 0f, 2f, 0f, 0f, 0f, 1f))
+
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 5f))),
+                            EllipticalArcCurve(
+                                CommandVariant.ABSOLUTE,
+                                listOf(
+                                    EllipticalArcCurve.Parameter(
+                                        radiusX = 5f,
+                                        radiusY = 3f,
+                                        angle = 0f,
+                                        arc = EllipticalArcCurve.ArcFlag.LARGE,
+                                        sweep = EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                        end = Point(10f, 5f),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
+
+        bake.visit(group)
+
+        val arc = (group.elements[0] as Path).commands[1] as EllipticalArcCurve
+        assertThat(arc.parameters[0].radiusX).isCloseTo(10f, 0.001f)
+        assertThat(arc.parameters[0].radiusY).isCloseTo(6f, 0.001f)
+        assertThat(arc.parameters[0].angle).isCloseTo(0f, 0.001f)
+    }
+
+    @Test
+    fun `arc radii preserved under pure rotation, angle shifts`() {
+        val rad = (30.0 * PI / 180.0).toFloat()
+        val rotation = Matrix3.from(floatArrayOf(cos(rad), -sin(rad), 0f, sin(rad), cos(rad), 0f, 0f, 0f, 1f))
+
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 5f))),
+                            EllipticalArcCurve(
+                                CommandVariant.ABSOLUTE,
+                                listOf(
+                                    EllipticalArcCurve.Parameter(
+                                        radiusX = 5f,
+                                        radiusY = 3f,
+                                        angle = 0f,
+                                        arc = EllipticalArcCurve.ArcFlag.LARGE,
+                                        sweep = EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                        end = Point(10f, 5f),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                rotation,
+            )
+
+        bake.visit(group)
+
+        val arc = (group.elements[0] as Path).commands[1] as EllipticalArcCurve
+        assertThat(arc.parameters[0].radiusX).isCloseTo(5f, 0.001f)
+        assertThat(arc.parameters[0].radiusY).isCloseTo(3f, 0.001f)
+        assertThat(arc.parameters[0].angle).isCloseTo(30f, 0.001f)
+    }
+
+    @Test
+    fun `arc sweep flag flips under reflection`() {
+        val reflection = Matrix3.from(floatArrayOf(-1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f))
+
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 5f))),
+                            EllipticalArcCurve(
+                                CommandVariant.ABSOLUTE,
+                                listOf(
+                                    EllipticalArcCurve.Parameter(
+                                        radiusX = 5f,
+                                        radiusY = 3f,
+                                        angle = 0f,
+                                        arc = EllipticalArcCurve.ArcFlag.LARGE,
+                                        sweep = EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                        end = Point(10f, 5f),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                reflection,
+            )
+
+        bake.visit(group)
+
+        val arc = (group.elements[0] as Path).commands[1] as EllipticalArcCurve
+        assertThat(arc.parameters[0].sweep).isEqualTo(EllipticalArcCurve.SweepFlag.ANTICLOCKWISE)
+    }
+
+    @Test
+    fun `non-uniform scale on a circle produces matching ellipse radii`() {
+        // The specific case from vgo.svg: ellipse with rx=ry under the non-uniform scale
+        // matrix(0.660895, 0, 0, 0.618886, ...) becomes a near-circle of radius ~7.5.
+        val transform =
+            Matrix3.from(floatArrayOf(0.660895f, 0f, 0f, 0f, 0.618886f, 0f, 0f, 0f, 1f))
+
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(387.604f, 133.16f))),
+                            EllipticalArcCurve(
+                                CommandVariant.ABSOLUTE,
+                                listOf(
+                                    EllipticalArcCurve.Parameter(
+                                        radiusX = 11.348f,
+                                        radiusY = 12.119f,
+                                        angle = 0f,
+                                        arc = EllipticalArcCurve.ArcFlag.LARGE,
+                                        sweep = EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                        end = Point(410.30f, 133.16f),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
+
+        bake.visit(group)
+
+        val arc = (group.elements[0] as Path).commands[1] as EllipticalArcCurve
+        // 11.348 * 0.660895 ≈ 7.500 ; 12.119 * 0.618886 ≈ 7.501
+        // SVD canonicalizes major-axis-first, so order may swap with a 90° angle —
+        // either form represents the same near-circular geometry.
+        val rx = arc.parameters[0].radiusX
+        val ry = arc.parameters[0].radiusY
+        assertThat(maxOf(rx, ry)).isCloseTo(7.501f, 0.01f)
+        assertThat(minOf(rx, ry)).isCloseTo(7.500f, 0.01f)
     }
 }

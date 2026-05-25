@@ -21,6 +21,7 @@ import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.Vector3
+import com.jzbrooks.vgo.core.util.math.applyTransform
 import java.util.Stack
 
 /**
@@ -304,6 +305,7 @@ class BakeTransformations :
                                     }
 
                                 parameter.end = (transform * Vector3(end)).toPoint()
+                                parameter.applyTransform(transform)
                             }
                             variant = CommandVariant.ABSOLUTE
 
