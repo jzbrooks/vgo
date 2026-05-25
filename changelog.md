@@ -17,6 +17,7 @@
 - Clip paths inside transformed groups are sometimes not transformed
   - *Breaking*: `BakeTransformations` is now a `TopDownTransformer`
 - Less-common styling elements (not modeled in `PaintedElement`) were dropped on the round-trip through vgo
+- `BakeTransformations` correctly transforms elliptical arcs by non-uniform transformations
 
 ## 3.4.0 - 2026-03-29
 
