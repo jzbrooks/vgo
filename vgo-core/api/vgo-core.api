@@ -1274,6 +1274,10 @@ public final class com/jzbrooks/vgo/core/util/math/CurvesKt {
 	public static final fun toCubicBezierCurve (Lcom/jzbrooks/vgo/core/graphic/command/SmoothCubicBezierCurve;Lcom/jzbrooks/vgo/core/graphic/command/CubicCurve;)Lcom/jzbrooks/vgo/core/graphic/command/CubicBezierCurve;
 }
 
+public final class com/jzbrooks/vgo/core/util/math/EllipticalArcKt {
+	public static final fun applyTransform (Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$Parameter;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)V
+}
+
 public final class com/jzbrooks/vgo/core/util/math/LineSegment {
 	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;Lcom/jzbrooks/vgo/core/util/math/Point;)V
 	public final fun component1 ()Lcom/jzbrooks/vgo/core/util/math/Point;
