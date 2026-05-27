@@ -1,6 +1,5 @@
 package com.jzbrooks.vgo.iv
 
-import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Group
@@ -37,7 +36,6 @@ import kotlin.math.hypot
 @ExperimentalVgoApi
 class ImageVectorWriter(
     private val fileName: String,
-    override val options: Set<Writer.Option> = emptySet(),
     private val decimalFormat: DecimalFormat =
         DecimalFormat().apply {
             maximumFractionDigits = 2
@@ -47,8 +45,8 @@ class ImageVectorWriter(
             minimumIntegerDigits = 0
             decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
         },
-) : Writer<ImageVector> {
-    override fun write(
+) {
+    fun write(
         graphic: ImageVector,
         stream: OutputStream,
     ) {

@@ -8,7 +8,6 @@ import com.jzbrooks.vgo.core.Paint
 import com.jzbrooks.vgo.core.RadialGradient
 import com.jzbrooks.vgo.core.SweepGradient
 import com.jzbrooks.vgo.core.TileMode
-import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
@@ -19,7 +18,6 @@ import com.jzbrooks.vgo.core.graphic.Shape
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import org.w3c.dom.Document
 import java.io.OutputStream
-import java.util.Collections.emptySet
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -30,10 +28,10 @@ import kotlin.math.atan
 import kotlin.math.hypot
 
 class VectorDrawableWriter(
-    override val options: Set<Writer.Option> = emptySet(),
+    private val indent: Int = 0,
     private val commandPrinter: VectorDrawableCommandPrinter = VectorDrawableCommandPrinter(3),
-) : Writer<VectorDrawable> {
-    override fun write(
+) {
+    fun write(
         graphic: VectorDrawable,
         stream: OutputStream,
     ) {
@@ -48,8 +46,7 @@ class VectorDrawableWriter(
         val transformer = TransformerFactory.newInstance().newTransformer()
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
 
-        val indent = options.filterIsInstance<Writer.Option.Indent>().singleOrNull()?.columns
-        if (indent != null) {
+        if (indent > 0) {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes")
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", indent.toString())
         }

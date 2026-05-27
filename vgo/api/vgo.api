@@ -65,12 +65,10 @@ public final class com/jzbrooks/vgo/iv/ImageVectorReaderKt {
 	public static final fun parse (Lorg/jetbrains/kotlin/psi/KtFile;)Lcom/jzbrooks/vgo/iv/ImageVector;
 }
 
-public final class com/jzbrooks/vgo/iv/ImageVectorWriter : com/jzbrooks/vgo/core/Writer {
-	public fun <init> (Ljava/lang/String;Ljava/util/Set;Ljava/text/DecimalFormat;)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Set;Ljava/text/DecimalFormat;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun getOptions ()Ljava/util/Set;
-	public synthetic fun write (Lcom/jzbrooks/vgo/core/graphic/Graphic;Ljava/io/OutputStream;)V
-	public fun write (Lcom/jzbrooks/vgo/iv/ImageVector;Ljava/io/OutputStream;)V
+public final class com/jzbrooks/vgo/iv/ImageVectorWriter {
+	public fun <init> (Ljava/lang/String;Ljava/text/DecimalFormat;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/text/DecimalFormat;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun write (Lcom/jzbrooks/vgo/iv/ImageVector;Ljava/io/OutputStream;)V
 	public final fun write (Lcom/squareup/kotlinpoet/FileSpec;Ljava/io/OutputStream;)V
 }
 
@@ -105,14 +103,12 @@ public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicReaderKt {
 	public static final fun parse (Lorg/w3c/dom/Node;)Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;
 }
 
-public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicWriter : com/jzbrooks/vgo/core/Writer {
+public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicWriter {
 	public fun <init> ()V
-	public fun <init> (Ljava/util/Set;Lcom/jzbrooks/vgo/svg/ScalableVectorGraphicCommandPrinter;)V
-	public synthetic fun <init> (Ljava/util/Set;Lcom/jzbrooks/vgo/svg/ScalableVectorGraphicCommandPrinter;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (ILcom/jzbrooks/vgo/svg/ScalableVectorGraphicCommandPrinter;)V
+	public synthetic fun <init> (ILcom/jzbrooks/vgo/svg/ScalableVectorGraphicCommandPrinter;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun createDocument (Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;)Lorg/w3c/dom/Document;
-	public fun getOptions ()Ljava/util/Set;
-	public synthetic fun write (Lcom/jzbrooks/vgo/core/graphic/Graphic;Ljava/io/OutputStream;)V
-	public fun write (Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;Ljava/io/OutputStream;)V
+	public final fun write (Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;Ljava/io/OutputStream;)V
 	public final fun write (Lorg/w3c/dom/Document;Ljava/io/OutputStream;)V
 }
 
@@ -184,13 +180,11 @@ public final class com/jzbrooks/vgo/vd/VectorDrawableReaderKt {
 	public static final fun parse (Lorg/w3c/dom/Node;)Lcom/jzbrooks/vgo/vd/VectorDrawable;
 }
 
-public final class com/jzbrooks/vgo/vd/VectorDrawableWriter : com/jzbrooks/vgo/core/Writer {
+public final class com/jzbrooks/vgo/vd/VectorDrawableWriter {
 	public fun <init> ()V
-	public fun <init> (Ljava/util/Set;Lcom/jzbrooks/vgo/vd/VectorDrawableCommandPrinter;)V
-	public synthetic fun <init> (Ljava/util/Set;Lcom/jzbrooks/vgo/vd/VectorDrawableCommandPrinter;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun getOptions ()Ljava/util/Set;
-	public synthetic fun write (Lcom/jzbrooks/vgo/core/graphic/Graphic;Ljava/io/OutputStream;)V
-	public fun write (Lcom/jzbrooks/vgo/vd/VectorDrawable;Ljava/io/OutputStream;)V
+	public fun <init> (ILcom/jzbrooks/vgo/vd/VectorDrawableCommandPrinter;)V
+	public synthetic fun <init> (ILcom/jzbrooks/vgo/vd/VectorDrawableCommandPrinter;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun write (Lcom/jzbrooks/vgo/vd/VectorDrawable;Ljava/io/OutputStream;)V
 	public final fun write (Lorg/w3c/dom/Document;Ljava/io/OutputStream;)V
 }
 

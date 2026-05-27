@@ -16,8 +16,8 @@ class VgoPluginTest {
     fun pluginAddsTaskToProject() {
         val project: Project = ProjectBuilder.builder().build()
         project.pluginManager.apply("com.jzbrooks.vgo")
-        val task = project.tasks.getByName("shrinkVectorArtwork")
-        assertThat(task).isInstanceOf(ShrinkVectorArtwork::class)
+        val task = project.tasks.getByName("shrinkVectorGraphic")
+        assertThat(task).isInstanceOf(ShrinkVectorGraphic::class)
     }
 
     @Test
@@ -35,7 +35,7 @@ class VgoPluginTest {
             inputs = project.fileTree(input)
         }
 
-        val task = project.tasks.getByName<ShrinkVectorArtwork>("shrinkVectorArtwork")
+        val task = project.tasks.getByName<ShrinkVectorGraphic>("shrinkVectorGraphic")
 
         assertThat(task::files).containsExactly(input.absolutePath)
         assertThat(task::showStatistics).isTrue()
