@@ -19,6 +19,12 @@
 - Less-common styling elements (not modeled in `PaintedElement`) were dropped on the round-trip through vgo
 - `BakeTransformations` correctly transforms elliptical arcs by non-uniform transformations
 
+### Removed
+- `Writer`: deprecated in [3.3.0](3.3.0 - 2026-02-02)
+- `shrinkVectorArt` Gradle task: deprecated in [3.3.0](3.3.0 - 2026-02-02)
+- `ConvertCurvesToArcs(CommandPrinter)`: deprecated in [3.2.0](3.2.0 - 2025-05-03)
+- `com.jzbrooks.vgo.core.optimization`: deprecated in [3.1.0](3.1.0 - 2025-03-13)
+
 ## 3.4.0 - 2026-03-29
 
 ### Changed

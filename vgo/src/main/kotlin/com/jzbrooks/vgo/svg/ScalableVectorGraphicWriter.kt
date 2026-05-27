@@ -4,7 +4,6 @@ import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.HexFormat
 import com.jzbrooks.vgo.core.Paint
-import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Element
@@ -21,7 +20,6 @@ import com.jzbrooks.vgo.core.graphic.Shape
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import org.w3c.dom.Document
 import java.io.OutputStream
-import java.util.Collections.emptySet
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
@@ -29,10 +27,10 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
 class ScalableVectorGraphicWriter(
-    override val options: Set<Writer.Option> = emptySet(),
+    private val indent: Int = 0,
     private val commandPrinter: ScalableVectorGraphicCommandPrinter = ScalableVectorGraphicCommandPrinter(3),
-) : Writer<ScalableVectorGraphic> {
-    override fun write(
+) {
+    fun write(
         graphic: ScalableVectorGraphic,
         stream: OutputStream,
     ) {
@@ -47,8 +45,7 @@ class ScalableVectorGraphicWriter(
         val transformer = TransformerFactory.newInstance().newTransformer()
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
 
-        val indent = options.filterIsInstance<Writer.Option.Indent>().singleOrNull()?.columns
-        if (indent != null) {
+        if (indent > 0) {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes")
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", indent.toString())
             transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", indent.toString())

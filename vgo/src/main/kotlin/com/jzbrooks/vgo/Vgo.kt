@@ -3,7 +3,6 @@
 package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
-import com.jzbrooks.vgo.core.Writer
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.iv.ImageVector
 import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
@@ -53,11 +52,6 @@ class Vgo(
             return 0
         }
 
-        val writerOptions = mutableSetOf<Writer.Option>()
-        options.indent?.let { indentColumns ->
-            writerOptions.add(Writer.Option.Indent(indentColumns))
-        }
-
         var inputs = options.input
         if (inputs.isEmpty()) {
             require(options.output.isEmpty())
@@ -77,7 +71,7 @@ class Vgo(
         val containsDirectory = inputOutputMap.any { (input, _) -> input.isDirectory }
         printFileNames = options.printStats && (files > 1 || containsDirectory)
 
-        return handleFiles(inputOutputMap, writerOptions)
+        return handleFiles(inputOutputMap)
     }
 
     private fun pairOutputs(): Map<File, Path> =
@@ -94,7 +88,6 @@ class Vgo(
     private fun handleFile(
         input: File,
         outputPath: Path,
-        writerOptions: Set<Writer.Option>,
     ) {
         val output =
             if (input.path == outputPath.pathString) {
@@ -173,7 +166,7 @@ class Vgo(
                 is VectorDrawable -> {
                     val printer = VectorDrawableCommandPrinter(3)
                     val document = graphic.toDocument(printer)
-                    val writer = VectorDrawableWriter(writerOptions, printer)
+                    val writer = VectorDrawableWriter(options.indent ?: 0, printer)
 
                     val countingStream = CountingOutputStream()
                     writer.write(document, countingStream)
@@ -198,7 +191,7 @@ class Vgo(
                 }
 
                 is ScalableVectorGraphic -> {
-                    val writer = ScalableVectorGraphicWriter(writerOptions)
+                    val writer = ScalableVectorGraphicWriter(options.indent ?: 0)
                     val document = writer.createDocument(graphic)
 
                     val countingStream = CountingOutputStream()
@@ -234,7 +227,7 @@ class Vgo(
                             decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
                         }
 
-                    val writer = ImageVectorWriter(output.nameWithoutExtension, writerOptions)
+                    val writer = ImageVectorWriter(output.nameWithoutExtension)
                     val fileSpec = graphic.toFileSpec(output.nameWithoutExtension, decimalFormat)
                     val countingStream = CountingOutputStream()
                     writer.write(fileSpec, countingStream)
@@ -285,20 +278,17 @@ class Vgo(
         }
     }
 
-    private fun handleFiles(
-        inputOutputMap: Map<File, Path>,
-        writerOptions: Set<Writer.Option>,
-    ): Int {
+    private fun handleFiles(inputOutputMap: Map<File, Path>): Int {
         for (entry in inputOutputMap) {
             val (input, output) = entry
 
             when {
                 entry.isFilePair -> {
-                    handleFile(input, output, writerOptions)
+                    handleFile(input, output)
                 }
 
                 entry.isDirectoryPair -> {
-                    handleDirectory(input, output, writerOptions)
+                    handleDirectory(input, output)
                 }
 
                 !entry.inputExists -> {
@@ -336,13 +326,12 @@ class Vgo(
     private fun handleDirectory(
         input: File,
         output: Path,
-        options: Set<Writer.Option>,
     ) {
         assert(input.isDirectory)
         assert(output.isDirectory() || !output.exists())
 
         for (file in input.walkTopDown().filter { file -> !file.isHidden && !file.isDirectory }) {
-            handleFile(file, output.resolve(file.name), options)
+            handleFile(file, output.resolve(file.name))
         }
 
         if (this.options.printStats) {
