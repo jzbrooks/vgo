@@ -1,6 +1,5 @@
 package com.jzbrooks.vgo.core.transformation
 
-import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
@@ -28,8 +27,6 @@ class SimplifyBezierCurveCommands(
     private var skipAnother = false
 
     override fun visit(graphic: Graphic) {}
-
-    override fun visit(clipPath: ClipPath) {}
 
     override fun visit(group: Group) {}
 

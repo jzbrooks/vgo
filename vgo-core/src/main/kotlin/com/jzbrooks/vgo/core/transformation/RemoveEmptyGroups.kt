@@ -1,6 +1,5 @@
 package com.jzbrooks.vgo.core.transformation
 
-import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -20,8 +19,6 @@ class RemoveEmptyGroups : BottomUpTransformer {
     override fun visit(group: Group) {
         removeEmptyGroups(group)
     }
-
-    override fun visit(clipPath: ClipPath) {}
 
     override fun visit(extra: Extra) {}
 

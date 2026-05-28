@@ -359,257 +359,261 @@ private fun emitElement(
         }
 
         is Group -> {
-            val matrix = element.transform
-
-            val scaleX = hypot(matrix[0, 0], matrix[0, 1])
-            val scaleY = hypot(matrix[1, 0], matrix[1, 1])
-
-            val rotation = atan2(matrix[0, 1], matrix[0, 0]) * (180 / PI).toFloat()
-
-            val translationX = matrix[0, 2]
-            val translationY = matrix[1, 2]
-
-            codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "group"))
-            codeBlock.withIndent {
-                add("rotate = %Lf,\n", decimalFormat.format(rotation))
-                add("scaleX = %Lf,\n", decimalFormat.format(scaleX))
-                add("scaleY = %Lf,\n", decimalFormat.format(scaleY))
-                add("translationX = %Lf,\n", decimalFormat.format(translationX))
-                add("translationY = %Lf,\n", decimalFormat.format(translationY))
-            }
-            codeBlock.add(") {\n")
-            codeBlock.withIndent {
-                for (child in element.elements) {
-                    emitElement(child, codeBlock, decimalFormat)
-                }
-            }
-            codeBlock.add("}\n")
-        }
-
-        is ClipPath -> {
-            val pathNode = ClassName("androidx.compose.ui.graphics.vector", "PathNode")
-
-            codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "group"))
-            codeBlock.withIndent {
-                add("clipPathData = listOf(\n")
-                withIndent {
-                    // todo: This might be wrong? Can these commands be flatmapped?
-                    //  I think the answer is likely no, because merging paths this way
-                    //  can alter the semantics of the paths (e.g. the big merge path bug involving
-                    //  path intersections), but this bit of functionality is only very badly supported
-                    //  right now anyways.
-                    for (command in element.elements.filterIsInstance<Path>().flatMap { it.commands }) {
-                        when (command) {
-                            is MoveTo -> {
-                                val coord = command.parameters.first()
-                                if (command.variant == CommandVariant.ABSOLUTE) {
-                                    add("%T.MoveTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(coord.x), coord.y)
-                                } else {
-                                    add("%T.RelativeMoveTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(coord.x), coord.y)
-                                }
-
-                                for (parameter in command.parameters.drop(1)) {
-                                    if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add(
-                                            "%T.LineTo(%Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.x),
-                                            decimalFormat.format(parameter.y),
-                                        )
-                                    } else {
-                                        add(
-                                            "%T.RelativeLineTo(%Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.x),
-                                            decimalFormat.format(parameter.y),
-                                        )
-                                    }
-                                }
-                            }
-
-                            is LineTo -> {
-                                for (parameter in command.parameters) {
-                                    if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add(
-                                            "%T.LineTo(%Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.x),
-                                            decimalFormat.format(parameter.y),
-                                        )
-                                    } else {
-                                        add(
-                                            "%T.RelativeLineTo(%Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.x),
-                                            decimalFormat.format(parameter.y),
-                                        )
-                                    }
-                                }
-                            }
-
-                            is HorizontalLineTo -> {
-                                for (parameter in command.parameters) {
-                                    if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add("%T.HorizontalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
-                                    } else {
-                                        add("%T.RelativeHorizontalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
-                                    }
-                                }
-                            }
-
-                            is VerticalLineTo -> {
-                                for (parameter in command.parameters) {
-                                    if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add("%T.VerticalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
-                                    } else {
-                                        add("%T.RelativeVerticalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
-                                    }
-                                }
-                            }
-
-                            is CubicBezierCurve -> {
-                                for (parameter in command.parameters) {
-                                    if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add(
-                                            "%T.CurveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.startControl.x),
-                                            decimalFormat.format(parameter.startControl.y),
-                                            decimalFormat.format(parameter.endControl.x),
-                                            decimalFormat.format(parameter.endControl.y),
-                                            decimalFormat.format(parameter.end.x),
-                                            decimalFormat.format(parameter.end.y),
-                                        )
-                                    } else {
-                                        add(
-                                            "%T.RelativeCurveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.startControl.x),
-                                            decimalFormat.format(parameter.startControl.y),
-                                            decimalFormat.format(parameter.endControl.x),
-                                            decimalFormat.format(parameter.endControl.y),
-                                            decimalFormat.format(parameter.end.x),
-                                            decimalFormat.format(parameter.end.y),
-                                        )
-                                    }
-                                }
-                            }
-
-                            is SmoothCubicBezierCurve -> {
-                                for (parameter in command.parameters) {
-                                    if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add(
-                                            "%T.ReflectiveCurveTo(%Lf, %Lf, %Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.endControl.x),
-                                            decimalFormat.format(parameter.endControl.y),
-                                            decimalFormat.format(parameter.end.x),
-                                            decimalFormat.format(parameter.end.y),
-                                        )
-                                    } else {
-                                        add(
-                                            "%T.RelativeReflectiveCurveTo(%Lf, %Lf, %Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.endControl.x),
-                                            decimalFormat.format(parameter.endControl.y),
-                                            decimalFormat.format(parameter.end.x),
-                                            decimalFormat.format(parameter.end.y),
-                                        )
-                                    }
-                                }
-                            }
-
-                            is QuadraticBezierCurve -> {
-                                for (parameter in command.parameters) {
-                                    if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add(
-                                            "%T.QuadTo(%Lf, %Lf, %Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.control.x),
-                                            decimalFormat.format(parameter.control.y),
-                                            decimalFormat.format(parameter.end.x),
-                                            decimalFormat.format(parameter.end.y),
-                                        )
-                                    } else {
-                                        add(
-                                            "%T.RelativeQuadTo(%Lf, %Lf, %Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.control.x),
-                                            decimalFormat.format(parameter.control.y),
-                                            decimalFormat.format(parameter.end.x),
-                                            decimalFormat.format(parameter.end.y),
-                                        )
-                                    }
-                                }
-                            }
-
-                            is SmoothQuadraticBezierCurve -> {
-                                for (parameter in command.parameters) {
-                                    if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add(
-                                            "%T.ReflectiveQuadTo(%Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.x),
-                                            decimalFormat.format(parameter.y),
-                                        )
-                                    } else {
-                                        add(
-                                            "%T.RelativeReflectiveQuadTo(%Lf, %Lf),\n",
-                                            pathNode,
-                                            decimalFormat.format(parameter.x),
-                                            decimalFormat.format(parameter.y),
-                                        )
-                                    }
-                                }
-                            }
-
-                            is EllipticalArcCurve -> {
-                                for (parameter in command.parameters) {
-                                    if (command.variant == CommandVariant.ABSOLUTE) {
-                                        add(
-                                            "%T.ArcTo(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf),\n",
-                                            pathNode,
-                                            parameter.radiusX,
-                                            parameter.radiusY,
-                                            parameter.angle,
-                                            parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
-                                            parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
-                                            decimalFormat.format(parameter.end.x),
-                                            decimalFormat.format(parameter.end.y),
-                                        )
-                                    } else {
-                                        add(
-                                            "%T.RelativeArcTo(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf),\n",
-                                            parameter.radiusX,
-                                            parameter.radiusY,
-                                            parameter.angle,
-                                            parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
-                                            parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
-                                            decimalFormat.format(parameter.end.x),
-                                            decimalFormat.format(parameter.end.y),
-                                        )
-                                    }
-                                }
-                            }
-
-                            ClosePath -> {
-                                add("%T.Close,\n", pathNode)
-                            }
-                        }
-                    }
-                }
-                codeBlock.add("),\n")
-            }
-            codeBlock.add(") {\n")
-            codeBlock.withIndent {
-                for (child in element.elements) {
-                    // todo: figure out how VGO tracks clip paths (the rules are slightly weird for VDs and I vaguely remember modeling being weird)
-                    emitElement(child, codeBlock, decimalFormat)
-                }
-            }
-            codeBlock.add("}\n")
+            emitGroupWithClipPaths(element, element.clipPaths, codeBlock, decimalFormat)
         }
 
         else -> {}
     }
+}
+
+private fun emitGroupWithClipPaths(
+    group: Group,
+    remaining: List<ClipPath>,
+    codeBlock: CodeBlock.Builder,
+    decimalFormat: DecimalFormat,
+) {
+    if (remaining.isEmpty()) {
+        emitPlainGroup(group, codeBlock, decimalFormat)
+        return
+    }
+    val clipPath = remaining.first()
+    val rest = remaining.drop(1)
+    codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "group"))
+    codeBlock.withIndent {
+        emitClipPathDataArg(clipPath.regions, decimalFormat)
+    }
+    codeBlock.add(") {\n")
+    codeBlock.withIndent {
+        emitGroupWithClipPaths(group, rest, codeBlock, decimalFormat)
+    }
+    codeBlock.add("}\n")
+}
+
+private fun emitPlainGroup(
+    group: Group,
+    codeBlock: CodeBlock.Builder,
+    decimalFormat: DecimalFormat,
+) {
+    val matrix = group.transform
+    val scaleX = hypot(matrix[0, 0], matrix[0, 1])
+    val scaleY = hypot(matrix[1, 0], matrix[1, 1])
+    val rotation = atan2(matrix[0, 1], matrix[0, 0]) * (180 / PI).toFloat()
+    val translationX = matrix[0, 2]
+    val translationY = matrix[1, 2]
+
+    codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "group"))
+    codeBlock.withIndent {
+        add("rotate = %Lf,\n", decimalFormat.format(rotation))
+        add("scaleX = %Lf,\n", decimalFormat.format(scaleX))
+        add("scaleY = %Lf,\n", decimalFormat.format(scaleY))
+        add("translationX = %Lf,\n", decimalFormat.format(translationX))
+        add("translationY = %Lf,\n", decimalFormat.format(translationY))
+    }
+    codeBlock.add(") {\n")
+    codeBlock.withIndent {
+        for (child in group.elements) {
+            emitElement(child, codeBlock, decimalFormat)
+        }
+    }
+    codeBlock.add("}\n")
+}
+
+private fun CodeBlock.Builder.emitClipPathDataArg(
+    regions: List<Path>,
+    decimalFormat: DecimalFormat,
+) {
+    val pathNode = ClassName("androidx.compose.ui.graphics.vector", "PathNode")
+    add("clipPathData = listOf(\n")
+    withIndent {
+        for (command in regions.flatMap { it.commands }) {
+            when (command) {
+                is MoveTo -> {
+                    val coord = command.parameters.first()
+                    if (command.variant == CommandVariant.ABSOLUTE) {
+                        add("%T.MoveTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(coord.x), coord.y)
+                    } else {
+                        add("%T.RelativeMoveTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(coord.x), coord.y)
+                    }
+                    for (parameter in command.parameters.drop(1)) {
+                        if (command.variant == CommandVariant.ABSOLUTE) {
+                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
+                        } else {
+                            add(
+                                "%T.RelativeLineTo(%Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.x),
+                                decimalFormat.format(parameter.y),
+                            )
+                        }
+                    }
+                }
+
+                is LineTo -> {
+                    for (parameter in command.parameters) {
+                        if (command.variant == CommandVariant.ABSOLUTE) {
+                            add("%T.LineTo(%Lf, %Lf),\n", pathNode, decimalFormat.format(parameter.x), decimalFormat.format(parameter.y))
+                        } else {
+                            add(
+                                "%T.RelativeLineTo(%Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.x),
+                                decimalFormat.format(parameter.y),
+                            )
+                        }
+                    }
+                }
+
+                is HorizontalLineTo -> {
+                    for (parameter in command.parameters) {
+                        if (command.variant == CommandVariant.ABSOLUTE) {
+                            add("%T.HorizontalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
+                        } else {
+                            add("%T.RelativeHorizontalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
+                        }
+                    }
+                }
+
+                is VerticalLineTo -> {
+                    for (parameter in command.parameters) {
+                        if (command.variant == CommandVariant.ABSOLUTE) {
+                            add("%T.VerticalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
+                        } else {
+                            add("%T.RelativeVerticalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
+                        }
+                    }
+                }
+
+                is CubicBezierCurve -> {
+                    for (parameter in command.parameters) {
+                        if (command.variant == CommandVariant.ABSOLUTE) {
+                            add(
+                                "%T.CurveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.startControl.x),
+                                decimalFormat.format(parameter.startControl.y),
+                                decimalFormat.format(parameter.endControl.x),
+                                decimalFormat.format(parameter.endControl.y),
+                                decimalFormat.format(parameter.end.x),
+                                decimalFormat.format(parameter.end.y),
+                            )
+                        } else {
+                            add(
+                                "%T.RelativeCurveTo(%Lf, %Lf, %Lf, %Lf, %Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.startControl.x),
+                                decimalFormat.format(parameter.startControl.y),
+                                decimalFormat.format(parameter.endControl.x),
+                                decimalFormat.format(parameter.endControl.y),
+                                decimalFormat.format(parameter.end.x),
+                                decimalFormat.format(parameter.end.y),
+                            )
+                        }
+                    }
+                }
+
+                is SmoothCubicBezierCurve -> {
+                    for (parameter in command.parameters) {
+                        if (command.variant == CommandVariant.ABSOLUTE) {
+                            add(
+                                "%T.ReflectiveCurveTo(%Lf, %Lf, %Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.endControl.x),
+                                decimalFormat.format(parameter.endControl.y),
+                                decimalFormat.format(parameter.end.x),
+                                decimalFormat.format(parameter.end.y),
+                            )
+                        } else {
+                            add(
+                                "%T.RelativeReflectiveCurveTo(%Lf, %Lf, %Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.endControl.x),
+                                decimalFormat.format(parameter.endControl.y),
+                                decimalFormat.format(parameter.end.x),
+                                decimalFormat.format(parameter.end.y),
+                            )
+                        }
+                    }
+                }
+
+                is QuadraticBezierCurve -> {
+                    for (parameter in command.parameters) {
+                        if (command.variant == CommandVariant.ABSOLUTE) {
+                            add(
+                                "%T.QuadTo(%Lf, %Lf, %Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.control.x),
+                                decimalFormat.format(parameter.control.y),
+                                decimalFormat.format(parameter.end.x),
+                                decimalFormat.format(parameter.end.y),
+                            )
+                        } else {
+                            add(
+                                "%T.RelativeQuadTo(%Lf, %Lf, %Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.control.x),
+                                decimalFormat.format(parameter.control.y),
+                                decimalFormat.format(parameter.end.x),
+                                decimalFormat.format(parameter.end.y),
+                            )
+                        }
+                    }
+                }
+
+                is SmoothQuadraticBezierCurve -> {
+                    for (parameter in command.parameters) {
+                        if (command.variant == CommandVariant.ABSOLUTE) {
+                            add(
+                                "%T.ReflectiveQuadTo(%Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.x),
+                                decimalFormat.format(parameter.y),
+                            )
+                        } else {
+                            add(
+                                "%T.RelativeReflectiveQuadTo(%Lf, %Lf),\n",
+                                pathNode,
+                                decimalFormat.format(parameter.x),
+                                decimalFormat.format(parameter.y),
+                            )
+                        }
+                    }
+                }
+
+                is EllipticalArcCurve -> {
+                    for (parameter in command.parameters) {
+                        if (command.variant == CommandVariant.ABSOLUTE) {
+                            add(
+                                "%T.ArcTo(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf),\n",
+                                pathNode,
+                                parameter.radiusX,
+                                parameter.radiusY,
+                                parameter.angle,
+                                parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
+                                parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                decimalFormat.format(parameter.end.x),
+                                decimalFormat.format(parameter.end.y),
+                            )
+                        } else {
+                            add(
+                                "%T.RelativeArcTo(%Lf, %Lf, %Lf, %L, %L, %Lf, %Lf),\n",
+                                pathNode,
+                                parameter.radiusX,
+                                parameter.radiusY,
+                                parameter.angle,
+                                parameter.arc == EllipticalArcCurve.ArcFlag.LARGE,
+                                parameter.sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE,
+                                decimalFormat.format(parameter.end.x),
+                                decimalFormat.format(parameter.end.y),
+                            )
+                        }
+                    }
+                }
+
+                ClosePath -> {
+                    add("%T.Close,\n", pathNode)
+                }
+            }
+        }
+    }
+    add("),\n")
 }

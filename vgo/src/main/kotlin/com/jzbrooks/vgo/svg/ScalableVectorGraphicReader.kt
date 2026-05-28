@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.svg
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Ellipse
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -12,7 +13,9 @@ import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.Polygon
 import com.jzbrooks.vgo.core.graphic.Polyline
 import com.jzbrooks.vgo.core.graphic.Rect
+import com.jzbrooks.vgo.core.graphic.Shape
 import com.jzbrooks.vgo.core.graphic.command.CommandString
+import com.jzbrooks.vgo.core.transformation.ConvertShapesToPaths
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.util.xml.asSequence
@@ -35,17 +38,99 @@ fun parse(root: Node): ScalableVectorGraphic {
     // Style properties should overwrite inherited attributes
     val inherited = rootAttrs + rootStyleProperties
 
+    // Pre-pass: harvest <clipPath id="..."> defs anywhere in the document (typically
+    // inside <defs>, but the spec allows them anywhere). They're skipped by the main
+    // parse below — only resolved references via Group.clipPaths surface them in IR.
+    val clipPathDefs = harvestClipPathDefs(root, inherited)
+
     val elements =
         root.childNodes
             .asSequence()
             .mapNotNull { parseElement(it, inherited) }
             .toList()
 
+    resolveClipPathReferences(elements, clipPathDefs)
+
     return ScalableVectorGraphic(
         elements,
         root.attributes.removeOrNull("id")?.nodeValue,
         root.attributes.toMutableMap(),
     )
+}
+
+private fun harvestClipPathDefs(
+    root: Node,
+    inherited: Map<String, String>,
+): Map<String, ClipPath> {
+    val defs = mutableMapOf<String, ClipPath>()
+
+    fun walk(
+        node: Node,
+        ctx: Map<String, String>,
+    ) {
+        if (node is Text || node is Comment) return
+        if (node.nodeName == "clipPath") {
+            val def = parseClipPathDef(node, ctx)
+            val defId = def.id
+            if (defId != null) defs[defId] = def
+            return
+        }
+        val childCtx = collectStyleInheritance(node, ctx)
+        node.childNodes.asSequence().forEach { walk(it, childCtx) }
+    }
+
+    root.childNodes.asSequence().forEach { walk(it, inherited) }
+    return defs
+}
+
+private fun parseClipPathDef(
+    node: Node,
+    inherited: Map<String, String>,
+): ClipPath {
+    val childInherited = collectStyleInheritance(node, inherited)
+
+    val regions =
+        node.childNodes
+            .asSequence()
+            .mapNotNull { parseElement(it, childInherited) }
+            .mapNotNull { child ->
+                when (child) {
+                    is Path -> child
+                    is Shape -> ConvertShapesToPaths.convertToPath(child)
+                    else -> null
+                }
+            }.toList()
+
+    node.attributes.removeOrNull("style")
+
+    return ClipPath(
+        regions,
+        node.attributes.removeOrNull("id")?.nodeValue,
+        node.attributes.toMutableMap(),
+    )
+}
+
+private val clipPathUrlRegex = Regex("""url\(\s*["']?#([^)\s"']+)["']?\s*\)""")
+
+private fun resolveClipPathReferences(
+    elements: List<Element>,
+    defs: Map<String, ClipPath>,
+) {
+    fun walk(element: Element) {
+        if (element is Group) {
+            val ref = element.foreign["clip-path"]
+            val id = ref?.let { clipPathUrlRegex.find(it)?.groupValues?.get(1) }
+            val def = id?.let(defs::get)
+            if (def != null) {
+                element.clipPaths = listOf(def)
+                element.foreign.remove("clip-path")
+            }
+        }
+        if (element is ContainerElement) {
+            element.elements.forEach(::walk)
+        }
+    }
+    elements.forEach(::walk)
 }
 
 private fun parseElement(
@@ -56,7 +141,7 @@ private fun parseElement(
 
     return when (node.nodeName) {
         "g" -> parseGroupElement(node, inherited)
-        "clipPath" -> parseClipPath(node, inherited)
+        "clipPath" -> null
         "path" -> parsePathElement(node, inherited)
         "circle" -> parseCircleElement(node, inherited)
         "ellipse" -> parseEllipseElement(node, inherited)
@@ -66,27 +151,6 @@ private fun parseElement(
         "polygon" -> parsePolygonElement(node, inherited)
         else -> parseExtraElement(node, inherited)
     }
-}
-
-private fun parseClipPath(
-    node: Node,
-    inherited: Map<String, String> = emptyMap(),
-): ClipPath {
-    val childInherited = collectStyleInheritance(node, inherited)
-
-    val childElements =
-        node.childNodes
-            .asSequence()
-            .mapNotNull { parseElement(it, childInherited) }
-            .toList()
-
-    node.attributes.removeOrNull("style")
-
-    return ClipPath(
-        childElements,
-        node.attributes.removeOrNull("id")?.nodeValue,
-        node.attributes.toMutableMap(),
-    )
 }
 
 private fun parseGroupElement(

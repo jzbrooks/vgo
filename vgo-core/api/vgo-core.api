@@ -161,20 +161,20 @@ public final class com/jzbrooks/vgo/core/graphic/Circle : com/jzbrooks/vgo/core/
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/jzbrooks/vgo/core/graphic/ClipPath : com/jzbrooks/vgo/core/graphic/ContainerElement {
+public final class com/jzbrooks/vgo/core/graphic/ClipPath {
 	public fun <init> (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;)V
-	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun component1 ()Ljava/util/List;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Ljava/util/Map;
 	public final fun copy (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;)Lcom/jzbrooks/vgo/core/graphic/ClipPath;
 	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/ClipPath;Ljava/util/List;Ljava/lang/String;Ljava/util/Map;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/ClipPath;
 	public fun equals (Ljava/lang/Object;)Z
-	public fun getElements ()Ljava/util/List;
-	public fun getForeign ()Ljava/util/Map;
-	public fun getId ()Ljava/lang/String;
+	public final fun getForeign ()Ljava/util/Map;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getRegions ()Ljava/util/List;
 	public fun hashCode ()I
-	public fun setElements (Ljava/util/List;)V
+	public final fun setRegions (Ljava/util/List;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -190,7 +190,6 @@ public abstract interface class com/jzbrooks/vgo/core/graphic/Element {
 }
 
 public abstract interface class com/jzbrooks/vgo/core/graphic/ElementVisitor {
-	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -260,21 +259,24 @@ public abstract interface class com/jzbrooks/vgo/core/graphic/Graphic : com/jzbr
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Group : com/jzbrooks/vgo/core/graphic/ContainerElement {
-	public fun <init> (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)V
-	public synthetic fun <init> (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
 	public final fun component1 ()Ljava/util/List;
 	public final fun component2 ()Ljava/lang/String;
 	public final fun component3 ()Ljava/util/Map;
 	public final fun component4 ()Lcom/jzbrooks/vgo/core/util/math/Matrix3;
-	public final fun copy (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)Lcom/jzbrooks/vgo/core/graphic/Group;
-	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Group;Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Group;
+	public final fun component5 ()Ljava/util/List;
+	public final fun copy (Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/Group;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Group;Ljava/util/List;Ljava/lang/String;Ljava/util/Map;Lcom/jzbrooks/vgo/core/util/math/Matrix3;Ljava/util/List;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Group;
 	public fun equals (Ljava/lang/Object;)Z
+	public final fun getClipPaths ()Ljava/util/List;
 	public fun getElements ()Ljava/util/List;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
 	public final fun getTransform ()Lcom/jzbrooks/vgo/core/util/math/Matrix3;
 	public fun hashCode ()I
+	public final fun setClipPaths (Ljava/util/List;)V
 	public fun setElements (Ljava/util/List;)V
 	public final fun setTransform (Lcom/jzbrooks/vgo/core/util/math/Matrix3;)V
 	public fun toString ()Ljava/lang/String;
@@ -782,7 +784,6 @@ public final class com/jzbrooks/vgo/core/graphic/command/VerticalLineTo : com/jz
 
 public final class com/jzbrooks/vgo/core/transformation/BakeTransformations : com/jzbrooks/vgo/core/graphic/ElementVisitor, com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -795,7 +796,6 @@ public abstract interface class com/jzbrooks/vgo/core/transformation/BottomUpTra
 
 public final class com/jzbrooks/vgo/core/transformation/BreakoutImplicitCommands : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -805,7 +805,6 @@ public final class com/jzbrooks/vgo/core/transformation/BreakoutImplicitCommands
 
 public final class com/jzbrooks/vgo/core/transformation/CollapseGroups : com/jzbrooks/vgo/core/transformation/BottomUpTransformer {
 	public fun <init> ()V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -815,7 +814,6 @@ public final class com/jzbrooks/vgo/core/transformation/CollapseGroups : com/jzb
 
 public final class com/jzbrooks/vgo/core/transformation/CommandVariant : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> (Lcom/jzbrooks/vgo/core/transformation/CommandVariant$Mode;)V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -853,7 +851,6 @@ public final class com/jzbrooks/vgo/core/transformation/CommandVariant$Mode$Rela
 
 public final class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> (Lcom/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion;)V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -885,7 +882,6 @@ public final class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Crit
 public final class com/jzbrooks/vgo/core/transformation/ConvertShapesToPaths : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public static final field Companion Lcom/jzbrooks/vgo/core/transformation/ConvertShapesToPaths$Companion;
 	public fun <init> ()V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -901,7 +897,6 @@ public final class com/jzbrooks/vgo/core/transformation/MergePaths : com/jzbrook
 	public fun <init> ()V
 	public fun <init> (Lcom/jzbrooks/vgo/core/transformation/MergePaths$Constraints;)V
 	public synthetic fun <init> (Lcom/jzbrooks/vgo/core/transformation/MergePaths$Constraints;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -934,7 +929,6 @@ public final class com/jzbrooks/vgo/core/transformation/MergePaths$Constraints$P
 
 public final class com/jzbrooks/vgo/core/transformation/Polycommands : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -944,7 +938,6 @@ public final class com/jzbrooks/vgo/core/transformation/Polycommands : com/jzbro
 
 public final class com/jzbrooks/vgo/core/transformation/RemoveEmptyGroups : com/jzbrooks/vgo/core/transformation/BottomUpTransformer {
 	public fun <init> ()V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -954,7 +947,6 @@ public final class com/jzbrooks/vgo/core/transformation/RemoveEmptyGroups : com/
 
 public final class com/jzbrooks/vgo/core/transformation/RemoveRedundantCommands : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -964,7 +956,6 @@ public final class com/jzbrooks/vgo/core/transformation/RemoveRedundantCommands 
 
 public final class com/jzbrooks/vgo/core/transformation/RemoveTransparentPaths : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -974,7 +965,6 @@ public final class com/jzbrooks/vgo/core/transformation/RemoveTransparentPaths :
 
 public final class com/jzbrooks/vgo/core/transformation/SimplifyBezierCurveCommands : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> (F)V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -987,7 +977,6 @@ public final class com/jzbrooks/vgo/core/transformation/SimplifyLineCommands : c
 	public fun <init> (F)V
 	public final fun getCommands ()Ljava/util/List;
 	public final fun setCommands (Ljava/util/List;)V
-	public fun visit (Lcom/jzbrooks/vgo/core/graphic/ClipPath;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V

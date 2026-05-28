@@ -29,11 +29,7 @@ import org.w3c.dom.Text
 import kotlin.math.roundToInt
 
 fun parse(root: Node): VectorDrawable {
-    val elements =
-        root.childNodes
-            .asSequence()
-            .mapNotNull(::parseElement)
-            .toList()
+    val elements = partitionChildren(root.childNodes.asSequence())
 
     return VectorDrawable(
         elements,
@@ -48,17 +44,47 @@ private fun parseElement(node: Node): Element? {
     return when (node.nodeName) {
         "group" -> parseGroup(node)
         "path" -> parsePath(node)
-        "clip-path" -> parseClipPath(node)
         else -> parseExtraElement(node)
     }
 }
 
+// VD semantics: a <clip-path> only affects siblings that appear *after* it in
+// source order. Translate that positional form into the IR's group-scoped form
+// by synthesizing nested Groups whose clipPaths cover only the elements that
+// followed each clip-path. The synthetic group is always the last entry in its
+// parent's elements list, which the writer relies on to elide it on emit.
+private fun partitionChildren(rawChildren: Sequence<Node>): List<Element> {
+    val rootScope = mutableListOf<Element>()
+    var currentScope: MutableList<Element> = rootScope
+    val pendingClipPaths = mutableListOf<ClipPath>()
+
+    for (child in rawChildren) {
+        if (child is Text || child is Comment) continue
+        if (child.nodeName == "clip-path") {
+            pendingClipPaths += parseClipPath(child)
+            continue
+        }
+        val parsed = parseElement(child) ?: continue
+
+        if (pendingClipPaths.isNotEmpty()) {
+            val syntheticElements = mutableListOf<Element>()
+            val synthetic =
+                Group(
+                    elements = syntheticElements,
+                    clipPaths = pendingClipPaths.toList(),
+                )
+            currentScope.add(synthetic)
+            currentScope = syntheticElements
+            pendingClipPaths.clear()
+        }
+        currentScope.add(parsed)
+    }
+
+    return rootScope
+}
+
 private fun parseGroup(node: Node): Group {
-    val groupChildElements =
-        node.childNodes
-            .asSequence()
-            .mapNotNull(::parseElement)
-            .toList()
+    val groupChildElements = partitionChildren(node.childNodes.asSequence())
 
     // This has to happen before foreign property collection
     val transform = node.attributes.computeTransformationMatrix()
@@ -125,47 +151,34 @@ private fun parsePath(node: Node): Path {
 private fun parseClipPath(node: Node): ClipPath {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
 
-    return if (pathDataString.startsWith('@') || pathDataString.startsWith('?')) {
-        ClipPath(
-            listOf(
-                Path(
-                    null,
-                    mutableMapOf(),
-                    emptyList(),
-                    Colors.TRANSPARENT,
-                    Path.FillRule.NON_ZERO,
-                    Colors.TRANSPARENT,
-                    0f,
-                    Path.LineCap.BUTT,
-                    Path.LineJoin.MITER,
-                    4f,
-                ),
-            ),
-            node.attributes.removeOrNull("android:name")?.nodeValue,
-            node.attributes.toMutableMap(),
-        )
-    } else {
-        node.attributes.removeNamedItem("android:pathData")
+    // Resource references (@drawable/x, ?attr/x) can't be resolved into commands;
+    // preserve the original android:pathData in foreign and emit an empty Path so
+    // downstream transforms know there's nothing optimizable.
+    val isResourceReference = pathDataString.startsWith('@') || pathDataString.startsWith('?')
+    val commands = if (isResourceReference) emptyList() else CommandString(pathDataString).toCommandList()
 
-        ClipPath(
-            listOf(
-                Path(
-                    null,
-                    mutableMapOf(),
-                    CommandString(pathDataString).toCommandList(),
-                    Colors.TRANSPARENT,
-                    Path.FillRule.NON_ZERO,
-                    Colors.TRANSPARENT,
-                    0f,
-                    Path.LineCap.BUTT,
-                    Path.LineJoin.MITER,
-                    4f,
-                ),
-            ),
-            node.attributes.removeOrNull("android:name")?.nodeValue,
-            node.attributes.toMutableMap(),
-        )
+    if (!isResourceReference) {
+        node.attributes.removeNamedItem("android:pathData")
     }
+
+    return ClipPath(
+        listOf(
+            Path(
+                id = null,
+                foreign = mutableMapOf(),
+                commands = commands,
+                fill = Colors.TRANSPARENT,
+                fillRule = Path.FillRule.NON_ZERO,
+                stroke = Colors.TRANSPARENT,
+                strokeWidth = 0f,
+                strokeLineCap = Path.LineCap.BUTT,
+                strokeLineJoin = Path.LineJoin.MITER,
+                strokeMiterLimit = 4f,
+            ),
+        ),
+        node.attributes.removeOrNull("android:name")?.nodeValue,
+        node.attributes.toMutableMap(),
+    )
 }
 
 private fun parseExtraElement(node: Node): Extra {
