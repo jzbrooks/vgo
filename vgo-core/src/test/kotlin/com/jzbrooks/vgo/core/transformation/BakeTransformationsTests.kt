@@ -493,34 +493,34 @@ class BakeTransformationsTests {
     }
 
     @Test
-    fun `clip path children receive parent group transform`() {
+    fun `clip path regions receive parent group transform`() {
         val transform = Matrix3.from(floatArrayOf(1f, 0f, 5f, 0f, 1f, 5f, 0f, 0f, 1f))
 
         val group =
             Group(
-                listOf(
-                    createPath(
-                        listOf(
-                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 1f))),
+                elements =
+                    listOf(
+                        createPath(
+                            listOf(
+                                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                                LineTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 1f))),
+                            ),
                         ),
                     ),
-                    ClipPath(
-                        listOf(
-                            createPath(
-                                listOf(
-                                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
-                                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 2f))),
+                transform = transform,
+                clipPaths =
+                    listOf(
+                        ClipPath(
+                            listOf(
+                                createPath(
+                                    listOf(
+                                        MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                                        LineTo(CommandVariant.ABSOLUTE, listOf(Point(2f, 2f))),
+                                    ),
                                 ),
                             ),
                         ),
-                        null,
-                        mutableMapOf(),
                     ),
-                ),
-                null,
-                mutableMapOf(),
-                transform,
             )
 
         bake.visit(group)
@@ -536,40 +536,27 @@ class BakeTransformationsTests {
                 LineTo(CommandVariant.ABSOLUTE, listOf(Point(6f, 6f))),
             )
 
-        val clipPath = group.elements[1] as ClipPath
-        assertThat(clipPath::elements)
-            .index(0)
-            .isInstanceOf<Path>()
-            .prop(Path::commands)
-            .containsExactly(
-                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(5f, 5f))),
-                LineTo(CommandVariant.ABSOLUTE, listOf(Point(7f, 7f))),
-            )
+        val region = group.clipPaths[0].regions[0]
+        assertThat(region::commands).containsExactly(
+            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(5f, 5f))),
+            LineTo(CommandVariant.ABSOLUTE, listOf(Point(7f, 7f))),
+        )
     }
 
     @Test
-    fun `clip path with non-path children prevents baking`() {
+    fun `clip path with empty-commands region prevents baking`() {
         val transform = Matrix3.from(floatArrayOf(1f, 0f, 5f, 0f, 1f, 5f, 0f, 0f, 1f))
 
         val group =
             Group(
-                listOf(
-                    ClipPath(
-                        listOf(
-                            Group(
-                                listOf(createPath()),
-                                null,
-                                mutableMapOf(),
-                                Matrix3.IDENTITY,
-                            ),
-                        ),
-                        null,
-                        mutableMapOf(),
+                elements = listOf(createPath()),
+                transform = transform,
+                clipPaths =
+                    listOf(
+                        // Empty-commands Path stands in for unresolved VD resource references
+                        // (@drawable/x) — BakeTransformations must skip baking in that case.
+                        ClipPath(listOf(createPath(emptyList()))),
                     ),
-                ),
-                null,
-                mutableMapOf(),
-                transform,
             )
 
         bake.visit(group)

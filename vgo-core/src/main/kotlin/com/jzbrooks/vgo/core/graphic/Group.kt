@@ -7,6 +7,7 @@ data class Group(
     override val id: String? = null,
     override val foreign: MutableMap<String, String> = mutableMapOf(),
     var transform: Matrix3 = Matrix3.IDENTITY,
+    var clipPaths: List<ClipPath> = emptyList(),
 ) : ContainerElement {
     override fun accept(visitor: ElementVisitor) = visitor.visit(this)
 }

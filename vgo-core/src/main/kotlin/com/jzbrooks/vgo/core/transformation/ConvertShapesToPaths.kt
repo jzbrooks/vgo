@@ -1,7 +1,6 @@
 package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.Circle
-import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Ellipse
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -26,8 +25,6 @@ class ConvertShapesToPaths : TopDownTransformer {
     override fun visit(graphic: Graphic) = convertShapes(graphic)
 
     override fun visit(group: Group) = convertShapes(group)
-
-    override fun visit(clipPath: ClipPath) = convertShapes(clipPath)
 
     override fun visit(extra: Extra) {}
 
