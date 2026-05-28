@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.vd
 import assertk.assertThat
 import assertk.assertions.endsWith
 import assertk.assertions.hasSameSizeAs
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.startsWith
 import com.jzbrooks.vgo.core.Color
@@ -99,7 +100,14 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val firstGenNodes = output.firstChild.childNodes.toList()
 
-            assertThat(firstGenNodes).hasNames("group", "clip-path", "path")
+            // Top-level: a group (clip-path lives inside as a property) and a path.
+            assertThat(firstGenNodes).hasNames("group", "path")
+
+            val groupChildren =
+                output.firstChild.firstChild.childNodes
+                    .toList()
+            // Group's clip-path is emitted first, then the original child elements.
+            assertThat(groupChildren).hasNames("clip-path", "path", "bicycle")
         }
     }
 
@@ -122,7 +130,11 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val firstPathNode = output.firstChild.firstChild.firstChild
+            // Group emits its clip-path(s) first, then the original child elements;
+            // the first path is at index 1.
+            val firstPathNode =
+                output.firstChild.firstChild.childNodes
+                    .item(1)
 
             assertThat(firstPathNode.attributes.getNamedItem("android:name")).hasValue("strike_thru_path")
         }
@@ -138,7 +150,9 @@ class VectorDrawableWriterTests {
                 output.firstChild.firstChild.childNodes
                     .toList()
 
-            assertThat(groupChildren).hasSameSizeAs((graphic.elements[0] as Group).elements)
+            val group = graphic.elements[0] as Group
+            // Output prepends a <clip-path> per Group.clipPaths entry to the group's elements.
+            assertThat(groupChildren).hasSize(group.elements.size + group.clipPaths.size)
         }
     }
 
@@ -161,9 +175,10 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
+            // Group children layout: [clip-path, path("strike_thru_path"), bicycle].
             val extraNode =
                 output.firstChild.firstChild.childNodes
-                    .item(1)
+                    .item(2)
 
             assertThat(extraNode).hasName("bicycle")
         }
@@ -233,14 +248,113 @@ class VectorDrawableWriterTests {
     }
 
     @Test
+    fun testSyntheticClipGroupElided() {
+        // [path, syntheticClipGroup] at root: the writer should inline the
+        // synthetic group's clip-paths and children directly into <vector>.
+        val clip =
+            ClipPath(
+                listOf(createPath(CommandString("M 0 0 L 10 0 L 10 10 L 0 10 Z").toCommandList())),
+            )
+        val drawable =
+            VectorDrawable(
+                listOf(
+                    createPath(CommandString("M 0 0 L 1 1 Z").toCommandList()),
+                    Group(
+                        elements = listOf(createPath(CommandString("M 2 2 L 3 3 Z").toCommandList())),
+                        id = null,
+                        foreign = mutableMapOf(),
+                        transform = Matrix3.IDENTITY,
+                        clipPaths = listOf(clip),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns:android" to "http://schemas.android.com/apk/res/android"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            VectorDrawableWriter().write(drawable, memoryStream)
+            val output = memoryStream.toDocument()
+
+            val rootChildren = output.firstChild.childNodes.toList()
+            assertThat(rootChildren).hasNames("path", "clip-path", "path")
+        }
+    }
+
+    @Test
+    fun testNonLastClipOnlyGroupPreserved() {
+        // The clip-only group is NOT last in its parent's elements, so eliding
+        // would leak the clip onto the trailing sibling path. The <group>
+        // wrapper must be preserved.
+        val clip =
+            ClipPath(
+                listOf(createPath(CommandString("M 0 0 L 10 0 L 10 10 L 0 10 Z").toCommandList())),
+            )
+        val drawable =
+            VectorDrawable(
+                listOf(
+                    Group(
+                        elements = listOf(createPath(CommandString("M 2 2 L 3 3 Z").toCommandList())),
+                        id = null,
+                        foreign = mutableMapOf(),
+                        transform = Matrix3.IDENTITY,
+                        clipPaths = listOf(clip),
+                    ),
+                    createPath(CommandString("M 4 4 L 5 5 Z").toCommandList()),
+                ),
+                null,
+                mutableMapOf("xmlns:android" to "http://schemas.android.com/apk/res/android"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            VectorDrawableWriter().write(drawable, memoryStream)
+            val output = memoryStream.toDocument()
+
+            val rootChildren = output.firstChild.childNodes.toList()
+            assertThat(rootChildren).hasNames("group", "path")
+        }
+    }
+
+    @Test
+    fun testNamedClipOnlyGroupNotElided() {
+        // A non-null id blocks elision so the <group> wrapper survives.
+        val clip =
+            ClipPath(
+                listOf(createPath(CommandString("M 0 0 L 10 0 L 10 10 L 0 10 Z").toCommandList())),
+            )
+        val drawable =
+            VectorDrawable(
+                listOf(
+                    Group(
+                        elements = listOf(createPath(CommandString("M 2 2 L 3 3 Z").toCommandList())),
+                        id = "named_clip_group",
+                        foreign = mutableMapOf(),
+                        transform = Matrix3.IDENTITY,
+                        clipPaths = listOf(clip),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns:android" to "http://schemas.android.com/apk/res/android"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            VectorDrawableWriter().write(drawable, memoryStream)
+            val output = memoryStream.toDocument()
+
+            val rootChildren = output.firstChild.childNodes.toList()
+            assertThat(rootChildren).hasNames("group")
+        }
+    }
+
+    @Test
     fun testExtraChildrenWritten() {
         ByteArrayOutputStream().use { memoryStream ->
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
+            // Group children layout: [clip-path, path("strike_thru_path"), bicycle].
             val extraNode =
                 output.firstChild.firstChild.childNodes
-                    .item(1)
+                    .item(2)
 
             assertThat(extraNode.firstChild).hasName("group")
         }
@@ -257,32 +371,34 @@ class VectorDrawableWriterTests {
             VectorDrawable(
                 listOf(
                     Group(
-                        listOf(
-                            createPath(
-                                CommandString("M 2 4.27 L 3.27 3 L 3.27 3 L 2 4.27 Z").toCommandList(),
-                                "strike_thru_path",
+                        elements =
+                            listOf(
+                                createPath(
+                                    CommandString("M 2 4.27 L 3.27 3 L 3.27 3 L 2 4.27 Z").toCommandList(),
+                                    "strike_thru_path",
+                                ),
+                                Extra(
+                                    "bicycle",
+                                    listOf(Group(emptyList(), null, mutableMapOf(), Matrix3.IDENTITY)),
+                                    null,
+                                    mutableMapOf(),
+                                ),
                             ),
-                            Extra(
-                                "bicycle",
-                                listOf(Group(emptyList(), null, mutableMapOf(), Matrix3.IDENTITY)),
-                                null,
-                                mutableMapOf(),
+                        id = "transform_group",
+                        foreign = mutableMapOf(),
+                        transform = Matrix3.from(floatArrayOf(1f, 0f, 10f, 0f, 1f, 15f, 0f, 0f, 1f)),
+                        clipPaths =
+                            listOf(
+                                ClipPath(
+                                    listOf(
+                                        createPath(
+                                            CommandString(
+                                                "M 0 0 L 24 0 L 24 24 L 0 24 L 0 0 Z M 4.54 1.73 L 3.27 3 L 3.27 3 L 4.54 1.73 Z",
+                                            ).toCommandList(),
+                                        ),
+                                    ),
+                                ),
                             ),
-                        ),
-                        "transform_group",
-                        mutableMapOf(),
-                        Matrix3.from(floatArrayOf(1f, 0f, 10f, 0f, 1f, 15f, 0f, 0f, 1f)),
-                    ),
-                    ClipPath(
-                        listOf(
-                            createPath(
-                                CommandString(
-                                    "M 0 0 L 24 0 L 24 24 L 0 24 L 0 0 Z M 4.54 1.73 L 3.27 3 L 3.27 3 L 4.54 1.73 Z",
-                                ).toCommandList(),
-                            ),
-                        ),
-                        null,
-                        mutableMapOf(),
                     ),
                     createPath(
                         CommandString(

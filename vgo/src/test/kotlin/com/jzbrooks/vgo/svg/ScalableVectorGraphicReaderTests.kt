@@ -479,6 +479,67 @@ class ScalableVectorGraphicReaderTests {
     }
 
     @Test
+    fun testGroupClipPathRefIsResolved() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <defs>
+            |    <clipPath id="cp1">
+            |      <path d="M0,0h10v10h-10z" />
+            |    </clipPath>
+            |  </defs>
+            |  <g clip-path="url(#cp1)">
+            |    <path d="M0,0l2,3Z" />
+            |  </g>
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val group = graphic.elements.filterIsInstance<Group>().first()
+
+        assertThat(group::clipPaths).hasSize(1)
+        assertThat(group.clipPaths.first()::id).isEqualTo("cp1")
+    }
+
+    @Test
+    fun testGroupClipPathRefUnresolvedWhenIdMissing() {
+        val vectorText =
+            """
+            |<svg viewBox="0 0 100 100">
+            |  <g clip-path="url(#missing)">
+            |    <path d="M0,0l2,3Z" />
+            |  </g>
+            |</svg>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        val graphic = parse(document.firstChild)
+        val group = graphic.elements.filterIsInstance<Group>().first()
+
+        assertThat(group::clipPaths).isEmpty()
+        assertThat(group.foreign["clip-path"]).isEqualTo("url(#missing)")
+    }
+
+    @Test
     fun testUnextractedStylePropertiesPreservedInForeignOnPath() {
         val vectorText =
             """

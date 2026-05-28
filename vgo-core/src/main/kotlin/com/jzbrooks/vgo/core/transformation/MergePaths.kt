@@ -1,6 +1,5 @@
 package com.jzbrooks.vgo.core.transformation
 
-import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -36,8 +35,6 @@ class MergePaths(
     override fun visit(graphic: Graphic) = merge(graphic)
 
     override fun visit(group: Group) = merge(group)
-
-    override fun visit(clipPath: ClipPath) = merge(clipPath)
 
     override fun visit(extra: Extra) {}
 

@@ -5,6 +5,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsExactly
 import assertk.assertions.containsNone
+import assertk.assertions.first
 import assertk.assertions.hasSize
 import assertk.assertions.index
 import assertk.assertions.isEmpty
@@ -13,12 +14,14 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.key
 import assertk.assertions.prop
+import assertk.assertions.single
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.GradientStop
 import com.jzbrooks.vgo.core.LinearGradient
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
+import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
@@ -86,7 +89,14 @@ class VectorDrawableReaderTests {
                 ClosePath,
             ),
         )
-        assertThat(graphic::elements).hasSize(3)
+        // The fixture is `[path, clip-path, path]` at the root; positional VD scope
+        // turns this into `[path, synthGroup(clipPaths=[c], elements=[path])]`.
+        assertThat(graphic::elements).hasSize(2)
+        assertThat(graphic::elements)
+            .index(1)
+            .isInstanceOf(Group::class)
+            .prop(Group::clipPaths)
+            .hasSize(1)
     }
 
     @Test
@@ -395,5 +405,160 @@ class VectorDrawableReaderTests {
 
         assertThat(path::foreign).key("android:fillColor").isEqualTo("?attrs/dark")
         assertThat(path::foreign).key("android:fillAlpha").isEqualTo("0.1")
+    }
+
+    @Test
+    fun testLeadingClipPathsProduceSyntheticSubGroup() {
+        // With positional VD scope, `[clip, clip, path]` inside a group becomes
+        // a single synthetic sub-group carrying both clips and the path.
+        val vectorText =
+            """
+            |<vector>
+            |  <group>
+            |    <clip-path android:pathData="M0,0h10v10h-10z" />
+            |    <clip-path android:pathData="M5,5h10v10h-10z" />
+            |    <path android:pathData="M0,0l2,3Z" android:fillColor="#FF0000" />
+            |  </group>
+            |</vector>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
+            }
+
+        val graphic = parse(document.firstChild)
+
+        assertThat(graphic, "graphic")
+            .prop(Graphic::elements)
+            .single()
+            .isInstanceOf<Group>()
+            .all {
+                prop(Group::clipPaths).isEmpty()
+                prop(Group::elements).single().isInstanceOf<Group>().all {
+                    prop(Group::clipPaths).hasSize(2)
+                    prop(Group::elements).single().isInstanceOf<Path>()
+                }
+            }
+    }
+
+    @Test
+    fun testInterleavedClipPathProducesSyntheticSubGroup() {
+        val vectorText =
+            """
+            |<vector>
+            |  <group>
+            |    <path android:pathData="M0,0l2,3Z" />
+            |    <clip-path android:pathData="M0,0h10v10h-10z" />
+            |    <path android:pathData="M5,5l1,1Z" />
+            |  </group>
+            |</vector>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
+            }
+
+        val graphic = parse(document.firstChild)
+
+        assertThat(graphic, "graphic")
+            .prop(Graphic::elements)
+            .single()
+            .isInstanceOf<Group>()
+            .all {
+                prop(Group::clipPaths).isEmpty()
+                prop(Group::elements).all {
+                    hasSize(2)
+                    first().isInstanceOf<Path>()
+                    index(1).isInstanceOf<Group>().all {
+                        prop(Group::clipPaths).hasSize(1)
+                        prop(Group::elements).single().isInstanceOf<Path>()
+                    }
+                }
+            }
+    }
+
+    @Test
+    fun testTopLevelClipPathProducesSyntheticGroup() {
+        val vectorText =
+            """
+            |<vector>
+            |  <path android:pathData="M0,0l2,3Z" />
+            |  <clip-path android:pathData="M0,0h10v10h-10z" />
+            |  <path android:pathData="M5,5l1,1Z" />
+            |</vector>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
+            }
+
+        val graphic = parse(document.firstChild)
+
+        assertThat(graphic, "graphic")
+            .prop(Graphic::elements)
+            .all {
+                hasSize(2)
+                first().isInstanceOf<Path>()
+                index(1).isInstanceOf<Group>().all {
+                    prop(Group::clipPaths).hasSize(1)
+                    prop(Group::elements).single().isInstanceOf<Path>()
+                }
+            }
+    }
+
+    @Test
+    fun testReClipMidStreamProducesNestedSyntheticGroups() {
+        val vectorText =
+            """
+            |<vector>
+            |  <group>
+            |    <clip-path android:pathData="M0,0h10v10h-10z" />
+            |    <path android:pathData="M0,0l2,3Z" />
+            |    <clip-path android:pathData="M5,5h10v10h-10z" />
+            |    <path android:pathData="M5,5l1,1Z" />
+            |  </group>
+            |</vector>
+            |
+            """.trimMargin().toByteArray()
+
+        val document =
+            ByteArrayInputStream(vectorText).use {
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(it).apply {
+                    documentElement.normalize()
+                }
+            }
+
+        val graphic = parse(document.firstChild)
+
+        assertThat(graphic, "graphic")
+            .prop(Graphic::elements)
+            .single()
+            .isInstanceOf<Group>()
+            .all {
+                prop(Group::clipPaths).isEmpty()
+                prop(Group::elements).single().isInstanceOf<Group>().all {
+                    prop(Group::clipPaths).hasSize(1)
+                    prop(Group::elements).all {
+                        hasSize(2)
+                        index(0).isInstanceOf<Path>()
+                        index(1).isInstanceOf<Group>().all {
+                            prop(Group::clipPaths).hasSize(1)
+                            prop(Group::elements).single().isInstanceOf<Path>()
+                        }
+                    }
+                }
+            }
     }
 }

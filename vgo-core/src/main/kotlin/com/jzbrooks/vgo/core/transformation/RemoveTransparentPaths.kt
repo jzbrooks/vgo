@@ -2,7 +2,6 @@ package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Paint
-import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -14,8 +13,6 @@ class RemoveTransparentPaths : TopDownTransformer {
     override fun visit(graphic: Graphic) = removeTransparentPaths(graphic)
 
     override fun visit(group: Group) = removeTransparentPaths(group)
-
-    override fun visit(clipPath: ClipPath) {}
 
     override fun visit(extra: Extra) {}
 

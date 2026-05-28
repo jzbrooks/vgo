@@ -1,6 +1,5 @@
 package com.jzbrooks.vgo.core.transformation
 
-import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ElementVisitor
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -32,8 +31,6 @@ class BakeTransformations :
     TopDownTransformer {
     override fun visit(graphic: Graphic) {}
 
-    override fun visit(clipPath: ClipPath) {}
-
     override fun visit(extra: Extra) {}
 
     override fun visit(shape: Shape) {}
@@ -49,9 +46,11 @@ class BakeTransformations :
                     when (element) {
                         is Path -> true
                         is Group -> true
-                        is ClipPath -> element.elements.all { it is Path }
                         else -> false
                     }
+                } &&
+                group.clipPaths.all { clipPath ->
+                    clipPath.regions.all { it.commands.isNotEmpty() }
                 }
 
         if (shouldBakeTransform) {
@@ -65,15 +64,15 @@ class BakeTransformations :
                         child.transform = groupTransform * child.transform
                     }
 
-                    is ClipPath -> {
-                        for (clipChild in child.elements) {
-                            applyTransform(clipChild as Path, groupTransform)
-                        }
-                    }
-
                     else -> {
                         error("Unexpected element type: ${child::class}")
                     }
+                }
+            }
+
+            for (clipPath in group.clipPaths) {
+                for (region in clipPath.regions) {
+                    applyTransform(region, groupTransform)
                 }
             }
 

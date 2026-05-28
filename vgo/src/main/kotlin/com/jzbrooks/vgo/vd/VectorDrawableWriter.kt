@@ -92,8 +92,9 @@ fun VectorDrawable.toDocument(commandPrinter: VectorDrawableCommandPrinter): Doc
 
     document.appendChild(root)
 
-    for (element in elements) {
-        document.createChildElement(commandPrinter, root, element)
+    val lastIndex = elements.lastIndex
+    for ((index, element) in elements.withIndex()) {
+        document.createChildElement(commandPrinter, root, element, isLast = index == lastIndex)
     }
 
     return document
@@ -112,7 +113,30 @@ private fun Document.createChildElement(
     commandPrinter: VectorDrawableCommandPrinter,
     parent: org.w3c.dom.Element,
     element: Element,
+    isLast: Boolean = true,
 ) {
+    // Elide anonymous, last-in-parent clip-only Groups: the reader synthesizes
+    // these to model VD's positional clip-path scope, so inlining them on emit
+    // restores the original flat positional form. The "last in parent's elements"
+    // check is load-bearing — inlining a non-last clip-only group would leak its
+    // clip-paths onto the parent's subsequent siblings.
+    if (element is Group &&
+        isLast &&
+        element.id == null &&
+        element.transform.contentsEqual(Matrix3.IDENTITY) &&
+        element.foreign.isEmpty() &&
+        element.clipPaths.isNotEmpty()
+    ) {
+        for (clipPath in element.clipPaths) {
+            emitClipPath(commandPrinter, parent, clipPath)
+        }
+        val lastChildIndex = element.elements.lastIndex
+        for ((index, child) in element.elements.withIndex()) {
+            createChildElement(commandPrinter, parent, child, isLast = index == lastChildIndex)
+        }
+        return
+    }
+
     val node =
         when (element) {
             is Path -> {
@@ -187,27 +211,25 @@ private fun Document.createChildElement(
                         writeTransforms(commandPrinter, element, node)
                     }
 
-                    for (child in element.elements) {
-                        createChildElement(commandPrinter, node, child)
+                    // VD semantics: every <clip-path> inside a <group> applies to all
+                    // subsequent siblings; multiple clip-paths intersect. Emit them as
+                    // the first children so they affect everything that follows.
+                    for (clipPath in element.clipPaths) {
+                        emitClipPath(commandPrinter, node, clipPath)
                     }
-                }
-            }
 
-            is ClipPath -> {
-                createElement("clip-path").apply {
-                    val data =
-                        (element.elements[0] as Path)
-                            .commands
-                            .joinToString(separator = "", transform = commandPrinter::print)
-
-                    setAttribute("android:pathData", data)
+                    val lastChildIndex = element.elements.lastIndex
+                    for ((index, child) in element.elements.withIndex()) {
+                        createChildElement(commandPrinter, node, child, isLast = index == lastChildIndex)
+                    }
                 }
             }
 
             is Extra -> {
                 createElement(element.name).also {
-                    for (child in element.elements) {
-                        createChildElement(commandPrinter, it, child)
+                    val lastChildIndex = element.elements.lastIndex
+                    for ((index, child) in element.elements.withIndex()) {
+                        createChildElement(commandPrinter, it, child, isLast = index == lastChildIndex)
                     }
                 }
             }
@@ -233,6 +255,31 @@ private fun Document.createChildElement(
 
         parent.appendChild(node)
     }
+}
+
+private fun Document.emitClipPath(
+    commandPrinter: VectorDrawableCommandPrinter,
+    parent: org.w3c.dom.Element,
+    clipPath: ClipPath,
+) {
+    val clipNode = createElement("clip-path")
+    val region = clipPath.regions.firstOrNull()
+    if (region != null) {
+        val data =
+            if (region.commands.isNotEmpty()) {
+                region.commands.joinToString(separator = "", transform = commandPrinter::print)
+            } else {
+                clipPath.foreign["android:pathData"] ?: ""
+            }
+        if (data.isNotEmpty()) clipNode.setAttribute("android:pathData", data)
+    }
+    val name = clipPath.id
+    if (name != null) clipNode.setAttribute("android:name", name)
+    for ((k, v) in clipPath.foreign) {
+        if (k == "android:pathData" && clipNode.hasAttribute(k)) continue
+        clipNode.setAttribute(k, v)
+    }
+    parent.appendChild(clipNode)
 }
 
 private fun writeTransforms(

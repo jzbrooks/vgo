@@ -1,6 +1,5 @@
 package com.jzbrooks.vgo.core.transformation
 
-import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -15,9 +14,8 @@ import com.jzbrooks.vgo.core.util.math.Matrix3
 class CollapseGroups : BottomUpTransformer {
     private val Group.isMergeable: Boolean
         get() {
-            val hasValidClipPath = elements.any { it is ClipPath }
             val hasAttributes = id != null || !transform.contentsEqual(Matrix3.IDENTITY) || foreign.isNotEmpty()
-            return !hasValidClipPath && elements.isNotEmpty() && !hasAttributes
+            return clipPaths.isEmpty() && elements.isNotEmpty() && !hasAttributes
         }
 
     override fun visit(graphic: Graphic) {
@@ -27,8 +25,6 @@ class CollapseGroups : BottomUpTransformer {
     override fun visit(group: Group) {
         mergeChildGroups(group)
     }
-
-    override fun visit(clipPath: ClipPath) {}
 
     override fun visit(extra: Extra) {}
 

@@ -6,6 +6,7 @@ import com.jzbrooks.vgo.core.HexFormat
 import com.jzbrooks.vgo.core.Paint
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Ellipse
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -71,12 +72,61 @@ class ScalableVectorGraphicWriter(
         }
         document.appendChild(root)
 
+        // Assign stable ids to every ClipPath reachable via Group.clipPaths and emit
+        // them as <defs><clipPath>...</clipPath></defs> so refs below resolve.
+        val clipPathIds = assignClipPathIds(graphic)
+        if (clipPathIds.isNotEmpty()) {
+            val defs = document.createElement("defs")
+            root.appendChild(defs)
+            for ((clipPath, id) in clipPathIds) {
+                val clipPathElement = document.createElement("clipPath")
+                clipPathElement.setAttribute("id", id)
+                for ((key, value) in clipPath.foreign) {
+                    clipPathElement.setAttribute(key, value)
+                }
+                val regionInherited = InheritedStyle()
+                for (region in clipPath.regions) {
+                    document.createChildElement(commandPrinter, clipPathElement, region, regionInherited)
+                }
+                defs.appendChild(clipPathElement)
+            }
+        }
+
         val inherited = graphic.foreign.toChildInheritedStyle(InheritedStyle())
         for (element in graphic.elements) {
-            document.createChildElement(commandPrinter, root, element, inherited)
+            document.createChildElement(commandPrinter, root, element, inherited, clipPathIds)
         }
 
         return document
+    }
+
+    private fun assignClipPathIds(graphic: ScalableVectorGraphic): LinkedHashMap<ClipPath, String> {
+        val result = LinkedHashMap<ClipPath, String>()
+        val usedIds = mutableSetOf<String>()
+        var counter = 0
+
+        fun nextId(preferred: String?): String {
+            if (preferred != null && usedIds.add(preferred)) return preferred
+            while (true) {
+                val candidate = "clipPath${counter++}"
+                if (usedIds.add(candidate)) return candidate
+            }
+        }
+
+        fun walk(element: Element) {
+            if (element is Group) {
+                for (clipPath in element.clipPaths) {
+                    if (clipPath !in result) {
+                        result[clipPath] = nextId(clipPath.id)
+                    }
+                }
+            }
+            if (element is ContainerElement) {
+                element.elements.forEach(::walk)
+            }
+        }
+        graphic.elements.forEach(::walk)
+        return result
     }
 
     private data class InheritedStyle(
@@ -193,6 +243,7 @@ class ScalableVectorGraphicWriter(
         parent: org.w3c.dom.Element,
         element: Element,
         inherited: InheritedStyle = InheritedStyle(),
+        clipPathIds: Map<ClipPath, String> = emptyMap(),
     ) {
         val writtenForeign = element.foreign.withoutImpliedPresentationAttrs(inherited)
         val node =
@@ -206,35 +257,51 @@ class ScalableVectorGraphicWriter(
                 }
 
                 is Group -> {
-                    createElement("g").also { node ->
-                        if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
-                            val matrix = element.transform
-                            val matrixElements =
-                                listOf(
-                                    commandPrinter.formatter.format(matrix[0, 0]),
-                                    commandPrinter.formatter.format(matrix[1, 0]),
-                                    commandPrinter.formatter.format(matrix[0, 1]),
-                                    commandPrinter.formatter.format(matrix[1, 1]),
-                                    commandPrinter.formatter.format(matrix[0, 2]),
-                                    commandPrinter.formatter.format(matrix[1, 2]),
-                                ).joinToString(separator = ",")
+                    val groupElement =
+                        createElement("g").also { node ->
+                            if (!element.transform.contentsEqual(Matrix3.IDENTITY)) {
+                                val matrix = element.transform
+                                val matrixElements =
+                                    listOf(
+                                        commandPrinter.formatter.format(matrix[0, 0]),
+                                        commandPrinter.formatter.format(matrix[1, 0]),
+                                        commandPrinter.formatter.format(matrix[0, 1]),
+                                        commandPrinter.formatter.format(matrix[1, 1]),
+                                        commandPrinter.formatter.format(matrix[0, 2]),
+                                        commandPrinter.formatter.format(matrix[1, 2]),
+                                    ).joinToString(separator = ",")
 
-                            node.setAttribute("transform", "matrix($matrixElements)")
+                                node.setAttribute("transform", "matrix($matrixElements)")
+                            }
+
+                            val childInherited = writtenForeign.toChildInheritedStyle(inherited)
+                            for (child in element.elements) {
+                                createChildElement(commandPrinter, node, child, childInherited, clipPathIds)
+                            }
                         }
 
-                        val childInherited = writtenForeign.toChildInheritedStyle(inherited)
-                        for (child in element.elements) {
-                            createChildElement(commandPrinter, node, child, childInherited)
-                        }
-                    }
-                }
+                    if (element.clipPaths.isEmpty()) {
+                        groupElement
+                    } else {
+                        // SVG clip-path is single-valued; multiple clip paths intersect via
+                        // synthesized wrapping <g> elements. Decorate the inner group with
+                        // id+foreign here and skip the generic post-block.
+                        val elementName = element.id
+                        if (elementName != null) groupElement.setAttribute("id", elementName)
+                        for ((k, v) in writtenForeign) groupElement.setAttribute(k, v)
 
-                is ClipPath -> {
-                    createElement("clipPath").also {
-                        val childInherited = writtenForeign.toChildInheritedStyle(inherited)
-                        for (child in element.elements) {
-                            createChildElement(commandPrinter, it, child, childInherited)
+                        var inner: org.w3c.dom.Element = groupElement
+                        val firstId = clipPathIds[element.clipPaths.first()]
+                        if (firstId != null) inner.setAttribute("clip-path", "url(#$firstId)")
+                        for (extra in element.clipPaths.drop(1)) {
+                            val id = clipPathIds[extra] ?: continue
+                            val wrapper = createElement("g")
+                            wrapper.setAttribute("clip-path", "url(#$id)")
+                            wrapper.appendChild(inner)
+                            inner = wrapper
                         }
+                        parent.appendChild(inner)
+                        null
                     }
                 }
 
@@ -242,7 +309,7 @@ class ScalableVectorGraphicWriter(
                     createElement(element.name).also {
                         val childInherited = writtenForeign.toChildInheritedStyle(inherited)
                         for (child in element.elements) {
-                            createChildElement(commandPrinter, it, child, childInherited)
+                            createChildElement(commandPrinter, it, child, childInherited, clipPathIds)
                         }
                     }
                 }
