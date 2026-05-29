@@ -24,7 +24,6 @@ class FakeCommandPrinter : CommandPrinter {
             is SmoothQuadraticBezierCurve -> print(command)
             is EllipticalArcCurve -> print(command)
             is ClosePath -> "Z"
-            else -> throw IllegalArgumentException("An unexpected command type was encountered: $command")
         }
 
     private fun print(moveTo: MoveTo): String {

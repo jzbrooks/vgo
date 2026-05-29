@@ -24,7 +24,13 @@ subprojects {
 
     pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
         configure<KotlinJvmProjectExtension> {
-            compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+            compilerOptions {
+                jvmTarget.set(JvmTarget.JVM_17)
+                val runningFromIdea =
+                    System.getProperty("idea.active") == "true" ||
+                        System.getProperty("idea.sync.active") == "true"
+                allWarningsAsErrors.set(!runningFromIdea)
+            }
         }
 
         configure<JavaPluginExtension> {
