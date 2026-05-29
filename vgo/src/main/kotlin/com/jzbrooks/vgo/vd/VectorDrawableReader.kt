@@ -1,10 +1,10 @@
 package com.jzbrooks.vgo.vd
 
+import com.jzbrooks.vgo.core.Brush
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.GradientStop
 import com.jzbrooks.vgo.core.LinearGradient
-import com.jzbrooks.vgo.core.Paint
 import com.jzbrooks.vgo.core.RadialGradient
 import com.jzbrooks.vgo.core.SweepGradient
 import com.jzbrooks.vgo.core.TileMode
@@ -100,14 +100,14 @@ private fun parsePath(node: Node): Path {
     val pathDataString = node.attributes.getNamedItem("android:pathData")!!.textContent
 
     val id = node.attributes.removeOrNull("android:name")?.nodeValue
-    val fill: Paint =
+    val fill: Brush =
         node.attributes.extractColor("android:fillColor", "android:fillAlpha")
             ?: node.parseAaptGradient("android:fillColor")
             ?: Colors.TRANSPARENT
 
     val fillRule = node.attributes.extractFillRule("android:fillType")
 
-    val stroke: Paint =
+    val stroke: Brush =
         node.attributes.extractColor("android:strokeColor", "android:strokeAlpha")
             ?: node.parseAaptGradient("android:strokeColor")
             ?: Colors.TRANSPARENT
@@ -259,7 +259,7 @@ private fun parseColorInt(value: String): UInt =
         else -> value.trimStart('#').toUInt(radix = 16) or 0xFF000000u
     }
 
-private fun Node.parseAaptGradient(attrName: String): Paint? {
+private fun Node.parseAaptGradient(attrName: String): Brush? {
     val aaptAttr =
         childNodes
             .asSequence()

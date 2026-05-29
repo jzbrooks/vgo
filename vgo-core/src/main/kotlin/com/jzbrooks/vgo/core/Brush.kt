@@ -2,7 +2,7 @@ package com.jzbrooks.vgo.core
 
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 
-sealed interface Paint
+sealed interface Brush
 
 enum class HexFormat {
     RGBA,
@@ -12,7 +12,7 @@ enum class HexFormat {
 @JvmInline
 value class Color(
     private val argb: UInt,
-) : Paint {
+) : Brush {
     constructor(alpha: UByte, red: UByte, green: UByte, blue: UByte) : this(
         (alpha.toUInt() shl 24) or
             (red.toUInt() shl 16) or
@@ -98,7 +98,7 @@ value class Color(
         }
 }
 
-sealed interface Gradient : Paint {
+sealed interface Gradient : Brush {
     val stops: List<GradientStop>
 }
 

@@ -1,9 +1,9 @@
 package com.jzbrooks.vgo.svg
 
+import com.jzbrooks.vgo.core.Brush
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.HexFormat
-import com.jzbrooks.vgo.core.Paint
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
@@ -130,9 +130,9 @@ class ScalableVectorGraphicWriter(
     }
 
     private data class InheritedStyle(
-        val fill: Paint = Colors.BLACK,
+        val fill: Brush = Colors.BLACK,
         val fillRule: Path.FillRule = Path.FillRule.NON_ZERO,
-        val stroke: Paint = Colors.TRANSPARENT,
+        val stroke: Brush = Colors.TRANSPARENT,
         val strokeWidth: Float = 1f,
         val strokeLineCap: Path.LineCap = Path.LineCap.BUTT,
         val strokeLineJoin: Path.LineJoin = Path.LineJoin.MITER,
