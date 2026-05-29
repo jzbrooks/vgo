@@ -30,6 +30,7 @@ subprojects {
                     System.getProperty("idea.active") == "true" ||
                         System.getProperty("idea.sync.active") == "true"
                 allWarningsAsErrors.set(!runningFromIdea)
+                extraWarnings.set(!runningFromIdea)
             }
         }
 

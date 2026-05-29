@@ -232,15 +232,15 @@ fun EllipticalArcCurve.Parameter.computeCenterParameterization(
     val x1primeSquared = x1prime * x1prime
     val y1primeSquared = y1prime * y1prime
 
-    var radiusChecker = x1primeSquared / (radiusX * radiusX) + y1primeSquared / (radiusY * radiusY)
+    val radiusChecker = x1primeSquared / (radiusX * radiusX) + y1primeSquared / (radiusY * radiusY)
     if (radiusChecker > 1) {
         val root = sqrt(radiusChecker)
         rx *= root.toFloat()
         ry *= root.toFloat()
     }
 
-    var rx2 = rx * rx
-    var ry2 = ry * ry
+    val rx2 = rx * rx
+    val ry2 = ry * ry
     val sign = if ((arc == EllipticalArcCurve.ArcFlag.LARGE) == (sweep == EllipticalArcCurve.SweepFlag.CLOCKWISE)) -1 else 1
     val sq = ((rx2 * ry2 - rx2 * y1primeSquared - ry2 * x1primeSquared) / (rx2 * y1primeSquared + ry2 * x1primeSquared))
     val c = sign * sqrt(sq.coerceAtLeast(0.0))
