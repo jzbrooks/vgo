@@ -1,15 +1,15 @@
 package com.jzbrooks.vgo.core.graphic
 
-import com.jzbrooks.vgo.core.Paint
+import com.jzbrooks.vgo.core.Brush
 import com.jzbrooks.vgo.core.graphic.command.Command
 
 data class Path(
     override val id: String?,
     override val foreign: MutableMap<String, String>,
     var commands: List<Command>,
-    override val fill: Paint,
+    override val fill: Brush,
     override val fillRule: FillRule,
-    override val stroke: Paint,
+    override val stroke: Brush,
     override val strokeWidth: Float,
     override val strokeLineCap: LineCap,
     override val strokeLineJoin: LineJoin,

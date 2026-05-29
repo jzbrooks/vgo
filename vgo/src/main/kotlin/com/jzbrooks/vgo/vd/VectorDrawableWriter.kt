@@ -1,10 +1,10 @@
 package com.jzbrooks.vgo.vd
 
+import com.jzbrooks.vgo.core.Brush
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Gradient
 import com.jzbrooks.vgo.core.HexFormat
 import com.jzbrooks.vgo.core.LinearGradient
-import com.jzbrooks.vgo.core.Paint
 import com.jzbrooks.vgo.core.RadialGradient
 import com.jzbrooks.vgo.core.SweepGradient
 import com.jzbrooks.vgo.core.TileMode
@@ -323,17 +323,17 @@ private fun writeTransforms(
 private fun org.w3c.dom.Element.writePaintAttribute(
     commandPrinter: VectorDrawableCommandPrinter,
     attrName: String,
-    paint: Paint,
+    brush: Brush,
 ) {
-    when (paint) {
+    when (brush) {
         is Color -> {
-            if (paint.alpha != 0.toUByte()) {
-                setAttribute(attrName, paint.toHexString(HexFormat.ARGB))
+            if (brush.alpha != 0.toUByte()) {
+                setAttribute(attrName, brush.toHexString(HexFormat.ARGB))
             }
         }
 
         is Gradient -> {
-            appendChild(buildGradientAaptAttr(commandPrinter, ownerDocument, attrName, paint))
+            appendChild(buildGradientAaptAttr(commandPrinter, ownerDocument, attrName, brush))
         }
     }
 }

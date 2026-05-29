@@ -1,11 +1,11 @@
 package com.jzbrooks.vgo.core.graphic
 
-import com.jzbrooks.vgo.core.Paint
+import com.jzbrooks.vgo.core.Brush
 
 interface PaintedElement : Element {
-    val fill: Paint
+    val fill: Brush
     val fillRule: Path.FillRule
-    val stroke: Paint
+    val stroke: Brush
     val strokeWidth: Float
     val strokeLineCap: Path.LineCap
     val strokeLineJoin: Path.LineJoin
