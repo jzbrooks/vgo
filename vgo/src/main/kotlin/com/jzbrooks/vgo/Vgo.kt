@@ -52,21 +52,22 @@ class Vgo(
             return 0
         }
 
-        var inputs = options.input
-        if (inputs.isEmpty()) {
-            require(options.output.isEmpty())
+        val inputs =
+            if (options.input.isEmpty()) {
+                require(options.output.isEmpty())
 
-            var path = readlnOrNull()
-            val standardInPaths = mutableListOf<String>()
-            while (path != null) {
-                standardInPaths.add(path)
-                path = readlnOrNull()
+                buildList {
+                    var path = readlnOrNull()
+                    while (path != null) {
+                        add(path)
+                        path = readlnOrNull()
+                    }
+                }
+            } else {
+                options.input
             }
 
-            inputs = standardInPaths
-        }
-
-        val inputOutputMap = pairOutputs()
+        val inputOutputMap = pairOutputs(inputs)
         val files = inputOutputMap.count { (input, _) -> input.isFile }
         val containsDirectory = inputOutputMap.any { (input, _) -> input.isDirectory }
         printFileNames = options.printStats && (files > 1 || containsDirectory)
@@ -74,13 +75,13 @@ class Vgo(
         return handleFiles(inputOutputMap)
     }
 
-    private fun pairOutputs(): Map<File, Path> =
+    private fun pairOutputs(inputs: List<String>): Map<File, Path> =
         if (options.output.isNotEmpty()) {
-            options.input.zip(options.output) { a, b ->
+            inputs.zip(options.output) { a, b ->
                 Pair(File(a), Paths.get(b))
             }
         } else {
-            options.input.zip(options.input) { a, b ->
+            inputs.zip(inputs) { a, b ->
                 Pair(File(a), Paths.get(b))
             }
         }.toMap()
