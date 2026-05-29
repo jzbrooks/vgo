@@ -6,20 +6,16 @@ import org.w3c.dom.Node
 
 fun <T> Assert<Node>.hasValue(other: T) =
     given { actual ->
-        if (actual.nodeValue == other) {
-            return
+        if (actual.nodeValue != other) {
+            fail(other, actual)
         }
-
-        fail(other, actual)
     }
 
 fun <T> Assert<Node>.hasName(other: T) =
     given { actual ->
-        if (actual.nodeName == other) {
-            return
+        if (actual.nodeName != other) {
+            fail(other, actual)
         }
-
-        fail(other, actual)
     }
 
 /**
