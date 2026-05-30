@@ -16,6 +16,7 @@ import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.SmoothQuadraticBezierCurve
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
+import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
@@ -359,21 +360,21 @@ private fun emitElement(
         }
 
         is Group -> {
-            emitGroupWithClipPaths(element, element.clipPaths, codeBlock, decimalFormat)
+            emitGroup(element, element.clipPaths, codeBlock, decimalFormat)
         }
 
         else -> {}
     }
 }
 
-private fun emitGroupWithClipPaths(
+private fun emitGroup(
     group: Group,
     remaining: List<ClipPath>,
     codeBlock: CodeBlock.Builder,
     decimalFormat: DecimalFormat,
 ) {
-    if (remaining.isEmpty()) {
-        emitPlainGroup(group, codeBlock, decimalFormat)
+    if (remaining.size <= 1) {
+        emitCombinedGroup(group, remaining.firstOrNull(), codeBlock, decimalFormat)
         return
     }
     val clipPath = remaining.first()
@@ -384,32 +385,44 @@ private fun emitGroupWithClipPaths(
     }
     codeBlock.add(") {\n")
     codeBlock.withIndent {
-        emitGroupWithClipPaths(group, rest, codeBlock, decimalFormat)
+        emitGroup(group, rest, codeBlock, decimalFormat)
     }
     codeBlock.add("}\n")
 }
 
-private fun emitPlainGroup(
+private fun emitCombinedGroup(
     group: Group,
+    clipPath: ClipPath?,
     codeBlock: CodeBlock.Builder,
     decimalFormat: DecimalFormat,
 ) {
-    val matrix = group.transform
-    val scaleX = hypot(matrix[0, 0], matrix[0, 1])
-    val scaleY = hypot(matrix[1, 0], matrix[1, 1])
-    val rotation = atan2(matrix[0, 1], matrix[0, 0]) * (180 / PI).toFloat()
-    val translationX = matrix[0, 2]
-    val translationY = matrix[1, 2]
+    val groupMember = MemberName("androidx.compose.ui.graphics.vector", "group")
+    val hasTransform = !group.transform.contentsEqual(Matrix3.IDENTITY)
 
-    codeBlock.add("%M(\n", MemberName("androidx.compose.ui.graphics.vector", "group"))
-    codeBlock.withIndent {
-        add("rotate = %Lf,\n", decimalFormat.format(rotation))
-        add("scaleX = %Lf,\n", decimalFormat.format(scaleX))
-        add("scaleY = %Lf,\n", decimalFormat.format(scaleY))
-        add("translationX = %Lf,\n", decimalFormat.format(translationX))
-        add("translationY = %Lf,\n", decimalFormat.format(translationY))
+    if (!hasTransform && clipPath == null) {
+        codeBlock.add("%M {\n", groupMember)
+    } else {
+        codeBlock.add("%M(\n", groupMember)
+        codeBlock.withIndent {
+            if (hasTransform) {
+                val matrix = group.transform
+                val scaleX = hypot(matrix[0, 0], matrix[0, 1])
+                val scaleY = hypot(matrix[1, 0], matrix[1, 1])
+                val rotation = atan2(matrix[0, 1], matrix[0, 0]) * (180 / PI).toFloat()
+                val translationX = matrix[0, 2]
+                val translationY = matrix[1, 2]
+                add("rotate = %Lf,\n", decimalFormat.format(rotation))
+                add("scaleX = %Lf,\n", decimalFormat.format(scaleX))
+                add("scaleY = %Lf,\n", decimalFormat.format(scaleY))
+                add("translationX = %Lf,\n", decimalFormat.format(translationX))
+                add("translationY = %Lf,\n", decimalFormat.format(translationY))
+            }
+            if (clipPath != null) {
+                emitClipPathDataArg(clipPath.regions, decimalFormat)
+            }
+        }
+        codeBlock.add(") {\n")
     }
-    codeBlock.add(") {\n")
     codeBlock.withIndent {
         for (child in group.elements) {
             emitElement(child, codeBlock, decimalFormat)

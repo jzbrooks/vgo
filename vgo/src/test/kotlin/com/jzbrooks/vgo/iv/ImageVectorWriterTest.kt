@@ -1,13 +1,21 @@
 package com.jzbrooks.vgo.iv
 
 import assertk.assertThat
+import assertk.assertions.containsExactly
+import assertk.assertions.hasSize
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.jzbrooks.vgo.core.graphic.ClipPath
+import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
+import com.jzbrooks.vgo.core.util.math.computeTransformation
 import com.jzbrooks.vgo.util.element.createPath
 import org.jetbrains.kotlin.com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
+import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.psiUtil.visibilityModifier
@@ -59,6 +67,63 @@ class ImageVectorWriterTest {
         }
     }
 
+    @Test
+    fun testGroupWithTransformAndClipPathCombinesArgs() {
+        val groupCalls = writeAndCollectGroups(buildGraphic(groupWithTransformAndClipPath()))
+
+        assertThat(groupCalls).hasSize(1)
+        assertThat(groupCalls.single().argumentNames()).containsExactly(
+            "rotate",
+            "scaleX",
+            "scaleY",
+            "translationX",
+            "translationY",
+            "clipPathData",
+        )
+    }
+
+    @Test
+    fun testGroupWithIdentityTransformAndClipPathEmitsOnlyClipPathData() {
+        val groupCalls = writeAndCollectGroups(buildGraphic(groupWithIdentityTransformAndClipPath()))
+
+        assertThat(groupCalls).hasSize(1)
+        assertThat(groupCalls.single().argumentNames()).containsExactly("clipPathData")
+    }
+
+    @Test
+    fun testGroupWithTransformAndTwoClipPathsNestsOuterAndCombinesInner() {
+        val groupCalls = writeAndCollectGroups(buildGraphic(groupWithTransformAndTwoClipPaths()))
+
+        assertThat(groupCalls).hasSize(2)
+        assertThat(groupCalls[0].argumentNames()).containsExactly("clipPathData")
+        assertThat(groupCalls[1].argumentNames()).containsExactly(
+            "rotate",
+            "scaleX",
+            "scaleY",
+            "translationX",
+            "translationY",
+            "clipPathData",
+        )
+    }
+
+    @Test
+    fun testGroupWithIdentityTransformAndNoClipPathsEmitsBareGroup() {
+        val groupCalls = writeAndCollectGroups(buildGraphic(groupWithIdentityTransformAndNoClipPaths()))
+
+        assertThat(groupCalls).hasSize(1)
+        assertThat(groupCalls.single().argumentNames()).isEmpty()
+    }
+
+    private fun writeAndCollectGroups(graphic: ImageVector): List<KtCallExpression> {
+        val bytes =
+            ByteArrayOutputStream().use { memoryStream ->
+                ImageVectorWriter("test").write(graphic, memoryStream)
+                memoryStream.toByteArray()
+            }
+        val psiFile = ByteArrayInputStream(bytes).use { parseKotlinFile(disposable, it) }
+        return psiFile.collectCallsNamed("group")
+    }
+
     companion object {
         val graphic =
             ImageVector(
@@ -85,5 +150,77 @@ class ImageVectorWriterTest {
                 24f,
                 24f,
             )
+
+        private fun buildGraphic(group: Group): ImageVector =
+            ImageVector(
+                listOf(group),
+                id = null,
+                mutableMapOf(),
+                24f,
+                24f,
+                24f,
+                24f,
+            )
+
+        private fun samplePath() = createPath(CommandString("M 0 0 L 24 0 L 24 24 L 0 24 Z").toCommandList())
+
+        private fun sampleClipPath() =
+            ClipPath(
+                regions =
+                    listOf(
+                        createPath(CommandString("M 0 0 L 24 0 L 24 24 L 0 24 Z").toCommandList()),
+                    ),
+            )
+
+        private fun secondClipPath() =
+            ClipPath(
+                regions =
+                    listOf(
+                        createPath(CommandString("M 4 4 L 20 4 L 20 20 L 4 20 Z").toCommandList()),
+                    ),
+            )
+
+        private fun groupWithTransformAndClipPath(): Group =
+            Group(
+                elements = listOf(samplePath()),
+                transform = computeTransformation(scaleX = 2f, scaleY = 2f, translationX = 10f, translationY = 5f),
+                clipPaths = listOf(sampleClipPath()),
+            )
+
+        private fun groupWithIdentityTransformAndClipPath(): Group =
+            Group(
+                elements = listOf(samplePath()),
+                clipPaths = listOf(sampleClipPath()),
+            )
+
+        private fun groupWithTransformAndTwoClipPaths(): Group =
+            Group(
+                elements = listOf(samplePath()),
+                transform = computeTransformation(scaleX = 2f, scaleY = 2f),
+                clipPaths = listOf(sampleClipPath(), secondClipPath()),
+            )
+
+        private fun groupWithIdentityTransformAndNoClipPaths(): Group =
+            Group(
+                elements = listOf(samplePath()),
+            )
+
+        private fun KtFile.collectCallsNamed(name: String): List<KtCallExpression> {
+            val results = mutableListOf<KtCallExpression>()
+            accept(
+                object : KtTreeVisitorVoid() {
+                    override fun visitCallExpression(expression: KtCallExpression) {
+                        if (expression.calleeExpression?.text == name) {
+                            results.add(expression)
+                        }
+                        super.visitCallExpression(expression)
+                    }
+                },
+            )
+            return results
+        }
+
+        private fun KtCallExpression.argumentNames(): List<String> =
+            valueArgumentList?.arguments?.mapNotNull { it.getArgumentName()?.asName?.identifier } ?: emptyList()
     }
 }
