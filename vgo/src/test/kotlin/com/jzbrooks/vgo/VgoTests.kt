@@ -135,6 +135,25 @@ class VgoTests {
     }
 
     @Test
+    fun `svg input is converted to ImageVector with format iv`(info: TestInfo) {
+        val outputPath = "build/test-results/${info.displayName}/simple_heart.kt"
+
+        val options =
+            Vgo.Options(
+                format = "iv",
+                input = listOf("src/test/resources/simple_heart.svg"),
+                output = listOf(outputPath),
+            )
+
+        val exitCode = Vgo(options).run()
+
+        assertThat(exitCode).isEqualTo(0)
+        val output = File(outputPath).readText()
+        assertThat(output).contains("ImageVector.Builder")
+        assertThat(output).doesNotContain("<svg")
+    }
+
+    @Test
     fun `optimized file is not modified when re-run produces same or larger output`() {
         val targetPath = "build/test-results/bug_117.xml"
 
