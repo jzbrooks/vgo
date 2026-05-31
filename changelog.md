@@ -9,9 +9,13 @@
 - `PaintedElement` abstracts common paintable element attributes
 - `ConvertShapesToPaths` converts shape elements to paths for interaction with the optimization pipeline
   - Currently, transformations only operate on paths, so this transformation unlocks optimization for shape-heavy graphics 
+- Clip paths are supported in `ImageVector`
+- SVG ↔ `ImageVector` conversions
 
 ### Changed
 - Top-down transformations are applied before bottom-up transformations
+- *Breaking*: Clip paths are represented as a property on a group. The clip path applies to group children.
+  - `ClipPath` is no longer an `Element` 
 
 ### Fixed
 - Clip paths inside transformed groups are sometimes not transformed
