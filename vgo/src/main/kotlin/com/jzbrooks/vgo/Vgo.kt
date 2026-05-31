@@ -8,11 +8,13 @@ import com.jzbrooks.vgo.iv.ImageVector
 import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
 import com.jzbrooks.vgo.iv.ImageVectorWriter
 import com.jzbrooks.vgo.iv.toFileSpec
+import com.jzbrooks.vgo.iv.toSvg
 import com.jzbrooks.vgo.iv.toVectorDrawable
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicCommandPrinter
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
+import com.jzbrooks.vgo.svg.toImageVector
 import com.jzbrooks.vgo.svg.toVectorDrawable
 import com.jzbrooks.vgo.util.CountingOutputStream
 import com.jzbrooks.vgo.util.parse
@@ -114,32 +116,46 @@ class Vgo(
         if (graphic == null && outputPath.isSameFileAs(input.toPath())) return
 
         if (graphic != null) {
-            when (options.format) {
-                "vd" -> {
-                    when (graphic) {
-                        is ScalableVectorGraphic -> graphic.toVectorDrawable()
-                        is ImageVector -> graphic.toVectorDrawable()
+            graphic =
+                when (options.format) {
+                    "vd" -> {
+                        when (graphic) {
+                            is VectorDrawable -> graphic
+                            is ScalableVectorGraphic -> graphic.toVectorDrawable()
+                            is ImageVector -> graphic.toVectorDrawable()
+                            else -> graphic
+                        }
                     }
-                }
 
-                "svg" -> {
-                    if (graphic is VectorDrawable) {
-                        graphic = graphic.toSvg()
+                    "svg" -> {
+                        when (graphic) {
+                            is ScalableVectorGraphic -> graphic
+                            is VectorDrawable -> graphic.toSvg()
+                            is ImageVector -> graphic.toSvg()
+                            else -> graphic
+                        }
                     }
-                }
 
-                "iv" -> {
-                    if (graphic is VectorDrawable) {
-                        graphic = graphic.toImageVector()
+                    "iv" -> {
+                        when (graphic) {
+                            is ImageVector -> graphic
+                            is VectorDrawable -> graphic.toImageVector()
+                            is ScalableVectorGraphic -> graphic.toImageVector()
+                            else -> graphic
+                        }
                     }
-                }
 
-                else -> {
-                    if (options.format?.isNotEmpty() == true) {
-                        System.err.println("Unknown format ${options.format}")
+                    null -> {
+                        graphic
+                    }
+
+                    else -> {
+                        if (options.format.isNotEmpty()) {
+                            System.err.println("Unknown format ${options.format}")
+                        }
+                        graphic
                     }
                 }
-            }
 
             if (!options.noOptimization) {
                 val optimizationRegistry =

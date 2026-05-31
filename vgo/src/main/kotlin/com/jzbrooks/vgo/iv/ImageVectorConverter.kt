@@ -1,24 +1,27 @@
 package com.jzbrooks.vgo.iv
 
+import com.jzbrooks.vgo.core.graphic.ContainerElement
+import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
+import com.jzbrooks.vgo.svg.ScalableVectorGraphic
 import com.jzbrooks.vgo.vd.VectorDrawable
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
 
+private val decimalFormat =
+    DecimalFormat().apply {
+        maximumFractionDigits = 2
+        isDecimalSeparatorAlwaysShown = false
+        isGroupingUsed = false
+        roundingMode = RoundingMode.HALF_UP
+        minimumIntegerDigits = 0
+        decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
+    }
+
 @ExperimentalVgoApi
 fun ImageVector.toVectorDrawable(): VectorDrawable {
-    val decimalFormat =
-        DecimalFormat().apply {
-            maximumFractionDigits = 2
-            isDecimalSeparatorAlwaysShown = false
-            isGroupingUsed = false
-            roundingMode = RoundingMode.HALF_UP
-            minimumIntegerDigits = 0
-            decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
-        }
-
     val vdElementAttributes =
         mutableMapOf(
             "xmlns:android" to "http://schemas.android.com/apk/res/android",
@@ -35,4 +38,31 @@ fun ImageVector.toVectorDrawable(): VectorDrawable {
     foreign.clear()
 
     return VectorDrawable(elements, id, vdElementAttributes)
+}
+
+@ExperimentalVgoApi
+fun ImageVector.toSvg(): ScalableVectorGraphic {
+    val svgElementAttributes =
+        mutableMapOf(
+            "xmlns" to "http://www.w3.org/2000/svg",
+            "viewBox" to
+                "0 0 ${decimalFormat.format(viewportWidth)} ${decimalFormat.format(viewportHeight)}",
+            "width" to decimalFormat.format(defaultWidthDp),
+            "height" to decimalFormat.format(defaultHeightDp),
+        )
+
+    traverse(this)
+    foreign.clear()
+
+    return ScalableVectorGraphic(elements, id, svgElementAttributes)
+}
+
+private fun traverse(element: Element): Element {
+    if (element is ContainerElement) {
+        element.elements = element.elements.map(::traverse)
+    }
+
+    element.foreign.clear()
+
+    return element
 }
