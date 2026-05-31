@@ -54,6 +54,7 @@ public final class com/jzbrooks/vgo/iv/ImageVector : com/jzbrooks/vgo/core/graph
 }
 
 public final class com/jzbrooks/vgo/iv/ImageVectorConverterKt {
+	public static final fun toSvg (Lcom/jzbrooks/vgo/iv/ImageVector;)Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;
 	public static final fun toVectorDrawable (Lcom/jzbrooks/vgo/iv/ImageVector;)Lcom/jzbrooks/vgo/vd/VectorDrawable;
 }
 
@@ -74,6 +75,10 @@ public final class com/jzbrooks/vgo/iv/ImageVectorWriter {
 
 public final class com/jzbrooks/vgo/iv/ImageVectorWriterKt {
 	public static final fun toFileSpec (Lcom/jzbrooks/vgo/iv/ImageVector;Ljava/lang/String;Ljava/text/DecimalFormat;)Lcom/squareup/kotlinpoet/FileSpec;
+}
+
+public final class com/jzbrooks/vgo/svg/ImageVectorConverterKt {
+	public static final fun toImageVector (Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;)Lcom/jzbrooks/vgo/iv/ImageVector;
 }
 
 public final class com/jzbrooks/vgo/svg/ScalableVectorGraphic : com/jzbrooks/vgo/core/graphic/Graphic {
