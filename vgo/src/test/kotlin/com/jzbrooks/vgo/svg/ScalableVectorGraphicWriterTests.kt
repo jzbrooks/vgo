@@ -1,6 +1,8 @@
 package com.jzbrooks.vgo.svg
 
+import assertk.all
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.hasSameSizeAs
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
@@ -15,6 +17,8 @@ import com.jzbrooks.vgo.core.graphic.Polygon
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Point
+import com.jzbrooks.vgo.util.assertk.attribute
+import com.jzbrooks.vgo.util.assertk.doesNotHaveAttribute
 import com.jzbrooks.vgo.util.assertk.hasName
 import com.jzbrooks.vgo.util.assertk.hasNames
 import com.jzbrooks.vgo.util.assertk.hasValue
@@ -43,9 +47,9 @@ class ScalableVectorGraphicWriterTests {
             ScalableVectorGraphicWriter().write(graphic, it)
 
             val output = it.toDocument()
-            val rootAttributes = output.firstChild.attributes
+            val root = output.firstChild
 
-            assertThat(rootAttributes.getNamedItem("viewbox").nodeValue).isEqualTo("0 0 100 100")
+            assertThat(root).attribute("viewbox").isEqualTo("0 0 100 100")
         }
     }
 
@@ -95,7 +99,7 @@ class ScalableVectorGraphicWriterTests {
             val output = memoryStream.toDocument()
             val firstPathNode = output.firstChild.firstChild
 
-            assertThat(firstPathNode.attributes.getNamedItem("id")).hasValue("strike_thru_path")
+            assertThat(firstPathNode).attribute("id").isEqualTo("strike_thru_path")
         }
     }
 
@@ -181,7 +185,7 @@ class ScalableVectorGraphicWriterTests {
             val output = memoryStream.toDocument()
             val pathNode = output.firstChild.firstChild.firstChild
 
-            assertThat(pathNode.attributes.getNamedItem("fill")).isNull()
+            assertThat(pathNode).doesNotHaveAttribute("fill")
         }
     }
 
@@ -205,7 +209,7 @@ class ScalableVectorGraphicWriterTests {
             val output = memoryStream.toDocument()
             val pathNode = output.firstChild.firstChild.firstChild
 
-            assertThat(pathNode.attributes.getNamedItem("fill")).hasValue("black")
+            assertThat(pathNode).attribute("fill").isEqualTo("black")
         }
     }
 
@@ -229,7 +233,7 @@ class ScalableVectorGraphicWriterTests {
             val output = memoryStream.toDocument()
             val groupNode = output.firstChild.firstChild
 
-            assertThat(groupNode.attributes.getNamedItem("fill")).isNull()
+            assertThat(groupNode).doesNotHaveAttribute("fill")
         }
     }
 
@@ -253,7 +257,7 @@ class ScalableVectorGraphicWriterTests {
             val output = memoryStream.toDocument()
             val pathNode = output.firstChild.firstChild.firstChild
 
-            assertThat(pathNode.attributes.getNamedItem("stroke")).hasValue("none")
+            assertThat(pathNode).attribute("stroke").isEqualTo("none")
         }
     }
 
@@ -287,10 +291,12 @@ class ScalableVectorGraphicWriterTests {
             val output = memoryStream.toDocument()
             val circleNode = output.firstChild.firstChild
 
-            assertThat(circleNode).hasName("circle")
-            assertThat(circleNode.attributes.getNamedItem("fill")).hasValue("red")
-            assertThat(circleNode.attributes.getNamedItem("stroke")).hasValue("blue")
-            assertThat(circleNode.attributes.getNamedItem("stroke-width")).hasValue("2")
+            assertThat(circleNode).all {
+                hasName("circle")
+                attribute("fill").isEqualTo("red")
+                attribute("stroke").isEqualTo("blue")
+                attribute("stroke-width").isEqualTo("2")
+            }
         }
     }
 
@@ -327,7 +333,7 @@ class ScalableVectorGraphicWriterTests {
             val output = memoryStream.toDocument()
             val rectNode = output.firstChild.firstChild
 
-            assertThat(rectNode.attributes.getNamedItem("fill")).hasValue("none")
+            assertThat(rectNode).attribute("fill").isEqualTo("none")
         }
     }
 
@@ -364,8 +370,10 @@ class ScalableVectorGraphicWriterTests {
             val output = memoryStream.toDocument()
             val polygonNode = output.firstChild.firstChild.firstChild
 
-            assertThat(polygonNode).hasName("polygon")
-            assertThat(polygonNode.attributes.getNamedItem("fill")).isNull()
+            assertThat(polygonNode).all {
+                hasName("polygon")
+                doesNotHaveAttribute("fill")
+            }
         }
     }
 
