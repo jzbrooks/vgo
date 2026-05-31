@@ -118,31 +118,36 @@ class Vgo(
         if (graphic != null) {
             graphic =
                 when (options.format) {
-                    "vd" ->
+                    "vd" -> {
                         when (graphic) {
                             is VectorDrawable -> graphic
                             is ScalableVectorGraphic -> graphic.toVectorDrawable()
                             is ImageVector -> graphic.toVectorDrawable()
                             else -> graphic
                         }
+                    }
 
-                    "svg" ->
+                    "svg" -> {
                         when (graphic) {
                             is ScalableVectorGraphic -> graphic
                             is VectorDrawable -> graphic.toSvg()
                             is ImageVector -> graphic.toSvg()
                             else -> graphic
                         }
+                    }
 
-                    "iv" ->
+                    "iv" -> {
                         when (graphic) {
                             is ImageVector -> graphic
                             is VectorDrawable -> graphic.toImageVector()
                             is ScalableVectorGraphic -> graphic.toImageVector()
                             else -> graphic
                         }
+                    }
 
-                    null -> graphic
+                    null -> {
+                        graphic
+                    }
 
                     else -> {
                         if (options.format.isNotEmpty()) {
