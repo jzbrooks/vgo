@@ -1,10 +1,14 @@
 package com.jzbrooks.vgo.vd
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.endsWith
+import assertk.assertions.first
 import assertk.assertions.hasSameSizeAs
 import assertk.assertions.hasSize
+import assertk.assertions.index
 import assertk.assertions.isEqualTo
+import assertk.assertions.prop
 import assertk.assertions.startsWith
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.GradientStop
@@ -14,13 +18,16 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
+import com.jzbrooks.vgo.util.assertk.attribute
 import com.jzbrooks.vgo.util.assertk.hasName
 import com.jzbrooks.vgo.util.assertk.hasNames
 import com.jzbrooks.vgo.util.assertk.hasValue
+import com.jzbrooks.vgo.util.assertk.item
 import com.jzbrooks.vgo.util.element.createPath
 import com.jzbrooks.vgo.util.xml.toList
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
+import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import javax.xml.parsers.DocumentBuilderFactory
@@ -42,10 +49,12 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, it)
 
             val output = it.toDocument()
-            val rootAttributes = output.firstChild.attributes
+            val root = output.firstChild
 
-            assertThat(rootAttributes.getNamedItem("android:viewportWidth")).hasValue("24")
-            assertThat(rootAttributes.getNamedItem("android:viewportHeight")).hasValue("24")
+            assertThat(root).all {
+                attribute("android:viewportWidth").isEqualTo("24")
+                attribute("android:viewportWidth").isEqualTo("24")
+            }
         }
     }
 
@@ -55,10 +64,12 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, it)
 
             val output = it.toDocument()
-            val rootAttributes = output.firstChild.attributes
+            val root = output.firstChild
 
-            assertThat(rootAttributes.getNamedItem("android:width").nodeValue).startsWith("24")
-            assertThat(rootAttributes.getNamedItem("android:height").nodeValue).startsWith("24")
+            assertThat(root).all {
+                attribute("android:width").startsWith("24")
+                attribute("android:height").startsWith("24")
+            }
         }
     }
 
@@ -85,10 +96,12 @@ class VectorDrawableWriterTests {
             VectorDrawableWriter().write(graphic, memoryStream)
 
             val output = memoryStream.toDocument()
-            val rootAttributes = output.firstChild.attributes
+            val root = output.firstChild
 
-            assertThat(rootAttributes.getNamedItem("android:height").nodeValue).endsWith("dp")
-            assertThat(rootAttributes.getNamedItem("android:width").nodeValue).endsWith("dp")
+            assertThat(root).all {
+                attribute("android:height").endsWith("dp")
+                attribute("android:width").endsWith("dp")
+            }
         }
     }
 
@@ -136,7 +149,7 @@ class VectorDrawableWriterTests {
                 output.firstChild.firstChild.childNodes
                     .item(1)
 
-            assertThat(firstPathNode.attributes.getNamedItem("android:name")).hasValue("strike_thru_path")
+            assertThat(firstPathNode).attribute("android:name").isEqualTo("strike_thru_path")
         }
     }
 
@@ -164,8 +177,10 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val transformGroup = output.firstChild.firstChild
 
-            assertThat(transformGroup.attributes.getNamedItem("android:translateX")).hasValue("10")
-            assertThat(transformGroup.attributes.getNamedItem("android:translateY")).hasValue("15")
+            assertThat(transformGroup, "transformGroup").all {
+                attribute("android:translateX").isEqualTo("10")
+                attribute("android:translateY").isEqualTo("15")
+            }
         }
     }
 
@@ -222,28 +237,26 @@ class VectorDrawableWriterTests {
             val output = memoryStream.toDocument()
             val root = output.firstChild
 
-            assertThat(root.attributes.getNamedItem("xmlns:aapt")).hasValue("http://schemas.android.com/aapt")
+            assertThat(root).attribute("xmlns:aapt").isEqualTo("http://schemas.android.com/aapt")
 
             val pathNode = root.firstChild
             val aaptAttr = pathNode.childNodes.toList().single { it.nodeName == "aapt:attr" }
-            assertThat(aaptAttr.attributes.getNamedItem("name")).hasValue("android:fillColor")
+            assertThat(aaptAttr).attribute("name").isEqualTo("android:fillColor")
 
             val gradientNode = aaptAttr.firstChild
-            assertThat(gradientNode).hasName("gradient")
-            assertThat(gradientNode.attributes.getNamedItem("android:type")).hasValue("linear")
-            assertThat(gradientNode.attributes.getNamedItem("android:startX").nodeValue).startsWith("0")
-            assertThat(gradientNode.attributes.getNamedItem("android:endX").nodeValue).startsWith("24")
+            assertThat(gradientNode).all {
+                hasName("gradient")
+                attribute("android:type").isEqualTo("linear")
+                attribute("android:startX").startsWith("0")
+                attribute("android:endX").startsWith("24")
+            }
 
             val items = gradientNode.childNodes.toList().filter { it.nodeName == "item" }
-            assertThat(items).transform("item count") { it.size }.isEqualTo(3)
-            assertThat(
-                items[0]
-                    .attributes
-                    .getNamedItem("android:color")
-                    .nodeValue
-                    .lowercase(),
-            ).isEqualTo("#b125ea")
-            assertThat(items[2].attributes.getNamedItem("android:offset").nodeValue).startsWith("1")
+            assertThat(items).all {
+                hasSize(3)
+                first().attribute("android:color").isEqualTo("#b125ea", ignoreCase = true)
+                index(2).attribute("android:offset").startsWith("1")
+            }
         }
     }
 
