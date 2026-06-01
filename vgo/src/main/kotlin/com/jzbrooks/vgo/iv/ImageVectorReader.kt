@@ -828,28 +828,28 @@ private fun parseClipPathNodes(listOfCall: KtCallExpression): List<Command> {
                 }
             }
 
-            "HorizontalLineTo" -> {
+            "HorizontalTo" -> {
                 val point = parseFloatArgument(call)
                 if (point != null) {
                     commands.add(HorizontalLineTo(CommandVariant.ABSOLUTE, listOf(point)))
                 }
             }
 
-            "RelativeHorizontalLineTo" -> {
+            "RelativeHorizontalTo" -> {
                 val point = parseFloatArgument(call)
                 if (point != null) {
                     commands.add(HorizontalLineTo(CommandVariant.RELATIVE, listOf(point)))
                 }
             }
 
-            "VerticalLineTo" -> {
+            "VerticalTo" -> {
                 val point = parseFloatArgument(call)
                 if (point != null) {
                     commands.add(VerticalLineTo(CommandVariant.ABSOLUTE, listOf(point)))
                 }
             }
 
-            "RelativeVerticalLineTo" -> {
+            "RelativeVerticalTo" -> {
                 val point = parseFloatArgument(call)
                 if (point != null) {
                     commands.add(VerticalLineTo(CommandVariant.RELATIVE, listOf(point)))
