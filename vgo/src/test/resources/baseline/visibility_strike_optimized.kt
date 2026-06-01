@@ -18,10 +18,10 @@ public val visibilitystrike: ImageVector
     .group(
       clipPathData = listOf(
         PathNode.MoveTo(0f, 0.0f),
-        PathNode.HorizontalLineTo(24f),
-        PathNode.VerticalLineTo(24f),
-        PathNode.HorizontalLineTo(0f),
-        PathNode.VerticalLineTo(0f),
+        PathNode.HorizontalTo(24f),
+        PathNode.VerticalTo(24f),
+        PathNode.HorizontalTo(0f),
+        PathNode.VerticalTo(0f),
         PathNode.Close,
         PathNode.MoveTo(4.54f, 1.73f),
         PathNode.LineTo(3.27f, 3f),

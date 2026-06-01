@@ -479,9 +479,9 @@ private fun CodeBlock.Builder.emitClipPathDataArg(
                 is HorizontalLineTo -> {
                     for (parameter in command.parameters) {
                         if (command.variant == CommandVariant.ABSOLUTE) {
-                            add("%T.HorizontalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
+                            add("%T.HorizontalTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
                         } else {
-                            add("%T.RelativeHorizontalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
+                            add("%T.RelativeHorizontalTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
                         }
                     }
                 }
@@ -489,9 +489,9 @@ private fun CodeBlock.Builder.emitClipPathDataArg(
                 is VerticalLineTo -> {
                     for (parameter in command.parameters) {
                         if (command.variant == CommandVariant.ABSOLUTE) {
-                            add("%T.VerticalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
+                            add("%T.VerticalTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
                         } else {
-                            add("%T.RelativeVerticalLineTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
+                            add("%T.RelativeVerticalTo(%Lf),\n", pathNode, decimalFormat.format(parameter))
                         }
                     }
                 }
