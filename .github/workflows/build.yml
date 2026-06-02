@@ -1,7 +1,7 @@
 name: build
 
 env:
-  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx8g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
     - uses: actions/setup-java@v5
       with:
         distribution: zulu
-        java-version: 21
+        java-version: 25
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v6
@@ -73,42 +73,32 @@ jobs:
         name: vgo-intellij
         path: vgo-intellij/build/distributions/vgo-intellij.zip
 
-  # Run plugin structure verification along with IntelliJ Plugin Verifier
   verify-plugin:
     name: Verify plugin
     needs: [ build ]
     runs-on: ubuntu-latest
     steps:
-
-      # Free GitHub Actions Environment Disk Space
       - name: Maximize Build Space
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
           tool-cache: false
           large-packages: false
 
-      # Check out the current repository
       - name: Fetch Sources
         uses: actions/checkout@v6
 
-      # Set up the Java environment for the next steps
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
           distribution: zulu
-          java-version: 21
+          java-version: 25
 
-      # Setup Gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
-        with:
-          cache-read-only: true
 
-      # Run Verify Plugin task and IntelliJ Plugin Verifier tool
       - name: Run Plugin Verification tasks
         run: ./gradlew verifyPlugin
 
-      # Collect Plugin Verifier Result
       - name: Collect Plugin Verifier Result
         if: ${{ always() }}
         uses: actions/upload-artifact@v7
@@ -126,7 +116,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      # Check out current repository
       - name: Fetch Sources
         uses: actions/checkout@v6
 
