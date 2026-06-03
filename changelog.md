@@ -3,6 +3,21 @@
 ## Unreleased
 
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 4.0.0 - 2026-06-03
+
+### Added
+
 - An IntelliJ plugin offers vgo optimization in the project explorer context menu for supported files (vector drawables and SVGs)
 - Gradients are supported for vector drawables
 - Shape elements (e.g. `<circle />`) are supported for SVG
@@ -13,17 +28,20 @@
 - SVG ↔ `ImageVector` conversions
 
 ### Changed
+
 - Top-down transformations are applied before bottom-up transformations
 - *Breaking*: Clip paths are represented as a property on a group. The clip path applies to group children.
   - `ClipPath` is no longer an `Element` 
 
 ### Fixed
+
 - Clip paths inside transformed groups are sometimes not transformed
   - *Breaking*: `BakeTransformations` is now a `TopDownTransformer`
 - Less-common styling elements (not modeled in `PaintedElement`) were dropped on the round-trip through vgo
 - `BakeTransformations` correctly transforms elliptical arcs by non-uniform transformations
 
 ### Removed
+
 - `Writer`: deprecated in [3.3.0](3.3.0 - 2026-02-02)
 - `shrinkVectorArt` Gradle task: deprecated in [3.3.0](3.3.0 - 2026-02-02)
 - `ConvertCurvesToArcs(CommandPrinter)`: deprecated in [3.2.0](3.2.0 - 2025-05-03)
