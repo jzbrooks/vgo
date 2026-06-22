@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.core.transformation
 
+import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
@@ -139,6 +140,10 @@ class MergePaths(
             return true
         }
 
+        if (!haveComplexColoring(current, previous)) {
+            return false
+        }
+
         val previousBounds = surveyor.findBoundingBox(previous.commands)
         val currentBounds = surveyor.findBoundingBox(current.commands)
 
@@ -152,6 +157,23 @@ class MergePaths(
         val currentHull = surveyor.sampleConvexHull(current.commands)
 
         return intersects(previousHull, currentHull)
+    }
+
+    private fun haveComplexColoring(
+        first: Path,
+        second: Path,
+    ): Boolean {
+        // Painting an opaque color over itself is identical to painting it once, so
+        // intersection at stroke crossings is lossless for opaque-stroke, no-fill paths.
+        val bothTransparentFill =
+            first.fill.let { it is Color && it.alpha == 0.toUByte() } &&
+                second.fill.let { it is Color && it.alpha == 0.toUByte() }
+
+        val bothOpaqueStroke =
+            first.stroke.let { it is Color && it.alpha == 0xFF.toUByte() } &&
+                second.stroke.let { it is Color && it.alpha == 0xFF.toUByte() }
+
+        return !bothTransparentFill || !bothOpaqueStroke
     }
 
     private fun haveSameAttributes(
