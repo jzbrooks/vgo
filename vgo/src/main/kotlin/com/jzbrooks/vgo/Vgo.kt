@@ -3,6 +3,7 @@
 package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
+import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.iv.ImageVector
 import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
@@ -168,6 +169,11 @@ class Vgo(
 
                 optimizationRegistry?.apply(graphic)
             }
+        }
+
+        if (options.onGraphicReady != null) {
+            if (graphic != null) options.onGraphicReady.invoke(graphic)
+            return
         }
 
         // Format conversions should always write the converted output regardless of size,
@@ -404,5 +410,6 @@ class Vgo(
         val indent: Int? = null,
         val format: String? = null,
         val noOptimization: Boolean = false,
+        val onGraphicReady: ((Graphic) -> Unit)? = null,
     )
 }
