@@ -5,9 +5,7 @@ plugins {
 
 kotlin {
     @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
-    abiValidation {
-        enabled.set(true)
-    }
+    abiValidation()
 }
 
 dependencies {
@@ -21,12 +19,12 @@ dependencies {
 }
 
 tasks {
-    val sourcesJar by registering(Jar::class) {
+    register<Jar>("sourcesJar") {
         archiveClassifier.set("sources")
         from(sourceSets["main"].allSource)
     }
 
-    val javadocJar by registering(Jar::class) {
+    register<Jar>("javadocJar") {
         archiveClassifier.set("javadoc")
         from(this@tasks["javadoc"])
     }

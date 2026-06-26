@@ -3,6 +3,7 @@ package com.jzbrooks.vgo.iv
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
+import org.jetbrains.kotlin.cli.create
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.openapi.Disposable
@@ -20,11 +21,10 @@ fun parseKotlinFile(
     input: InputStream,
 ): KtFile {
     val text = input.reader().readText()
-    val configuration = CompilerConfiguration()
-    configuration.put(
-        CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY,
-        PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false),
-    )
+    val configuration =
+        CompilerConfiguration.create(
+            messageCollector = PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false),
+        )
 
     val environment =
         KotlinCoreEnvironment.createForProduction(
