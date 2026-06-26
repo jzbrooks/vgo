@@ -27,12 +27,12 @@ gradlePlugin {
 }
 
 tasks {
-    val sourcesJar by registering(Jar::class) {
+    register<Jar>("sourcesJar") {
         archiveClassifier.set("sources")
         from(sourceSets["main"].allSource)
     }
 
-    val javadocJar by registering(Jar::class) {
+    register<Jar>("javadocJar") {
         archiveClassifier.set("javadoc")
         from(this@tasks["javadoc"])
     }

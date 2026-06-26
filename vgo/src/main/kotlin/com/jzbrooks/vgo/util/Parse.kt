@@ -6,12 +6,12 @@ import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import org.jetbrains.kotlin.K1Deprecation
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
+import org.jetbrains.kotlin.cli.create
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
 import org.jetbrains.kotlin.com.intellij.psi.PsiManager
 import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
-import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.psi.KtFile
@@ -38,11 +38,10 @@ internal fun parse(
             val disposable = Disposer.newDisposable()
 
             try {
-                val configuration = CompilerConfiguration()
-                configuration.put(
-                    CommonConfigurationKeys.MESSAGE_COLLECTOR_KEY,
-                    PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false),
-                )
+                val configuration =
+                    CompilerConfiguration.create(
+                        messageCollector = PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false),
+                    )
 
                 val environment =
                     KotlinCoreEnvironment.createForProduction(

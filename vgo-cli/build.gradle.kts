@@ -9,7 +9,7 @@ tasks {
         dependsOn(configurations.runtimeClasspath)
         manifest {
             attributes["Main-Class"] = "com.jzbrooks.vgo.cli.CommandLineInterface"
-            attributes["Bundle-Version"] = project.properties["VERSION_NAME"]
+            attributes["Bundle-Version"] = providers.gradleProperty("VERSION_NAME").get()
 
             exclude(
                 "META-INF/*.SF",
@@ -59,35 +59,36 @@ tasks {
         }
     }
 
-    val optimize by registering(JavaExec::class) {
-        description = "Runs r8 on the jar application."
-        group = "build"
+    val optimize =
+        register<JavaExec>("optimize") {
+            description = "Runs r8 on the jar application."
+            group = "build"
 
-        inputs.file(layout.buildDirectory.file("libs/debug/vgo-cli.jar"))
-        outputs.file(layout.buildDirectory.file("libs/vgo.jar"))
+            inputs.file(layout.buildDirectory.file("libs/debug/vgo-cli.jar"))
+            outputs.file(layout.buildDirectory.file("libs/vgo.jar"))
 
-        val javaHome = System.getProperty("java.home")
+            val javaHome = System.getProperty("java.home")
 
-        classpath(r8)
-        mainClass = "com.android.tools.r8.R8"
+            classpath(r8)
+            mainClass = "com.android.tools.r8.R8"
 
-        args(
-            "--release",
-            "--classfile",
-            "--lib",
-            javaHome,
-            "--output",
-            layout.buildDirectory.file("libs/vgo.jar").get(),
-            "--pg-conf",
-            "optimize.pro",
-            layout.buildDirectory.file("libs/debug/vgo-cli.jar").get(),
-        )
+            args(
+                "--release",
+                "--classfile",
+                "--lib",
+                javaHome,
+                "--output",
+                layout.buildDirectory.file("libs/vgo.jar").get(),
+                "--pg-conf",
+                "optimize.pro",
+                layout.buildDirectory.file("libs/debug/vgo-cli.jar").get(),
+            )
 
-        dependsOn(getByName("jar"))
-    }
+            dependsOn(getByName("jar"))
+        }
 
     val binaryFileProp = layout.buildDirectory.file("libs/vgo")
-    val binary by registering {
+    register("binary") {
         description = "Prepends shell script in the jar to improve CLI"
         group = "build"
 
@@ -109,13 +110,13 @@ tasks {
     }
 }
 
-val r8: Configuration by configurations.creating
+val r8: Configuration = configurations.create("r8")
 
 dependencies {
     implementation(project(":vgo"))
 
     implementation("com.android.tools:sdk-common:32.2.1")
-    implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.3.21")
+    implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.4.0")
 
     r8("com.android.tools:r8:9.1.31")
 

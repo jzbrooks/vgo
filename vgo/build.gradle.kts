@@ -11,9 +11,7 @@ plugins {
 
 kotlin {
     @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
-    abiValidation {
-        enabled.set(true)
-    }
+    abiValidation()
 
     sourceSets
         .getByName("main")
@@ -28,7 +26,7 @@ dependencies {
     compileOnly("com.android.tools:sdk-common:32.2.1")
 
     // Provided by kotlin gradle plugin
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.3.21")
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.4.0")
 
     implementation("com.squareup:kotlinpoet:2.3.0")
 
@@ -38,7 +36,7 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.3.21")
+    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.4.0")
 
     testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
 }
@@ -48,45 +46,48 @@ tasks {
         dependsOn("generateConstants")
     }
 
-    val generateConstants by registering {
-        finalizedBy("compileKotlin")
+    val generateConstants =
+        register("generateConstants") {
+            finalizedBy("compileKotlin")
 
-        outputs.files("$projectDir/src/generated/kotlin/com/jzbrooks/BuildConstants.kt")
+            outputs.files("$projectDir/src/generated/kotlin/com/jzbrooks/BuildConstants.kt")
 
-        doLast {
-            val generatedDirectory = Paths.get("$projectDir/src/generated/kotlin/com/jzbrooks")
-            Files.createDirectories(generatedDirectory)
-            val generatedFile = generatedDirectory.resolve("BuildConstants.kt")
+            doLast {
+                val generatedDirectory = Paths.get("$projectDir/src/generated/kotlin/com/jzbrooks")
+                Files.createDirectories(generatedDirectory)
+                val generatedFile = generatedDirectory.resolve("BuildConstants.kt")
 
-            PrintWriter(generatedFile.toFile()).use { output ->
-                val buildConstantsClass =
-                    buildString {
-                        appendLine(
-                            """
+                PrintWriter(generatedFile.toFile()).use { output ->
+                    val buildConstantsClass =
+                        buildString {
+                            appendLine(
+                                """
                                |package com.jzbrooks
                                |
                                |internal object BuildConstants {
-                            """.trimMargin(),
-                        )
+                                """.trimMargin(),
+                            )
 
-                        val vgoProperties =
-                            project.properties
-                                .filterKeys { it == "VERSION_NAME" }
+                            val vgoProperties =
+                                providers.gradlePropertiesPrefixedBy("generate.").get() +
+                                    listOf(
+                                        "VERSION_NAME",
+                                    ).associateWith { key -> providers.gradleProperty(key).get() }
 
-                        for (property in vgoProperties) {
-                            append("    const val ")
-                            append(property.key.uppercase())
-                            append(" = \"")
-                            append(property.value)
-                            appendLine('"')
+                            for (property in vgoProperties) {
+                                append("    const val ")
+                                append(property.key.uppercase())
+                                append(" = \"")
+                                append(property.value)
+                                appendLine('"')
+                            }
+
+                            appendLine("}")
                         }
-
-                        appendLine("}")
-                    }
-                output.write(buildConstantsClass)
+                    output.write(buildConstantsClass)
+                }
             }
         }
-    }
 
     withType<KtLintCheckTask>().configureEach {
         mustRunAfter(generateConstants)
@@ -96,7 +97,7 @@ tasks {
         mustRunAfter(generateConstants)
     }
 
-    val updateBaselineOptimizations by registering(Copy::class) {
+    register<Copy>("updateBaselineOptimizations") {
         description = "Updates baseline assets with the latest integration test outputs."
         group = "Build Setup"
 
@@ -110,14 +111,14 @@ tasks {
         rename("(\\w+)_testOptimizationFinishes.(xml|svg|kt)", "$1_optimized.$2")
     }
 
-    val sourcesJar by registering(Jar::class) {
+    register<Jar>("sourcesJar") {
         dependsOn(generateConstants)
 
         archiveClassifier.set("sources")
         from(sourceSets["main"].allSource)
     }
 
-    val javadocJar by registering(Jar::class) {
+    register<Jar>("javadocJar") {
         dependsOn(generateConstants)
 
         archiveClassifier.set("javadoc")
