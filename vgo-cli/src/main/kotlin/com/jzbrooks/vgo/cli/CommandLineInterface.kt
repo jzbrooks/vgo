@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.cli
 
 import com.jzbrooks.vgo.Vgo
+import com.jzbrooks.vgo.core.util.ir.PlainColorScheme
 import kotlin.system.exitProcess
 
 class CommandLineInterface {
@@ -15,6 +16,7 @@ class CommandLineInterface {
 
         val printVersion = argReader.readFlag("version|v")
         val printStats = argReader.readFlag("stats|s")
+        val printIrMode = argReader.readOptionWithDefault("print-ir", "color")
         val indent = argReader.readOption("indent")?.toIntOrNull()
 
         val outputs =
@@ -46,6 +48,25 @@ class CommandLineInterface {
                 format = format,
                 noOptimization = noOptimization,
                 input = inputs,
+                dumpIr =
+                    when (printIrMode) {
+                        "plain" -> {
+                            Vgo.Options.IrDumpOptions(PlainColorScheme)
+                        }
+
+                        "color" -> {
+                            Vgo.Options.IrDumpOptions(AnsiColorScheme)
+                        }
+
+                        null -> {
+                            null
+                        }
+
+                        else -> {
+                            System.err.println("Warning: unsupported ir dump mode $printIrMode")
+                            null
+                        }
+                    },
             )
 
         return Vgo(options).run()
@@ -64,6 +85,7 @@ Options:
   --indent value     write files with value columns of indentation
   --format value     write specified output format (svg, vd, iv)
   --no-optimization  skip graphic optimization
+  --print-ir[=MODE]  print IR tree after optimization and exit without writing (color [default], plain; use = to pass mode)
             """.trimIndent()
 
         @JvmStatic

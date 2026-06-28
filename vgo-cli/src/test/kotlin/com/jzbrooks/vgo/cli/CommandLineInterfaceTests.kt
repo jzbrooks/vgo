@@ -20,16 +20,26 @@ class CommandLineInterfaceTests {
     private val avocadoExampleRelativePath = Paths.get("src/test/resources/avocado_example.xml").toString()
     private val heartExampleRelativePath = Paths.get("src/test/resources/simple_heart.xml").toString()
     private lateinit var systemOutput: ByteArrayOutputStream
+    private lateinit var systemError: ByteArrayOutputStream
+    private lateinit var originalOut: PrintStream
+    private lateinit var originalErr: PrintStream
 
     @BeforeEach
     fun redirect() {
+        originalOut = System.out
+        originalErr = System.err
         systemOutput = ByteArrayOutputStream()
+        systemError = ByteArrayOutputStream()
         System.setOut(PrintStream(systemOutput))
+        System.setErr(PrintStream(systemError))
     }
 
     @AfterEach
     fun cleanup() {
+        System.setOut(originalOut)
+        System.setErr(originalErr)
         systemOutput.close()
+        systemError.close()
     }
 
     @Test
@@ -194,6 +204,47 @@ class CommandLineInterfaceTests {
         val output = File("build/integrationTest/no-optimization-test.svg").readText()
         assertThat(output).startsWith("<svg")
         assertThat(output).hasLineCount(42)
+    }
+
+    @Test
+    fun `print-ir default mode produces ir output`() {
+        val arguments = arrayOf(heartExampleRelativePath, "--print-ir")
+        val exitCode = CommandLineInterface().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        assertThat(systemOutput.toString()).contains("Path")
+    }
+
+    @Test
+    fun `print-ir plain mode produces no ansi escape codes`() {
+        val arguments = arrayOf(heartExampleRelativePath, "--print-ir=plain")
+        val exitCode = CommandLineInterface().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        val esc = Char(0x1B).toString()
+        assertThat(systemOutput.toString()).doesNotContain(esc)
+    }
+
+    @Test
+    fun `print-ir color mode produces ansi escape codes`() {
+        val arguments = arrayOf(heartExampleRelativePath, "--print-ir=color")
+        val exitCode = CommandLineInterface().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        val esc = Char(0x1B).toString()
+        assertThat(systemOutput.toString()).contains(esc)
+    }
+
+    @Test
+    fun `print-ir unknown mode warns and skips ir output`() {
+        val arguments =
+            arrayOf(
+                heartExampleRelativePath,
+                "-o",
+                "build/integrationTest/print-ir-unknown.xml",
+                "--print-ir=unknown",
+            )
+        val exitCode = CommandLineInterface().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        assertThat(systemError.toString()).contains("unsupported ir dump mode")
+        assertThat(systemOutput.toString()).doesNotContain("Path")
     }
 
     companion object {
