@@ -1,4 +1,4 @@
-package com.jzbrooks.vgo.cli
+package com.jzbrooks.vgo.core.util.ir
 
 import com.jzbrooks.vgo.core.Brush
 import com.jzbrooks.vgo.core.Color

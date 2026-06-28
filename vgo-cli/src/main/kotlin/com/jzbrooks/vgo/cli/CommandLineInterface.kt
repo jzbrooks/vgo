@@ -47,7 +47,25 @@ class CommandLineInterface {
                 format = format,
                 noOptimization = noOptimization,
                 input = inputs,
-                onGraphicReady = printIrMode?.let { mode -> IrPrinter(System.out, mode != "plain")::visit },
+                dumpIr =
+                    when (printIrMode) {
+                        "plain" -> {
+                            Vgo.Options.IrDumpMode.Plain
+                        }
+
+                        "color" -> {
+                            Vgo.Options.IrDumpMode.Color
+                        }
+
+                        null -> {
+                            null
+                        }
+
+                        else -> {
+                            System.err.println("Warning: unsupported ir dump mode $printIrMode")
+                            null
+                        }
+                    },
             )
 
         return Vgo(options).run()
