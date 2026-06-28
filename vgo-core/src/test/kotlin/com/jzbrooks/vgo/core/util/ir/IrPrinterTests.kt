@@ -14,6 +14,24 @@ import java.io.ByteArrayOutputStream
 import java.io.PrintStream
 import java.nio.charset.StandardCharsets
 
+private object TestColorSchemeStub : IrColorScheme {
+    override fun bold(s: String) = "bold"
+
+    override fun cyan(s: String) = "cyan"
+
+    override fun green(s: String) = "green"
+
+    override fun yellow(s: String) = "yellow"
+
+    override fun dim(s: String) = "dim"
+
+    override fun colorSwatch(
+        red: Int,
+        green: Int,
+        blue: Int,
+    ) = "swatch"
+}
+
 class IrPrinterTests {
     private val path =
         createPath(
@@ -22,11 +40,11 @@ class IrPrinterTests {
     private val graphic = createGraphic(listOf(path))
 
     private fun captureIr(
-        useColor: Boolean,
+        colorScheme: IrColorScheme = PlainColorScheme,
         block: (IrPrinter) -> Unit,
     ): String {
         val baos = ByteArrayOutputStream()
-        IrPrinter(PrintStream(baos, true, StandardCharsets.UTF_8), useColor).also(block)
+        IrPrinter(PrintStream(baos, true, StandardCharsets.UTF_8), colorScheme).also(block)
         return baos.toString(StandardCharsets.UTF_8)
     }
 
@@ -46,27 +64,20 @@ class IrPrinterTests {
     }
 
     @Test
-    fun `plain mode produces no ansi escape codes`() {
-        val esc = Char(0x1B).toString()
-        assertThat(captureIr(false) { it.visit(graphic) }).doesNotContain(esc)
-    }
-
-    @Test
     fun `color mode produces ansi escape codes`() {
-        val esc = Char(0x1B).toString()
-        assertThat(captureIr(true) { it.visit(graphic) }).contains(esc)
+        assertThat(captureIr(TestColorSchemeStub) { it.visit(graphic) }).contains("dim")
     }
 
     @Test
     fun `graphic id is shown in brackets`() {
         val withId = createGraphic(id = "myicon")
-        assertThat(captureIr(false) { it.visit(withId) }).contains("[myicon]")
+        assertThat(captureIr { it.visit(withId) }).contains("[myicon]")
     }
 
     @Test
     fun `path id is shown in brackets`() {
         val g = createGraphic(listOf(createPath(id = "mypath")))
-        assertThat(captureIr(false) { it.visit(g) }).contains("[mypath]")
+        assertThat(captureIr { it.visit(g) }).contains("[mypath]")
     }
 
     @Test
@@ -77,7 +88,7 @@ class IrPrinterTests {
     @Test
     fun `multiple children use branch and corner connectors`() {
         val g = createGraphic(listOf(path, path))
-        val output = captureIr(false) { it.visit(g) }
+        val output = captureIr { it.visit(g) }
         assertThat(output).contains("├──")
         assertThat(output).contains("└──")
     }
@@ -85,6 +96,6 @@ class IrPrinterTests {
     @Test
     fun `group appears in output`() {
         val g = createGraphic(listOf(Group(listOf(path))))
-        assertThat(captureIr(false) { it.visit(g) }).contains("Group")
+        assertThat(captureIr { it.visit(g) }).contains("Group")
     }
 }

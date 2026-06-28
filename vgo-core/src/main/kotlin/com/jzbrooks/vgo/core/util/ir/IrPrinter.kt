@@ -37,12 +37,9 @@ import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import java.io.PrintStream
 
-private const val ESC = ""
-private const val RESET = "$ESC[0m"
-
 class IrPrinter(
     private val out: PrintStream = System.out,
-    private val useColor: Boolean = true,
+    private val colorScheme: IrColorScheme = PlainColorScheme,
 ) : ElementVisitor {
     private val prefixStack = ArrayDeque<String>()
 
@@ -51,7 +48,7 @@ class IrPrinter(
     private fun renderChildren(items: List<() -> Unit>) {
         items.forEachIndexed { i, render ->
             val isLast = i == items.lastIndex
-            out.print(dim(prefix() + if (isLast) "└── " else "├── "))
+            out.print(colorScheme.dim(prefix() + if (isLast) "└── " else "├── "))
             prefixStack.add(if (isLast) "    " else "│   ")
             render()
             prefixStack.removeLast()
@@ -65,15 +62,15 @@ class IrPrinter(
     override fun visit(graphic: Graphic) {
         val label =
             buildString {
-                append(bold(graphic::class.simpleName ?: "Graphic"))
-                graphic.id?.let { append(" " + cyan("[$it]")) }
+                append(colorScheme.bold(graphic::class.simpleName ?: "Graphic"))
+                graphic.id?.let { append(" " + colorScheme.cyan("[$it]")) }
                 val vw = graphic.foreign["android:viewportWidth"]
                 val vh = graphic.foreign["android:viewportHeight"]
                 if (vw != null && vh != null) {
-                    append(dim(" (${vw}x$vh)"))
+                    append(colorScheme.dim(" (${vw}x$vh)"))
                 } else {
                     val viewBox = graphic.foreign["viewBox"]
-                    if (viewBox != null) append(dim(" viewBox=$viewBox"))
+                    if (viewBox != null) append(colorScheme.dim(" viewBox=$viewBox"))
                 }
             }
         out.println(label)
@@ -83,10 +80,10 @@ class IrPrinter(
     override fun visit(group: Group) {
         val label =
             buildString {
-                append(bold("Group"))
-                group.id?.let { append(" " + cyan("[$it]")) }
-                if (group.transform != Matrix3.IDENTITY) append(dim(" transform=..."))
-                if (group.clipPaths.isNotEmpty()) append(dim(" ${group.clipPaths.size} clip(s)"))
+                append(colorScheme.bold("Group"))
+                group.id?.let { append(" " + colorScheme.cyan("[$it]")) }
+                if (group.transform != Matrix3.IDENTITY) append(colorScheme.dim(" transform=..."))
+                if (group.clipPaths.isNotEmpty()) append(colorScheme.dim(" ${group.clipPaths.size} clip(s)"))
             }
         out.println(label)
 
@@ -98,14 +95,14 @@ class IrPrinter(
     override fun visit(path: Path) {
         val label =
             buildString {
-                append(bold("Path"))
-                path.id?.let { append(" " + cyan("[$it]")) }
+                append(colorScheme.bold("Path"))
+                path.id?.let { append(" " + colorScheme.cyan("[$it]")) }
                 append(" fill=").append(formatBrush(path.fill))
                 if (path.stroke != Colors.TRANSPARENT) {
                     append(" stroke=").append(formatBrush(path.stroke))
                     append(" sw=").append(formatFloat(path.strokeWidth))
                 }
-                append(dim(" (${path.commands.size} cmds)"))
+                append(colorScheme.dim(" (${path.commands.size} cmds)"))
             }
         out.println(label)
         renderChildren(path.commands.map { cmd -> { out.println(formatCommand(cmd)) } })
@@ -114,10 +111,10 @@ class IrPrinter(
     override fun visit(extra: Extra) {
         val label =
             buildString {
-                append(bold("Extra"))
-                extra.id?.let { append(" " + cyan("[$it]")) }
-                append(dim(" <${extra.name}>"))
-                if (extra.elements.isNotEmpty()) append(dim(" (${extra.elements.size})"))
+                append(colorScheme.bold("Extra"))
+                extra.id?.let { append(" " + colorScheme.cyan("[$it]")) }
+                append(colorScheme.dim(" <${extra.name}>"))
+                if (extra.elements.isNotEmpty()) append(colorScheme.dim(" (${extra.elements.size})"))
             }
         out.println(label)
         if (extra.elements.isNotEmpty()) renderElementChildren(extra.elements)
@@ -126,8 +123,8 @@ class IrPrinter(
     override fun visit(shape: Shape) {
         val label =
             buildString {
-                append(bold(shape::class.simpleName ?: "Shape"))
-                shape.id?.let { append(" " + cyan("[$it]")) }
+                append(colorScheme.bold(shape::class.simpleName ?: "Shape"))
+                shape.id?.let { append(" " + colorScheme.cyan("[$it]")) }
                 append(" fill=").append(formatBrush(shape.fill))
                 if (shape.stroke != Colors.TRANSPARENT) {
                     append(" stroke=").append(formatBrush(shape.stroke))
@@ -137,7 +134,7 @@ class IrPrinter(
                         val cx = formatFloat(shape.cx)
                         val cy = formatFloat(shape.cy)
                         val r = formatFloat(shape.r)
-                        append(dim(" cx=$cx cy=$cy r=$r"))
+                        append(colorScheme.dim(" cx=$cx cy=$cy r=$r"))
                     }
 
                     is Ellipse -> {
@@ -145,7 +142,7 @@ class IrPrinter(
                         val cy = formatFloat(shape.cy)
                         val rx = formatFloat(shape.rx)
                         val ry = formatFloat(shape.ry)
-                        append(dim(" cx=$cx cy=$cy rx=$rx ry=$ry"))
+                        append(colorScheme.dim(" cx=$cx cy=$cy rx=$rx ry=$ry"))
                     }
 
                     is Rect -> {
@@ -153,7 +150,7 @@ class IrPrinter(
                         val y = formatFloat(shape.y)
                         val w = formatFloat(shape.width)
                         val h = formatFloat(shape.height)
-                        append(dim(" x=$x y=$y w=$w h=$h"))
+                        append(colorScheme.dim(" x=$x y=$y w=$w h=$h"))
                     }
 
                     is Line -> {
@@ -161,15 +158,15 @@ class IrPrinter(
                         val y1 = formatFloat(shape.y1)
                         val x2 = formatFloat(shape.x2)
                         val y2 = formatFloat(shape.y2)
-                        append(dim(" ($x1,$y1)->($x2,$y2)"))
+                        append(colorScheme.dim(" ($x1,$y1)->($x2,$y2)"))
                     }
 
                     is Polyline -> {
-                        append(dim(" (${shape.points.size} pts)"))
+                        append(colorScheme.dim(" (${shape.points.size} pts)"))
                     }
 
                     is Polygon -> {
-                        append(dim(" (${shape.points.size} pts)"))
+                        append(colorScheme.dim(" (${shape.points.size} pts)"))
                     }
                 }
             }
@@ -179,9 +176,9 @@ class IrPrinter(
     private fun renderClipPath(cp: ClipPath) {
         val label =
             buildString {
-                append(bold("ClipPath"))
-                cp.id?.let { append(" " + cyan("[$it]")) }
-                append(dim(" (${cp.regions.size})"))
+                append(colorScheme.bold("ClipPath"))
+                cp.id?.let { append(" " + colorScheme.cyan("[$it]")) }
+                append(colorScheme.dim(" (${cp.regions.size})"))
             }
         out.println(label)
         renderChildren(cp.regions.map { path -> { path.accept(this) } })
@@ -190,7 +187,7 @@ class IrPrinter(
     private fun formatCommand(cmd: Command): String =
         when (cmd) {
             is ClosePath -> {
-                green("Z")
+                colorScheme.green("Z").toString()
             }
 
             is MoveTo -> {
@@ -248,44 +245,30 @@ class IrPrinter(
         variant: CommandVariant,
         abs: String,
         rel: String,
-    ): String = green(if (variant == CommandVariant.ABSOLUTE) abs else rel)
+    ): String = colorScheme.green(if (variant == CommandVariant.ABSOLUTE) abs else rel).toString()
 
-    private fun formatBrush(brush: Brush): String =
+    private fun formatBrush(brush: Brush): CharSequence =
         when (brush) {
             is Color -> {
                 val hex = brush.toHexString(HexFormat.ARGB)
-                if (useColor) {
-                    val swatch = "$ESC[38;2;${brush.red.toInt()};${brush.green.toInt()};${brush.blue.toInt()}m■$RESET"
-                    "$swatch ${yellow(hex)}"
-                } else {
-                    hex
-                }
+                val swatch = colorScheme.colorSwatch(brush.red.toInt(), brush.green.toInt(), brush.blue.toInt())
+                if (swatch.isEmpty()) colorScheme.yellow(hex) else "$swatch ${colorScheme.yellow(hex)}"
             }
 
             is LinearGradient -> {
-                dim("linear-gradient(${brush.stops.size} stops)")
+                colorScheme.dim("linear-gradient(${brush.stops.size} stops)")
             }
 
             is RadialGradient -> {
-                dim("radial-gradient(${brush.stops.size} stops)")
+                colorScheme.dim("radial-gradient(${brush.stops.size} stops)")
             }
 
             is SweepGradient -> {
-                dim("sweep-gradient(${brush.stops.size} stops)")
+                colorScheme.dim("sweep-gradient(${brush.stops.size} stops)")
             }
         }
 
     private fun formatPoint(p: Point): String = "${formatFloat(p.x)},${formatFloat(p.y)}"
 
     private fun formatFloat(f: Float): String = if (f % 1f == 0f) f.toInt().toString() else f.toString()
-
-    private fun bold(s: String) = if (useColor) "$ESC[1m$s$RESET" else s
-
-    private fun cyan(s: String) = if (useColor) "$ESC[36m$s$RESET" else s
-
-    private fun green(s: String) = if (useColor) "$ESC[32m$s$RESET" else s
-
-    private fun yellow(s: String) = if (useColor) "$ESC[33m$s$RESET" else s
-
-    private fun dim(s: String) = if (useColor) "$ESC[2m$s$RESET" else s
 }

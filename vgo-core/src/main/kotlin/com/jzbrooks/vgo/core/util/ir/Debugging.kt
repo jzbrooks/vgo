@@ -14,6 +14,6 @@ import java.nio.charset.StandardCharsets
 fun Graphic.asIr(): String {
     val baos = ByteArrayOutputStream()
     val ps = PrintStream(baos, true, StandardCharsets.UTF_8)
-    IrPrinter(ps, false).visit(this)
+    IrPrinter(ps).visit(this)
     return baos.toString(StandardCharsets.UTF_8)
 }

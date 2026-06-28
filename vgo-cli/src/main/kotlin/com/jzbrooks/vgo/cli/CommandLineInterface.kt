@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.cli
 
 import com.jzbrooks.vgo.Vgo
+import com.jzbrooks.vgo.core.util.ir.PlainColorScheme
 import kotlin.system.exitProcess
 
 class CommandLineInterface {
@@ -50,11 +51,11 @@ class CommandLineInterface {
                 dumpIr =
                     when (printIrMode) {
                         "plain" -> {
-                            Vgo.Options.IrDumpMode.Plain
+                            Vgo.Options.IrDumpOptions(PlainColorScheme)
                         }
 
                         "color" -> {
-                            Vgo.Options.IrDumpMode.Color
+                            Vgo.Options.IrDumpOptions(AnsiColorScheme)
                         }
 
                         null -> {

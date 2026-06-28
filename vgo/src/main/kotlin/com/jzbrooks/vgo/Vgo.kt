@@ -5,6 +5,7 @@ package com.jzbrooks.vgo
 import com.jzbrooks.BuildConstants
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
+import com.jzbrooks.vgo.core.util.ir.IrColorScheme
 import com.jzbrooks.vgo.core.util.ir.IrPrinter
 import com.jzbrooks.vgo.iv.ImageVector
 import com.jzbrooks.vgo.iv.ImageVectorOptimizationRegistry
@@ -172,9 +173,9 @@ class Vgo(
             }
         }
 
-        if (options.dumpIr != null) {
+        options.dumpIr?.let { options ->
             if (graphic != null) {
-                IrPrinter(useColor = options.dumpIr === Options.IrDumpMode.Color).visit(graphic)
+                IrPrinter(colorScheme = options.colorScheme).visit(graphic)
             } else {
                 System.err.println("Warning: Unable to dump IR. Graphic could not be parsed.")
             }
@@ -415,11 +416,10 @@ class Vgo(
         val indent: Int? = null,
         val format: String? = null,
         val noOptimization: Boolean = false,
-        val dumpIr: IrDumpMode? = null,
+        val dumpIr: IrDumpOptions? = null,
     ) {
-        enum class IrDumpMode {
-            Color,
-            Plain,
-        }
+        data class IrDumpOptions(
+            val colorScheme: IrColorScheme,
+        )
     }
 }
