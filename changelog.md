@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- `MergePaths` will merge opaque stroke, no fill paths regardless of overlap.
 
 ### Deprecated
 

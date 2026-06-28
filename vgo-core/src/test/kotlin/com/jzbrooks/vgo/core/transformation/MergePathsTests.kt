@@ -10,6 +10,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.Command
@@ -504,6 +505,70 @@ class MergePathsTests {
                 prop(ParameterizedCommand<*>::variant.name) { it.parameters }
                     .isEqualTo(listOf(Point(10f, 10f), Point(20f, 20f)))
             }
+    }
+
+    @Test
+    fun `opaque stroke intersecting paths are merged`() {
+        // Horizontal line from (0,50) to (100,50)
+        val horizontal =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 50f))),
+                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 50f))),
+                ),
+                fill = Colors.TRANSPARENT,
+                stroke = Colors.BLACK,
+            )
+        // Vertical line from (50,0) to (50,100) — crosses horizontal at (50,50)
+        val vertical =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 0f))),
+                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 100f))),
+                ),
+                fill = Colors.TRANSPARENT,
+                stroke = Colors.BLACK,
+            )
+
+        val graphic = createGraphic(listOf(horizontal, vertical))
+        val optimization = MergePaths(MergePaths.Constraints.None)
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
+
+        assertThat(graphic::elements).hasSize(1)
+    }
+
+    @Test
+    fun `semi-transparent stroke intersecting paths are not merged`() {
+        val semiTransparentStroke = Color(0x80000000u)
+
+        // Horizontal line from (0,50) to (100,50)
+        val horizontal =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 50f))),
+                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(100f, 50f))),
+                ),
+                fill = Colors.TRANSPARENT,
+                stroke = semiTransparentStroke,
+            )
+        // Vertical line from (50,0) to (50,100) — crosses horizontal at (50,50)
+        val vertical =
+            createPath(
+                listOf(
+                    MoveTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 0f))),
+                    LineTo(CommandVariant.ABSOLUTE, listOf(Point(50f, 100f))),
+                ),
+                fill = Colors.TRANSPARENT,
+                stroke = semiTransparentStroke,
+            )
+
+        val graphic = createGraphic(listOf(horizontal, vertical))
+        val optimization = MergePaths(MergePaths.Constraints.None)
+
+        traverseBottomUp(graphic) { it.accept(optimization) }
+
+        assertThat(graphic::elements).hasSize(2)
     }
 
     @Test
