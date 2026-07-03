@@ -233,6 +233,16 @@ class CommandLineInterfaceTests {
     }
 
     @Test
+    fun `print-ir auto mode produces plain output when stdout is not a terminal`() {
+        val arguments = arrayOf(heartExampleRelativePath, "--print-ir=auto")
+        val exitCode = CommandLineInterface().run(arguments)
+        assertThat(exitCode).isEqualTo(0)
+        val esc = Char(0x1B).toString()
+        assertThat(systemOutput.toString()).contains("Path")
+        assertThat(systemOutput.toString()).doesNotContain(esc)
+    }
+
+    @Test
     fun `print-ir unknown mode warns and skips ir output`() {
         val arguments =
             arrayOf(

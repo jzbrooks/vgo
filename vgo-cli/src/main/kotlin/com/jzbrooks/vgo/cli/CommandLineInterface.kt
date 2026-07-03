@@ -16,7 +16,7 @@ class CommandLineInterface {
 
         val printVersion = argReader.readFlag("version|v")
         val printStats = argReader.readFlag("stats|s")
-        val printIrMode = argReader.readOptionWithDefault("print-ir", "color")
+        val printIrMode = argReader.readOptionWithDefault("print-ir", "auto")
         val indent = argReader.readOption("indent")?.toIntOrNull()
 
         val outputs =
@@ -50,6 +50,10 @@ class CommandLineInterface {
                 input = inputs,
                 dumpIr =
                     when (printIrMode) {
+                        "auto" -> {
+                            Vgo.Options.IrDumpOptions(if (colorEnabled()) AnsiColorScheme else PlainColorScheme)
+                        }
+
                         "plain" -> {
                             Vgo.Options.IrDumpOptions(PlainColorScheme)
                         }
@@ -85,7 +89,7 @@ Options:
   --indent value     write files with value columns of indentation
   --format value     write specified output format (svg, vd, iv)
   --no-optimization  skip graphic optimization
-  --print-ir[=MODE]  print IR tree after optimization and exit without writing (color [default], plain; use = to pass mode)
+  --print-ir[=MODE]  print IR tree after optimization and exit without writing (auto [default], color, plain; use = to pass mode)
             """.trimIndent()
 
         @JvmStatic
