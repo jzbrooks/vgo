@@ -89,7 +89,7 @@ Options:
   --indent value     write files with value columns of indentation
   --format value     write specified output format (svg, vd, iv)
   --no-optimization  skip graphic optimization
-  --print-ir[=MODE]  print IR tree after optimization and exit without writing (auto [default], color, plain; use = to pass mode)
+  --print-ir[=MODE]  print IR tree and exit without writing (auto [default], color, plain; use = to pass mode)
             """.trimIndent()
 
         @JvmStatic

@@ -3,6 +3,9 @@
 ## Unreleased
 
 ### Added
+- `--print-ir[=MODE]` to dump vgo intermediate representation. MODE is `auto` by default, which honors `NO_COLOR`
+`CLICOLOR_FORCE`, and `TERM` environment variables while also only using ANSI color escape sequences if the output
+is a terminal.
 
 ### Changed
 - `MergePaths` will merge opaque stroke, no fill paths regardless of overlap.
