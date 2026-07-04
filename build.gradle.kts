@@ -1,95 +1,9 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
-import org.jlleitschuh.gradle.ktlint.KtlintPlugin
-
 plugins {
-    id("org.jetbrains.changelog") version "2.5.0"
-    id("org.jetbrains.kotlin.jvm") version "2.4.0"
-    id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
-    id("com.vanniktech.maven.publish") version "0.37.0" apply false
-    id("org.jetbrains.intellij.platform") version "2.18.1" apply false
+    alias(libs.plugins.changelog)
+    alias(libs.plugins.maven.publish) apply false
+    alias(libs.plugins.intellij.platform) apply false
 }
 
 version = property("VERSION_NAME").toString()
 
 changelog.path.set("changelog.md")
-
-subprojects {
-    apply<KtlintPlugin>()
-    configure<KtlintExtension> {
-        version.set("1.8.0")
-    }
-
-    pluginManager.withPlugin("org.jetbrains.kotlin.jvm") {
-        configure<KotlinJvmProjectExtension> {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_17)
-                val runningFromIdea =
-                    System.getProperty("idea.active") == "true" ||
-                        System.getProperty("idea.sync.active") == "true"
-                allWarningsAsErrors.set(!runningFromIdea)
-                extraWarnings.set(!runningFromIdea)
-            }
-        }
-
-        configure<JavaPluginExtension> {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
-        }
-    }
-
-    tasks.withType<Test> {
-        useJUnitPlatform()
-
-        testLogging {
-            exceptionFormat = TestExceptionFormat.FULL
-            showExceptions = true
-            showCauses = true
-        }
-
-        addTestListener(
-            object : TestListener {
-                override fun afterSuite(
-                    suite: TestDescriptor,
-                    result: TestResult,
-                ) {
-                    if (suite.parent == null) {
-                        val output =
-                            buildString {
-                                append("|  Results: ")
-                                append(result.resultType)
-                                append(" (")
-                                append(result.testCount)
-                                append(" tests, ")
-                                append(result.successfulTestCount)
-                                append(" passed, ")
-                                append(result.failedTestCount)
-                                append(" failed, ")
-                                append(result.skippedTestCount)
-                                append(" skipped)  |")
-                            }
-                        val border = "-".repeat(output.length)
-                        logger.lifecycle(
-                            """
-                            $border
-                            $output
-                            $border
-                            """.trimIndent(),
-                        )
-                    }
-                }
-
-                override fun afterTest(
-                    testDescriptor: TestDescriptor?,
-                    result: TestResult?,
-                ) {}
-
-                override fun beforeTest(testDescriptor: TestDescriptor?) {}
-
-                override fun beforeSuite(suite: TestDescriptor?) {}
-            },
-        )
-    }
-}

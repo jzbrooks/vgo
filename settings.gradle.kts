@@ -13,4 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
+rootProject.name = "vgo"
+
 include("vgo-core", "vgo", "vgo-gradle", "vgo-cli", "vgo-intellij")

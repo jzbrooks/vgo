@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    id("vgo.kotlin-conventions")
     id("com.vanniktech.maven.publish")
 }
 
@@ -9,23 +9,11 @@ kotlin {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:6.1.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testImplementation("org.junit.platform:junit-platform-launcher")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.junit.platform.launcher)
+    testRuntimeOnly(libs.junit.jupiter.engine)
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
-}
-
-tasks {
-    register<Jar>("sourcesJar") {
-        archiveClassifier.set("sources")
-        from(sourceSets["main"].allSource)
-    }
-
-    register<Jar>("javadocJar") {
-        archiveClassifier.set("javadoc")
-        from(this@tasks["javadoc"])
-    }
+    testImplementation(libs.assertk)
 }

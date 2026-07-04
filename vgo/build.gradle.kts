@@ -1,127 +1,82 @@
-import org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask
-import org.jlleitschuh.gradle.ktlint.tasks.KtLintFormatTask
-import java.io.PrintWriter
-import java.nio.file.Files
-import java.nio.file.Paths
-
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    id("vgo.kotlin-conventions")
     id("com.vanniktech.maven.publish")
 }
 
 kotlin {
     @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
     abiValidation()
-
-    sourceSets
-        .getByName("main")
-        .kotlin
-        .srcDir("src/generated/kotlin")
 }
 
 dependencies {
     implementation(project(":vgo-core"))
 
     // Provided by the android gradle plugin
-    compileOnly("com.android.tools:sdk-common:32.2.1")
+    compileOnly(libs.android.sdk.common)
 
     // Provided by kotlin gradle plugin
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.4.0")
+    compileOnly(libs.kotlin.compiler.embeddable)
 
-    implementation("com.squareup:kotlinpoet:2.3.0")
+    implementation(libs.kotlinpoet)
 
-    testImplementation(platform("org.junit:junit-bom:6.1.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
-    testImplementation("org.junit.platform:junit-platform-launcher")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.jupiter.params)
+    testImplementation(libs.junit.platform.launcher)
+    testRuntimeOnly(libs.junit.jupiter.engine)
 
-    testImplementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:2.4.0")
+    testImplementation(libs.kotlin.compiler.embeddable)
 
-    testImplementation("com.willowtreeapps.assertk:assertk-jvm:0.28.1")
+    testImplementation(libs.assertk)
 }
 
-tasks {
-    compileKotlin {
-        dependsOn("generateConstants")
-    }
+val generateConstants =
+    tasks.register("generateConstants") {
+        val constants =
+            providers.gradlePropertiesPrefixedBy("generate.").get() +
+                listOf("VERSION_NAME").associateWith { key -> providers.gradleProperty(key).get() }
+        inputs.property("constants", constants)
 
-    val generateConstants =
-        register("generateConstants") {
-            finalizedBy("compileKotlin")
+        val outputDirectory = layout.buildDirectory.dir("generated/sources/buildConstants/kotlin")
+        outputs.dir(outputDirectory)
 
-            outputs.files("$projectDir/src/generated/kotlin/com/jzbrooks/BuildConstants.kt")
+        doLast {
+            val packageDirectory = outputDirectory.get().asFile.resolve("com/jzbrooks")
+            packageDirectory.mkdirs()
 
-            doLast {
-                val generatedDirectory = Paths.get("$projectDir/src/generated/kotlin/com/jzbrooks")
-                Files.createDirectories(generatedDirectory)
-                val generatedFile = generatedDirectory.resolve("BuildConstants.kt")
+            val buildConstantsClass =
+                buildString {
+                    appendLine("package com.jzbrooks")
+                    appendLine()
+                    appendLine("internal object BuildConstants {")
 
-                PrintWriter(generatedFile.toFile()).use { output ->
-                    val buildConstantsClass =
-                        buildString {
-                            appendLine(
-                                """
-                               |package com.jzbrooks
-                               |
-                               |internal object BuildConstants {
-                                """.trimMargin(),
-                            )
+                    for (constant in constants) {
+                        append("    const val ")
+                        append(constant.key.uppercase())
+                        append(" = \"")
+                        append(constant.value)
+                        appendLine('"')
+                    }
 
-                            val vgoProperties =
-                                providers.gradlePropertiesPrefixedBy("generate.").get() +
-                                    listOf(
-                                        "VERSION_NAME",
-                                    ).associateWith { key -> providers.gradleProperty(key).get() }
-
-                            for (property in vgoProperties) {
-                                append("    const val ")
-                                append(property.key.uppercase())
-                                append(" = \"")
-                                append(property.value)
-                                appendLine('"')
-                            }
-
-                            appendLine("}")
-                        }
-                    output.write(buildConstantsClass)
+                    appendLine("}")
                 }
-            }
+
+            packageDirectory.resolve("BuildConstants.kt").writeText(buildConstantsClass)
         }
-
-    withType<KtLintCheckTask>().configureEach {
-        mustRunAfter(generateConstants)
     }
 
-    withType<KtLintFormatTask>().configureEach {
-        mustRunAfter(generateConstants)
+kotlin.sourceSets["main"].kotlin.srcDir(generateConstants)
+
+tasks.register<Copy>("updateBaselineOptimizations") {
+    description = "Updates baseline assets with the latest integration test outputs."
+    group = "Build Setup"
+
+    val source = layout.buildDirectory.dir("test-results")
+    from(source) {
+        include("*testOptimizationFinishes.xml")
+        include("*testOptimizationFinishes.svg")
+        include("*testOptimizationFinishes.kt")
     }
-
-    register<Copy>("updateBaselineOptimizations") {
-        description = "Updates baseline assets with the latest integration test outputs."
-        group = "Build Setup"
-
-        val source = layout.buildDirectory.dir("test-results")
-        from(source) {
-            include("*testOptimizationFinishes.xml")
-            include("*testOptimizationFinishes.svg")
-            include("*testOptimizationFinishes.kt")
-        }
-        into("src/test/resources/baseline/")
-        rename("(\\w+)_testOptimizationFinishes.(xml|svg|kt)", "$1_optimized.$2")
-    }
-
-    register<Jar>("sourcesJar") {
-        dependsOn(generateConstants)
-
-        archiveClassifier.set("sources")
-        from(sourceSets["main"].allSource)
-    }
-
-    register<Jar>("javadocJar") {
-        dependsOn(generateConstants)
-
-        archiveClassifier.set("javadoc")
-        from(this@tasks["javadoc"])
-    }
+    into("src/test/resources/baseline/")
+    rename("(\\w+)_testOptimizationFinishes.(xml|svg|kt)", "$1_optimized.$2")
 }

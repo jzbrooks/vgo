@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm")
+    id("vgo.kotlin-conventions")
     id("org.jetbrains.intellij.platform")
 }
 
