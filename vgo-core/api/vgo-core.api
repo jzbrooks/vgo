@@ -1000,6 +1000,46 @@ public final class com/jzbrooks/vgo/core/util/element/TraverseKt {
 	public static final fun traverseTopDown (Lcom/jzbrooks/vgo/core/graphic/Element;Lkotlin/jvm/functions/Function1;)Lcom/jzbrooks/vgo/core/graphic/Element;
 }
 
+public final class com/jzbrooks/vgo/core/util/ir/DebuggingKt {
+	public static final fun asIr (Lcom/jzbrooks/vgo/core/graphic/Graphic;)Ljava/lang/String;
+}
+
+public abstract interface class com/jzbrooks/vgo/core/util/ir/IrColorScheme {
+	public abstract fun bold (Ljava/lang/String;)Ljava/lang/CharSequence;
+	public abstract fun colorSwatch (III)Ljava/lang/CharSequence;
+	public abstract fun cyan (Ljava/lang/String;)Ljava/lang/CharSequence;
+	public abstract fun dim (Ljava/lang/String;)Ljava/lang/CharSequence;
+	public abstract fun green (Ljava/lang/String;)Ljava/lang/CharSequence;
+	public abstract fun yellow (Ljava/lang/String;)Ljava/lang/CharSequence;
+}
+
+public final class com/jzbrooks/vgo/core/util/ir/IrPrinter : com/jzbrooks/vgo/core/graphic/ElementVisitor {
+	public fun <init> ()V
+	public fun <init> (Ljava/io/PrintStream;Lcom/jzbrooks/vgo/core/util/ir/IrColorScheme;)V
+	public synthetic fun <init> (Ljava/io/PrintStream;Lcom/jzbrooks/vgo/core/util/ir/IrColorScheme;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Shape;)V
+}
+
+public final class com/jzbrooks/vgo/core/util/ir/PlainColorScheme : com/jzbrooks/vgo/core/util/ir/IrColorScheme {
+	public static final field INSTANCE Lcom/jzbrooks/vgo/core/util/ir/PlainColorScheme;
+	public synthetic fun bold (Ljava/lang/String;)Ljava/lang/CharSequence;
+	public fun bold (Ljava/lang/String;)Ljava/lang/String;
+	public synthetic fun colorSwatch (III)Ljava/lang/CharSequence;
+	public fun colorSwatch (III)Ljava/lang/String;
+	public synthetic fun cyan (Ljava/lang/String;)Ljava/lang/CharSequence;
+	public fun cyan (Ljava/lang/String;)Ljava/lang/String;
+	public synthetic fun dim (Ljava/lang/String;)Ljava/lang/CharSequence;
+	public fun dim (Ljava/lang/String;)Ljava/lang/String;
+	public synthetic fun green (Ljava/lang/String;)Ljava/lang/CharSequence;
+	public fun green (Ljava/lang/String;)Ljava/lang/String;
+	public synthetic fun yellow (Ljava/lang/String;)Ljava/lang/CharSequence;
+	public fun yellow (Ljava/lang/String;)Ljava/lang/String;
+}
+
 public final class com/jzbrooks/vgo/core/util/math/CenterParameterization {
 	public fun <init> (Lcom/jzbrooks/vgo/core/util/math/Point;FFD)V
 	public final fun component1 ()Lcom/jzbrooks/vgo/core/util/math/Point;
