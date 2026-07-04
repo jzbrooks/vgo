@@ -7,14 +7,31 @@
 `CLICOLOR_FORCE`, and `TERM` environment variables while also only using ANSI color escape sequences if the output
 is a terminal.
 
+- Gradients are supported for SVG (reading and writing)
+  - Reading converts `<linearGradient>` and `<radialGradient>` definitions referenced via `fill`/`stroke` `url(#id)` when they are exactly representable:
+    - `gradientUnits="userSpaceOnUse"` coordinates
+    - `gradientUnits="objectBoundingBox"` coordinates (including percentages), resolved against the referencing element's bounding box
+    - `gradientTransform` baked into gradient coordinates when the transformed gradient still renders identically (rotation, uniform scale, translation, and axis-aligned gradients under non-uniform scale — the common Illustrator/Figma export forms)
+    - `href`/`xlink:href` templates (e.g. stops inherited from another gradient)
+    - `spreadMethod`, percentage stop offsets, and stop styling via attributes or `style` (`stop-color`, `stop-opacity`)
+  - Unsupported cases (e.g. skew `gradientTransform`, focal points, unresolvable references) are passed through to the output verbatim instead of being converted
+  - Writing emits gradient brushes as `<defs>` definitions referenced with `url(#id)`, enabling vector drawable → SVG conversion of gradient drawables. Sweep gradients cannot be represented in SVG and fail conversion with a clear error
+
 ### Changed
 - `MergePaths` will merge opaque stroke, no fill paths regardless of overlap.
+- Shape elements carry their paints in new `Shape.fillBrush` and `Shape.strokeBrush` properties, which can represent gradients
+- `BakeTransformations` no longer bakes a group transform when a child path's paint would be invalidated by it (a gradient that cannot be exactly transformed, or an unconverted `url(#id)` paint reference); the transform is retained on the group instead
 
 ### Deprecated
+
+- `Shape.fill` and `Shape.stroke`: their `Color` type cannot represent gradient paints, so they hold placeholder colors (black fill, transparent stroke) when the shape is painted with a gradient. Read `fillBrush`/`strokeBrush` instead — they are the source of truth for shape paints
 
 ### Removed
 
 ### Fixed
+
+- SVG paths referencing gradients (`fill="url(#id)"`) were parsed as black fills, rendering gradient-filled artwork solid black after optimization
+- `BakeTransformations` transformed path geometry without transforming gradient paint coordinates, warping gradient-painted paths inside transformed groups (affected vector drawables)
 
 ### Security
 

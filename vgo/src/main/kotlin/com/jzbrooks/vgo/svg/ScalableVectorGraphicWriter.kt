@@ -3,7 +3,12 @@ package com.jzbrooks.vgo.svg
 import com.jzbrooks.vgo.core.Brush
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.Gradient
 import com.jzbrooks.vgo.core.HexFormat
+import com.jzbrooks.vgo.core.LinearGradient
+import com.jzbrooks.vgo.core.RadialGradient
+import com.jzbrooks.vgo.core.SweepGradient
+import com.jzbrooks.vgo.core.TileMode
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.ContainerElement
@@ -72,10 +77,15 @@ class ScalableVectorGraphicWriter(
         }
         document.appendChild(root)
 
-        // Assign stable ids to every ClipPath reachable via Group.clipPaths and emit
-        // them as <defs><clipPath>...</clipPath></defs> so refs below resolve.
-        val clipPathIds = assignClipPathIds(graphic)
-        if (clipPathIds.isNotEmpty()) {
+        // Generated def ids must not collide with ids of passthrough elements,
+        // which may still be url-referenced from foreign attributes.
+        val usedIds = collectExtraElementIds(graphic)
+
+        // Assign stable ids to every ClipPath reachable via Group.clipPaths and every
+        // gradient brush, and emit them under <defs> so refs below resolve.
+        val clipPathIds = assignClipPathIds(graphic, usedIds)
+        val gradientIds = assignGradientIds(graphic, usedIds)
+        if (clipPathIds.isNotEmpty() || gradientIds.isNotEmpty()) {
             val defs = document.createElement("defs")
             root.appendChild(defs)
             for ((clipPath, id) in clipPathIds) {
@@ -86,23 +96,43 @@ class ScalableVectorGraphicWriter(
                 }
                 val regionInherited = InheritedStyle()
                 for (region in clipPath.regions) {
-                    document.createChildElement(commandPrinter, clipPathElement, region, regionInherited)
+                    document.createChildElement(commandPrinter, clipPathElement, region, regionInherited, emptyMap(), gradientIds)
                 }
                 defs.appendChild(clipPathElement)
+            }
+            for ((gradient, id) in gradientIds) {
+                defs.appendChild(document.createGradientDefElement(gradient, id))
             }
         }
 
         val inherited = graphic.foreign.toChildInheritedStyle(InheritedStyle())
         for (element in graphic.elements) {
-            document.createChildElement(commandPrinter, root, element, inherited, clipPathIds)
+            document.createChildElement(commandPrinter, root, element, inherited, clipPathIds, gradientIds)
         }
 
         return document
     }
 
-    private fun assignClipPathIds(graphic: ScalableVectorGraphic): LinkedHashMap<ClipPath, String> {
+    private fun collectExtraElementIds(graphic: ScalableVectorGraphic): MutableSet<String> {
+        val ids = mutableSetOf<String>()
+
+        fun walk(element: Element) {
+            if (element is Extra) {
+                element.id?.let(ids::add)
+            }
+            if (element is ContainerElement) {
+                element.elements.forEach(::walk)
+            }
+        }
+        graphic.elements.forEach(::walk)
+        return ids
+    }
+
+    private fun assignClipPathIds(
+        graphic: ScalableVectorGraphic,
+        usedIds: MutableSet<String>,
+    ): LinkedHashMap<ClipPath, String> {
         val result = LinkedHashMap<ClipPath, String>()
-        val usedIds = mutableSetOf<String>()
         var counter = 0
 
         fun nextId(preferred: String?): String {
@@ -129,6 +159,114 @@ class ScalableVectorGraphicWriter(
         return result
     }
 
+    private fun assignGradientIds(
+        graphic: ScalableVectorGraphic,
+        usedIds: MutableSet<String>,
+    ): LinkedHashMap<Gradient, String> {
+        val result = LinkedHashMap<Gradient, String>()
+        var counter = 0
+
+        fun nextId(): String {
+            while (true) {
+                val candidate = "gradient${counter++}"
+                if (usedIds.add(candidate)) return candidate
+            }
+        }
+
+        fun assign(brush: Brush) {
+            if (brush is Gradient && brush !in result) {
+                check(brush !is SweepGradient) { "SweepGradient cannot be represented in SVG" }
+                result[brush] = nextId()
+            }
+        }
+
+        fun walk(element: Element) {
+            if (element is PaintedElement) {
+                assign(element.effectiveFill)
+                assign(element.effectiveStroke)
+            }
+            if (element is Group) {
+                for (clipPath in element.clipPaths) {
+                    clipPath.regions.forEach(::walk)
+                }
+            }
+            if (element is ContainerElement) {
+                element.elements.forEach(::walk)
+            }
+        }
+        graphic.elements.forEach(::walk)
+        return result
+    }
+
+    private fun Document.createGradientDefElement(
+        gradient: Gradient,
+        id: String,
+    ): org.w3c.dom.Element {
+        val formatter = commandPrinter.formatter
+
+        val element =
+            when (gradient) {
+                is LinearGradient -> {
+                    createElement("linearGradient").apply {
+                        setAttribute("id", id)
+                        setAttribute("gradientUnits", "userSpaceOnUse")
+                        setAttribute("x1", formatter.format(gradient.startX))
+                        setAttribute("y1", formatter.format(gradient.startY))
+                        setAttribute("x2", formatter.format(gradient.endX))
+                        setAttribute("y2", formatter.format(gradient.endY))
+                    }
+                }
+
+                is RadialGradient -> {
+                    createElement("radialGradient").apply {
+                        setAttribute("id", id)
+                        setAttribute("gradientUnits", "userSpaceOnUse")
+                        setAttribute("cx", formatter.format(gradient.centerX))
+                        setAttribute("cy", formatter.format(gradient.centerY))
+                        setAttribute("r", formatter.format(gradient.radius))
+                    }
+                }
+
+                is SweepGradient -> {
+                    error("SweepGradient cannot be represented in SVG")
+                }
+            }
+
+        val spreadMethod =
+            when (gradient.tileMode()) {
+                TileMode.CLAMP -> null
+                TileMode.MIRROR -> "reflect"
+                TileMode.REPEAT -> "repeat"
+            }
+        if (spreadMethod != null) {
+            element.setAttribute("spreadMethod", spreadMethod)
+        }
+
+        for (stop in gradient.stops) {
+            val stopElement = createElement("stop")
+            stopElement.setAttribute("offset", formatter.format(stop.offset))
+
+            // Alpha is expressed via stop-opacity for compatibility — SVG 1.1
+            // renderers don't accept RGBA hex in stop-color.
+            val opaque = Color(0xFF.toUByte(), stop.color.red, stop.color.green, stop.color.blue)
+            stopElement.setAttribute("stop-color", Colors.NAMES_BY_COLORS[opaque] ?: opaque.toHexString(HexFormat.RGBA))
+            if (stop.color.alpha != 0xFF.toUByte()) {
+                stopElement.setAttribute("stop-opacity", formatter.format(stop.color.alpha.toFloat() / 0xFF))
+            }
+
+            element.appendChild(stopElement)
+        }
+
+        return element
+    }
+
+    private fun Gradient.tileMode(): TileMode =
+        when (this) {
+            is LinearGradient -> tileMode
+            is RadialGradient -> tileMode
+            is SweepGradient -> TileMode.CLAMP
+        }
+
     private data class InheritedStyle(
         val fill: Brush = Colors.BLACK,
         val fillRule: Path.FillRule = Path.FillRule.NON_ZERO,
@@ -142,32 +280,56 @@ class ScalableVectorGraphicWriter(
     private fun Map<String, String>.withoutImpliedPresentationAttrs(inherited: InheritedStyle): Map<String, String> {
         val inheritedFillColor = inherited.fill as? Color ?: Colors.BLACK
         val inheritedStrokeColor = inherited.stroke as? Color ?: Colors.TRANSPARENT
-        return filter { (key, _) ->
+        return filter { (key, value) ->
             when (key) {
-                "fill" -> (extractColor("fill", inheritedFillColor) ?: inherited.fill) != inherited.fill
+                // Unresolved paint server references parse as the default color and
+                // would otherwise be mistaken for an implied attribute
+                "fill" -> value.isUrlPaint() || (extractColor("fill", inheritedFillColor) ?: inherited.fill) != inherited.fill
+
                 "fill-rule" -> (extractFillRule("fill-rule") ?: inherited.fillRule) != inherited.fillRule
-                "stroke" -> (extractColor("stroke", inheritedStrokeColor) ?: inherited.stroke) != inherited.stroke
+
+                "stroke" -> value.isUrlPaint() || (extractColor("stroke", inheritedStrokeColor) ?: inherited.stroke) != inherited.stroke
+
                 "stroke-width" -> this["stroke-width"]?.toFloatOrNull() != inherited.strokeWidth
+
                 "stroke-linecap" -> (extractLineCap("stroke-linecap") ?: inherited.strokeLineCap) != inherited.strokeLineCap
+
                 "stroke-linejoin" -> (extractLineJoin("stroke-linejoin") ?: inherited.strokeLineJoin) != inherited.strokeLineJoin
+
                 "stroke-miterlimit" -> this["stroke-miterlimit"]?.toFloatOrNull() != inherited.strokeMiterLimit
+
                 else -> true
             }
         }
     }
 
+    // Shapes surface gradient paints through their brush properties; the
+    // Color-typed fill/stroke are deprecated placeholders.
+    private val PaintedElement.effectiveFill: Brush
+        get() = if (this is Shape) fillBrush else fill
+
+    private val PaintedElement.effectiveStroke: Brush
+        get() = if (this is Shape) strokeBrush else stroke
+
     private fun org.w3c.dom.Element.writePaintAttributes(
         element: PaintedElement,
         inherited: InheritedStyle,
+        gradientIds: Map<Gradient, String>,
     ) {
-        if (element.fill != inherited.fill) {
-            val fill = element.fill
-            check(fill is Color) { "SVG gradient output is not supported" }
-            if (fill.alpha == 0.toUByte()) {
-                setAttribute("fill", "none")
-            } else {
-                val color = Colors.NAMES_BY_COLORS[fill] ?: fill.toHexString(HexFormat.RGBA)
-                setAttribute("fill", color)
+        when (val fill = element.effectiveFill) {
+            inherited.fill -> {}
+
+            is Color -> {
+                if (fill.alpha == 0.toUByte()) {
+                    setAttribute("fill", "none")
+                } else {
+                    val color = Colors.NAMES_BY_COLORS[fill] ?: fill.toHexString(HexFormat.RGBA)
+                    setAttribute("fill", color)
+                }
+            }
+
+            is Gradient -> {
+                setAttribute("fill", "url(#${gradientIds.getValue(fill)})")
             }
         }
 
@@ -180,14 +342,20 @@ class ScalableVectorGraphicWriter(
             setAttribute("fill-rule", fillRule)
         }
 
-        if (element.stroke != inherited.stroke) {
-            val stroke = element.stroke
-            check(stroke is Color) { "SVG gradient output is not supported" }
-            if (stroke.alpha == 0.toUByte()) {
-                setAttribute("stroke", "none")
-            } else {
-                val color = Colors.NAMES_BY_COLORS[stroke] ?: stroke.toHexString(HexFormat.RGBA)
-                setAttribute("stroke", color)
+        when (val stroke = element.effectiveStroke) {
+            inherited.stroke -> {}
+
+            is Color -> {
+                if (stroke.alpha == 0.toUByte()) {
+                    setAttribute("stroke", "none")
+                } else {
+                    val color = Colors.NAMES_BY_COLORS[stroke] ?: stroke.toHexString(HexFormat.RGBA)
+                    setAttribute("stroke", color)
+                }
+            }
+
+            is Gradient -> {
+                setAttribute("stroke", "url(#${gradientIds.getValue(stroke)})")
             }
         }
 
@@ -244,6 +412,7 @@ class ScalableVectorGraphicWriter(
         element: Element,
         inherited: InheritedStyle = InheritedStyle(),
         clipPathIds: Map<ClipPath, String> = emptyMap(),
+        gradientIds: Map<Gradient, String> = emptyMap(),
     ) {
         val writtenForeign = element.foreign.withoutImpliedPresentationAttrs(inherited)
         val node =
@@ -252,7 +421,7 @@ class ScalableVectorGraphicWriter(
                     createElement("path").apply {
                         val data = element.commands.joinToString(separator = "", transform = commandPrinter::print)
                         setAttribute("d", data)
-                        writePaintAttributes(element, inherited)
+                        writePaintAttributes(element, inherited, gradientIds)
                     }
                 }
 
@@ -276,7 +445,7 @@ class ScalableVectorGraphicWriter(
 
                             val childInherited = writtenForeign.toChildInheritedStyle(inherited)
                             for (child in element.elements) {
-                                createChildElement(commandPrinter, node, child, childInherited, clipPathIds)
+                                createChildElement(commandPrinter, node, child, childInherited, clipPathIds, gradientIds)
                             }
                         }
 
@@ -309,7 +478,7 @@ class ScalableVectorGraphicWriter(
                     createElement(element.name).also {
                         val childInherited = writtenForeign.toChildInheritedStyle(inherited)
                         for (child in element.elements) {
-                            createChildElement(commandPrinter, it, child, childInherited, clipPathIds)
+                            createChildElement(commandPrinter, it, child, childInherited, clipPathIds, gradientIds)
                         }
                     }
                 }
@@ -365,7 +534,7 @@ class ScalableVectorGraphicWriter(
                                 setAttribute("points", element.points.joinToString(" ") { "${fmt.format(it.x)},${fmt.format(it.y)}" })
                             }
                         }
-                    }.also { it.writePaintAttributes(element, inherited) }
+                    }.also { it.writePaintAttributes(element, inherited, gradientIds) }
                 }
 
                 else -> {

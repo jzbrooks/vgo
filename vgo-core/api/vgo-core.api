@@ -147,17 +147,21 @@ public final class com/jzbrooks/vgo/core/graphic/Circle : com/jzbrooks/vgo/core/
 	public final fun getCy ()F
 	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFill-3SA-Bs8 ()I
+	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
 	public final fun getR ()F
 	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStroke-3SA-Bs8 ()I
+	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
 	public fun getStrokeWidth ()F
 	public fun hashCode ()I
+	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -220,6 +224,7 @@ public final class com/jzbrooks/vgo/core/graphic/Ellipse : com/jzbrooks/vgo/core
 	public final fun getCy ()F
 	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFill-3SA-Bs8 ()I
+	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
@@ -227,11 +232,14 @@ public final class com/jzbrooks/vgo/core/graphic/Ellipse : com/jzbrooks/vgo/core
 	public final fun getRy ()F
 	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStroke-3SA-Bs8 ()I
+	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
 	public fun getStrokeWidth ()F
 	public fun hashCode ()I
+	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -303,11 +311,13 @@ public final class com/jzbrooks/vgo/core/graphic/Line : com/jzbrooks/vgo/core/gr
 	public fun equals (Ljava/lang/Object;)Z
 	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFill-3SA-Bs8 ()I
+	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
 	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStroke-3SA-Bs8 ()I
+	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
@@ -317,6 +327,8 @@ public final class com/jzbrooks/vgo/core/graphic/Line : com/jzbrooks/vgo/core/gr
 	public final fun getY1 ()F
 	public final fun getY2 ()F
 	public fun hashCode ()I
+	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -407,17 +419,21 @@ public final class com/jzbrooks/vgo/core/graphic/Polygon : com/jzbrooks/vgo/core
 	public fun equals (Ljava/lang/Object;)Z
 	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFill-3SA-Bs8 ()I
+	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
 	public final fun getPoints ()Ljava/util/List;
 	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStroke-3SA-Bs8 ()I
+	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
 	public fun getStrokeWidth ()F
 	public fun hashCode ()I
+	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -439,17 +455,21 @@ public final class com/jzbrooks/vgo/core/graphic/Polyline : com/jzbrooks/vgo/cor
 	public fun equals (Ljava/lang/Object;)Z
 	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFill-3SA-Bs8 ()I
+	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
 	public final fun getPoints ()Ljava/util/List;
 	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStroke-3SA-Bs8 ()I
+	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
 	public fun getStrokeWidth ()F
 	public fun hashCode ()I
+	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
 
@@ -476,6 +496,7 @@ public final class com/jzbrooks/vgo/core/graphic/Rect : com/jzbrooks/vgo/core/gr
 	public fun equals (Ljava/lang/Object;)Z
 	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFill-3SA-Bs8 ()I
+	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public final fun getHeight ()F
@@ -484,6 +505,7 @@ public final class com/jzbrooks/vgo/core/graphic/Rect : com/jzbrooks/vgo/core/gr
 	public final fun getRy ()F
 	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStroke-3SA-Bs8 ()I
+	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
@@ -492,11 +514,17 @@ public final class com/jzbrooks/vgo/core/graphic/Rect : com/jzbrooks/vgo/core/gr
 	public final fun getX ()F
 	public final fun getY ()F
 	public fun hashCode ()I
+	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
 
 public abstract interface class com/jzbrooks/vgo/core/graphic/Shape : com/jzbrooks/vgo/core/graphic/PaintedElement {
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
+	public abstract fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
+	public abstract fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
+	public abstract fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public abstract fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Shape$DefaultImpls {
@@ -1100,6 +1128,13 @@ public final class com/jzbrooks/vgo/core/util/math/CurvesKt {
 
 public final class com/jzbrooks/vgo/core/util/math/EllipticalArcKt {
 	public static final fun applyTransform (Lcom/jzbrooks/vgo/core/graphic/command/EllipticalArcCurve$Parameter;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)V
+}
+
+public final class com/jzbrooks/vgo/core/util/math/GradientTransformsKt {
+	public static final fun transformedOrNull (Lcom/jzbrooks/vgo/core/Gradient;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)Lcom/jzbrooks/vgo/core/Gradient;
+	public static final fun transformedOrNull (Lcom/jzbrooks/vgo/core/LinearGradient;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)Lcom/jzbrooks/vgo/core/LinearGradient;
+	public static final fun transformedOrNull (Lcom/jzbrooks/vgo/core/RadialGradient;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)Lcom/jzbrooks/vgo/core/RadialGradient;
+	public static final fun transformedOrNull (Lcom/jzbrooks/vgo/core/SweepGradient;Lcom/jzbrooks/vgo/core/util/math/Matrix3;)Lcom/jzbrooks/vgo/core/SweepGradient;
 }
 
 public final class com/jzbrooks/vgo/core/util/math/LineSegment {

@@ -154,6 +154,25 @@ class VgoTests {
     }
 
     @Test
+    fun `VectorDrawable gradient is converted to an svg gradient def`(info: TestInfo) {
+        val outputPath = "build/test-results/${info.displayName}/gradient_linear.svg"
+
+        val options =
+            Vgo.Options(
+                format = "svg",
+                input = listOf("src/test/resources/gradient_linear.xml"),
+                output = listOf(outputPath),
+            )
+
+        val exitCode = Vgo(options).run()
+
+        assertThat(exitCode).isEqualTo(0)
+        val output = File(outputPath).readText()
+        assertThat(output).contains("<linearGradient")
+        assertThat(output).contains("url(#gradient0)")
+    }
+
+    @Test
     fun `optimized file is not modified when re-run produces same or larger output`() {
         val targetPath = "build/test-results/bug_117.xml"
 

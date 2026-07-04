@@ -1,5 +1,7 @@
 package com.jzbrooks.vgo.core.transformation
 
+import com.jzbrooks.vgo.core.Brush
+import com.jzbrooks.vgo.core.Gradient
 import com.jzbrooks.vgo.core.graphic.ElementVisitor
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -21,6 +23,7 @@ import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.Vector3
 import com.jzbrooks.vgo.core.util.math.applyTransform
+import com.jzbrooks.vgo.core.util.math.transformedOrNull
 import java.util.Stack
 
 /**
@@ -44,9 +47,25 @@ class BakeTransformations :
             !groupTransform.contentsEqual(Matrix3.IDENTITY) &&
                 group.elements.all { element ->
                     when (element) {
-                        is Path -> true
-                        is Group -> true
-                        else -> false
+                        // Gradient coordinates live in user space, so baking the group
+                        // transform into path geometry must also bake it into the
+                        // gradient — only possible when the transformed gradient is
+                        // exactly representable. Paint server references left in the
+                        // foreign map (e.g. SVG fill="url(#id)") point at coordinates
+                        // this pass cannot update, so they block baking entirely.
+                        is Path -> {
+                            element.fill.canBakeTransform(groupTransform) &&
+                                element.stroke.canBakeTransform(groupTransform) &&
+                                element.foreign.values.none { it.contains("url(") }
+                        }
+
+                        is Group -> {
+                            true
+                        }
+
+                        else -> {
+                            false
+                        }
                     }
                 } &&
                 group.clipPaths.all { clipPath ->
@@ -54,21 +73,34 @@ class BakeTransformations :
                 }
 
         if (shouldBakeTransform) {
-            for (child in group.elements) {
-                when (child) {
-                    is Path -> {
-                        applyTransform(child, groupTransform)
-                    }
+            group.elements =
+                group.elements.map { child ->
+                    when (child) {
+                        is Path -> {
+                            applyTransform(child, groupTransform)
 
-                    is Group -> {
-                        child.transform = groupTransform * child.transform
-                    }
+                            val fill = child.fill
+                            val stroke = child.stroke
+                            if (fill is Gradient || stroke is Gradient) {
+                                child.copy(
+                                    fill = (fill as? Gradient)?.transformedOrNull(groupTransform) ?: fill,
+                                    stroke = (stroke as? Gradient)?.transformedOrNull(groupTransform) ?: stroke,
+                                )
+                            } else {
+                                child
+                            }
+                        }
 
-                    else -> {
-                        error("Unexpected element type: ${child::class}")
+                        is Group -> {
+                            child.transform = groupTransform * child.transform
+                            child
+                        }
+
+                        else -> {
+                            error("Unexpected element type: ${child::class}")
+                        }
                     }
                 }
-            }
 
             for (clipPath in group.clipPaths) {
                 for (region in clipPath.regions) {
@@ -80,6 +112,8 @@ class BakeTransformations :
             group.transform = Matrix3.IDENTITY
         }
     }
+
+    private fun Brush.canBakeTransform(transform: Matrix3): Boolean = this !is Gradient || transformedOrNull(transform) != null
 
     private fun applyTransform(
         path: Path,

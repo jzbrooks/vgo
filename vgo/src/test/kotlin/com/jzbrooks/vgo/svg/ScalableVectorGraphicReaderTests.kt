@@ -13,6 +13,11 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.GradientStop
+import com.jzbrooks.vgo.core.LinearGradient
+import com.jzbrooks.vgo.core.RadialGradient
+import com.jzbrooks.vgo.core.TileMode
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
@@ -469,7 +474,7 @@ class ScalableVectorGraphicReaderTests {
         val graphic = parse(document.firstChild)
         val rect = graphic.elements.first() as Rect
 
-        assertThat(rect::fill).isEqualTo(Color(0xFFFF0000u))
+        assertThat(rect::fillBrush).isEqualTo(Color(0xFFFF0000u))
         val style = rect.foreign["style"]
         assertThat(style).isNotNull()
         val styleProps = style!!.split(';').map { it.trim() }.toSet()
@@ -563,5 +568,377 @@ class ScalableVectorGraphicReaderTests {
 
         assertThat(path::stroke).isEqualTo(Color(0xFF0000FFu))
         assertThat(path.foreign["style"]).isEqualTo("opacity:0.75")
+    }
+
+    @Test
+    fun testUserSpaceLinearGradientFillParsed() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <defs>
+                |    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="0">
+                |      <stop offset="0" stop-color="#b125ea"/>
+                |      <stop offset="0.5" stop-color="#833fef"/>
+                |      <stop offset="1" stop-color="#008aff"/>
+                |    </linearGradient>
+                |  </defs>
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.first() as Path
+        val expected =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(0.5f, Color(0xFF833FEFu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        assertThat(path::fill).isEqualTo(expected)
+    }
+
+    @Test
+    fun testConsumedGradientDefAndEmptyDefsArePruned() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <defs>
+                |    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="0">
+                |      <stop offset="0" stop-color="#b125ea"/>
+                |      <stop offset="1" stop-color="#008aff"/>
+                |    </linearGradient>
+                |  </defs>
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        assertThat(graphic.elements.filterIsInstance<Extra>(), "extra elements").isEmpty()
+    }
+
+    @Test
+    fun testGradientTransformIsBakedIntoCoordinates() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <linearGradient id="g" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse"
+                |      gradientTransform="matrix(2,0,0,4,10,20)">
+                |    <stop offset="0" stop-color="#b125ea"/>
+                |    <stop offset="1" stop-color="#008aff"/>
+                |  </linearGradient>
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.first() as Path
+        val fill = path.fill as LinearGradient
+        assertThat(fill::startX).isEqualTo(10f)
+        assertThat(fill::startY).isEqualTo(20f)
+        assertThat(fill::endX).isEqualTo(12f)
+        assertThat(fill::endY).isEqualTo(20f)
+    }
+
+    @Test
+    fun testObjectBoundingBoxGradientResolvesAgainstElementBounds() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 200 200">
+                |  <linearGradient id="g">
+                |    <stop offset="0" stop-color="#b125ea"/>
+                |    <stop offset="1" stop-color="#008aff"/>
+                |  </linearGradient>
+                |  <rect x="10" y="20" width="100" height="50" fill="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val rect = graphic.elements.first() as Rect
+        val fill = rect.fillBrush as LinearGradient
+        assertThat(fill::startX).isEqualTo(10f)
+        assertThat(fill::startY).isEqualTo(20f)
+        assertThat(fill::endX).isEqualTo(110f)
+        assertThat(fill::endY).isEqualTo(20f)
+    }
+
+    @Test
+    fun testRadialGradientStrokeParsed() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <radialGradient id="g" gradientUnits="userSpaceOnUse" cx="12" cy="12" r="6" spreadMethod="reflect">
+                |    <stop offset="0" stop-color="#b125ea"/>
+                |    <stop offset="1" stop-color="#008aff"/>
+                |  </radialGradient>
+                |  <path d="M0,0L24,0L24,24Z" fill="none" stroke="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        val expected =
+            RadialGradient(
+                centerX = 12f,
+                centerY = 12f,
+                radius = 6f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+                tileMode = TileMode.MIRROR,
+            )
+        assertThat(path::stroke).isEqualTo(expected)
+    }
+
+    @Test
+    fun testGradientStopsParsedFromStyleWithPercentOffsetsAndOpacity() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="0" spreadMethod="repeat">
+                |    <stop offset="50%" style="stop-color:rgb(255,0,0);stop-opacity:0.5"/>
+                |    <stop offset="100%" style="stop-color:#008aff"/>
+                |  </linearGradient>
+                |  <path d="M0,0L24,0L24,24Z" style="fill:url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.first() as Path
+        val expected =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0.5f, Color(0x80FF0000u)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+                tileMode = TileMode.REPEAT,
+            )
+        assertThat(path::fill).isEqualTo(expected)
+    }
+
+    @Test
+    fun testSingleStopGradientCollapsesToSolidColor() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <linearGradient id="g">
+                |    <stop offset="0" stop-color="#b125ea"/>
+                |  </linearGradient>
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.first() as Path
+        assertThat(path::fill).isEqualTo(Color(0xFFB125EAu))
+    }
+
+    @Test
+    fun testStoplessGradientRendersAsNoFill() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <linearGradient id="g"/>
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.first() as Path
+        assertThat(path::fill).isEqualTo(Colors.TRANSPARENT)
+    }
+
+    @Test
+    fun testHrefTemplateSuppliesStops() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <linearGradient id="base">
+                |    <stop offset="0" stop-color="#b125ea"/>
+                |    <stop offset="1" stop-color="#008aff"/>
+                |  </linearGradient>
+                |  <linearGradient id="derived" href="#base" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="10" y2="0"/>
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#derived)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        val expected =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 10f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        assertThat(path::fill).isEqualTo(expected)
+
+        // The consumed def is pruned; the unreferenced template is conservatively kept
+        val extras = graphic.elements.filterIsInstance<Extra>()
+        assertThat(extras.map { it.id }, "extra element ids").containsExactly("base")
+    }
+
+    @Test
+    fun testCyclicHrefFallsBackToPassthrough() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <linearGradient id="a" href="#b"/>
+                |  <linearGradient id="b" href="#a"/>
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#a)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        assertThat(path::fill).isEqualTo(Colors.BLACK)
+        assertThat(path.foreign["fill"]).isEqualTo("url(#a)")
+        assertThat(graphic.elements.filterIsInstance<Extra>(), "extra elements").hasSize(2)
+    }
+
+    @Test
+    fun testUnrepresentableGradientTransformFallsBackToPassthrough() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <defs>
+                |    <linearGradient id="skewed" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="0"
+                |        gradientTransform="matrix(1,1,0,1,0,0)">
+                |      <stop offset="0" stop-color="#b125ea"/>
+                |      <stop offset="1" stop-color="#008aff"/>
+                |    </linearGradient>
+                |  </defs>
+                |  <path d="M0,0L24,0L24,24Z" style="fill:url(#skewed)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        assertThat(path::fill).isEqualTo(Colors.BLACK)
+        assertThat(path.foreign["style"]).isEqualTo("fill:url(#skewed)")
+
+        val defs = graphic.elements.filterIsInstance<Extra>().single()
+        assertThat(defs::name).isEqualTo("defs")
+        assertThat(defs.elements.filterIsInstance<Extra>().map { it.id }, "def ids").containsExactly("skewed")
+    }
+
+    @Test
+    fun testPartiallyResolvableGradientDefIsKept() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="24" y2="0">
+                |    <stop offset="0" stop-color="#b125ea"/>
+                |    <stop offset="1" stop-color="#008aff"/>
+                |  </linearGradient>
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#g)"/>
+                |  <g fill="url(#g)">
+                |    <circle cx="12" cy="12" r="6"/>
+                |  </g>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        assertThat(path.fill, "path fill").isInstanceOf(LinearGradient::class)
+
+        // The group's reference is not resolved, so the def must survive
+        val group = graphic.elements.filterIsInstance<Group>().single()
+        assertThat(group.foreign["fill"]).isEqualTo("url(#g)")
+        assertThat(graphic.elements.filterIsInstance<Extra>().map { it.id }, "extra element ids").containsExactly("g")
+    }
+
+    @Test
+    fun testMissingGradientReferenceFallsBackToPassthrough() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#missing)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.first() as Path
+        assertThat(path::fill).isEqualTo(Colors.BLACK)
+        assertThat(path.foreign["fill"]).isEqualTo("url(#missing)")
+    }
+
+    @Test
+    fun testUserSpacePercentageCoordinatesFallBackToPassthrough() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="50%" y2="0">
+                |    <stop offset="0" stop-color="#b125ea"/>
+                |    <stop offset="1" stop-color="#008aff"/>
+                |  </linearGradient>
+                |  <path d="M0,0L24,0L24,24Z" fill="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        assertThat(path::fill).isEqualTo(Colors.BLACK)
+        assertThat(path.foreign["fill"]).isEqualTo("url(#g)")
+        assertThat(graphic.elements.filterIsInstance<Extra>(), "extra elements").hasSize(1)
+    }
+
+    private fun parseSvg(text: String): Graphic {
+        val document =
+            ByteArrayInputStream(text.toByteArray()).use { input ->
+                DocumentBuilderFactory
+                    .newInstance()
+                    .newDocumentBuilder()
+                    .parse(input)
+                    .apply { normalize() }
+            }
+
+        return parse(document.firstChild)
     }
 }

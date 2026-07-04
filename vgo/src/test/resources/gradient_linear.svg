@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;">
+    <g transform="matrix(2,0,0,2,0,0)">
+        <path d="M0,0L12,0L12,12L0,12Z" style="fill:url(#_Linear1);fill-rule:nonzero;"/>
+    </g>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(12,0,0,12,0,0)"><stop offset="0" style="stop-color:#b125ea;stop-opacity:1"/><stop offset="0.5" style="stop-color:#833fef;stop-opacity:1"/><stop offset="1" style="stop-color:#008aff;stop-opacity:1"/></linearGradient>
+    </defs>
+</svg>

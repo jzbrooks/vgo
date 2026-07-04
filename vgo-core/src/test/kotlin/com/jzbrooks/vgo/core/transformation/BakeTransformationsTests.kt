@@ -12,6 +12,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.key
 import assertk.assertions.prop
+import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.GradientStop
+import com.jzbrooks.vgo.core.LinearGradient
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
@@ -858,5 +861,95 @@ class BakeTransformationsTests {
         val ry = arc.parameters[0].radiusY
         assertThat(maxOf(rx, ry)).isCloseTo(7.501f, 0.01f)
         assertThat(minOf(rx, ry)).isCloseTo(7.500f, 0.01f)
+    }
+
+    @Test
+    fun testGradientCoordinatesAreBakedAlongsideGeometry() {
+        val transform = Matrix3.from(floatArrayOf(2f, 0f, 10f, 0f, 2f, 20f, 0f, 0f, 1f))
+        val gradient =
+            LinearGradient(
+                0f,
+                0f,
+                1f,
+                0f,
+                listOf(GradientStop(0f, Color(0xFFB125EAu)), GradientStop(1f, Color(0xFF008AFFu))),
+            )
+        val group =
+            Group(
+                listOf(
+                    createPath(
+                        listOf(
+                            MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                            LineTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 0f))),
+                        ),
+                        fill = gradient,
+                    ),
+                ),
+                null,
+                mutableMapOf(),
+                transform,
+            )
+
+        bake.visit(group)
+
+        val path = group.elements[0] as Path
+        assertThat(path::fill).isEqualTo(gradient.copy(startX = 10f, startY = 20f, endX = 12f, endY = 20f))
+        assertThat(group.transform.contentsEqual(Matrix3.IDENTITY), "group transform is identity").isEqualTo(true)
+        assertThat(path.commands[1]).isEqualTo(LineTo(CommandVariant.ABSOLUTE, listOf(Point(12f, 20f))))
+    }
+
+    @Test
+    fun testGroupWithUnrepresentableGradientTransformIsNotBaked() {
+        val skew = Matrix3.from(floatArrayOf(1f, 1f, 0f, 0f, 1f, 0f, 0f, 0f, 1f))
+        val gradient =
+            LinearGradient(
+                0f,
+                0f,
+                1f,
+                0f,
+                listOf(GradientStop(0f, Color(0xFFB125EAu)), GradientStop(1f, Color(0xFF008AFFu))),
+            )
+        val commands =
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 0f))),
+            )
+        val group =
+            Group(
+                listOf(createPath(commands, fill = gradient)),
+                null,
+                mutableMapOf(),
+                skew,
+            )
+
+        bake.visit(group)
+
+        val path = group.elements[0] as Path
+        assertThat(path::fill).isEqualTo(gradient)
+        assertThat(path::commands).isEqualTo(commands)
+        assertThat(group.transform.contentsEqual(skew), "group transform is retained").isEqualTo(true)
+    }
+
+    @Test
+    fun testGroupWithForeignPaintReferenceIsNotBaked() {
+        val transform = Matrix3.from(floatArrayOf(2f, 0f, 0f, 0f, 2f, 0f, 0f, 0f, 1f))
+        val commands =
+            listOf(
+                MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f))),
+                LineTo(CommandVariant.ABSOLUTE, listOf(Point(1f, 0f))),
+            )
+        val group =
+            Group(
+                listOf(createPath(commands, foreign = mutableMapOf("fill" to "url(#gradient)"))),
+                null,
+                mutableMapOf(),
+                transform,
+            )
+
+        bake.visit(group)
+
+        val path = group.elements[0] as Path
+        assertThat(path::commands).isEqualTo(commands)
+        assertThat(group.transform.contentsEqual(transform), "group transform is retained").isEqualTo(true)
     }
 }
