@@ -6,6 +6,7 @@ import assertk.assertions.contains
 import assertk.assertions.containsExactly
 import assertk.assertions.containsNone
 import assertk.assertions.doesNotContain
+import assertk.assertions.first
 import assertk.assertions.index
 import assertk.assertions.isCloseTo
 import assertk.assertions.isEqualTo
@@ -892,10 +893,13 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        val path = group.elements[0] as Path
-        assertThat(path::fill).isEqualTo(gradient.copy(startX = 10f, startY = 20f, endX = 12f, endY = 20f))
-        assertThat(group.transform.contentsEqual(Matrix3.IDENTITY), "group transform is identity").isEqualTo(true)
-        assertThat(path.commands[1]).isEqualTo(LineTo(CommandVariant.ABSOLUTE, listOf(Point(12f, 20f))))
+        assertThat(group).all {
+            prop(Group::transform).isEqualTo(Matrix3.IDENTITY)
+            prop(Group::elements).first().isInstanceOf<Path>().all {
+                prop(Path::fill).isEqualTo(gradient.copy(startX = 10f, startY = 20f, endX = 12f, endY = 20f))
+                prop(Path::commands).index(1).isEqualTo(LineTo(CommandVariant.ABSOLUTE, listOf(Point(12f, 20f))))
+            }
+        }
     }
 
     @Test
@@ -924,10 +928,13 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        val path = group.elements[0] as Path
-        assertThat(path::fill).isEqualTo(gradient)
-        assertThat(path::commands).isEqualTo(commands)
-        assertThat(group.transform.contentsEqual(skew), "group transform is retained").isEqualTo(true)
+        assertThat(group).all {
+            prop(Group::transform).isEqualTo(skew)
+            prop(Group::elements).first().isInstanceOf<Path>().all {
+                prop(Path::fill).isEqualTo(gradient)
+                prop(Path::commands).isEqualTo(commands)
+            }
+        }
     }
 
     @Test
@@ -948,8 +955,13 @@ class BakeTransformationsTests {
 
         bake.visit(group)
 
-        val path = group.elements[0] as Path
-        assertThat(path::commands).isEqualTo(commands)
-        assertThat(group.transform.contentsEqual(transform), "group transform is retained").isEqualTo(true)
+        assertThat(group).all {
+            prop(Group::transform).isEqualTo(transform)
+            prop(Group::elements)
+                .first()
+                .isInstanceOf<Path>()
+                .prop(Path::commands)
+                .isEqualTo(commands)
+        }
     }
 }
