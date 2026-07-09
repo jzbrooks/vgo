@@ -50,7 +50,7 @@ fun parse(root: Node): ScalableVectorGraphic {
     // Pre-pass: harvest <clipPath id="..."> defs anywhere in the document (typically
     // inside <defs>, but the spec allows them anywhere). They're skipped by the main
     // parse below — only resolved references via Group.clipPaths surface them in IR.
-    val clipPathDefs = harvestClipPathDefs(root, inherited, gradients)
+    val clipPathDefs = harvestClipPathDefs(root, gradients, inherited)
 
     val elements =
         root.childNodes
@@ -67,8 +67,6 @@ fun parse(root: Node): ScalableVectorGraphic {
     )
 }
 
-private val GRADIENT_DEF_NAMES = setOf("linearGradient", "radialGradient")
-
 /**
  * Removes gradient definition elements whose every reference was converted to a
  * typed brush, along with any <defs> containers that end up empty. Definitions
@@ -81,12 +79,12 @@ private fun pruneConsumedGradientDefs(
 ): List<Element> {
     fun prune(elements: List<Element>): List<Element> =
         elements.mapNotNull { element ->
-            when {
-                element is Extra && element.name in GRADIENT_DEF_NAMES && element.id in consumedIds -> {
+            when (element) {
+                is Extra if element.name in GRADIENT_ELEMENT_NAMES && element.id in consumedIds -> {
                     null
                 }
 
-                element is ContainerElement -> {
+                is ContainerElement -> {
                     element.elements = prune(element.elements)
                     val prunableDefs =
                         element is Extra &&
@@ -108,8 +106,8 @@ private fun pruneConsumedGradientDefs(
 
 private fun harvestClipPathDefs(
     root: Node,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String>,
-    gradients: SvgGradients,
 ): Map<String, ClipPath> {
     val defs = mutableMapOf<String, ClipPath>()
 
@@ -119,7 +117,7 @@ private fun harvestClipPathDefs(
     ) {
         if (node is Text || node is Comment) return
         if (node.nodeName == "clipPath") {
-            val def = parseClipPathDef(node, ctx, gradients)
+            val def = parseClipPathDef(node, gradients, ctx)
             val defId = def.id
             if (defId != null) defs[defId] = def
             return
@@ -134,8 +132,8 @@ private fun harvestClipPathDefs(
 
 private fun parseClipPathDef(
     node: Node,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String>,
-    gradients: SvgGradients,
 ): ClipPath {
     val childInherited = collectStyleInheritance(node, inherited)
 
@@ -183,7 +181,7 @@ private fun resolveClipPathReferences(
 
 private fun parseElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Element? {
     if (node is Text || node is Comment) return null
@@ -204,7 +202,7 @@ private fun parseElement(
 
 private fun parseGroupElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Group {
     val childInherited = collectStyleInheritance(node, inherited)
@@ -248,17 +246,15 @@ private fun collectStyleInheritance(
 
 /**
  * Merges inherited, node-level, and style presentation attributes, removes them
- * from the DOM node (so they don't leak into [foreign]), and returns the resolved values.
+ * from the DOM node (so they don't leak into [Path.foreign]), and returns the resolved values.
  *
- * Gradient references (`url(#id)`) on the element itself resolve to typed brushes
- * via [gradients]; unresolvable references are re-attached to the node so they
- * pass through to the output verbatim instead of collapsing to a solid color.
+ * Gradient references (`url(#id)`) on the element itself are preserved as raw
+ * values so they can be resolved after the element is built and its bounds are
+ * available uniformly.
  */
 private fun extractMergedPresentationAttributes(
     node: Node,
     inherited: Map<String, String>,
-    gradients: SvgGradients,
-    bounds: () -> Rectangle?,
 ): PresentationAttributes {
     val styleProperties =
         node.attributes
@@ -285,26 +281,20 @@ private fun extractMergedPresentationAttributes(
     // The order of concatenation is important for precedence.
     // style > node attrs > inherited > CSS initial value
     val merged = inherited + nodeAttrMap + styleProperties
+    val ownPaints = mutableMapOf<String, OwnPaint>()
 
     fun resolvePaint(
         key: String,
-        default: com.jzbrooks.vgo.core.Color,
+        default: Color,
     ): Brush {
         // Only references on the element itself resolve — a reference inherited
         // from an ancestor stays in the ancestor's foreign attributes and SVG
         // paint inheritance keeps the output correct.
-        val own = styleProperties[key] ?: nodeAttrMap[key]
+        val ownStyle = styleProperties[key]
+        val ownAttribute = nodeAttrMap[key]
+        val own = ownStyle ?: ownAttribute
         if (own != null && own.isUrlPaint()) {
-            val brush = gradients.resolveBrush(own, bounds)
-            if (brush != null) return brush
-
-            if (styleProperties.containsKey(key)) {
-                unextractedStyle[key] = own
-            } else {
-                val attr = node.ownerDocument.createAttribute(key)
-                attr.value = own
-                node.attributes.setNamedItem(attr)
-            }
+            ownPaints[key] = OwnPaint(own, if (ownStyle != null) PaintSource.STYLE else PaintSource.ATTRIBUTE)
             return default
         }
         return merged.extractColor(key, default) ?: default
@@ -319,6 +309,7 @@ private fun extractMergedPresentationAttributes(
             strokeLineCap = merged.extractLineCap("stroke-linecap") ?: Path.LineCap.BUTT,
             strokeLineJoin = merged.extractLineJoin("stroke-linejoin") ?: Path.LineJoin.MITER,
             strokeMiterLimit = merged["stroke-miterlimit"]?.toFloatOrNull() ?: 4f,
+            ownPaints = OwnPaints(ownPaints["fill"], ownPaints["stroke"]),
         )
 
     if (unextractedStyle.isNotEmpty()) {
@@ -330,16 +321,6 @@ private fun extractMergedPresentationAttributes(
 
     return presentation
 }
-
-private data class PresentationAttributes(
-    val fill: Brush,
-    val fillRule: Path.FillRule,
-    val stroke: Brush,
-    val strokeWidth: Float,
-    val strokeLineCap: Path.LineCap,
-    val strokeLineJoin: Path.LineJoin,
-    val strokeMiterLimit: Float,
-)
 
 // The typed Color properties on shapes cannot represent gradients; they hold
 // the CSS initial values as placeholders while the brush carries the true paint.
@@ -355,11 +336,89 @@ private fun <T : Shape> T.applyBrushes(presentation: PresentationAttributes): T 
         strokeBrush = presentation.stroke
     }
 
-private val surveyor = Surveyor()
+private fun <T : Element> T.resolveElementGradientPaints(
+    ownPaints: OwnPaints,
+    gradients: SvgGradientDefs,
+): T {
+    var element: Element = this
+
+    fun resolve(rawPaint: OwnPaint): Brush? {
+        val bounds =
+            if (gradients.requiresObjectBounds(rawPaint.rawValue)) {
+                { element.paintBoundsOrNull() }
+            } else {
+                { null }
+            }
+        return gradients.resolveBrush(rawPaint.rawValue, bounds)
+    }
+
+    ownPaints.fill?.let { rawPaint ->
+        val brush = resolve(rawPaint)
+        if (brush == null) {
+            element.restoreRawPaint("fill", rawPaint)
+        } else {
+            element =
+                when (val current = element) {
+                    is Path -> current.copy(fill = brush)
+                    is Shape -> current.apply { fillBrush = brush }
+                    else -> current
+                }
+        }
+    }
+
+    ownPaints.stroke?.let { rawPaint ->
+        val brush = resolve(rawPaint)
+        if (brush == null) {
+            element.restoreRawPaint("stroke", rawPaint)
+        } else {
+            element =
+                when (val current = element) {
+                    is Path -> current.copy(stroke = brush)
+                    is Shape -> current.apply { strokeBrush = brush }
+                    else -> current
+                }
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return element as T
+}
+
+private fun Element.restoreRawPaint(
+    key: String,
+    rawPaint: OwnPaint,
+) {
+    when (rawPaint.source) {
+        PaintSource.ATTRIBUTE -> {
+            foreign[key] = rawPaint.rawValue
+        }
+
+        PaintSource.STYLE -> {
+            val style = foreign["style"]?.parseStyleAttribute()?.toMutableMap() ?: mutableMapOf()
+            style[key] = rawPaint.rawValue
+            foreign["style"] = style.entries.joinToString(";") { (k, v) -> "$k:$v" }
+        }
+    }
+}
+
+private fun Element.paintBoundsOrNull(): Rectangle? {
+    val surveyor = Surveyor()
+
+    return when (this) {
+        is Path -> if (commands.isEmpty()) null else surveyor.findBoundingBox(commands)
+        is Circle -> Rectangle(cx - r, cy + r, cx + r, cy - r)
+        is Ellipse -> Rectangle(cx - rx, cy + ry, cx + rx, cy - ry)
+        is Rect -> Rectangle(x, y + height, x + width, y)
+        is Line -> Rectangle(minOf(x1, x2), maxOf(y1, y2), maxOf(x1, x2), minOf(y1, y2))
+        is Polyline -> points.boundsOrNull()
+        is Polygon -> points.boundsOrNull()
+        else -> null
+    }
+}
 
 private fun parsePathElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Path {
     val commands =
@@ -370,10 +429,7 @@ private fun parsePathElement(
                 .toString(),
         ).toCommandList()
     val id = node.attributes.removeOrNull("id")?.nodeValue
-    val presentation =
-        extractMergedPresentationAttributes(node, inherited, gradients) {
-            if (commands.isEmpty()) null else surveyor.findBoundingBox(commands)
-        }
+    val presentation = extractMergedPresentationAttributes(node, inherited)
 
     return Path(
         id,
@@ -386,22 +442,19 @@ private fun parsePathElement(
         presentation.strokeLineCap,
         presentation.strokeLineJoin,
         presentation.strokeMiterLimit,
-    )
+    ).resolveElementGradientPaints(presentation.ownPaints, gradients)
 }
 
 private fun parseCircleElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Circle {
     val cx = node.attributes.removeFloatOrNull("cx") ?: 0f
     val cy = node.attributes.removeFloatOrNull("cy") ?: 0f
     val r = node.attributes.removeFloatOrNull("r") ?: 0f
     val id = node.attributes.removeOrNull("id")?.nodeValue
-    val presentation =
-        extractMergedPresentationAttributes(node, inherited, gradients) {
-            Rectangle(cx - r, cy + r, cx + r, cy - r)
-        }
+    val presentation = extractMergedPresentationAttributes(node, inherited)
 
     return Circle(
         id,
@@ -416,12 +469,12 @@ private fun parseCircleElement(
         presentation.strokeLineCap,
         presentation.strokeLineJoin,
         presentation.strokeMiterLimit,
-    ).applyBrushes(presentation)
+    ).applyBrushes(presentation).resolveElementGradientPaints(presentation.ownPaints, gradients)
 }
 
 private fun parseEllipseElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Ellipse {
     val cx = node.attributes.removeFloatOrNull("cx") ?: 0f
@@ -429,10 +482,7 @@ private fun parseEllipseElement(
     val rx = node.attributes.removeFloatOrNull("rx") ?: 0f
     val ry = node.attributes.removeFloatOrNull("ry") ?: 0f
     val id = node.attributes.removeOrNull("id")?.nodeValue
-    val presentation =
-        extractMergedPresentationAttributes(node, inherited, gradients) {
-            Rectangle(cx - rx, cy + ry, cx + rx, cy - ry)
-        }
+    val presentation = extractMergedPresentationAttributes(node, inherited)
 
     return Ellipse(
         id,
@@ -448,12 +498,12 @@ private fun parseEllipseElement(
         presentation.strokeLineCap,
         presentation.strokeLineJoin,
         presentation.strokeMiterLimit,
-    ).applyBrushes(presentation)
+    ).applyBrushes(presentation).resolveElementGradientPaints(presentation.ownPaints, gradients)
 }
 
 private fun parseRectElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Rect {
     val x = node.attributes.removeFloatOrNull("x") ?: 0f
@@ -465,10 +515,7 @@ private fun parseRectElement(
     val rx = (rawRx ?: rawRy ?: 0f).coerceAtMost(width / 2)
     val ry = (rawRy ?: rawRx ?: 0f).coerceAtMost(height / 2)
     val id = node.attributes.removeOrNull("id")?.nodeValue
-    val presentation =
-        extractMergedPresentationAttributes(node, inherited, gradients) {
-            Rectangle(x, y + height, x + width, y)
-        }
+    val presentation = extractMergedPresentationAttributes(node, inherited)
 
     return Rect(
         id,
@@ -486,12 +533,12 @@ private fun parseRectElement(
         presentation.strokeLineCap,
         presentation.strokeLineJoin,
         presentation.strokeMiterLimit,
-    ).applyBrushes(presentation)
+    ).applyBrushes(presentation).resolveElementGradientPaints(presentation.ownPaints, gradients)
 }
 
 private fun parseLineElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Line {
     val x1 = node.attributes.removeFloatOrNull("x1") ?: 0f
@@ -499,10 +546,7 @@ private fun parseLineElement(
     val x2 = node.attributes.removeFloatOrNull("x2") ?: 0f
     val y2 = node.attributes.removeFloatOrNull("y2") ?: 0f
     val id = node.attributes.removeOrNull("id")?.nodeValue
-    val presentation =
-        extractMergedPresentationAttributes(node, inherited, gradients) {
-            Rectangle(minOf(x1, x2), maxOf(y1, y2), maxOf(x1, x2), minOf(y1, y2))
-        }
+    val presentation = extractMergedPresentationAttributes(node, inherited)
 
     return Line(
         id,
@@ -518,17 +562,17 @@ private fun parseLineElement(
         presentation.strokeLineCap,
         presentation.strokeLineJoin,
         presentation.strokeMiterLimit,
-    ).applyBrushes(presentation)
+    ).applyBrushes(presentation).resolveElementGradientPaints(presentation.ownPaints, gradients)
 }
 
 private fun parsePolylineElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Polyline {
     val points = parsePoints(node.attributes.removeOrNull("points")?.nodeValue ?: "")
     val id = node.attributes.removeOrNull("id")?.nodeValue
-    val presentation = extractMergedPresentationAttributes(node, inherited, gradients) { points.boundsOrNull() }
+    val presentation = extractMergedPresentationAttributes(node, inherited)
 
     return Polyline(
         id,
@@ -541,17 +585,17 @@ private fun parsePolylineElement(
         presentation.strokeLineCap,
         presentation.strokeLineJoin,
         presentation.strokeMiterLimit,
-    ).applyBrushes(presentation)
+    ).applyBrushes(presentation).resolveElementGradientPaints(presentation.ownPaints, gradients)
 }
 
 private fun parsePolygonElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Polygon {
     val points = parsePoints(node.attributes.removeOrNull("points")?.nodeValue ?: "")
     val id = node.attributes.removeOrNull("id")?.nodeValue
-    val presentation = extractMergedPresentationAttributes(node, inherited, gradients) { points.boundsOrNull() }
+    val presentation = extractMergedPresentationAttributes(node, inherited)
 
     return Polygon(
         id,
@@ -564,12 +608,12 @@ private fun parsePolygonElement(
         presentation.strokeLineCap,
         presentation.strokeLineJoin,
         presentation.strokeMiterLimit,
-    ).applyBrushes(presentation)
+    ).applyBrushes(presentation).resolveElementGradientPaints(presentation.ownPaints, gradients)
 }
 
-private val numberPattern = Regex("[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?")
-
 private fun parsePoints(value: String): List<Point> {
+    val numberPattern = Regex("[-+]?(?:\\d*\\.\\d+|\\d+\\.?)(?:[eE][-+]?\\d+)?")
+
     val numbers = numberPattern.findAll(value).map { it.value.toFloat() }.toList()
     return numbers.chunked(2).mapNotNull { pair ->
         if (pair.size == 2) Point(pair[0], pair[1]) else null
@@ -588,7 +632,7 @@ private fun List<Point>.boundsOrNull(): Rectangle? {
 
 private fun parseExtraElement(
     node: Node,
-    gradients: SvgGradients,
+    gradients: SvgGradientDefs,
     inherited: Map<String, String> = emptyMap(),
 ): Extra {
     val childInherited = collectStyleInheritance(node, inherited)
@@ -620,4 +664,30 @@ private fun NamedNodeMap.extractTransformMatrix(): Matrix3 {
     return Matrix3.from(
         floatArrayOf(entries[0], entries[2], entries[4], entries[1], entries[3], entries[5], 0f, 0f, 1f),
     )
+}
+
+private data class PresentationAttributes(
+    val fill: Brush,
+    val fillRule: Path.FillRule,
+    val stroke: Brush,
+    val strokeWidth: Float,
+    val strokeLineCap: Path.LineCap,
+    val strokeLineJoin: Path.LineJoin,
+    val strokeMiterLimit: Float,
+    val ownPaints: OwnPaints,
+)
+
+private data class OwnPaints(
+    val fill: OwnPaint?,
+    val stroke: OwnPaint?,
+)
+
+private data class OwnPaint(
+    val rawValue: String,
+    val source: PaintSource,
+)
+
+private enum class PaintSource {
+    ATTRIBUTE,
+    STYLE,
 }

@@ -3,7 +3,6 @@ package com.jzbrooks.vgo.svg
 import com.jzbrooks.vgo.core.Brush
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
-import com.jzbrooks.vgo.core.Gradient
 import com.jzbrooks.vgo.core.GradientStop
 import com.jzbrooks.vgo.core.LinearGradient
 import com.jzbrooks.vgo.core.RadialGradient
@@ -19,7 +18,7 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-private val GRADIENT_ELEMENT_NAMES = setOf("linearGradient", "radialGradient")
+val GRADIENT_ELEMENT_NAMES: Set<String> = hashSetOf("linearGradient", "radialGradient")
 private const val MAX_HREF_DEPTH = 8
 
 /**
@@ -27,7 +26,7 @@ private const val MAX_HREF_DEPTH = 8
  * along with a count of every `url(#id)` paint reference to them, so that
  * fully-resolved definitions can be pruned from the parsed graphic.
  */
-internal fun harvestGradientDefs(root: Node): SvgGradients {
+internal fun harvestGradientDefs(root: Node): SvgGradientDefs {
     val defsById = mutableMapOf<String, org.w3c.dom.Element>()
     val refCounts = mutableMapOf<String, Int>()
 
@@ -59,10 +58,11 @@ internal fun harvestGradientDefs(root: Node): SvgGradients {
     }
 
     walk(root)
-    return SvgGradients(defsById, refCounts)
+
+    return SvgGradientDefs(defsById, refCounts)
 }
 
-internal class SvgGradients(
+internal class SvgGradientDefs(
     private val defsById: Map<String, org.w3c.dom.Element>,
     private val refCounts: Map<String, Int>,
 ) {
@@ -86,7 +86,16 @@ internal class SvgGradients(
         return brush
     }
 
-    /** Ids whose every document-wide reference resolved to a typed brush. */
+    fun requiresObjectBounds(rawValue: String): Boolean {
+        val id = rawValue.extractUrlReferenceOrNull() ?: return false
+        val chain = templateChain(id) ?: return false
+
+        fun effectiveAttribute(name: String): String? = chain.firstNotNullOfOrNull { it.getAttribute(name).ifEmpty { null } }
+
+        return (effectiveAttribute("gradientUnits") ?: "objectBoundingBox") == "objectBoundingBox"
+    }
+
+    /** Ids who's every document-wide reference resolved to a typed brush. */
     fun fullyConsumedIds(): Set<String> = resolvedCounts.filterKeys { resolvedCounts[it] == refCounts[it] }.keys
 
     private fun buildBrush(

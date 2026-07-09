@@ -677,6 +677,52 @@ class ScalableVectorGraphicReaderTests {
     }
 
     @Test
+    fun testObjectBoundingBoxGradientResolvesAgainstPathBounds() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 200 200">
+                |  <linearGradient id="g">
+                |    <stop offset="0" stop-color="#b125ea"/>
+                |    <stop offset="1" stop-color="#008aff"/>
+                |  </linearGradient>
+                |  <path d="M20,30L70,30L70,90Z" fill="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.first() as Path
+        val fill = path.fill as LinearGradient
+        assertThat(fill::startX).isEqualTo(20f)
+        assertThat(fill::startY).isEqualTo(30f)
+        assertThat(fill::endX).isEqualTo(70f)
+        assertThat(fill::endY).isEqualTo(30f)
+    }
+
+    @Test
+    fun testObjectBoundingBoxGradientOnEmptyPathFallsBackToPassthrough() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 200 200">
+                |  <linearGradient id="g">
+                |    <stop offset="0" stop-color="#b125ea"/>
+                |    <stop offset="1" stop-color="#008aff"/>
+                |  </linearGradient>
+                |  <path d="" fill="url(#g)"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        assertThat(path::fill).isEqualTo(Colors.BLACK)
+        assertThat(path.foreign["fill"]).isEqualTo("url(#g)")
+        assertThat(graphic.elements.filterIsInstance<Extra>().map { it.id }, "extra element ids").containsExactly("g")
+    }
+
+    @Test
     fun testRadialGradientStrokeParsed() {
         val graphic =
             parseSvg(
