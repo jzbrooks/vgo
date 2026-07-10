@@ -233,6 +233,23 @@ private fun collectBuilderElements(builderCall: KtCallExpression): List<Element>
         current = parent
     }
 
+    // Local variable form: val builder = ImageVector.Builder(...); builder.path { ... }; builder.build()
+    val localProperty = current.parent as? KtProperty
+    if (localProperty != null && localProperty.isLocal && localProperty.initializer == current) {
+        val variableName = localProperty.name
+        val block = localProperty.parent as? KtBlockExpression
+
+        if (variableName != null && block != null) {
+            for (statement in block.statements.dropWhile { it != localProperty }.drop(1)) {
+                val qualified = statement as? KtDotQualifiedExpression ?: continue
+                val receiver = qualified.receiverExpression as? KtNameReferenceExpression ?: continue
+                if (receiver.getReferencedName() != variableName) continue
+
+                (qualified.selectorExpression as? KtCallExpression)?.let { dispatchBuilderCall(it, elements) }
+            }
+        }
+    }
+
     return elements
 }
 

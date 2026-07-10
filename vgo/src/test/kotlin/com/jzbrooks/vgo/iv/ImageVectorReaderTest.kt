@@ -553,6 +553,52 @@ class ImageVectorReaderTest {
     }
 
     @Test
+    fun `local builder variable form is parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.group
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+              get() {
+                val builder = ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                builder.path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                  moveTo(2f, 2f)
+                  lineTo(4f, 4f)
+                  close()
+                }
+                builder.group(rotate = 45f) {
+                  path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                    moveTo(6f, 6f)
+                    close()
+                  }
+                }
+                return builder.build()
+              }
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic.foreign["propertyName"]).isEqualTo("sample")
+        assertThat(graphic::elements).hasSize(2)
+        assertThat(graphic::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .hasSize(3)
+        assertThat(graphic::elements)
+            .index(1)
+            .isInstanceOf<Group>()
+            .prop(Group::elements)
+            .single()
+            .isInstanceOf<Path>()
+    }
+
+    @Test
     fun `clipPathData on a group is parsed into Group clipPaths`() {
         val source =
             """
