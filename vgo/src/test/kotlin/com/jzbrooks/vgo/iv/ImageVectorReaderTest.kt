@@ -163,6 +163,198 @@ class ImageVectorReaderTest {
     }
 
     @Test
+    fun `apply block builder form is parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.group
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+              get() = _sample ?: ImageVector.Builder(
+                name = "sample",
+                defaultWidth = 24.dp,
+                defaultHeight = 24.dp,
+                viewportWidth = 24f,
+                viewportHeight = 24f,
+              ).apply {
+                path(fill = SolidColor(Color(0xFF232F34))) {
+                  moveTo(2f, 2f)
+                  lineTo(4f, 4f)
+                  close()
+                }
+                group(rotate = 45f) {
+                  path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                    moveTo(6f, 6f)
+                    close()
+                  }
+                }
+              }.build().also { _sample = it }
+
+            private var _sample: ImageVector? = null
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic::id).isEqualTo("sample")
+        assertThat(graphic::elements).hasSize(2)
+        assertThat(graphic::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .hasSize(3)
+        assertThat(graphic::elements)
+            .index(1)
+            .isInstanceOf<Group>()
+            .prop(Group::elements)
+            .single()
+            .isInstanceOf<Path>()
+    }
+
+    @Test
+    fun `lazy delegate builder form is parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector by lazy {
+                ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                    .apply {
+                        path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                            moveTo(2f, 2f)
+                            close()
+                        }
+                    }.build()
+            }
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic.foreign["propertyName"]).isEqualTo("sample")
+        assertThat(graphic::elements)
+            .single()
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .hasSize(2)
+    }
+
+    @Test
+    fun `imported builder without receiver is parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.ImageVector.Builder
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector by lazy {
+                Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                    .apply {
+                        path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                            moveTo(2f, 2f)
+                            close()
+                        }
+                    }.build()
+            }
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic::elements).single().isInstanceOf<Path>()
+    }
+
+    @Test
+    fun `plain initializer builder form is parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            val sample = androidx.compose.ui.graphics.vector.ImageVector.Builder(
+                defaultWidth = 24.dp,
+                defaultHeight = 24.dp,
+                viewportWidth = 24f,
+                viewportHeight = 24f,
+            ).path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                moveTo(2f, 2f)
+                lineTo(4f, 4f)
+                close()
+            }.build()
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic.foreign["propertyName"]).isEqualTo("sample")
+        assertThat(graphic::elements)
+            .single()
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .hasSize(3)
+    }
+
+    @Test
+    fun `function builder form is parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            fun sampleIcon(): ImageVector =
+                ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                    .path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                        moveTo(2f, 2f)
+                        close()
+                    }.build()
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic.foreign["propertyName"]).isEqualTo("sampleIcon")
+        assertThat(graphic::elements).single().isInstanceOf<Path>()
+    }
+
+    @Test
+    fun `receiver qualified property keeps its package foreign key`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            val Icons.Outlined.Sample: ImageVector
+              get() = _sample ?: ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                .path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                  moveTo(2f, 2f)
+                  close()
+                }
+              .build().also { _sample = it }
+
+            private var _sample: ImageVector? = null
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic.foreign["propertyName"]).isEqualTo("Sample")
+        assertThat(graphic.foreign["packageName"]).isEqualTo("Icons.Outlined")
+    }
+
+    @Test
     fun `clipPathData on a group is parsed into Group clipPaths`() {
         val source =
             """

@@ -24,22 +24,23 @@ import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.core.util.math.computeTransformation
 import org.jetbrains.kotlin.com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.kotlin.psi.KtBinaryExpression
 import org.jetbrains.kotlin.psi.KtBlockExpression
 import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtCallableDeclaration
 import org.jetbrains.kotlin.psi.KtConstantExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
 import org.jetbrains.kotlin.psi.KtFile
+import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtLiteralStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
+import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPrefixExpression
 import org.jetbrains.kotlin.psi.KtProperty
-import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtPsiUtil
-import org.jetbrains.kotlin.psi.KtReturnExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
+import org.jetbrains.kotlin.psi.KtThisExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
 import org.jetbrains.kotlin.psi.KtValueArgument
 
@@ -76,33 +77,31 @@ private val COMPOSE_COLOR_CONSTANTS =
 
 @ExperimentalVgoApi
 fun parse(psiFile: KtFile): ImageVector {
-    val propertyVectors = findPropertyVectors(psiFile)
+    val vectors = findImageVectors(psiFile)
 
-    return checkNotNull(propertyVectors.firstOrNull()) {
+    return checkNotNull(vectors.firstOrNull()) {
         "Failed to parse ${psiFile.name}"
     }
 }
 
 /**
- * Find property-based ImageVector definitions like:
- * val BackingIcons.Outlined.Add: ImageVector get() = _Add ?: ImageVector.Builder(...).apply { ... }.build()
+ * Find ImageVector definitions by locating ImageVector.Builder calls anywhere
+ * in the file, regardless of the declaration shape surrounding them (property
+ * getters, backing-property elvis expressions, lazy delegates, plain
+ * initializers, or functions).
  */
-private fun findPropertyVectors(file: KtFile): List<ImageVector> {
+private fun findImageVectors(file: KtFile): List<ImageVector> {
     val results = mutableListOf<ImageVector>()
 
     file.accept(
         object : KtTreeVisitorVoid() {
-            override fun visitProperty(property: KtProperty) {
-                super.visitProperty(property)
+            override fun visitCallExpression(expression: KtCallExpression) {
+                super.visitCallExpression(expression)
 
-                // Check if it's an ImageVector property
-                if (property.typeReference?.text == "ImageVector") {
-                    val getter = property.getter
-                    if (getter != null) {
-                        val vectorGraphic = parsePropertyGetter(property, getter)
-                        if (vectorGraphic != null) {
-                            results.add(vectorGraphic)
-                        }
+                if (isImageVectorBuilderCall(expression, file)) {
+                    val vector = parseImageVector(expression)
+                    if (vector != null) {
+                        results.add(vector)
                     }
                 }
             }
@@ -112,133 +111,126 @@ private fun findPropertyVectors(file: KtFile): List<ImageVector> {
     return results
 }
 
-/**
- * Parse the getter of an ImageVector property to extract the vector definition
- */
-private fun parsePropertyGetter(
-    property: KtProperty,
-    getter: KtPropertyAccessor,
-): ImageVector? {
-    val propertyName = property.name ?: return null
+private fun isImageVectorBuilderCall(
+    call: KtCallExpression,
+    file: KtFile,
+): Boolean {
+    if ((call.calleeExpression as? KtNameReferenceExpression)?.getReferencedName() != "Builder") return false
 
-    // Find package name from qualified property if available
-    val packageName =
-        if (property.receiverTypeReference != null) {
-            property.receiverTypeReference!!.text
-        } else {
-            null
-        }
-
-    // Extract the body of the getter
-    val bodyExpr = getter.bodyExpression ?: return null
-
-    // Handle the _Add ?: ImageVector.Builder(...).apply { ... }.build() pattern
-    var builderExpression: KtExpression? = null
-
-    // First check if there's a direct return expression
-    if (bodyExpr is KtBlockExpression) {
-        for (statement in bodyExpr.statements) {
-            if (statement is KtReturnExpression) {
-                val returnValue = statement.returnedExpression
-                builderExpression =
-                    if (returnValue is KtBinaryExpression && returnValue.operationToken.toString() == "ELVIS") {
-                        // Handle the elvis operator (_Add ?: ImageVector.Builder...)
-                        returnValue.right
-                    } else {
-                        // Direct return of builder expression
-                        returnValue
-                    }
-                break
-            } else if (statement is KtBinaryExpression && statement.operationToken.toString() == "ELVIS") {
-                // Handle the elvis operator without explicit return
-                builderExpression = statement.right
-                break
-            } else if (statement is KtDotQualifiedExpression) {
-                // Direct builder expression without elvis
-                builderExpression = statement
-                break
-            }
-        }
-    } else if (bodyExpr is KtBinaryExpression && bodyExpr.operationToken.toString() == "ELVIS") {
-        // Handle elvis operator as the direct body
-        builderExpression = bodyExpr.right
-    } else {
-        // Direct expression body
-        builderExpression = bodyExpr
+    val parent = call.parent
+    if (parent is KtDotQualifiedExpression && parent.selectorExpression == call) {
+        val receiverText = parent.receiverExpression.text
+        return receiverText == "ImageVector" || receiverText.endsWith(".ImageVector")
     }
 
-    if (builderExpression != null) {
-        // If the expression ends with .build().also { _Add = it }
-        if (builderExpression is KtDotQualifiedExpression &&
-            builderExpression.selectorExpression?.text?.contains("also") == true
-        ) {
-            // Extract the part before .also
-            builderExpression = builderExpression.receiverExpression
-        }
-
-        // If the expression ends with .build()
-        if (builderExpression is KtDotQualifiedExpression &&
-            builderExpression.selectorExpression?.text?.contains("build") == true
-        ) {
-            // Extract the part before .build()
-            builderExpression = builderExpression.receiverExpression
-        }
-
-        // Now we should have the calls up to .build()
-        return parseVectorBuilderExpression(builderExpression, propertyName, packageName)
-    }
-
-    return null
+    // A bare Builder(...) call requires a direct import of ImageVector.Builder
+    return file.importDirectives.any { it.importedFqName?.asString()?.endsWith("ImageVector.Builder") == true }
 }
 
-private fun parseVectorBuilderExpression(
-    expression: KtExpression,
-    propertyName: String,
-    packageName: String?,
-): ImageVector? {
-    val elements = mutableListOf<Element>()
-    var id: String? = null
-    var defaultWidthDp: Float? = null
-    var defaultHeightDp: Float? = null
-    var viewportWidth: Float? = null
-    var viewportHeight: Float? = null
+private fun parseImageVector(builderCall: KtCallExpression): ImageVector? {
+    val arguments = resolveArguments(builderCall, BUILDER_PARAMETERS)
 
-    val foreign = mutableMapOf(FOREIGN_KEY_PROPERTY_NAME to propertyName)
-    if (packageName != null) {
-        foreign[FOREIGN_KEY_PACKAGE_NAME] = packageName
+    val defaultWidthDp = parseDpValue(arguments["defaultWidth"]) ?: return null
+    val defaultHeightDp = parseDpValue(arguments["defaultHeight"]) ?: return null
+    val viewportWidth = parseFloatLiteral(arguments["viewportWidth"]) ?: return null
+    val viewportHeight = parseFloatLiteral(arguments["viewportHeight"]) ?: return null
+
+    return ImageVector(
+        collectBuilderElements(builderCall),
+        parseStringLiteral(arguments["name"]),
+        deriveForeignKeys(builderCall),
+        defaultWidthDp,
+        defaultHeightDp,
+        viewportWidth,
+        viewportHeight,
+    )
+}
+
+/**
+ * The property or function name a vector definition belongs to survives
+ * optimization via the foreign map so the writer can round-trip it.
+ */
+private fun deriveForeignKeys(builderCall: KtCallExpression): MutableMap<String, String> {
+    val foreign = mutableMapOf<String, String>()
+
+    var declaration: KtCallableDeclaration? =
+        PsiTreeUtil.getParentOfType(builderCall, KtProperty::class.java, KtNamedFunction::class.java)
+    while (declaration is KtProperty && declaration.isLocal) {
+        declaration = PsiTreeUtil.getParentOfType(declaration, KtProperty::class.java, KtNamedFunction::class.java)
     }
 
-    if (expression is KtDotQualifiedExpression) {
-        val builderExpr = expression.receiverExpression
+    val name = declaration?.name ?: return foreign
+    foreign[FOREIGN_KEY_PROPERTY_NAME] = name
 
-        if (builderExpr is KtCallExpression ||
-            (builderExpr is KtDotQualifiedExpression && builderExpr.selectorExpression is KtCallExpression)
-        ) {
-            val callExpr =
-                builderExpr as? KtCallExpression
-                    ?: PsiTreeUtil.findChildOfType(builderExpr, KtCallExpression::class.java)!!
+    val receiverType = (declaration as? KtProperty)?.receiverTypeReference?.text
+    if (receiverType != null) {
+        foreign[FOREIGN_KEY_PACKAGE_NAME] = receiverType
+    }
 
-            val arguments = resolveArguments(callExpr, BUILDER_PARAMETERS)
-            id = parseStringLiteral(arguments["name"])
-            defaultWidthDp = parseDpValue(arguments["defaultWidth"])
-            defaultHeightDp = parseDpValue(arguments["defaultHeight"])
-            viewportWidth = parseFloatLiteral(arguments["viewportWidth"])
-            viewportHeight = parseFloatLiteral(arguments["viewportHeight"])
+    return foreign
+}
 
-            var callExpression = (callExpr.parent.parent as? KtDotQualifiedExpression)?.selectorExpression as? KtCallExpression
-            while (callExpression != null && callExpression.name != "build") {
-                val element = parseElement(callExpression)
-                if (element != null) elements.add(element)
+/**
+ * Collect path and group elements applied to the builder, whether chained
+ * fluently, applied inside a scope function like apply or run, or both.
+ */
+private fun collectBuilderElements(builderCall: KtCallExpression): List<Element> {
+    val elements = mutableListOf<Element>()
 
-                callExpression = (callExpression.parent.parent as? KtDotQualifiedExpression)?.selectorExpression as? KtCallExpression
+    var current: KtExpression = builderCall
+    (builderCall.parent as? KtDotQualifiedExpression)?.let { qualified ->
+        if (qualified.selectorExpression == builderCall) current = qualified
+    }
+
+    while (true) {
+        val parent = current.parent
+        if (parent !is KtDotQualifiedExpression || parent.receiverExpression != current) break
+
+        (parent.selectorExpression as? KtCallExpression)?.let { dispatchBuilderCall(it, elements) }
+        current = parent
+    }
+
+    return elements
+}
+
+private fun dispatchBuilderCall(
+    call: KtCallExpression,
+    elements: MutableList<Element>,
+) {
+    when ((call.calleeExpression as? KtNameReferenceExpression)?.getReferencedName()) {
+        "path", "group" -> parseElement(call)?.let(elements::add)
+        "apply", "run" -> parseScopeFunctionBody(call, elements)
+    }
+}
+
+private fun parseScopeFunctionBody(
+    scopeCall: KtCallExpression,
+    elements: MutableList<Element>,
+) {
+    val body =
+        scopeCall.lambdaArguments
+            .firstOrNull()
+            ?.getLambdaExpression()
+            ?.bodyExpression
+            ?: (
+                scopeCall.valueArgumentList
+                    ?.arguments
+                    ?.lastOrNull()
+                    ?.getArgumentExpression() as? KtLambdaExpression
+            )?.bodyExpression
+
+    for (statement in body?.statements.orEmpty()) {
+        when (statement) {
+            is KtCallExpression -> {
+                dispatchBuilderCall(statement, elements)
+            }
+
+            is KtDotQualifiedExpression -> {
+                if (statement.receiverExpression is KtThisExpression) {
+                    (statement.selectorExpression as? KtCallExpression)?.let { dispatchBuilderCall(it, elements) }
+                }
             }
         }
-    }
-
-    return if (defaultWidthDp != null && defaultHeightDp != null && viewportWidth != null && viewportHeight != null) {
-        ImageVector(elements, id, foreign, defaultWidthDp, defaultHeightDp, viewportWidth, viewportHeight)
-    } else {
-        null
     }
 }
 
