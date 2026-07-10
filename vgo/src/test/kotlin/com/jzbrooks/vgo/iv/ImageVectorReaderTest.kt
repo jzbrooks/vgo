@@ -355,6 +355,90 @@ class ImageVectorReaderTest {
     }
 
     @Test
+    fun `path styling arguments are parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.PathFillType
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.StrokeCap
+            import androidx.compose.ui.graphics.StrokeJoin
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+              get() = _sample ?: ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                .path(
+                  name = "outline",
+                  fill = SolidColor(Color(0, 0, 0, 255)),
+                  stroke = SolidColor(Color.White),
+                  strokeLineWidth = 2f,
+                  strokeLineCap = StrokeCap.Round,
+                  strokeLineJoin = StrokeJoin.Bevel,
+                  strokeLineMiter = 3f,
+                  pathFillType = PathFillType.EvenOdd,
+                ) {
+                  moveTo(2f, 2f)
+                  close()
+                }
+              .build().also { _sample = it }
+
+            private var _sample: ImageVector? = null
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        val path = assertThat(graphic::elements).single().isInstanceOf<Path>()
+        path.prop(Path::id).isEqualTo("outline")
+        path.prop(Path::strokeWidth).isEqualTo(2f)
+        path.prop(Path::strokeLineCap).isEqualTo(Path.LineCap.ROUND)
+        path.prop(Path::strokeLineJoin).isEqualTo(Path.LineJoin.BEVEL)
+        path.prop(Path::strokeMiterLimit).isEqualTo(3f)
+        path.prop(Path::fillRule).isEqualTo(Path.FillRule.EVEN_ODD)
+    }
+
+    @Test
+    fun `unspecified path fill type defaults to non-zero`() {
+        val psiFile = parseKotlinFile(disposable, inputStream)
+        val graphic = parse(psiFile)
+
+        assertThat(graphic::elements)
+            .single()
+            .isInstanceOf<Path>()
+            .prop(Path::fillRule)
+            .isEqualTo(Path.FillRule.NON_ZERO)
+    }
+
+    @Test
+    fun `positional path arguments are parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+              get() = _sample ?: ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                .path("outline", SolidColor(Color.Red), 0.5f) {
+                  moveTo(2f, 2f)
+                  close()
+                }
+              .build().also { _sample = it }
+
+            private var _sample: ImageVector? = null
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        val path = assertThat(graphic::elements).single().isInstanceOf<Path>()
+        path.prop(Path::id).isEqualTo("outline")
+        path.prop(Path::fill).isEqualTo(Color(0x7FFF0000u))
+    }
+
+    @Test
     fun `clipPathData on a group is parsed into Group clipPaths`() {
         val source =
             """

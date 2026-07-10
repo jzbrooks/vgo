@@ -42,7 +42,6 @@ import org.jetbrains.kotlin.psi.KtSimpleNameStringTemplateEntry
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import org.jetbrains.kotlin.psi.KtThisExpression
 import org.jetbrains.kotlin.psi.KtTreeVisitorVoid
-import org.jetbrains.kotlin.psi.KtValueArgument
 
 internal const val FOREIGN_KEY_PROPERTY_NAME = "propertyName"
 internal const val FOREIGN_KEY_PACKAGE_NAME = "packageName"
@@ -57,6 +56,36 @@ private val BUILDER_PARAMETERS =
         "tintColor",
         "tintBlendMode",
         "autoMirror",
+    )
+
+private val PATH_PARAMETERS =
+    listOf(
+        "name",
+        "fill",
+        "fillAlpha",
+        "stroke",
+        "strokeAlpha",
+        "strokeLineWidth",
+        "strokeLineCap",
+        "strokeLineJoin",
+        "strokeLineMiter",
+        "pathFillType",
+        "pathBuilder",
+    )
+
+private val PATH_PARAMETER_ALIASES = mapOf("strokeWidth" to "strokeLineWidth")
+
+private val GROUP_PARAMETERS =
+    listOf(
+        "name",
+        "rotate",
+        "pivotX",
+        "pivotY",
+        "scaleX",
+        "scaleY",
+        "translationX",
+        "translationY",
+        "clipPathData",
     )
 
 private val COMPOSE_COLOR_CONSTANTS =
@@ -242,65 +271,24 @@ private fun parseElement(callExpression: KtCallExpression): Element? =
     }
 
 private fun parseGroupBuilderCall(callExpression: KtCallExpression): Group {
-    var name: String? = null
-    var rotation: Float? = null
-    var pivotX: Float? = null
-    var pivotY: Float? = null
-    var scaleX: Float? = null
-    var scaleY: Float? = null
-    var translationX: Float? = null
-    var translationY: Float? = null
-    var clipPaths: List<ClipPath> = emptyList()
+    val arguments = resolveArguments(callExpression, GROUP_PARAMETERS)
 
-    callExpression.valueArgumentList?.arguments?.forEach { arg ->
-        if (arg is KtValueArgument) {
-            val argumentName = arg.getArgumentName()?.asName?.identifier
-            val expression = arg.getArgumentExpression()
+    val name = parseStringLiteral(arguments["name"])
+    val clipPaths =
+        parseClipPathDataExpression(arguments["clipPathData"])
+            ?.let { listOf(ClipPath(regions = listOf(it))) }
+            .orEmpty()
 
-            when (argumentName) {
-                "clipPathData" -> {
-                    val region = parseClipPathDataExpression(expression)
-                    if (region != null) {
-                        clipPaths = listOf(ClipPath(regions = listOf(region)))
-                    }
-                }
-
-                "name" -> {
-                    name = parseStringLiteral(expression)
-                }
-
-                "rotate" -> {
-                    rotation = parseFloatLiteral(expression)
-                }
-
-                "pivotX" -> {
-                    pivotX = parseFloatLiteral(expression)
-                }
-
-                "pivotY" -> {
-                    pivotY = parseFloatLiteral(expression)
-                }
-
-                "scaleX" -> {
-                    scaleX = parseFloatLiteral(expression)
-                }
-
-                "scaleY" -> {
-                    scaleY = parseFloatLiteral(expression)
-                }
-
-                "translationX" -> {
-                    translationX = parseFloatLiteral(expression)
-                }
-
-                "translationY" -> {
-                    translationY = parseFloatLiteral(expression)
-                }
-            }
-        }
-    }
-
-    val transform = computeTransformation(scaleX, scaleY, translationX, translationY, rotation, pivotX, pivotY)
+    val transform =
+        computeTransformation(
+            parseFloatLiteral(arguments["scaleX"]),
+            parseFloatLiteral(arguments["scaleY"]),
+            parseFloatLiteral(arguments["translationX"]),
+            parseFloatLiteral(arguments["translationY"]),
+            parseFloatLiteral(arguments["rotate"]),
+            parseFloatLiteral(arguments["pivotX"]),
+            parseFloatLiteral(arguments["pivotY"]),
+        )
 
     val elements: List<Element> =
         callExpression.lambdaArguments.firstOrNull()?.let { lambdaArg ->
@@ -326,80 +314,70 @@ private fun parseGroupBuilderCall(callExpression: KtCallExpression): Group {
 }
 
 private fun parsePathBuilderCall(callExpression: KtCallExpression): Path {
-    var fillColor: Color? = null
-    var strokeColor: Color? = null
-    var strokeWidth: Float? = null
-    var fillAlpha: Float? = null
-    var strokeAlpha: Float? = null
-    val commands = mutableListOf<Command>()
+    val arguments = resolveArguments(callExpression, PATH_PARAMETERS, PATH_PARAMETER_ALIASES)
 
-    // Extract named arguments from path call
-    callExpression.valueArgumentList?.arguments?.forEach { arg ->
-        if (arg is KtValueArgument) {
-            val argumentName = arg.getArgumentName()?.asName?.identifier
-            val expression = arg.getArgumentExpression()
+    // Process the path commands in the trailing lambda or the pathBuilder argument
+    val bodyExpr =
+        callExpression.lambdaArguments
+            .firstOrNull()
+            ?.getLambdaExpression()
+            ?.bodyExpression
+            ?: (arguments["pathBuilder"] as? KtLambdaExpression)?.bodyExpression
 
-            when (argumentName) {
-                "fill" -> {
-                    fillColor = parseColorArgument(expression)
-                }
+    val commands = bodyExpr?.let(::parsePathCommands).orEmpty()
 
-                "stroke" -> {
-                    strokeColor = parseColorArgument(expression)
-                }
-
-                "strokeWidth", "strokeLineWidth" -> {
-                    val floatText = (expression as? KtConstantExpression)?.text
-                    strokeWidth = floatText?.toFloatOrNull()
-                        ?: floatText?.removeSuffix("f")?.toFloatOrNull()
-                }
-
-                "fillAlpha" -> {
-                    val floatText = (expression as? KtConstantExpression)?.text
-                    fillAlpha = floatText?.toFloatOrNull()
-                        ?: floatText?.removeSuffix("f")?.toFloatOrNull()
-                }
-
-                "strokeAlpha" -> {
-                    val floatText = (expression as? KtConstantExpression)?.text
-                    strokeAlpha = floatText?.toFloatOrNull()
-                        ?: floatText?.removeSuffix("f")?.toFloatOrNull()
-                }
-            }
-        }
-    }
-
-    // Process the path commands in the lambda block
-    val lambdaArg = callExpression.lambdaArguments.firstOrNull()
-    val lambdaExpr = lambdaArg?.getLambdaExpression()
-    val bodyExpr = lambdaExpr?.bodyExpression
-
-    if (bodyExpr != null) {
-        commands.addAll(parsePathCommands(bodyExpr))
-    }
-
-    var effectiveFillColor = fillColor ?: Colors.BLACK
-    fillAlpha?.let {
+    var effectiveFillColor = parseColorArgument(arguments["fill"]) ?: Colors.BLACK
+    parseFloatLiteral(arguments["fillAlpha"])?.let {
         effectiveFillColor = effectiveFillColor.copy(alpha = (it * 255f).coerceIn(0f, 255f).toInt().toUByte())
     }
-    var effectiveStrokeColor = strokeColor ?: Colors.TRANSPARENT
-    strokeAlpha?.let {
+    var effectiveStrokeColor = parseColorArgument(arguments["stroke"]) ?: Colors.TRANSPARENT
+    parseFloatLiteral(arguments["strokeAlpha"])?.let {
         effectiveStrokeColor = effectiveStrokeColor.copy(alpha = (it * 255f).coerceIn(0f, 255f).toInt().toUByte())
     }
 
     return Path(
-        id = null,
+        id = parseStringLiteral(arguments["name"]),
         commands = commands,
         fill = effectiveFillColor,
         stroke = effectiveStrokeColor,
-        strokeWidth = strokeWidth ?: 0f,
-        fillRule = Path.FillRule.EVEN_ODD,
-        strokeLineCap = Path.LineCap.BUTT,
-        strokeLineJoin = Path.LineJoin.MITER,
-        strokeMiterLimit = 4f,
+        strokeWidth = parseFloatLiteral(arguments["strokeLineWidth"]) ?: 0f,
+        fillRule = parseFillRule(arguments["pathFillType"]) ?: Path.FillRule.NON_ZERO,
+        strokeLineCap = parseLineCap(arguments["strokeLineCap"]) ?: Path.LineCap.BUTT,
+        strokeLineJoin = parseLineJoin(arguments["strokeLineJoin"]) ?: Path.LineJoin.MITER,
+        strokeMiterLimit = parseFloatLiteral(arguments["strokeLineMiter"]) ?: 4f,
         foreign = mutableMapOf(),
     )
 }
+
+private fun parseFillRule(expression: KtExpression?): Path.FillRule? =
+    when (lastSimpleName(expression)) {
+        "EvenOdd" -> Path.FillRule.EVEN_ODD
+        "NonZero" -> Path.FillRule.NON_ZERO
+        else -> null
+    }
+
+private fun parseLineCap(expression: KtExpression?): Path.LineCap? =
+    when (lastSimpleName(expression)) {
+        "Butt" -> Path.LineCap.BUTT
+        "Round" -> Path.LineCap.ROUND
+        "Square" -> Path.LineCap.SQUARE
+        else -> null
+    }
+
+private fun parseLineJoin(expression: KtExpression?): Path.LineJoin? =
+    when (lastSimpleName(expression)) {
+        "Miter" -> Path.LineJoin.MITER
+        "Round" -> Path.LineJoin.ROUND
+        "Bevel" -> Path.LineJoin.BEVEL
+        else -> null
+    }
+
+private fun lastSimpleName(expression: KtExpression?): String? =
+    when (expression) {
+        is KtDotQualifiedExpression -> (expression.selectorExpression as? KtNameReferenceExpression)?.getReferencedName()
+        is KtNameReferenceExpression -> expression.getReferencedName()
+        else -> null
+    }
 
 private fun parsePathCommands(bodyExpr: KtBlockExpression): List<Command> {
     val commands = mutableListOf<Command>()
