@@ -77,9 +77,9 @@ class ScalableVectorGraphicWriter(
         }
         document.appendChild(root)
 
-        // Generated def ids must not collide with ids of passthrough elements,
-        // which may still be url-referenced from foreign attributes.
-        val usedIds = collectExtraElementIds(graphic)
+        // Generated def ids must not collide with ids already present in the
+        // output, which may be url-referenced from foreign attributes.
+        val usedIds = collectElementIds(graphic)
 
         // Assign stable ids to every ClipPath reachable via Group.clipPaths and every
         // gradient brush, and emit them under <defs> so refs below resolve.
@@ -113,12 +113,16 @@ class ScalableVectorGraphicWriter(
         return document
     }
 
-    private fun collectExtraElementIds(graphic: ScalableVectorGraphic): MutableSet<String> {
+    private fun collectElementIds(graphic: ScalableVectorGraphic): MutableSet<String> {
         val ids = mutableSetOf<String>()
+        graphic.id?.let(ids::add)
 
         fun walk(element: Element) {
-            if (element is Extra) {
-                element.id?.let(ids::add)
+            element.id?.let(ids::add)
+            if (element is Group) {
+                for (clipPath in element.clipPaths) {
+                    clipPath.regions.forEach(::walk)
+                }
             }
             if (element is ContainerElement) {
                 element.elements.forEach(::walk)

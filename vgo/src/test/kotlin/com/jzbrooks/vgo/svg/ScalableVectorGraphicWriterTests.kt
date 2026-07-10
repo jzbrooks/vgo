@@ -615,6 +615,111 @@ class ScalableVectorGraphicWriterTests {
     }
 
     @Test
+    fun testGeneratedGradientIdsAvoidPaintedElementIds() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(CommandString("M0,0L24,0Z").toCommandList(), id = "gradient0", fill = gradient),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            val gradientNode = defs.childNodes.toList().single { it.nodeName == "linearGradient" }
+            assertThat(gradientNode).attribute("id").isEqualTo("gradient1")
+
+            val path = root.childNodes.toList().single { it.nodeName == "path" }
+            assertThat(path).all {
+                attribute("id").isEqualTo("gradient0")
+                attribute("fill").isEqualTo("url(#gradient1)")
+            }
+        }
+    }
+
+    @Test
+    fun testGeneratedGradientIdsAvoidRootId() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(CommandString("M0,0L24,0Z").toCommandList(), fill = gradient),
+                ),
+                "gradient0",
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            val gradientNode = defs.childNodes.toList().single { it.nodeName == "linearGradient" }
+            assertThat(gradientNode).attribute("id").isEqualTo("gradient1")
+
+            val path = root.childNodes.toList().single { it.nodeName == "path" }
+            assertThat(path).attribute("fill").isEqualTo("url(#gradient1)")
+        }
+    }
+
+    @Test
+    fun testGeneratedClipPathIdsAvoidElementIds() {
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(CommandString("M0,0L24,0Z").toCommandList(), id = "clipPath0"),
+                    Group(
+                        listOf(createPath(CommandString("M0,24L24,24Z").toCommandList())),
+                        null,
+                        mutableMapOf(),
+                        clipPaths = listOf(ClipPath(listOf(createPath(CommandString("M0,0h24v24h-24z").toCommandList())))),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            val clipPathNode = defs.childNodes.toList().single { it.nodeName == "clipPath" }
+            assertThat(clipPathNode).attribute("id").isEqualTo("clipPath1")
+
+            val group = root.childNodes.toList().single { it.nodeName == "g" }
+            assertThat(group).attribute("clip-path").isEqualTo("url(#clipPath1)")
+        }
+    }
+
+    @Test
     fun testShapeGradientBrushWritesDefAndReference() {
         val gradient =
             LinearGradient(
