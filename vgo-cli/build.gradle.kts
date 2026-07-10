@@ -93,7 +93,6 @@ tasks {
             dependsOn(jar)
         }
 
-    val binaryFileProp = layout.buildDirectory.file("libs/vgo")
     register("binary") {
         description = "Prepends shell script in the jar to improve CLI"
         group = "build"
@@ -101,14 +100,15 @@ tasks {
         dependsOn(optimize)
 
         inputs.file(layout.buildDirectory.file("libs/vgo.jar"))
-        outputs.file(binaryFileProp)
+        outputs.file(layout.buildDirectory.file("libs/vgo"))
 
         doLast {
-            val binaryFile = binaryFileProp.get().asFile
+            val binaryFile = outputs.files.singleFile
+            val optimizedJar = inputs.files.singleFile
             binaryFile.parentFile.mkdirs()
             binaryFile.delete()
             binaryFile.appendText("#!/bin/sh\n\nexec java \$JAVA_OPTS -jar \$0 \"\$@\"\n\n")
-            layout.buildDirectory.file("libs/vgo.jar").get().asFile.inputStream().use {
+            optimizedJar.inputStream().use {
                 binaryFile.appendBytes(it.readBytes())
             }
             binaryFile.setExecutable(true, false)
