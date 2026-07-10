@@ -30,7 +30,6 @@ is a terminal.
 
 ### Fixed
 
-- SVG paths referencing gradients (`fill="url(#id)"`) were parsed as black fills, rendering gradient-filled artwork solid black after optimization
 - `BakeTransformations` transformed path geometry without transforming gradient paint coordinates, warping gradient-painted paths inside transformed groups (affected vector drawables)
 
 ### Security
