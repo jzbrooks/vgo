@@ -18,6 +18,20 @@ internal fun String.parseStyleAttribute(): Map<String, String> =
 internal val PRESENTATION_ATTRIBUTES: Set<String> =
     hashSetOf("fill", "fill-rule", "stroke", "stroke-width", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit")
 
+internal val urlReferenceRegex = Regex("""url\(\s*["']?#([^)\s"']+)["']?\s*\)""")
+
+/**
+ * Returns the referenced id when the entire value is a single `url(#id)` reference.
+ * Values with fallbacks (e.g. `url(#g) red`) don't match — they can't be
+ * faithfully collapsed to the referenced paint alone.
+ */
+internal fun String.extractUrlReferenceOrNull(): String? {
+    val match = urlReferenceRegex.matchEntire(trim()) ?: return null
+    return match.groupValues[1]
+}
+
+internal fun String.isUrlPaint(): Boolean = contains("url(")
+
 internal fun parseColorValue(
     value: String,
     default: Color,

@@ -1,15 +1,25 @@
 package com.jzbrooks.vgo.svg
 
 import assertk.all
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.hasSameSizeAs
+import assertk.assertions.hasSize
 import assertk.assertions.index
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isNull
+import com.jzbrooks.vgo.core.Brush
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
+import com.jzbrooks.vgo.core.GradientStop
+import com.jzbrooks.vgo.core.LinearGradient
+import com.jzbrooks.vgo.core.RadialGradient
+import com.jzbrooks.vgo.core.SweepGradient
+import com.jzbrooks.vgo.core.TileMode
 import com.jzbrooks.vgo.core.graphic.Circle
+import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
@@ -376,6 +386,448 @@ class ScalableVectorGraphicWriterTests {
             }
         }
     }
+
+    @Test
+    fun testLinearGradientFillWritesDefAndReference() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic = createGraphicWithBrush(fill = gradient)
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            val gradientNode = defs.childNodes.toList().single { it.nodeName == "linearGradient" }
+            assertThat(gradientNode).all {
+                attribute("id").isEqualTo("gradient0")
+                attribute("gradientUnits").isEqualTo("userSpaceOnUse")
+                attribute("x1").isEqualTo("0")
+                attribute("y1").isEqualTo("0")
+                attribute("x2").isEqualTo("24")
+                attribute("y2").isEqualTo("0")
+                doesNotHaveAttribute("spreadMethod")
+            }
+
+            val stops = gradientNode.childNodes.toList().filter { it.nodeName == "stop" }
+            assertThat(stops).hasSize(2)
+            assertThat(stops[0]).all {
+                attribute("offset").isEqualTo("0")
+                attribute("stop-color").isEqualTo("#b125ea")
+                doesNotHaveAttribute("stop-opacity")
+            }
+
+            val path = root.childNodes.toList().single { it.nodeName == "path" }
+            assertThat(path).attribute("fill").isEqualTo("url(#gradient0)")
+        }
+    }
+
+    @Test
+    fun testRadialGradientStrokeWritesDefAndReference() {
+        val gradient =
+            RadialGradient(
+                centerX = 12f,
+                centerY = 12f,
+                radius = 6f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+                tileMode = TileMode.MIRROR,
+            )
+        val graphic = createGraphicWithBrush(stroke = gradient)
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            val gradientNode = defs.childNodes.toList().single { it.nodeName == "radialGradient" }
+            assertThat(gradientNode).all {
+                attribute("cx").isEqualTo("12")
+                attribute("cy").isEqualTo("12")
+                attribute("r").isEqualTo("6")
+                attribute("spreadMethod").isEqualTo("reflect")
+            }
+
+            val path = root.childNodes.toList().single { it.nodeName == "path" }
+            assertThat(path).attribute("stroke").isEqualTo("url(#gradient0)")
+        }
+    }
+
+    @Test
+    fun testEqualGradientsShareOneDef() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(CommandString("M0,0L24,0Z").toCommandList(), fill = gradient),
+                    createPath(CommandString("M0,24L24,24Z").toCommandList(), fill = gradient.copy()),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            assertThat(defs.childNodes.toList().count { it.nodeName == "linearGradient" }, "gradient def count").isEqualTo(1)
+
+            val paths = root.childNodes.toList().filter { it.nodeName == "path" }
+            for (path in paths) {
+                assertThat(path).attribute("fill").isEqualTo("url(#gradient0)")
+            }
+        }
+    }
+
+    @Test
+    fun testTranslucentStopWritesStopOpacity() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0x80FF0000u)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic = createGraphicWithBrush(fill = gradient)
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            val gradientNode = defs.childNodes.toList().single { it.nodeName == "linearGradient" }
+            val stops = gradientNode.childNodes.toList().filter { it.nodeName == "stop" }
+
+            assertThat(stops[0]).all {
+                attribute("stop-color").isEqualTo("red")
+                attribute("stop-opacity").isEqualTo(".502")
+            }
+            assertThat(stops[1]).doesNotHaveAttribute("stop-opacity")
+        }
+    }
+
+    @Test
+    fun testGradientAndClipPathShareSingleDefsElement() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(createPath(CommandString("M0,0L24,0Z").toCommandList(), fill = gradient)),
+                        null,
+                        mutableMapOf(),
+                        clipPaths = listOf(ClipPath(listOf(createPath(CommandString("M0,0h24v24h-24z").toCommandList())))),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defsElements = root.childNodes.toList().filter { it.nodeName == "defs" }
+            assertThat(defsElements, "defs elements").hasSize(1)
+
+            val defChildren =
+                defsElements
+                    .single()
+                    .childNodes
+                    .toList()
+                    .map { it.nodeName }
+            assertThat(defChildren, "def children").isEqualTo(listOf("clipPath", "linearGradient"))
+        }
+    }
+
+    @Test
+    fun testGeneratedGradientIdsAvoidPassthroughDefIds() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    Extra("linearGradient", emptyList(), "gradient0", mutableMapOf()),
+                    createPath(CommandString("M0,0L24,0Z").toCommandList(), fill = gradient),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val path = root.childNodes.toList().single { it.nodeName == "path" }
+            assertThat(path).attribute("fill").isEqualTo("url(#gradient1)")
+        }
+    }
+
+    @Test
+    fun testGeneratedGradientIdsAvoidPaintedElementIds() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(CommandString("M0,0L24,0Z").toCommandList(), id = "gradient0", fill = gradient),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            val gradientNode = defs.childNodes.toList().single { it.nodeName == "linearGradient" }
+            assertThat(gradientNode).attribute("id").isEqualTo("gradient1")
+
+            val path = root.childNodes.toList().single { it.nodeName == "path" }
+            assertThat(path).all {
+                attribute("id").isEqualTo("gradient0")
+                attribute("fill").isEqualTo("url(#gradient1)")
+            }
+        }
+    }
+
+    @Test
+    fun testGeneratedGradientIdsAvoidRootId() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(CommandString("M0,0L24,0Z").toCommandList(), fill = gradient),
+                ),
+                "gradient0",
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            val gradientNode = defs.childNodes.toList().single { it.nodeName == "linearGradient" }
+            assertThat(gradientNode).attribute("id").isEqualTo("gradient1")
+
+            val path = root.childNodes.toList().single { it.nodeName == "path" }
+            assertThat(path).attribute("fill").isEqualTo("url(#gradient1)")
+        }
+    }
+
+    @Test
+    fun testGeneratedClipPathIdsAvoidElementIds() {
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(CommandString("M0,0L24,0Z").toCommandList(), id = "clipPath0"),
+                    Group(
+                        listOf(createPath(CommandString("M0,24L24,24Z").toCommandList())),
+                        null,
+                        mutableMapOf(),
+                        clipPaths = listOf(ClipPath(listOf(createPath(CommandString("M0,0h24v24h-24z").toCommandList())))),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            val clipPathNode = defs.childNodes.toList().single { it.nodeName == "clipPath" }
+            assertThat(clipPathNode).attribute("id").isEqualTo("clipPath1")
+
+            val group = root.childNodes.toList().single { it.nodeName == "g" }
+            assertThat(group).attribute("clip-path").isEqualTo("url(#clipPath1)")
+        }
+    }
+
+    @Test
+    fun testShapeGradientBrushWritesDefAndReference() {
+        val gradient =
+            LinearGradient(
+                startX = 0f,
+                startY = 0f,
+                endX = 24f,
+                endY = 0f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val rect =
+            Rect(
+                null,
+                mutableMapOf(),
+                0f,
+                0f,
+                24f,
+                24f,
+                0f,
+                0f,
+                Colors.BLACK,
+                Path.FillRule.NON_ZERO,
+                Colors.TRANSPARENT,
+                1f,
+                Path.LineCap.BUTT,
+                Path.LineJoin.MITER,
+                4f,
+            ).apply { fillBrush = gradient }
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(rect),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val defs = root.childNodes.toList().single { it.nodeName == "defs" }
+            assertThat(defs.childNodes.toList().count { it.nodeName == "linearGradient" }, "gradient def count").isEqualTo(1)
+
+            val rectNode = root.childNodes.toList().single { it.nodeName == "rect" }
+            assertThat(rectNode).attribute("fill").isEqualTo("url(#gradient0)")
+        }
+    }
+
+    @Test
+    fun testSweepGradientCannotBeWritten() {
+        val gradient =
+            SweepGradient(
+                centerX = 12f,
+                centerY = 12f,
+                stops =
+                    listOf(
+                        GradientStop(0f, Color(0xFFB125EAu)),
+                        GradientStop(1f, Color(0xFF008AFFu)),
+                    ),
+            )
+        val graphic = createGraphicWithBrush(fill = gradient)
+
+        ByteArrayOutputStream().use { memoryStream ->
+            assertFailure {
+                ScalableVectorGraphicWriter().write(graphic, memoryStream)
+            }.isInstanceOf(IllegalStateException::class)
+        }
+    }
+
+    @Test
+    fun testUnresolvedPaintReferenceInForeignIsWritten() {
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(
+                        CommandString("M0,0L24,0Z").toCommandList(),
+                        foreign = mutableMapOf("fill" to "url(#external)"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            val path = root.childNodes.toList().single { it.nodeName == "path" }
+            assertThat(path).attribute("fill").isEqualTo("url(#external)")
+        }
+    }
+
+    private fun createGraphicWithBrush(
+        fill: Brush = Colors.BLACK,
+        stroke: Brush = Colors.TRANSPARENT,
+    ) = ScalableVectorGraphic(
+        listOf(
+            createPath(
+                CommandString("M0,0L24,0L24,24Z").toCommandList(),
+                fill = fill,
+                stroke = stroke,
+            ),
+        ),
+        null,
+        mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+    )
 
     private fun ByteArrayOutputStream.toDocument(): Document =
         DocumentBuilderFactory

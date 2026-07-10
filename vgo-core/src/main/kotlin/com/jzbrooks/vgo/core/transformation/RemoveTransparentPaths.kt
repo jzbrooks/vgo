@@ -28,6 +28,9 @@ class RemoveTransparentPaths : TopDownTransformer {
                     element.id != null ||
                     // Colors that aren't able to be parsed may remain in the foreign map
                     element.foreign.keys.any { it.contains("color", ignoreCase = true) } ||
+                    // Unconverted paint server references (e.g. SVG fill="url(#gradient)")
+                    // remain in the foreign map
+                    element.foreign.values.any { it.contains("url(") } ||
                     // If a path isn't transparent, allow it. Gradient paints are never
                     // considered transparent here — we don't introspect their stops.
                     !element.fill.isTransparentColor() ||
