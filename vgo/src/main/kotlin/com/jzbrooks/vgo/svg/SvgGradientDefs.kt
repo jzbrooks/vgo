@@ -18,7 +18,6 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-val GRADIENT_ELEMENT_NAMES: Set<String> = hashSetOf("linearGradient", "radialGradient")
 private const val MAX_HREF_DEPTH = 8
 
 /**
@@ -40,7 +39,7 @@ internal fun harvestGradientDefs(root: Node): SvgGradientDefs {
     fun walk(node: Node) {
         if (node !is org.w3c.dom.Element) return
 
-        if (node.nodeName in GRADIENT_ELEMENT_NAMES) {
+        if (node.nodeName in SvgGradientDefs.GRADIENT_ELEMENT_NAMES) {
             val id = node.getAttribute("id")
             if (id.isNotEmpty()) defsById[id] = node
         }
@@ -354,5 +353,9 @@ internal class SvgGradientDefs(
         if (value.substring(consumed).any { !it.isWhitespace() && it != ',' }) return null
 
         return matrix
+    }
+
+    companion object {
+        val GRADIENT_ELEMENT_NAMES: Set<String> = hashSetOf("linearGradient", "radialGradient")
     }
 }

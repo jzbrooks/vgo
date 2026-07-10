@@ -80,7 +80,7 @@ private fun pruneConsumedGradientDefs(
     fun prune(elements: List<Element>): List<Element> =
         elements.mapNotNull { element ->
             when (element) {
-                is Extra if element.name in GRADIENT_ELEMENT_NAMES && element.id in consumedIds -> {
+                is Extra if element.name in SvgGradientDefs.GRADIENT_ELEMENT_NAMES && element.id in consumedIds -> {
                     null
                 }
 
