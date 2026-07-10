@@ -14,9 +14,12 @@ import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
+import com.jzbrooks.vgo.core.graphic.command.CubicBezierCurve
+import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
 import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
+import com.jzbrooks.vgo.core.util.math.Point
 import org.jetbrains.kotlin.com.intellij.openapi.Disposable
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
 import org.junit.jupiter.api.AfterEach
@@ -436,6 +439,117 @@ class ImageVectorReaderTest {
         val path = assertThat(graphic::elements).single().isInstanceOf<Path>()
         path.prop(Path::id).isEqualTo("outline")
         path.prop(Path::fill).isEqualTo(Color(0x7FFF0000u))
+    }
+
+    @Test
+    fun `named command arguments are parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+              get() = _sample ?: ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                .path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                  moveTo(y = 2f, x = 1f)
+                  arcTo(
+                    horizontalEllipseRadius = 5f,
+                    verticalEllipseRadius = 6f,
+                    theta = 0f,
+                    isMoreThanHalf = true,
+                    isPositiveArc = false,
+                    x1 = 10f,
+                    y1 = 11f,
+                  )
+                  curveTo(1f, 2f, x2 = 3f, y2 = 4f, x3 = 5f, y3 = 6f)
+                  close()
+                }
+              .build().also { _sample = it }
+
+            private var _sample: ImageVector? = null
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        val commands =
+            assertThat(graphic::elements)
+                .single()
+                .isInstanceOf<Path>()
+                .prop(Path::commands)
+        commands.hasSize(4)
+        commands
+            .first()
+            .isInstanceOf<MoveTo>()
+            .prop(MoveTo::parameters)
+            .single()
+            .isEqualTo(Point(1f, 2f))
+        val arc =
+            commands
+                .index(1)
+                .isInstanceOf<EllipticalArcCurve>()
+                .prop(EllipticalArcCurve::parameters)
+                .single()
+        arc.prop(EllipticalArcCurve.Parameter::radiusX).isEqualTo(5f)
+        arc.prop(EllipticalArcCurve.Parameter::arc).isEqualTo(EllipticalArcCurve.ArcFlag.LARGE)
+        arc.prop(EllipticalArcCurve.Parameter::sweep).isEqualTo(EllipticalArcCurve.SweepFlag.ANTICLOCKWISE)
+        arc.prop(EllipticalArcCurve.Parameter::end).isEqualTo(Point(10f, 11f))
+        commands
+            .index(2)
+            .isInstanceOf<CubicBezierCurve>()
+            .prop(CubicBezierCurve::parameters)
+            .single()
+            .isEqualTo(CubicBezierCurve.Parameter(Point(1f, 2f), Point(3f, 4f), Point(5f, 6f)))
+    }
+
+    @Test
+    fun `named path node arguments are parsed in clip path data`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.PathNode
+            import androidx.compose.ui.graphics.vector.group
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+              get() = _sample ?: ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                .group(
+                  clipPathData = listOf(
+                    PathNode.MoveTo(y = 2f, x = 1f),
+                    PathNode.LineTo(24f, 0f),
+                    PathNode.Close,
+                  ),
+                ) {
+                  path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                    moveTo(12f, 0f)
+                    close()
+                  }
+                }
+              .build().also { _sample = it }
+
+            private var _sample: ImageVector? = null
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic::elements)
+            .single()
+            .isInstanceOf<Group>()
+            .prop(Group::clipPaths)
+            .single()
+            .prop("regions") { it.regions }
+            .single()
+            .prop(Path::commands)
+            .first()
+            .isInstanceOf<MoveTo>()
+            .prop(MoveTo::parameters)
+            .single()
+            .isEqualTo(Point(1f, 2f))
     }
 
     @Test
