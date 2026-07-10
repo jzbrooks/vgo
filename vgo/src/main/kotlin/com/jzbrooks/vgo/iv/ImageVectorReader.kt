@@ -46,6 +46,34 @@ import org.jetbrains.kotlin.psi.KtValueArgument
 internal const val FOREIGN_KEY_PROPERTY_NAME = "propertyName"
 internal const val FOREIGN_KEY_PACKAGE_NAME = "packageName"
 
+private val BUILDER_PARAMETERS =
+    listOf(
+        "name",
+        "defaultWidth",
+        "defaultHeight",
+        "viewportWidth",
+        "viewportHeight",
+        "tintColor",
+        "tintBlendMode",
+        "autoMirror",
+    )
+
+private val COMPOSE_COLOR_CONSTANTS =
+    mapOf(
+        "Black" to Color(0xFF000000u),
+        "DarkGray" to Color(0xFF444444u),
+        "Gray" to Color(0xFF888888u),
+        "LightGray" to Color(0xFFCCCCCCu),
+        "White" to Color(0xFFFFFFFFu),
+        "Red" to Color(0xFFFF0000u),
+        "Green" to Color(0xFF00FF00u),
+        "Blue" to Color(0xFF0000FFu),
+        "Yellow" to Color(0xFFFFFF00u),
+        "Cyan" to Color(0xFF00FFFFu),
+        "Magenta" to Color(0xFFFF00FFu),
+        "Transparent" to Color(0x00000000u),
+    )
+
 @ExperimentalVgoApi
 fun parse(psiFile: KtFile): ImageVector {
     val propertyVectors = findPropertyVectors(psiFile)
@@ -190,51 +218,12 @@ private fun parseVectorBuilderExpression(
                 builderExpr as? KtCallExpression
                     ?: PsiTreeUtil.findChildOfType(builderExpr, KtCallExpression::class.java)!!
 
-            callExpr.valueArgumentList?.arguments?.forEach { arg ->
-                if (arg is KtValueArgument) {
-                    val argumentName = arg.getArgumentName()?.asName?.identifier
-                    val argExpr = arg.getArgumentExpression()
-
-                    when (argumentName) {
-                        "name" -> {
-                            if (argExpr is KtStringTemplateExpression) {
-                                id =
-                                    argExpr.entries.joinToString("") {
-                                        when (it) {
-                                            is KtLiteralStringTemplateEntry -> it.text
-                                            is KtSimpleNameStringTemplateEntry -> it.text
-                                            else -> ""
-                                        }
-                                    }
-                            }
-                        }
-
-                        "defaultWidth" -> {
-                            defaultWidthDp =
-                                argExpr
-                                    ?.text
-                                    ?.removeSuffix(".dp")
-                                    ?.toFloatOrNull()
-                        }
-
-                        "defaultHeight" -> {
-                            defaultHeightDp =
-                                argExpr
-                                    ?.text
-                                    ?.removeSuffix(".dp")
-                                    ?.toFloatOrNull()
-                        }
-
-                        "viewportWidth" -> {
-                            viewportWidth = argExpr?.text?.toFloatOrNull()
-                        }
-
-                        "viewportHeight" -> {
-                            viewportHeight = argExpr?.text?.toFloatOrNull()
-                        }
-                    }
-                }
-            }
+            val arguments = resolveArguments(callExpr, BUILDER_PARAMETERS)
+            id = parseStringLiteral(arguments["name"])
+            defaultWidthDp = parseDpValue(arguments["defaultWidth"])
+            defaultHeightDp = parseDpValue(arguments["defaultHeight"])
+            viewportWidth = parseFloatLiteral(arguments["viewportWidth"])
+            viewportHeight = parseFloatLiteral(arguments["viewportHeight"])
 
             var callExpression = (callExpr.parent.parent as? KtDotQualifiedExpression)?.selectorExpression as? KtCallExpression
             while (callExpression != null && callExpression.name != "build") {
@@ -285,14 +274,7 @@ private fun parseGroupBuilderCall(callExpression: KtCallExpression): Group {
                 }
 
                 "name" -> {
-                    if (expression is KtStringTemplateExpression && expression.entries.size == 1) {
-                        name =
-                            when (val literalExpr = expression.entries.first()) {
-                                is KtLiteralStringTemplateEntry -> literalExpr.text
-                                is KtSimpleNameStringTemplateEntry -> literalExpr.text
-                                else -> ""
-                            }
-                    }
+                    name = parseStringLiteral(expression)
                 }
 
                 "rotate" -> {
@@ -568,6 +550,68 @@ private fun parsePathCommands(bodyExpr: KtBlockExpression): List<Command> {
     return commands
 }
 
+/**
+ * Resolve a call's value arguments into a parameter-name-keyed map using the
+ * callee's declared parameter order, honoring positional, named, and mixed usage.
+ */
+private fun resolveArguments(
+    call: KtCallExpression,
+    parameters: List<String>,
+    aliases: Map<String, String> = emptyMap(),
+): Map<String, KtExpression> {
+    val resolved = mutableMapOf<String, KtExpression>()
+
+    for ((index, argument) in call.valueArgumentList
+        ?.arguments
+        .orEmpty()
+        .withIndex()) {
+        val expression = argument.getArgumentExpression() ?: continue
+        val name = argument.getArgumentName()?.asName?.identifier
+        val parameter =
+            if (name != null) {
+                aliases[name] ?: name
+            } else {
+                parameters.getOrNull(index) ?: continue
+            }
+        resolved[parameter] = expression
+    }
+
+    return resolved
+}
+
+private fun parseStringLiteral(expression: KtExpression?): String? {
+    val template = expression as? KtStringTemplateExpression ?: return null
+
+    return template.entries.joinToString("") { entry ->
+        when (entry) {
+            is KtLiteralStringTemplateEntry -> entry.text
+            is KtSimpleNameStringTemplateEntry -> entry.text
+            else -> ""
+        }
+    }
+}
+
+private fun parseDpValue(expression: KtExpression?): Float? =
+    when {
+        expression is KtDotQualifiedExpression &&
+            (expression.selectorExpression as? KtNameReferenceExpression)?.getReferencedName() == "dp" -> {
+            parseFloatLiteral(expression.receiverExpression)
+        }
+
+        expression is KtCallExpression && expression.calleeExpression?.text == "Dp" -> {
+            parseFloatLiteral(
+                expression.valueArgumentList
+                    ?.arguments
+                    ?.firstOrNull()
+                    ?.getArgumentExpression(),
+            )
+        }
+
+        else -> {
+            parseFloatLiteral(expression)
+        }
+    }
+
 private fun parseFloatLiteral(expression: KtExpression?): Float? {
     if (expression == null) return null
 
@@ -724,46 +768,61 @@ private fun parseArcArgument(expression: KtCallExpression): EllipticalArcCurve.P
 }
 
 private fun parseColorArgument(expression: KtExpression?): Color? {
-    if (expression == null) return null
+    var colorExpression = expression ?: return null
 
-    // Handle SolidColor(Color(0xFF232F34))
-    if (expression is KtCallExpression && expression.calleeExpression?.text == "SolidColor") {
-        val colorArg =
-            expression.valueArgumentList
-                ?.arguments
-                ?.firstOrNull()
-                ?.getArgumentExpression()
-        if (colorArg is KtCallExpression && colorArg.calleeExpression?.text == "Color") {
-            val colorValueArgs = colorArg.valueArgumentList?.arguments
-
-            if (colorValueArgs != null && colorValueArgs.size == 1) {
-                val colorValueArg = colorValueArgs[0].getArgumentExpression()
-                if (colorValueArg is KtConstantExpression) {
-                    return colorValueArg.text.toUIntOrNull()?.let(::Color)
-                }
-            } else if (colorValueArgs != null && colorValueArgs.size == 4) {
-                val r = colorValueArgs[0].getArgumentExpression()?.text?.toUByteOrNull() ?: return null
-                val g = colorValueArgs[1].getArgumentExpression()?.text?.toUByteOrNull() ?: return null
-                val b = colorValueArgs[2].getArgumentExpression()?.text?.toUByteOrNull() ?: return null
-                val a = colorValueArgs[3].getArgumentExpression()?.text?.toUByteOrNull() ?: return null
-                return Color(a, r, g, b)
-            }
-        }
+    // Unwrap SolidColor(...)
+    if (colorExpression is KtCallExpression && colorExpression.calleeExpression?.text == "SolidColor") {
+        colorExpression = colorExpression.valueArgumentList
+            ?.arguments
+            ?.firstOrNull()
+            ?.getArgumentExpression() ?: return null
     }
 
-    // Handle direct Color(0xFF232F34)
-    if (expression is KtCallExpression && expression.calleeExpression?.text == "Color") {
-        val colorValueArg =
-            expression.valueArgumentList
-                ?.arguments
-                ?.firstOrNull()
-                ?.getArgumentExpression()
-        if (colorValueArg is KtConstantExpression) {
-            return colorValueArg.text.toUIntOrNull()?.let(::Color)
+    // Handle companion constants like Color.Black
+    if (colorExpression is KtDotQualifiedExpression &&
+        colorExpression.receiverExpression.text.substringAfterLast('.') == "Color"
+    ) {
+        val constant = (colorExpression.selectorExpression as? KtNameReferenceExpression)?.getReferencedName()
+        return COMPOSE_COLOR_CONSTANTS[constant]
+    }
+
+    if (colorExpression is KtCallExpression && colorExpression.calleeExpression?.text == "Color") {
+        val arguments = colorExpression.valueArgumentList?.arguments.orEmpty()
+
+        // Handle Color(0xFF232F34)
+        if (arguments.size == 1) {
+            return parseColorLiteral(arguments[0].getArgumentExpression())
+        }
+
+        // Handle Color(r, g, b) and Color(r, g, b, a) with integer channels
+        if (arguments.size >= 3) {
+            val channels = resolveArguments(colorExpression, listOf("red", "green", "blue", "alpha"))
+            val red = channels["red"]?.text?.toUByteOrNull() ?: return null
+            val green = channels["green"]?.text?.toUByteOrNull() ?: return null
+            val blue = channels["blue"]?.text?.toUByteOrNull() ?: return null
+            val alpha = channels["alpha"]?.text?.toUByteOrNull() ?: 0xFF.toUByte()
+            return Color(alpha, red, green, blue)
         }
     }
 
     return null
+}
+
+private fun parseColorLiteral(expression: KtExpression?): Color? {
+    val text =
+        (expression as? KtConstantExpression)
+            ?.text
+            ?.replace("_", "")
+            ?.removeSuffix("L") ?: return null
+
+    val argb =
+        if (text.startsWith("0x") || text.startsWith("0X")) {
+            text.drop(2).toUIntOrNull(16)
+        } else {
+            text.toUIntOrNull()
+        }
+
+    return argb?.let(::Color)
 }
 
 private fun parseClipPathDataExpression(expression: KtExpression?): Path? {

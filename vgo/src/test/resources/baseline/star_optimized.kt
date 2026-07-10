@@ -7,7 +7,7 @@ import androidx.compose.ui.unit.dp
 public val star: ImageVector
   get() = _star ?: ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
     .path(
-      fill = SolidColor(Color(0, 0, 0, 255)),
+      fill = SolidColor(Color(255, 193, 7, 255)),
     ) {
       moveTo(12f, 2.0f)
       lineTo(15.09f, 8.26f)

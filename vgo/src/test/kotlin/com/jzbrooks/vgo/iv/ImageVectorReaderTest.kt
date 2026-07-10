@@ -9,6 +9,7 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.prop
 import assertk.assertions.single
+import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
@@ -59,6 +60,106 @@ class ImageVectorReaderTest {
             .isInstanceOf<Path>()
             .prop(Path::commands)
             .hasSize(11)
+    }
+
+    @Test
+    fun `hex color literals are parsed`() {
+        val psiFile = parseKotlinFile(disposable, inputStream)
+        val graphic = parse(psiFile)
+
+        assertThat(graphic::elements)
+            .single()
+            .isInstanceOf<Path>()
+            .prop(Path::fill)
+            .isEqualTo(Color(0xFFFFC107u))
+    }
+
+    @Test
+    fun `compose color constants are parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+              get() = _sample ?: ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                .path(fill = SolidColor(Color.Red)) {
+                  moveTo(2f, 2f)
+                  lineTo(4f, 4f)
+                  close()
+                }
+              .build().also { _sample = it }
+
+            private var _sample: ImageVector? = null
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic::elements)
+            .single()
+            .isInstanceOf<Path>()
+            .prop(Path::fill)
+            .isEqualTo(Color(0xFFFF0000u))
+    }
+
+    @Test
+    fun `float dp dimensions are parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+              get() = _sample ?: ImageVector.Builder(defaultWidth = 24f.dp, defaultHeight = 12f.dp, viewportWidth = 24f, viewportHeight = 24f)
+                .path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                  moveTo(2f, 2f)
+                  close()
+                }
+              .build().also { _sample = it }
+
+            private var _sample: ImageVector? = null
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic::defaultWidthDp).isEqualTo(24f)
+        assertThat(graphic::defaultHeightDp).isEqualTo(12f)
+    }
+
+    @Test
+    fun `positional builder arguments are parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+              get() = _sample ?: ImageVector.Builder("sample", 24.dp, 24.dp, 12f, viewportHeight = 12f)
+                .path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                  moveTo(2f, 2f)
+                  close()
+                }
+              .build().also { _sample = it }
+
+            private var _sample: ImageVector? = null
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic::id).isEqualTo("sample")
+        assertThat(graphic::defaultWidthDp).isEqualTo(24f)
+        assertThat(graphic::defaultHeightDp).isEqualTo(24f)
+        assertThat(graphic::viewportWidth).isEqualTo(12f)
+        assertThat(graphic::viewportHeight).isEqualTo(12f)
     }
 
     @Test
