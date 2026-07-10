@@ -1,0 +1,36 @@
+[versions]
+kotlin = "2.4.0"
+ktlint-cli = "1.8.0"
+junit = "6.1.1"
+assertk = "0.28.1"
+android-tools = "32.2.1"
+kotlinpoet = "2.3.0"
+r8 = "9.1.31"
+changelog = "2.5.0"
+ktlint-gradle = "14.2.0"
+maven-publish = "0.37.0"
+intellij-platform = "2.18.1"
+
+[libraries]
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter-api = { module = "org.junit.jupiter:junit-jupiter-api" }
+junit-jupiter-params = { module = "org.junit.jupiter:junit-jupiter-params" }
+junit-jupiter-engine = { module = "org.junit.jupiter:junit-jupiter-engine" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+assertk = { module = "com.willowtreeapps.assertk:assertk-jvm", version.ref = "assertk" }
+kotlin-compiler-embeddable = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin" }
+android-sdk-common = { module = "com.android.tools:sdk-common", version.ref = "android-tools" }
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
+r8 = { module = "com.android.tools:r8", version.ref = "r8" }
+
+# Used by the ktlint gradle plugin (see buildSrc convention plugin); listed here so Renovate updates it
+ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint-cli" }
+
+# Plugin artifacts for the buildSrc convention plugin classpath
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+ktlint-gradle-plugin = { module = "org.jlleitschuh.gradle:ktlint-gradle", version.ref = "ktlint-gradle" }
+
+[plugins]
+changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+intellij-platform = { id = "org.jetbrains.intellij.platform", version.ref = "intellij-platform" }
