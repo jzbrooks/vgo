@@ -17,6 +17,15 @@ is a terminal.
   - Unsupported cases (e.g. skew `gradientTransform`, focal points, unresolvable references) are passed through to the output verbatim instead of being converted
   - Writing emits gradient brushes as `<defs>` definitions referenced with `url(#id)`, enabling vector drawable → SVG conversion of gradient drawables. Sweep gradients cannot be represented in SVG and fail conversion with a clear error
 
+- ImageVector reading no longer requires one particular builder shape. The `ImageVector.Builder(...)` call is discovered anywhere in the file, so previously unparseable forms now work:
+  - `.apply { path(...) { ... } }` blocks (Valkyrie-style output) and `run` scope functions, in addition to fluent `.path {}.group {}` chains
+  - `by lazy { ... }` delegates, plain `val x = ...` initializers (no getter or explicit type required), functions returning `ImageVector`, and local builder variables (`val builder = ...; builder.path { ... }; builder.build()`)
+  - Kotlin 2.4 explicit backing fields (`val x: ImageVector` with `field = ImageVector.Builder(...)...build()`)
+  - directly imported `Builder(...)` calls and fully qualified `ImageVector` references
+- ImageVector reading resolves arguments by parameter name, so positional, named, and mixed argument styles are supported for `Builder(...)`, `path(...)`, `group(...)`, path commands, and `PathNode` constructors
+- ImageVector reading parses previously ignored path styling arguments: `name`, `pathFillType`, `strokeLineCap`, `strokeLineJoin`, and `strokeLineMiter`
+- ImageVector reading understands `Color` companion constants (e.g. `Color.Black`) and more dimension forms (`24f.dp`, `Dp(24f)`)
+
 ### Changed
 - `MergePaths` will merge opaque stroke, no fill paths regardless of overlap.
 - Shape elements carry their paints in new `Shape.fillBrush` and `Shape.strokeBrush` properties, which can represent gradients
@@ -31,6 +40,8 @@ is a terminal.
 ### Fixed
 
 - `BakeTransformations` transformed path geometry without transforming gradient paint coordinates, warping gradient-painted paths inside transformed groups (affected vector drawables)
+- Hex color literals in ImageVector sources (e.g. `Color(0xFFFFC107)`) failed to parse and silently fell back to black
+- ImageVector paths without an explicit `pathFillType` were read with an even-odd fill rule; Compose's default is non-zero
 
 ### Security
 

@@ -13,6 +13,8 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
 import kotlin.streams.asSequence
 
 class BaselineTests {
@@ -94,6 +96,30 @@ class BaselineTests {
     }
 
     @ParameterizedTest
+    @MethodSource("provideImageVectorAssets")
+    fun testImageVectorIsEquivalentToBaseline(
+        unoptimizedAsset: Path,
+        baselineAsset: Path,
+        testReporter: TestReporter,
+    ) {
+        val inputFile = unoptimizedAsset.toFile()
+        val outputFilePath =
+            "build/test-results/${inputFile.nameWithoutExtension}_testImageVectorIsEquivalentToBaseline.kt"
+        val options =
+            Vgo.Options(
+                indent = 2,
+                input = listOf(unoptimizedAsset.toString()),
+                output = listOf(outputFilePath),
+            )
+
+        val exitCode = Vgo(options).run()
+
+        assertThat(exitCode).isEqualTo(0)
+        testReporter.publishFile(Path.of(outputFilePath), MediaType.TEXT_PLAIN)
+        assertThat(File(outputFilePath), "optimized ImageVector").hasText(baselineAsset.toFile().readText())
+    }
+
+    @ParameterizedTest
     @MethodSource("provideUnoptimizedAssets")
     fun testOptimizedAssetIsNotLargerThanOriginal(
         unoptimizedAsset: Path,
@@ -135,6 +161,7 @@ class BaselineTests {
                     .list(Paths.get("src/test/resources"))
                     .asSequence()
                     .filterNot { Files.isDirectory(it) }
+                    .sortedBy { it.fileName.toString() }
                     .map { unoptimizedFile ->
                         val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
                         val optimizedDirectory = unoptimizedFile.parent.resolve("baseline")
@@ -145,6 +172,17 @@ class BaselineTests {
                 throw e
             }
 
+        private val imageVectorAssets: List<Pair<Path, Path>> =
+            Files
+                .walk(Paths.get("src/test/resources/imagevector"), 2)
+                .asSequence()
+                .filterNot { Files.isDirectory(it) }
+                .sortedBy { it.fileName.toString() }
+                .map { unoptimizedFile ->
+                    val completeStem = unoptimizedFile.fileName.nameWithoutExtension
+                    unoptimizedFile to Paths.get("src/test/resources/baseline", "${completeStem}_optimized.kt")
+                }.toList()
+
         @JvmStatic
         fun provideUnoptimizedAssets(): List<Arguments> =
             assets.map {
@@ -154,6 +192,12 @@ class BaselineTests {
         @JvmStatic
         fun provideUnoptimizedAndOptimizedAssets(): List<Arguments> =
             assets.map {
+                Arguments.of(it.first, it.second)
+            }
+
+        @JvmStatic
+        fun provideImageVectorAssets(): List<Arguments> =
+            imageVectorAssets.map {
                 Arguments.of(it.first, it.second)
             }
     }
