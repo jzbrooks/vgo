@@ -1,5 +1,6 @@
 package com.jzbrooks.vgo.iv
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.first
 import assertk.assertions.hasSize
@@ -7,6 +8,7 @@ import assertk.assertions.index
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
+import assertk.assertions.key
 import assertk.assertions.prop
 import assertk.assertions.single
 import com.jzbrooks.vgo.core.Color
@@ -240,7 +242,7 @@ class ImageVectorReaderTest {
 
         val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
 
-        assertThat(graphic.foreign["propertyName"]).isEqualTo("sample")
+        assertThat(graphic::foreign).key("propertyName").isEqualTo("sample")
         assertThat(graphic::elements)
             .single()
             .isInstanceOf<Path>()
@@ -298,7 +300,7 @@ class ImageVectorReaderTest {
 
         val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
 
-        assertThat(graphic.foreign["propertyName"]).isEqualTo("sample")
+        assertThat(graphic::foreign).key("propertyName").isEqualTo("sample")
         assertThat(graphic::elements)
             .single()
             .isInstanceOf<Path>()
@@ -326,7 +328,7 @@ class ImageVectorReaderTest {
 
         val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
 
-        assertThat(graphic.foreign["propertyName"]).isEqualTo("sampleIcon")
+        assertThat(graphic::foreign).key("propertyName").isEqualTo("sampleIcon")
         assertThat(graphic::elements).single().isInstanceOf<Path>()
     }
 
@@ -353,8 +355,10 @@ class ImageVectorReaderTest {
 
         val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
 
-        assertThat(graphic.foreign["propertyName"]).isEqualTo("Sample")
-        assertThat(graphic.foreign["packageName"]).isEqualTo("Icons.Outlined")
+        assertThat(graphic::foreign).all {
+            key("propertyName").isEqualTo("Sample")
+            key("packageName").isEqualTo("Icons.Outlined")
+        }
     }
 
     @Test
@@ -392,13 +396,14 @@ class ImageVectorReaderTest {
 
         val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
 
-        val path = assertThat(graphic::elements).single().isInstanceOf<Path>()
-        path.prop(Path::id).isEqualTo("outline")
-        path.prop(Path::strokeWidth).isEqualTo(2f)
-        path.prop(Path::strokeLineCap).isEqualTo(Path.LineCap.ROUND)
-        path.prop(Path::strokeLineJoin).isEqualTo(Path.LineJoin.BEVEL)
-        path.prop(Path::strokeMiterLimit).isEqualTo(3f)
-        path.prop(Path::fillRule).isEqualTo(Path.FillRule.EVEN_ODD)
+        assertThat(graphic::elements).single().isInstanceOf<Path>().all {
+            prop(Path::id).isEqualTo("outline")
+            prop(Path::strokeWidth).isEqualTo(2f)
+            prop(Path::strokeLineCap).isEqualTo(Path.LineCap.ROUND)
+            prop(Path::strokeLineJoin).isEqualTo(Path.LineJoin.BEVEL)
+            prop(Path::strokeMiterLimit).isEqualTo(3f)
+            prop(Path::fillRule).isEqualTo(Path.FillRule.EVEN_ODD)
+        }
     }
 
     @Test
@@ -436,9 +441,10 @@ class ImageVectorReaderTest {
 
         val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
 
-        val path = assertThat(graphic::elements).single().isInstanceOf<Path>()
-        path.prop(Path::id).isEqualTo("outline")
-        path.prop(Path::fill).isEqualTo(Color(0x7FFF0000u))
+        assertThat(graphic::elements).single().isInstanceOf<Path>().all {
+            prop(Path::id).isEqualTo("outline")
+            prop(Path::fill).isEqualTo(Color(0x7FFF0000u))
+        }
     }
 
     @Test
@@ -534,34 +540,36 @@ class ImageVectorReaderTest {
 
         val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
 
-        val commands =
-            assertThat(graphic::elements)
-                .single()
-                .isInstanceOf<Path>()
-                .prop(Path::commands)
-        commands.hasSize(4)
-        commands
-            .first()
-            .isInstanceOf<MoveTo>()
-            .prop(MoveTo::parameters)
+        assertThat(graphic::elements)
             .single()
-            .isEqualTo(Point(1f, 2f))
-        val arc =
-            commands
-                .index(1)
-                .isInstanceOf<EllipticalArcCurve>()
-                .prop(EllipticalArcCurve::parameters)
-                .single()
-        arc.prop(EllipticalArcCurve.Parameter::radiusX).isEqualTo(5f)
-        arc.prop(EllipticalArcCurve.Parameter::arc).isEqualTo(EllipticalArcCurve.ArcFlag.LARGE)
-        arc.prop(EllipticalArcCurve.Parameter::sweep).isEqualTo(EllipticalArcCurve.SweepFlag.ANTICLOCKWISE)
-        arc.prop(EllipticalArcCurve.Parameter::end).isEqualTo(Point(10f, 11f))
-        commands
-            .index(2)
-            .isInstanceOf<CubicBezierCurve>()
-            .prop(CubicBezierCurve::parameters)
-            .single()
-            .isEqualTo(CubicBezierCurve.Parameter(Point(1f, 2f), Point(3f, 4f), Point(5f, 6f)))
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .all {
+                hasSize(4)
+
+                index(0)
+                    .isInstanceOf<MoveTo>()
+                    .prop(MoveTo::parameters)
+                    .single()
+                    .isEqualTo(Point(1f, 2f))
+
+                index(1)
+                    .isInstanceOf<EllipticalArcCurve>()
+                    .prop(EllipticalArcCurve::parameters)
+                    .single()
+                    .all {
+                        prop(EllipticalArcCurve.Parameter::radiusX).isEqualTo(5f)
+                        prop(EllipticalArcCurve.Parameter::arc).isEqualTo(EllipticalArcCurve.ArcFlag.LARGE)
+                        prop(EllipticalArcCurve.Parameter::sweep).isEqualTo(EllipticalArcCurve.SweepFlag.ANTICLOCKWISE)
+                        prop(EllipticalArcCurve.Parameter::end).isEqualTo(Point(10f, 11f))
+                    }
+
+                index(2)
+                    .isInstanceOf<CubicBezierCurve>()
+                    .prop(CubicBezierCurve::parameters)
+                    .single()
+                    .isEqualTo(CubicBezierCurve.Parameter(Point(1f, 2f), Point(3f, 4f), Point(5f, 6f)))
+            }
     }
 
     @Test
@@ -643,7 +651,7 @@ class ImageVectorReaderTest {
 
         val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
 
-        assertThat(graphic.foreign["propertyName"]).isEqualTo("sample")
+        assertThat(graphic::foreign).key("propertyName").isEqualTo("sample")
         assertThat(graphic::elements).hasSize(2)
         assertThat(graphic::elements)
             .index(0)

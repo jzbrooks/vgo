@@ -279,7 +279,7 @@ private fun parseScopeFunctionBody(
                     ?.getArgumentExpression() as? KtLambdaExpression
             )?.bodyExpression
 
-    for (statement in body?.statements.orEmpty()) {
+    for (statement in body?.statements ?: emptyList()) {
         when (statement) {
             is KtCallExpression -> {
                 dispatchBuilderCall(statement, elements)
@@ -308,7 +308,7 @@ private fun parseGroupBuilderCall(callExpression: KtCallExpression): Group {
     val clipPaths =
         parseClipPathDataExpression(arguments["clipPathData"])
             ?.let { listOf(ClipPath(regions = listOf(it))) }
-            .orEmpty()
+            ?: emptyList()
 
     val transform =
         computeTransformation(
@@ -355,7 +355,7 @@ private fun parsePathBuilderCall(callExpression: KtCallExpression): Path {
             ?.bodyExpression
             ?: (arguments["pathBuilder"] as? KtLambdaExpression)?.bodyExpression
 
-    val commands = bodyExpr?.let(::parsePathCommands).orEmpty()
+    val commands = bodyExpr?.let(::parsePathCommands) ?: emptyList()
 
     var effectiveFillColor = parseColorArgument(arguments["fill"]) ?: Colors.BLACK
     parseFloatLiteral(arguments["fillAlpha"])?.let {
@@ -703,7 +703,7 @@ private fun parseColorArgument(expression: KtExpression?): Color? {
     }
 
     if (colorExpression is KtCallExpression && colorExpression.calleeExpression?.text == "Color") {
-        val arguments = colorExpression.valueArgumentList?.arguments.orEmpty()
+        val arguments = colorExpression.valueArgumentList?.arguments ?: emptyList()
 
         // Handle Color(0xFF232F34)
         if (arguments.size == 1) {
@@ -765,7 +765,7 @@ private fun parseClipPathDataExpression(expression: KtExpression?): Path? {
 private fun parseClipPathNodes(listOfCall: KtCallExpression): List<Command> {
     val commands = mutableListOf<Command>()
 
-    for (arg in listOfCall.valueArgumentList?.arguments.orEmpty()) {
+    for (arg in listOfCall.valueArgumentList?.arguments ?: emptyList()) {
         val node = arg.getArgumentExpression() as? KtDotQualifiedExpression ?: continue
         if (node.receiverExpression.text != "PathNode") continue
         val selector = node.selectorExpression
