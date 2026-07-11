@@ -37,7 +37,7 @@ class ImageVectorReaderTest {
 
     @BeforeEach
     fun setup() {
-        inputStream = javaClass.getResourceAsStream("/star.kt")!!
+        inputStream = javaClass.getResourceAsStream("/imagevector/star.kt")!!
         disposable = Disposer.newDisposable()
     }
 

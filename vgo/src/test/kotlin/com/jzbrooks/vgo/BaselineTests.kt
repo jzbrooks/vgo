@@ -160,7 +160,7 @@ class BaselineTests {
                 Files
                     .list(Paths.get("src/test/resources"))
                     .asSequence()
-                    .filter { !Files.isDirectory(it) && it.extension != "kt" }
+                    .filterNot { Files.isDirectory(it) }
                     .sortedBy { it.fileName.toString() }
                     .map { unoptimizedFile ->
                         val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
@@ -174,9 +174,9 @@ class BaselineTests {
 
         private val imageVectorAssets: List<Pair<Path, Path>> =
             Files
-                .walk(Paths.get("src/test/resources"), 2)
+                .walk(Paths.get("src/test/resources/imagevector"), 2)
                 .asSequence()
-                .filter { it.extension == "kt" && it.parent.fileName.toString() != "baseline" }
+                .filterNot { Files.isDirectory(it) }
                 .sortedBy { it.fileName.toString() }
                 .map { unoptimizedFile ->
                     val completeStem = unoptimizedFile.fileName.nameWithoutExtension
