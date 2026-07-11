@@ -4,23 +4,18 @@ import assertk.assertThat
 import assertk.assertions.hasText
 import assertk.assertions.isEqualTo
 import assertk.assertions.isLessThanOrEqualTo
-import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
-import com.jzbrooks.vgo.iv.ImageVector
-import com.jzbrooks.vgo.iv.ImageVectorWriter
-import com.jzbrooks.vgo.iv.parseKotlinFile
-import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
 import org.junit.jupiter.api.MediaType
 import org.junit.jupiter.api.TestReporter
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
 import kotlin.streams.asSequence
-import com.jzbrooks.vgo.iv.parse as ivParse
 
 class BaselineTests {
     @ParameterizedTest
@@ -100,36 +95,28 @@ class BaselineTests {
         assertThat(optimizedAssetSize, "optimized size").isLessThanOrEqualTo(baselineAssetSize)
     }
 
-    // Alternate builder forms of the baseline images live in
-    // src/test/resources/imagevector, named <baseline name>.<form>.kt.
-    // Each contains the same image data as its baseline, so both must
-    // parse to the same image. The full pipeline can't be compared
-    // byte-for-byte here: Vgo only writes output that shrinks the file,
-    // and re-optimizing a baseline's rounded coordinates can legitimately
-    // find conversions the original unrounded input did not.
-    @OptIn(ExperimentalVgoApi::class)
     @ParameterizedTest
-    @MethodSource("provideAlternateFormAssets")
-    fun testAlternateBuilderFormIsEquivalentToBaseline(
-        formAsset: Path,
+    @MethodSource("provideImageVectorAssets")
+    fun testImageVectorIsEquivalentToBaseline(
+        unoptimizedAsset: Path,
         baselineAsset: Path,
+        testReporter: TestReporter,
     ) {
-        val disposable = Disposer.newDisposable()
-        try {
-            val formGraphic = ivParse(parseKotlinFile(disposable, Files.newInputStream(formAsset)))
-            val baselineGraphic = ivParse(parseKotlinFile(disposable, Files.newInputStream(baselineAsset)))
+        val inputFile = unoptimizedAsset.toFile()
+        val outputFilePath =
+            "build/test-results/${inputFile.nameWithoutExtension}_testImageVectorIsEquivalentToBaseline.kt"
+        val options =
+            Vgo.Options(
+                indent = 2,
+                input = listOf(unoptimizedAsset.toString()),
+                output = listOf(outputFilePath),
+            )
 
-            assertThat(writeToString(formGraphic), "parsed form asset").isEqualTo(writeToString(baselineGraphic))
-        } finally {
-            disposable.dispose()
-        }
-    }
+        val exitCode = Vgo(options).run()
 
-    @OptIn(ExperimentalVgoApi::class)
-    private fun writeToString(graphic: ImageVector): String {
-        val stream = ByteArrayOutputStream()
-        ImageVectorWriter("test").write(graphic, stream)
-        return stream.toString()
+        assertThat(exitCode).isEqualTo(0)
+        testReporter.publishFile(Path.of(outputFilePath), MediaType.TEXT_PLAIN)
+        assertThat(File(outputFilePath), "optimized ImageVector").hasText(baselineAsset.toFile().readText())
     }
 
     @ParameterizedTest
@@ -173,7 +160,8 @@ class BaselineTests {
                 Files
                     .list(Paths.get("src/test/resources"))
                     .asSequence()
-                    .filterNot { Files.isDirectory(it) }
+                    .filter { !Files.isDirectory(it) && it.extension != "kt" }
+                    .sortedBy { it.fileName.toString() }
                     .map { unoptimizedFile ->
                         val (fileName, fileExtension) = unoptimizedFile.fileName.toString().split(".")
                         val optimizedDirectory = unoptimizedFile.parent.resolve("baseline")
@@ -184,15 +172,15 @@ class BaselineTests {
                 throw e
             }
 
-        // Alternate builder forms are named <baseline name>.<form>.kt
-        private val alternateFormAssets: List<Pair<Path, Path>> =
+        private val imageVectorAssets: List<Pair<Path, Path>> =
             Files
-                .list(Paths.get("src/test/resources/imagevector"))
+                .walk(Paths.get("src/test/resources"), 2)
                 .asSequence()
+                .filter { it.extension == "kt" && it.parent.fileName.toString() != "baseline" }
                 .sortedBy { it.fileName.toString() }
-                .map { formFile ->
-                    val baselineName = formFile.fileName.toString().substringBefore('.')
-                    formFile to Paths.get("src/test/resources/baseline", "${baselineName}_optimized.kt")
+                .map { unoptimizedFile ->
+                    val completeStem = unoptimizedFile.fileName.nameWithoutExtension
+                    unoptimizedFile to Paths.get("src/test/resources/baseline", "${completeStem}_optimized.kt")
                 }.toList()
 
         @JvmStatic
@@ -208,8 +196,8 @@ class BaselineTests {
             }
 
         @JvmStatic
-        fun provideAlternateFormAssets(): List<Arguments> =
-            alternateFormAssets.map {
+        fun provideImageVectorAssets(): List<Arguments> =
+            imageVectorAssets.map {
                 Arguments.of(it.first, it.second)
             }
     }

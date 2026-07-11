@@ -75,8 +75,8 @@ tasks.register<Copy>("updateBaselineOptimizations") {
     from(source) {
         include("*testOptimizationFinishes.xml")
         include("*testOptimizationFinishes.svg")
-        include("*testOptimizationFinishes.kt")
+        include("*testImageVectorIsEquivalentToBaseline.kt")
     }
     into("src/test/resources/baseline/")
-    rename("(\\w+)_testOptimizationFinishes.(xml|svg|kt)", "$1_optimized.$2")
+    rename("(.+)_test(?:OptimizationFinishes|ImageVectorIsEquivalentToBaseline)\\.(xml|svg|kt)", "$1_optimized.$2")
 }
