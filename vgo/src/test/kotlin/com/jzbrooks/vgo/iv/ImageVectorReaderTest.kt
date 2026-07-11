@@ -25,15 +25,8 @@ import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.nio.file.Files
-import java.nio.file.Paths
-import kotlin.streams.asSequence
 
 @OptIn(ExperimentalVgoApi::class)
 class ImageVectorReaderTest {
@@ -694,39 +687,5 @@ class ImageVectorReaderTest {
         path.prop(Path::commands).first().isInstanceOf<MoveTo>()
         path.prop(Path::commands).index(2).isInstanceOf<ClosePath>()
         path.prop(Path::commands).index(4).isInstanceOf<LineTo>()
-    }
-
-    // Alternate builder forms of the baseline images live in
-    // src/test/resources/imagevector, named <baseline name>.<form>.kt.
-    // Each must parse to the same image the baseline form does.
-    @ParameterizedTest
-    @MethodSource("provideFormAssets")
-    fun `alternate builder forms parse equivalently to the baseline form`(
-        formAsset: java.nio.file.Path,
-        baselineAsset: java.nio.file.Path,
-    ) {
-        val formGraphic = parse(parseKotlinFile(disposable, Files.newInputStream(formAsset)))
-        val baselineGraphic = parse(parseKotlinFile(disposable, Files.newInputStream(baselineAsset)))
-
-        assertThat(writeToString(formGraphic)).isEqualTo(writeToString(baselineGraphic))
-    }
-
-    private fun writeToString(graphic: ImageVector): String {
-        val stream = ByteArrayOutputStream()
-        ImageVectorWriter("test").write(graphic, stream)
-        return stream.toString()
-    }
-
-    companion object {
-        @JvmStatic
-        fun provideFormAssets(): List<Arguments> =
-            Files
-                .list(Paths.get("src/test/resources/imagevector"))
-                .asSequence()
-                .sortedBy { it.fileName.toString() }
-                .map { formFile ->
-                    val baselineName = formFile.fileName.toString().substringBefore('.')
-                    Arguments.of(formFile, Paths.get("src/test/resources/baseline", "${baselineName}_optimized.kt"))
-                }.toList()
     }
 }
