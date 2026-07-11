@@ -442,6 +442,66 @@ class ImageVectorReaderTest {
     }
 
     @Test
+    fun `explicit backing field form is parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+                field = ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                    .path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                        moveTo(2f, 2f)
+                        lineTo(4f, 4f)
+                        close()
+                    }
+                    .build()
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic.foreign["propertyName"]).isEqualTo("sample")
+        assertThat(graphic::elements)
+            .single()
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .hasSize(3)
+    }
+
+    @Test
+    fun `explicit backing field with declared type and apply block is parsed`() {
+        val source =
+            """
+            import androidx.compose.ui.graphics.Color
+            import androidx.compose.ui.graphics.SolidColor
+            import androidx.compose.ui.graphics.vector.ImageVector
+            import androidx.compose.ui.graphics.vector.path
+            import androidx.compose.ui.unit.dp
+
+            public val sample: ImageVector
+                field: ImageVector = ImageVector.Builder(defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f)
+                    .apply {
+                        path(fill = SolidColor(Color(0, 0, 0, 255))) {
+                            moveTo(2f, 2f)
+                            close()
+                        }
+                    }.build()
+            """.trimIndent()
+
+        val graphic = parse(parseKotlinFile(disposable, ByteArrayInputStream(source.toByteArray())))
+
+        assertThat(graphic.foreign["propertyName"]).isEqualTo("sample")
+        assertThat(graphic::elements)
+            .single()
+            .isInstanceOf<Path>()
+            .prop(Path::commands)
+            .hasSize(2)
+    }
+
+    @Test
     fun `named command arguments are parsed`() {
         val source =
             """

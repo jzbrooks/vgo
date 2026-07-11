@@ -20,6 +20,7 @@ is a terminal.
 - ImageVector reading no longer requires one particular builder shape. The `ImageVector.Builder(...)` call is discovered anywhere in the file, so previously unparseable forms now work:
   - `.apply { path(...) { ... } }` blocks (Valkyrie-style output) and `run` scope functions, in addition to fluent `.path {}.group {}` chains
   - `by lazy { ... }` delegates, plain `val x = ...` initializers (no getter or explicit type required), functions returning `ImageVector`, and local builder variables (`val builder = ...; builder.path { ... }; builder.build()`)
+  - Kotlin 2.4 explicit backing fields (`val x: ImageVector` with `field = ImageVector.Builder(...)...build()`)
   - directly imported `Builder(...)` calls and fully qualified `ImageVector` references
 - ImageVector reading resolves arguments by parameter name, so positional, named, and mixed argument styles are supported for `Builder(...)`, `path(...)`, `group(...)`, path commands, and `PathNode` constructors
 - ImageVector reading parses previously ignored path styling arguments: `name`, `pathFillType`, `strokeLineCap`, `strokeLineJoin`, and `strokeLineMiter`
