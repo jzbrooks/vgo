@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.4.0"
 ktlint-cli = "1.8.0"
-junit = "6.1.1"
+junit = "6.1.2"
 assertk = "0.28.1"
 android-tools = "32.2.1"
 kotlinpoet = "2.3.0"
