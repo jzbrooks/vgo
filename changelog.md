@@ -35,15 +35,11 @@ is a terminal.
 
 - `Shape.fill` and `Shape.stroke`: their `Color` type cannot represent gradient paints, so they hold placeholder colors (black fill, transparent stroke) when the shape is painted with a gradient. Read `fillBrush`/`strokeBrush` instead — they are the source of truth for shape paints
 
-### Removed
-
 ### Fixed
 
 - `BakeTransformations` transformed path geometry without transforming gradient paint coordinates, warping gradient-painted paths inside transformed groups (affected vector drawables)
 - Hex color literals in ImageVector sources (e.g. `Color(0xFFFFC107)`) failed to parse and silently fell back to black
 - ImageVector paths without an explicit `pathFillType` were read with an even-odd fill rule; Compose's default is non-zero
-
-### Security
 
 ## 4.0.0 - 2026-06-03
 
