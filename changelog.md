@@ -3,10 +3,24 @@
 ## Unreleased
 
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 4.1.0 - 2026-07-13
+
+### Added
+
 - `--print-ir[=MODE]` to dump vgo intermediate representation. MODE is `auto` by default, which honors `NO_COLOR`
 `CLICOLOR_FORCE`, and `TERM` environment variables while also only using ANSI color escape sequences if the output
 is a terminal.
-
 - Gradients are supported for SVG (reading and writing)
   - Reading converts `<linearGradient>` and `<radialGradient>` definitions referenced via `fill`/`stroke` `url(#id)` when they are exactly representable:
     - `gradientUnits="userSpaceOnUse"` coordinates
@@ -16,7 +30,6 @@ is a terminal.
     - `spreadMethod`, percentage stop offsets, and stop styling via attributes or `style` (`stop-color`, `stop-opacity`)
   - Unsupported cases (e.g. skew `gradientTransform`, focal points, unresolvable references) are passed through to the output verbatim instead of being converted
   - Writing emits gradient brushes as `<defs>` definitions referenced with `url(#id)`, enabling vector drawable → SVG conversion of gradient drawables. Sweep gradients cannot be represented in SVG and fail conversion with a clear error
-
 - ImageVector reading no longer requires one particular builder shape. The `ImageVector.Builder(...)` call is discovered anywhere in the file, so previously unparseable forms now work:
   - `.apply { path(...) { ... } }` blocks (Valkyrie-style output) and `run` scope functions, in addition to fluent `.path {}.group {}` chains
   - `by lazy { ... }` delegates, plain `val x = ...` initializers (no getter or explicit type required), functions returning `ImageVector`, and local builder variables (`val builder = ...; builder.path { ... }; builder.build()`)
@@ -27,6 +40,7 @@ is a terminal.
 - ImageVector reading understands `Color` companion constants (e.g. `Color.Black`) and more dimension forms (`24f.dp`, `Dp(24f)`)
 
 ### Changed
+
 - `MergePaths` will merge opaque stroke, no fill paths regardless of overlap.
 - Shape elements carry their paints in new `Shape.fillBrush` and `Shape.strokeBrush` properties, which can represent gradients
 - `BakeTransformations` no longer bakes a group transform when a child path's paint would be invalidated by it (a gradient that cannot be exactly transformed, or an unconverted `url(#id)` paint reference); the transform is retained on the group instead
