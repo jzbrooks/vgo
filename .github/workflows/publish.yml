@@ -89,6 +89,9 @@ jobs:
     name: Publish IntelliJ Plugin
     needs: [publish]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
     - name: Maximize Build Space
       uses: jlumbroso/free-disk-space@v1.3.1
@@ -113,11 +116,6 @@ jobs:
       with:
         cache-read-only: true
 
-    - name: Upload IntelliJ Plugin Release Asset
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: gh release upload ${{ github.event.release.tag_name }} ./vgo-intellij/build/distributions/*signed.zip
-
     - name: Publish Plugin to JetBrains Marketplace
       env:
         ORG_GRADLE_PROJECT_intellijPublishToken: ${{ secrets.INTELLIJ_PUBLISH_TOKEN }}
@@ -125,3 +123,8 @@ jobs:
         ORG_GRADLE_PROJECT_intellijPrivateKey: ${{ secrets.INTELLIJ_PRIVATE_KEY }}
         ORG_GRADLE_PROJECT_intellijPrivateKeyPassword: ${{ secrets.INTELLIJ_PRIVATE_KEY_PASSWORD }}
       run: ./gradlew :vgo-intellij:publishPlugin
+
+    - name: Upload IntelliJ Plugin Release Asset
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: gh release upload ${{ github.event.release.tag_name }} ./vgo-intellij/build/distributions/*signed.zip

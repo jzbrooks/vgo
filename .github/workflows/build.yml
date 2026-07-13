@@ -71,7 +71,7 @@ jobs:
       uses: actions/upload-artifact@v7
       with:
         name: vgo-intellij
-        path: vgo-intellij/build/distributions/vgo-intellij.zip
+        path: vgo-intellij/build/distributions/vgo-intellij*.zip
 
   verify-plugin:
     name: Verify plugin
