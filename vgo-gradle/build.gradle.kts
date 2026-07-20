@@ -5,7 +5,6 @@ plugins {
 }
 
 dependencies {
-    implementation(gradleKotlinDsl())
     implementation(project(":vgo"))
 
     testImplementation(platform(libs.junit.bom))
@@ -21,6 +20,8 @@ gradlePlugin {
     plugins {
         register("VgoPlugin") {
             id = "com.jzbrooks.vgo"
+            displayName = "vgo"
+            description = "Optimizes and converts vector artwork files."
             implementationClass = "com.jzbrooks.vgo.plugin.VgoPlugin"
         }
     }

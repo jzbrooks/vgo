@@ -1,12 +1,10 @@
 package com.jzbrooks.vgo.plugin
 
 import assertk.assertThat
-import assertk.assertions.containsExactly
+import assertk.assertions.containsOnly
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.getByName
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -31,13 +29,52 @@ class VgoPluginTest {
         val input = File(project.projectDir, "kotlin/com/jzbrooks/vgo/plugin/VgoPluginTest.kt")
 
         project.pluginManager.apply("com.jzbrooks.vgo")
-        project.configure<VgoPluginExtension> {
-            inputs = project.fileTree(input)
-        }
+        val extension = project.extensions.getByType(VgoPluginExtension::class.java)
+        extension.inputs.setFrom(project.fileTree(input))
 
-        val task = project.tasks.getByName<ShrinkVectorGraphic>("shrinkVectorGraphic")
+        val task = project.tasks.getByName("shrinkVectorGraphic") as ShrinkVectorGraphic
 
-        assertThat(task::files).containsExactly(input.absolutePath)
-        assertThat(task::showStatistics).isTrue()
+        assertThat(task.inputFiles.files).containsOnly(input)
+        assertThat(task.showStatistics.get()).isTrue()
+    }
+
+    @Test
+    fun outputsDefaultToInputsForInPlaceOptimization() {
+        val project: Project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(File("src/test"))
+                .build()
+
+        val input = File(project.projectDir, "kotlin/com/jzbrooks/vgo/plugin/VgoPluginTest.kt")
+
+        project.pluginManager.apply("com.jzbrooks.vgo")
+        val extension = project.extensions.getByType(VgoPluginExtension::class.java)
+        extension.inputs.setFrom(project.fileTree(input))
+
+        val task = project.tasks.getByName("shrinkVectorGraphic") as ShrinkVectorGraphic
+
+        assertThat(task.outputFiles.files).containsOnly(input)
+    }
+
+    @Test
+    fun explicitOutputsAreUsedWhenConfigured() {
+        val project: Project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(File("src/test"))
+                .build()
+
+        val input = File(project.projectDir, "kotlin/com/jzbrooks/vgo/plugin/VgoPluginTest.kt")
+        val output = File(project.projectDir, "converted/VgoPluginTest.xml")
+
+        project.pluginManager.apply("com.jzbrooks.vgo")
+        val extension = project.extensions.getByType(VgoPluginExtension::class.java)
+        extension.inputs.setFrom(project.fileTree(input))
+        extension.outputs.setFrom(output)
+
+        val task = project.tasks.getByName("shrinkVectorGraphic") as ShrinkVectorGraphic
+
+        assertThat(task.outputFiles.files).containsOnly(output)
     }
 }

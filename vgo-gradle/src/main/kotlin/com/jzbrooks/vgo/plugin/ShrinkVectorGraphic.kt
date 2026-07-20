@@ -2,63 +2,60 @@ package com.jzbrooks.vgo.plugin
 
 import com.jzbrooks.vgo.Vgo
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Console
+import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
-import org.gradle.kotlin.dsl.getByType
 import java.io.File
 
 @CacheableTask
-open class ShrinkVectorGraphic : DefaultTask() {
-    private val extension = project.extensions.getByType<VgoPluginExtension>()
-
-    private val defaultTree =
-        project.fileTree(project.projectDir).apply { include("**/res/drawable*/*.xml") }
-
-    init {
-        group = "resource"
-        description = "Shrink vector resources."
-    }
-
-    @get:Input
-    val files: List<String> = (extension.inputs ?: defaultTree).files.map(File::getAbsolutePath)
+abstract class ShrinkVectorGraphic : DefaultTask() {
+    @get:InputFiles
+    @get:SkipWhenEmpty
+    @get:IgnoreEmptyDirectories
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val inputFiles: ConfigurableFileCollection
 
     @get:OutputFiles
-    val outputFiles: List<String> = (extension.outputs ?: extension.inputs)?.files.orEmpty().map(File::getAbsolutePath)
+    abstract val outputFiles: ConfigurableFileCollection
+
+    @get:Console
+    abstract val showStatistics: Property<Boolean>
 
     @get:Input
-    val showStatistics = extension.showStatistics
+    abstract val outputFormat: Property<OutputFormat>
 
     @get:Input
-    val outputFormat = extension.format
+    abstract val indent: Property<Int>
 
     @get:Input
-    val indent = extension.indent
-
-    @get:Input
-    val noOptimization = extension.noOptimization
+    abstract val noOptimization: Property<Boolean>
 
     @TaskAction
     fun shrink() {
-        logger.lifecycle("Extension outputs: ${extension.outputs?.files}")
-        logger.lifecycle("Outputs: $outputFiles")
-
-        for (file in extension.outputs?.files ?: emptyList()) {
-            file.mkdirs()
-        }
-
         val options =
             Vgo.Options(
                 printVersion = false,
-                printStats = showStatistics,
-                indent = indent.takeIf { it > 0 }?.toInt(),
-                output = outputFiles,
-                format = outputFormat.cliName,
-                input = files,
-                noOptimization = noOptimization,
+                printStats = showStatistics.get(),
+                indent = indent.get().takeIf { it > 0 },
+                output = outputFiles.files.map(File::getAbsolutePath),
+                format = outputFormat.get().takeIf { it != OutputFormat.UNCHANGED }?.cliName,
+                input = inputFiles.files.map(File::getAbsolutePath),
+                noOptimization = noOptimization.get(),
             )
 
-        Vgo(options).run()
+        val exitCode = Vgo(options).run()
+        if (exitCode != 0) {
+            throw GradleException("vgo failed with exit code $exitCode")
+        }
     }
 }

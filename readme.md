@@ -21,7 +21,7 @@ vgo requires Java 17.
 ## Gradle Plugin
 The plugin aims to be fast and small by leveraging (for the entire tool) the JVM your Gradle build is already using.
 
-The `shrinkVectorArtwork` task is added to your project on plugin application.
+The `shrinkVectorGraphic` task is added to your project on plugin application.
 
 To incorporate the plugin in your build, configure maven central plugin resolution:
 ```groovy
@@ -51,7 +51,7 @@ vgo {
     inputs = fileTree(projectDir) {
         include '**/res/drawable*/*.xml'
     }
-    outputs = inputs
+    outputs = inputs // omit to optimize files in place
     showStatistics = true
     format = OutputFormat.UNCHANGED
     noOptimization = false
@@ -102,18 +102,19 @@ Options:
 // Optimize and convert svgs to vector drawables at build time
 vgo {
     format = OutputFormat.VECTOR_DRAWABLE
-    outputs = files(project.fileTree(project.projectDir) {
+    inputs = fileTree(projectDir) {
         include("icons/**/*.svg")
-    }.map {
-        val file = file("src/main/res/drawable/${it.nameWithoutExtension}.xml")
-        file.parentFile?.mkdirs()
-        file.createNewFile()
-        file
-    }).asFileTree
+    }
+    val drawableDir = layout.projectDirectory.dir("src/main/res/drawable")
+    outputs.setFrom(
+        inputs.elements.map { svgs ->
+            svgs.map { svg -> drawableDir.file("${svg.asFile.nameWithoutExtension}.xml").asFile }
+        }
+    )
 }
 
-tasks.getByName("processDebugResources").configureEach {
-    dependsOn("shrinkVectorArtwork")
+tasks.named("processDebugResources") {
+    dependsOn("shrinkVectorGraphic")
 }
 ```
 
