@@ -257,6 +257,94 @@ class CommandLineInterfaceTests {
         assertThat(systemOutput.toString()).doesNotContain("Path")
     }
 
+    @Test
+    fun `check flag exits zero when file is fully shrunk`() {
+        val shrunkPath = "build/integrationTest/check-shrunk.xml"
+        val optimizeExitCode = CommandLineInterface().run(arrayOf(heartExampleRelativePath, "-o", shrunkPath))
+        assertThat(optimizeExitCode).isEqualTo(0)
+
+        val exitCode = CommandLineInterface().run(arrayOf(shrunkPath, "--check"))
+
+        assertThat(exitCode).isEqualTo(0)
+        assertThat(systemOutput.toString()).doesNotContain(shrunkPath)
+    }
+
+    @Test
+    fun `check flag reports unshrunk file and exits nonzero`() {
+        val unshrunkPath = Paths.get("build/integrationTest/check-unshrunk.xml")
+        File(avocadoExampleRelativePath).copyTo(unshrunkPath.toFile(), overwrite = true)
+
+        val exitCode = CommandLineInterface().run(arrayOf(unshrunkPath.toString(), "--check"))
+
+        assertThat(exitCode).isEqualTo(1)
+        assertThat(systemOutput.toString()).contains(unshrunkPath.toString())
+    }
+
+    @Test
+    fun `check flag does not modify files`() {
+        val unshrunkPath = Paths.get("build/integrationTest/check-no-write.xml")
+        File(avocadoExampleRelativePath).copyTo(unshrunkPath.toFile(), overwrite = true)
+        val bytesBefore = unshrunkPath.toFile().readBytes()
+
+        val exitCode = CommandLineInterface().run(arrayOf(unshrunkPath.toString(), "--check"))
+
+        assertThat(exitCode).isEqualTo(1)
+        assertThat(unshrunkPath.toFile().readBytes().contentEquals(bytesBefore)).isEqualTo(true)
+    }
+
+    @Test
+    fun `check flag with directory input reports unshrunk files`() {
+        val directory = File("build/integrationTest/check-dir").apply { mkdirs() }
+        val unshrunkPath = directory.resolve("check-dir-avocado.xml")
+        File(avocadoExampleRelativePath).copyTo(unshrunkPath, overwrite = true)
+        File(heartExampleRelativePath).copyTo(directory.resolve("check-dir-heart.xml"), overwrite = true)
+
+        val exitCode = CommandLineInterface().run(arrayOf(directory.path, "--check"))
+
+        assertThat(exitCode).isEqualTo(1)
+        assertThat(systemOutput.toString()).contains(unshrunkPath.path)
+    }
+
+    @Test
+    fun `check flag rejects output option`() {
+        val outputPath = "build/integrationTest/check-rejected-output.xml"
+
+        val exitCode = CommandLineInterface().run(arrayOf(avocadoExampleRelativePath, "--check", "-o", outputPath))
+
+        assertThat(exitCode).isEqualTo(64)
+        assertThat(systemError.toString()).contains("cannot be combined with --output")
+        assertThat(File(outputPath).exists()).isEqualTo(false)
+    }
+
+    @Test
+    fun `check flag rejects format option`() {
+        val exitCode = CommandLineInterface().run(arrayOf(avocadoExampleRelativePath, "--check", "--format", "svg"))
+
+        assertThat(exitCode).isEqualTo(64)
+        assertThat(systemError.toString()).contains("cannot be combined with --format")
+    }
+
+    @Test
+    fun `check flag rejects print-ir option`() {
+        val exitCode = CommandLineInterface().run(arrayOf(avocadoExampleRelativePath, "--check", "--print-ir"))
+
+        assertThat(exitCode).isEqualTo(64)
+        assertThat(systemError.toString()).contains("cannot be combined with --print-ir")
+    }
+
+    @Test
+    fun `check flag warns that stats are ignored`() {
+        val shrunkPath = "build/integrationTest/check-stats-warning.xml"
+        val optimizeExitCode = CommandLineInterface().run(arrayOf(heartExampleRelativePath, "-o", shrunkPath))
+        assertThat(optimizeExitCode).isEqualTo(0)
+
+        val exitCode = CommandLineInterface().run(arrayOf(shrunkPath, "--check", "--stats"))
+
+        assertThat(exitCode).isEqualTo(0)
+        assertThat(systemError.toString()).contains("--stats is ignored")
+        assertThat(systemOutput.toString()).doesNotContain("Percent saved:")
+    }
+
     companion object {
         @JvmStatic
         @BeforeAll

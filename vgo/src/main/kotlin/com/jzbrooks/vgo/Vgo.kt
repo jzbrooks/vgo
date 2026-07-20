@@ -50,6 +50,7 @@ class Vgo(
     private var printFileNames = false
     private var totalBytesBefore = 0.0
     private var totalBytesAfter = 0.0
+    private val filesRequiringShrinking = mutableListOf<String>()
 
     fun run(): Int {
         if (options.printVersion) {
@@ -77,7 +78,15 @@ class Vgo(
         val containsDirectory = inputOutputMap.any { (input, _) -> input.isDirectory }
         printFileNames = options.printStats && (files > 1 || containsDirectory)
 
-        return handleFiles(inputOutputMap)
+        val exitCode = handleFiles(inputOutputMap)
+        if (exitCode != 0) return exitCode
+
+        if (options.checkOnly && filesRequiringShrinking.isNotEmpty()) {
+            for (path in filesRequiringShrinking) println(path)
+            return 1
+        }
+
+        return 0
     }
 
     private fun pairOutputs(inputs: List<String>): Map<File, Path> =
@@ -107,8 +116,10 @@ class Vgo(
                 outputPath
             }.toFile()
 
-        if (output.parentFile?.exists() == false) output.parentFile.mkdirs()
-        if (!output.exists()) output.createNewFile()
+        if (!options.checkOnly) {
+            if (output.parentFile?.exists() == false) output.parentFile.mkdirs()
+            if (!output.exists()) output.createNewFile()
+        }
 
         val sizeBefore = input.length()
         var graphic = parse(input, options.format)
@@ -116,7 +127,7 @@ class Vgo(
         // When the inputs are directories, the non-vector files shouldn't be skipped.
         // If the corresponding output path differs, the file will be copied below if
         // it is unable to be parsed.
-        if (graphic == null && outputPath.isSameFileAs(input.toPath())) return
+        if (graphic == null && (options.checkOnly || outputPath.isSameFileAs(input.toPath()))) return
 
         if (graphic != null) {
             graphic =
@@ -200,6 +211,13 @@ class Vgo(
                     val countingStream = CountingOutputStream()
                     writer.write(document, countingStream)
 
+                    if (options.checkOnly) {
+                        if (input.length().toULong() > countingStream.size) {
+                            filesRequiringShrinking.add(input.path)
+                        }
+                        return
+                    }
+
                     if (isFormatConversion || input.length().toULong() > countingStream.size) {
                         output.outputStream().use { outputStream ->
                             writer.write(document, outputStream)
@@ -225,6 +243,13 @@ class Vgo(
 
                     val countingStream = CountingOutputStream()
                     writer.write(document, countingStream)
+
+                    if (options.checkOnly) {
+                        if (input.length().toULong() > countingStream.size) {
+                            filesRequiringShrinking.add(input.path)
+                        }
+                        return
+                    }
 
                     if (isFormatConversion || input.length().toULong() > countingStream.size) {
                         output.outputStream().use { outputStream ->
@@ -260,6 +285,13 @@ class Vgo(
                     val fileSpec = graphic.toFileSpec(output.nameWithoutExtension, decimalFormat)
                     val countingStream = CountingOutputStream()
                     writer.write(fileSpec, countingStream)
+
+                    if (options.checkOnly) {
+                        if (input.length().toULong() > countingStream.size) {
+                            filesRequiringShrinking.add(input.path)
+                        }
+                        return
+                    }
 
                     if (isFormatConversion || input.length().toULong() > countingStream.size) {
                         output.outputStream().use { outputStream ->
@@ -417,6 +449,7 @@ class Vgo(
         val format: String? = null,
         val noOptimization: Boolean = false,
         val dumpIr: IrDumpOptions? = null,
+        val checkOnly: Boolean = false,
     ) {
         data class IrDumpOptions(
             val colorScheme: IrColorScheme,

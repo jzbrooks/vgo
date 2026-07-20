@@ -32,9 +32,31 @@ class CommandLineInterface {
 
         val format = argReader.readOption("format")
         val noOptimization = argReader.readFlag("no-optimization")
+        val check = argReader.readFlag("check")
 
         if (format == null && noOptimization) {
             System.err.println("Warning: skipping optimization without --format is a no-op.")
+        }
+
+        if (check) {
+            if (outputs.isNotEmpty()) {
+                System.err.println("Error: --check cannot be combined with --output.")
+                return 64
+            }
+
+            if (format != null) {
+                System.err.println("Error: --check cannot be combined with --format.")
+                return 64
+            }
+
+            if (printIrMode != null) {
+                System.err.println("Error: --check cannot be combined with --print-ir.")
+                return 64
+            }
+
+            if (printStats) {
+                System.err.println("Warning: --stats is ignored in check mode.")
+            }
         }
 
         val inputs = argReader.readArguments()
@@ -48,6 +70,7 @@ class CommandLineInterface {
                 format = format,
                 noOptimization = noOptimization,
                 input = inputs,
+                checkOnly = check,
                 dumpIr =
                     when (printIrMode) {
                         "auto" -> {
@@ -89,6 +112,7 @@ Options:
   --indent value     write files with value columns of indentation
   --format value     write specified output format (svg, vd, iv)
   --no-optimization  skip graphic optimization
+  --check            verify inputs are fully shrunk without writing; prints files that would change and exits non-zero
   --print-ir[=MODE]  print IR tree and exit without writing (auto [default], color, plain; use = to pass mode)
             """.trimIndent()
 
