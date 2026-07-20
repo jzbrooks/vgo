@@ -6,11 +6,25 @@
 
 ### Changed
 
+- Gradle plugin: the `vgo` extension now uses lazy Gradle types (`ConfigurableFileCollection`
+  for `inputs`/`outputs`, `Property` for the remaining options), making it compatible with the
+  configuration cache, isolated projects, and declarative-style assignment. `indent` is now an
+  `Int` rather than a `Byte`.
+- Gradle plugin: the `shrinkVectorGraphic` task now tracks the *contents* of its input files, so
+  editing a vector re-runs the task and unchanged inputs are skipped as `UP-TO-DATE`. Build cache
+  entries are relocatable (relative path sensitivity), and the task is skipped with `NO-SOURCE`
+  when no inputs match.
+- Gradle plugin: `shrinkVectorGraphic` fails the build when optimization reports an error instead
+  of silently succeeding.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Gradle plugin: the default `OutputFormat.UNCHANGED` no longer prints an "Unknown format
+  unchanged" warning for every file.
 
 ### Security
 

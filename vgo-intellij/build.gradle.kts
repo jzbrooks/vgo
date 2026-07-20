@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.intellij.platform")
 }
 
-version = rootProject.version
+version = providers.gradleProperty("VERSION_NAME").get()
 
 repositories {
     mavenCentral()

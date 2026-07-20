@@ -1,12 +1,13 @@
 package com.jzbrooks.vgo.plugin
 
-import org.gradle.api.file.FileTree
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.provider.Property
 
-open class VgoPluginExtension {
-    var inputs: FileTree? = null
-    var outputs: FileTree? = null
-    var showStatistics = true
-    var format = OutputFormat.UNCHANGED
-    var noOptimization = false
-    var indent: Byte = 0
+abstract class VgoPluginExtension {
+    abstract val inputs: ConfigurableFileCollection
+    abstract val outputs: ConfigurableFileCollection
+    abstract val showStatistics: Property<Boolean>
+    abstract val format: Property<OutputFormat>
+    abstract val noOptimization: Property<Boolean>
+    abstract val indent: Property<Int>
 }
