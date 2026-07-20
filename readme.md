@@ -23,6 +23,9 @@ The plugin aims to be fast and small by leveraging (for the entire tool) the JVM
 
 The `shrinkVectorGraphic` task is added to your project on plugin application.
 
+The `checkVectorGraphic` task is also added, a verification counterpart that fails the build if any
+vector graphic is not fully shrunk (without modifying any files)
+
 To incorporate the plugin in your build, configure maven central plugin resolution:
 ```groovy
 pluginManagement {
@@ -75,6 +78,7 @@ Options:
   --indent [value]   write files with value columns of indentation
   --format [value]   output format (svg, vd, iv)
   --no-optimiation   skip graphic optimization
+  --check            verify inputs are fully shrunk without writing; prints files that would change and exits non-zero
   --print-ir[=MODE]  print IR tree and exit without writing (auto [default], color, plain; use = to pass mode)  
 ```
 
@@ -95,6 +99,9 @@ Options:
 
 # Optimize multiple input sources write results to the
 > vgo vector.xml -o new_vector.xml ./assets -o ./new_assets
+
+# Fail (non-zero exit) if any vector is not fully shrunk — useful in CI
+> vgo --check ./assets
 ```
 
 ### Gradle Plugin

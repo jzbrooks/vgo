@@ -1,11 +1,14 @@
 package com.jzbrooks.vgo.plugin
 
 import assertk.assertThat
+import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
+import assertk.assertions.prop
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.io.File
 
@@ -13,9 +16,19 @@ class VgoPluginTest {
     @Test
     fun pluginAddsTaskToProject() {
         val project: Project = ProjectBuilder.builder().build()
+        project.tasks.register("check")
         project.pluginManager.apply("com.jzbrooks.vgo")
         val task = project.tasks.getByName("shrinkVectorGraphic")
         assertThat(task).isInstanceOf(ShrinkVectorGraphic::class)
+    }
+
+    @Test
+    fun pluginAddsCheckTaskToProject() {
+        val project: Project = ProjectBuilder.builder().build()
+        project.tasks.register("check")
+        project.pluginManager.apply("com.jzbrooks.vgo")
+        val task = project.tasks.getByName("checkVectorGraphic")
+        assertThat(task).isInstanceOf(CheckVectorGraphic::class)
     }
 
     @Test
@@ -25,6 +38,8 @@ class VgoPluginTest {
                 .builder()
                 .withProjectDir(File("src/test"))
                 .build()
+
+        project.tasks.register("check")
 
         val input = File(project.projectDir, "kotlin/com/jzbrooks/vgo/plugin/VgoPluginTest.kt")
 
@@ -46,6 +61,8 @@ class VgoPluginTest {
                 .withProjectDir(File("src/test"))
                 .build()
 
+        project.tasks.register("check")
+
         val input = File(project.projectDir, "kotlin/com/jzbrooks/vgo/plugin/VgoPluginTest.kt")
 
         project.pluginManager.apply("com.jzbrooks.vgo")
@@ -65,6 +82,8 @@ class VgoPluginTest {
                 .withProjectDir(File("src/test"))
                 .build()
 
+        project.tasks.register("check")
+
         val input = File(project.projectDir, "kotlin/com/jzbrooks/vgo/plugin/VgoPluginTest.kt")
         val output = File(project.projectDir, "converted/VgoPluginTest.xml")
 
@@ -76,5 +95,29 @@ class VgoPluginTest {
         val task = project.tasks.getByName("shrinkVectorGraphic") as ShrinkVectorGraphic
 
         assertThat(task.outputFiles.files).containsOnly(output)
+    }
+
+    @Test
+    fun checkTaskConfiguration() {
+        val project: Project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(File("src/test"))
+                .build()
+
+        project.tasks.register("check")
+
+        val input = File(project.projectDir, "kotlin/com/jzbrooks/vgo/plugin/VgoPluginTest.kt")
+
+        project.pluginManager.apply("com.jzbrooks.vgo")
+        val extension = project.extensions.getByType(VgoPluginExtension::class.java)
+        extension.inputs.setFrom(project.fileTree(input))
+
+        val task = project.tasks.getByName("checkVectorGraphic")
+
+        assertThat(task)
+            .isInstanceOf<CheckVectorGraphic>()
+            .prop(CheckVectorGraphic::files)
+            .containsExactly(input.absolutePath)
     }
 }

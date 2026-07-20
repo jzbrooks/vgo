@@ -19,6 +19,11 @@ import java.io.File
 
 @CacheableTask
 abstract class ShrinkVectorGraphic : DefaultTask() {
+    init {
+        group = "resource"
+        description = "Shrinks vector graphic files."
+    }
+
     @get:InputFiles
     @get:SkipWhenEmpty
     @get:IgnoreEmptyDirectories

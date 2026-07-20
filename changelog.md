@@ -4,6 +4,11 @@
 
 ### Added
 
+- `--check` verifies inputs are already fully shrunk without writing anything. Files that would
+change are printed and the process exits non-zero, making it suitable for CI.
+- `checkVectorGraphic` Gradle task, a verification counterpart to `shrinkVectorGraphic` that fails
+the build when vector graphics are not fully shrunk.
+
 ### Changed
 
 - Gradle plugin: the `vgo` extension now uses lazy Gradle types (`ConfigurableFileCollection`

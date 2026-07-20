@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.plugin
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.language.base.plugins.LifecycleBasePlugin
 
 class VgoPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -18,9 +19,6 @@ class VgoPlugin : Plugin<Project> {
         extension.indent.convention(0)
 
         target.tasks.register("shrinkVectorGraphic", ShrinkVectorGraphic::class.java) { task ->
-            task.group = "resource"
-            task.description = "Shrinks vector graphic files."
-
             task.inputFiles.setFrom(extension.inputs)
             // An empty output collection means "optimize in place" to the tool,
             // but the inputs must be declared as outputs for up-to-date checks
@@ -35,5 +33,10 @@ class VgoPlugin : Plugin<Project> {
             task.indent.set(extension.indent)
             task.noOptimization.set(extension.noOptimization)
         }
+
+        val checkTask =
+            target.tasks.register("checkVectorGraphic", CheckVectorGraphic::class.java)
+
+        target.tasks.named(LifecycleBasePlugin.CHECK_TASK_NAME).configure { it.dependsOn(checkTask) }
     }
 }
