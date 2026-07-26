@@ -10,6 +10,7 @@ import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.LinearGradient
 import com.jzbrooks.vgo.core.TileMode
+import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
@@ -192,6 +193,42 @@ class RemoveRedundantPaintAttributesTests {
         assertThat(graphic::elements).index(0).isInstanceOf<Path>().all {
             prop(Path::strokeLineJoin).isEqualTo(Path.LineJoin.MITER_CLIP)
             prop(Path::strokeMiterLimit).isEqualTo(7f)
+        }
+    }
+
+    @Test
+    fun testShapeBrushesSurviveCanonicalization() {
+        // Shape.copy() drops fillBrush/strokeBrush, and Shape narrows the deprecated
+        // stroke to Color, so the rewrite has to restore both by hand. Shapes reach the
+        // transform only when ConvertShapesToPaths isn't in the pipeline.
+        val gradient = LinearGradient(0f, 0f, 1f, 1f, emptyList(), TileMode.CLAMP)
+        val circle =
+            Circle(
+                id = null,
+                foreign = mutableMapOf(),
+                cx = 5f,
+                cy = 5f,
+                r = 5f,
+                fill = Colors.BLACK,
+                fillRule = Path.FillRule.EVEN_ODD,
+                stroke = Color(0xFF333333u),
+                strokeWidth = 0f,
+                strokeLineCap = Path.LineCap.ROUND,
+                strokeLineJoin = Path.LineJoin.MITER,
+                strokeMiterLimit = 7f,
+            ).apply { fillBrush = gradient }
+
+        val graphic = createGraphic(listOf(circle))
+
+        RemoveRedundantPaintAttributes().visit(graphic)
+
+        assertThat(graphic::elements).index(0).isInstanceOf<Circle>().all {
+            // A gradient fill is never treated as invisible, so the fill rule stays.
+            prop(Circle::fillRule).isEqualTo(Path.FillRule.EVEN_ODD)
+            prop(Circle::fillBrush).isEqualTo(gradient)
+            prop(Circle::strokeBrush).isEqualTo(Colors.TRANSPARENT)
+            prop(Circle::strokeLineCap).isEqualTo(Path.LineCap.BUTT)
+            prop(Circle::strokeMiterLimit).isEqualTo(4f)
         }
     }
 

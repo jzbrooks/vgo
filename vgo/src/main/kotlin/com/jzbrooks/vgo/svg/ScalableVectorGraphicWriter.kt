@@ -364,45 +364,45 @@ class ScalableVectorGraphicWriter(
             }
         }
 
-        // Everything below qualifies a stroke, so none of it is observable without one.
-        // These guards key on the paint alone — never on the width — because a visible
+        // Everything in here qualifies a stroke, so none of it is observable without one.
+        // The guard keys on the paint alone — never on the width — because a visible
         // paint with stroke-width="0" still has to emit that 0, or SVG's inherited
-        // default of 1 paints a stroke that wasn't there. They also keep the writer
+        // default of 1 paints a stroke that wasn't there. It also keeps the writer
         // honest on IR the transformations never touched: --no-optimization output, and
         // every id-bearing element RemoveRedundantPaintAttributes skips.
-        if (!element.hasVisibleStrokePaint) return
+        if (element.hasVisibleStrokePaint) {
+            if (element.strokeWidth != inherited.strokeWidth) {
+                setAttribute("stroke-width", commandPrinter.formatter.format(element.strokeWidth))
+            }
 
-        if (element.strokeWidth != inherited.strokeWidth) {
-            setAttribute("stroke-width", commandPrinter.formatter.format(element.strokeWidth))
-        }
+            if (element.strokeLineCap != inherited.strokeLineCap) {
+                val lineCap =
+                    when (element.strokeLineCap) {
+                        Path.LineCap.SQUARE -> "square"
+                        Path.LineCap.ROUND -> "round"
+                        Path.LineCap.BUTT -> "butt"
+                    }
+                setAttribute("stroke-linecap", lineCap)
+            }
 
-        if (element.strokeLineCap != inherited.strokeLineCap) {
-            val lineCap =
-                when (element.strokeLineCap) {
-                    Path.LineCap.SQUARE -> "square"
-                    Path.LineCap.ROUND -> "round"
-                    Path.LineCap.BUTT -> "butt"
-                }
-            setAttribute("stroke-linecap", lineCap)
-        }
+            if (element.strokeLineJoin != inherited.strokeLineJoin) {
+                val lineJoin =
+                    when (element.strokeLineJoin) {
+                        Path.LineJoin.ROUND -> "round"
+                        Path.LineJoin.BEVEL -> "bevel"
+                        Path.LineJoin.MITER_CLIP -> "miter-clip"
+                        Path.LineJoin.ARCS -> "arcs"
+                        Path.LineJoin.MITER -> "miter"
+                    }
+                setAttribute("stroke-linejoin", lineJoin)
+            }
 
-        if (element.strokeLineJoin != inherited.strokeLineJoin) {
-            val lineJoin =
-                when (element.strokeLineJoin) {
-                    Path.LineJoin.ROUND -> "round"
-                    Path.LineJoin.BEVEL -> "bevel"
-                    Path.LineJoin.MITER_CLIP -> "miter-clip"
-                    Path.LineJoin.ARCS -> "arcs"
-                    Path.LineJoin.MITER -> "miter"
-                }
-            setAttribute("stroke-linejoin", lineJoin)
-        }
-
-        // Guarded for the same reason as fill-rule: an ancestor's miter limit inherits,
-        // so a round-joined path under <g stroke-miterlimit="1.5"> would be handed an
-        // explicit stroke-miterlimit="4" once the unread value is canonicalized.
-        if (element.usesMiterLimit && element.strokeMiterLimit != inherited.strokeMiterLimit) {
-            setAttribute("stroke-miterlimit", commandPrinter.formatter.format(element.strokeMiterLimit))
+            // Guarded for the same reason as fill-rule: an ancestor's miter limit inherits,
+            // so a round-joined path under <g stroke-miterlimit="1.5"> would be handed an
+            // explicit stroke-miterlimit="4" once the unread value is canonicalized.
+            if (element.usesMiterLimit && element.strokeMiterLimit != inherited.strokeMiterLimit) {
+                setAttribute("stroke-miterlimit", commandPrinter.formatter.format(element.strokeMiterLimit))
+            }
         }
     }
 
