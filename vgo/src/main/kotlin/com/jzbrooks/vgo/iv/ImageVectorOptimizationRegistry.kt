@@ -9,6 +9,7 @@ import com.jzbrooks.vgo.core.transformation.ConvertShapesToPaths
 import com.jzbrooks.vgo.core.transformation.MergePaths
 import com.jzbrooks.vgo.core.transformation.RemoveEmptyGroups
 import com.jzbrooks.vgo.core.transformation.RemoveRedundantCommands
+import com.jzbrooks.vgo.core.transformation.RemoveRedundantPaintAttributes
 import com.jzbrooks.vgo.core.transformation.RemoveTransparentPaths
 import com.jzbrooks.vgo.core.transformation.SimplifyBezierCurveCommands
 import com.jzbrooks.vgo.core.transformation.SimplifyLineCommands
@@ -29,6 +30,7 @@ class ImageVectorOptimizationRegistry :
                 ConvertShapesToPaths(),
                 BakeTransformations(),
                 RemoveTransparentPaths(),
+                RemoveRedundantPaintAttributes(),
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),
                 SimplifyLineCommands(1e-3f),
