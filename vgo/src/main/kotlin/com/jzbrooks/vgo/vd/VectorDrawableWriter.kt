@@ -197,7 +197,7 @@ private fun Document.createChildElement(
                     }
 
                     if (element.strokeMiterLimit != 4f) {
-                        setAttribute("android:strokeLineJoin", commandPrinter.formatter.format(element.strokeMiterLimit))
+                        setAttribute("android:strokeMiterLimit", commandPrinter.formatter.format(element.strokeMiterLimit))
                     }
                 }
             }

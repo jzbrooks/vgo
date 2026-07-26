@@ -16,6 +16,7 @@ import com.jzbrooks.vgo.core.LinearGradient
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.util.assertk.attribute
@@ -256,6 +257,34 @@ class VectorDrawableWriterTests {
                 hasSize(3)
                 first().attribute("android:color").isEqualTo("#b125ea", ignoreCase = true)
                 index(2).attribute("android:offset").startsWith("1")
+            }
+        }
+    }
+
+    @Test
+    fun testMiterLimitWrittenWithoutClobberingLineJoin() {
+        val drawable =
+            VectorDrawable(
+                listOf(
+                    createPath(
+                        CommandString("M 0 0 L 1 1 Z").toCommandList(),
+                        stroke = Color(0xFF333333u),
+                        strokeWidth = 1f,
+                        strokeLineJoin = Path.LineJoin.BEVEL,
+                        strokeMiterLimit = 7f,
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns:android" to "http://schemas.android.com/apk/res/android"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            VectorDrawableWriter().write(drawable, memoryStream)
+            val output = memoryStream.toDocument()
+
+            assertThat(output.firstChild.firstChild).all {
+                attribute("android:strokeLineJoin").isEqualTo("bevel")
+                attribute("android:strokeMiterLimit").startsWith("7")
             }
         }
     }
