@@ -200,6 +200,131 @@ class ScalableVectorGraphicWriterTests {
     }
 
     @Test
+    fun testStrokeQualifiersOmittedWhenStrokeIsTransparent() {
+        val strokelessGraphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(
+                        fill = Color(0xFFFF0000u),
+                        stroke = Colors.TRANSPARENT,
+                        strokeWidth = 3f,
+                        strokeLineCap = Path.LineCap.ROUND,
+                        strokeMiterLimit = 7f,
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(strokelessGraphic, memoryStream)
+
+            val output = memoryStream.toDocument()
+
+            assertThat(output.firstChild.firstChild).all {
+                doesNotHaveAttribute("stroke-width")
+                doesNotHaveAttribute("stroke-linecap")
+                doesNotHaveAttribute("stroke-miterlimit")
+            }
+        }
+    }
+
+    @Test
+    fun testZeroStrokeWidthWrittenWhenStrokeIsVisible() {
+        // A visible paint with a zero width still has to emit that zero, or SVG's
+        // inherited default of 1 paints a stroke the source never had. The transform
+        // leaves this path alone because it's named.
+        val zeroWidthGraphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(
+                        id = "animatable",
+                        stroke = Color(0xFF333333u),
+                        strokeWidth = 0f,
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(zeroWidthGraphic, memoryStream)
+
+            val output = memoryStream.toDocument()
+
+            assertThat(output.firstChild.firstChild).all {
+                attribute("stroke").isEqualTo("#333")
+                attribute("stroke-width").isEqualTo("0")
+            }
+        }
+    }
+
+    @Test
+    fun testMiterLimitOmittedForJoinsThatIgnoreIt() {
+        // The group's miter limit inherits, so without a guard the round-joined child
+        // would be handed an explicit stroke-miterlimit no renderer reads.
+        val graphicWithGroup =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(
+                            createPath(
+                                stroke = Color(0xFF333333u),
+                                strokeWidth = 1f,
+                                strokeLineJoin = Path.LineJoin.ROUND,
+                                strokeMiterLimit = 4f,
+                            ),
+                        ),
+                        foreign = mutableMapOf("stroke-miterlimit" to "1.5"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val pathNode = output.firstChild.firstChild.firstChild
+
+            assertThat(pathNode).doesNotHaveAttribute("stroke-miterlimit")
+        }
+    }
+
+    @Test
+    fun testFillRuleOmittedWhenFillIsTransparent() {
+        // fill-rule inherits too, so a canonicalized NON_ZERO under an evenodd
+        // ancestor would otherwise grow into an explicit fill-rule="nonzero".
+        val graphicWithGroup =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(
+                            createPath(
+                                fill = Colors.TRANSPARENT,
+                                fillRule = Path.FillRule.NON_ZERO,
+                                stroke = Color(0xFF333333u),
+                            ),
+                        ),
+                        foreign = mutableMapOf("fill-rule" to "evenodd"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphicWithGroup, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val pathNode = output.firstChild.firstChild.firstChild
+
+            assertThat(pathNode).doesNotHaveAttribute("fill-rule")
+        }
+    }
+
+    @Test
     fun testFillWrittenWhenDiffersFromParentGroup() {
         val graphicWithGroup =
             ScalableVectorGraphic(
