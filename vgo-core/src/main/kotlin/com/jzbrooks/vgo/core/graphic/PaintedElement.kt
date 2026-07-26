@@ -73,6 +73,10 @@ private val Brush.isVisible: Boolean
  * paint server reference restored by the reader when it couldn't be resolved.
  * Such an element renders paint that its typed fields don't describe, so nothing
  * about that channel can be elided.
+ *
+ * Deliberately over-approximate: substring matching also catches attributes that
+ * merely mention a channel without painting it, like `stroke-dasharray`. Those
+ * elements simply keep their paint attributes.
  */
 private fun PaintedElement.hasUnmodeledPaint(channel: String): Boolean =
     foreign.keys.any { it.contains(channel, ignoreCase = true) } ||
