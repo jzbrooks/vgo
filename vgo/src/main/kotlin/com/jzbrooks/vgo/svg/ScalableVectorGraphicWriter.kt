@@ -23,6 +23,11 @@ import com.jzbrooks.vgo.core.graphic.Polygon
 import com.jzbrooks.vgo.core.graphic.Polyline
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
+import com.jzbrooks.vgo.core.graphic.effectiveFill
+import com.jzbrooks.vgo.core.graphic.effectiveStroke
+import com.jzbrooks.vgo.core.graphic.hasVisibleFillPaint
+import com.jzbrooks.vgo.core.graphic.hasVisibleStrokePaint
+import com.jzbrooks.vgo.core.graphic.usesMiterLimit
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import org.w3c.dom.Document
 import java.io.OutputStream
@@ -307,14 +312,6 @@ class ScalableVectorGraphicWriter(
         }
     }
 
-    // Shapes surface gradient paints through their brush properties; the
-    // Color-typed fill/stroke are deprecated placeholders.
-    private val PaintedElement.effectiveFill: Brush
-        get() = if (this is Shape) fillBrush else fill
-
-    private val PaintedElement.effectiveStroke: Brush
-        get() = if (this is Shape) strokeBrush else stroke
-
     private fun org.w3c.dom.Element.writePaintAttributes(
         element: PaintedElement,
         inherited: InheritedStyle,
@@ -337,7 +334,11 @@ class ScalableVectorGraphicWriter(
             }
         }
 
-        if (element.fillRule != inherited.fillRule) {
+        // A fill rule only shapes a fill, so it's unobservable without one. Skipping it
+        // here rather than trusting the IR value matters because SVG inherits: a path
+        // under <g fill-rule="evenodd"> would otherwise be handed an explicit
+        // fill-rule="nonzero" the moment the value is canonicalized.
+        if (element.hasVisibleFillPaint && element.fillRule != inherited.fillRule) {
             val fillRule =
                 when (element.fillRule) {
                     Path.FillRule.EVEN_ODD -> "evenodd"
@@ -362,6 +363,14 @@ class ScalableVectorGraphicWriter(
                 setAttribute("stroke", "url(#${gradientIds.getValue(stroke)})")
             }
         }
+
+        // Everything below qualifies a stroke, so none of it is observable without one.
+        // These guards key on the paint alone — never on the width — because a visible
+        // paint with stroke-width="0" still has to emit that 0, or SVG's inherited
+        // default of 1 paints a stroke that wasn't there. They also keep the writer
+        // honest on IR the transformations never touched: --no-optimization output, and
+        // every id-bearing element RemoveRedundantPaintAttributes skips.
+        if (!element.hasVisibleStrokePaint) return
 
         if (element.strokeWidth != inherited.strokeWidth) {
             setAttribute("stroke-width", commandPrinter.formatter.format(element.strokeWidth))
@@ -389,7 +398,10 @@ class ScalableVectorGraphicWriter(
             setAttribute("stroke-linejoin", lineJoin)
         }
 
-        if (element.strokeMiterLimit != inherited.strokeMiterLimit) {
+        // Guarded for the same reason as fill-rule: an ancestor's miter limit inherits,
+        // so a round-joined path under <g stroke-miterlimit="1.5"> would be handed an
+        // explicit stroke-miterlimit="4" once the unread value is canonicalized.
+        if (element.usesMiterLimit && element.strokeMiterLimit != inherited.strokeMiterLimit) {
             setAttribute("stroke-miterlimit", commandPrinter.formatter.format(element.strokeMiterLimit))
         }
     }
