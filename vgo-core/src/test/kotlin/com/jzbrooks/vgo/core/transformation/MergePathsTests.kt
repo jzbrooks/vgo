@@ -25,6 +25,7 @@ import com.jzbrooks.vgo.core.graphic.command.SmoothCubicBezierCurve
 import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
 import com.jzbrooks.vgo.core.util.element.traverseBottomUp
+import com.jzbrooks.vgo.core.util.element.traverseTopDown
 import com.jzbrooks.vgo.core.util.math.Point
 import org.junit.jupiter.api.Test
 
@@ -597,5 +598,37 @@ class MergePathsTests {
         traverseBottomUp(graphic) { it.accept(optimization) }
 
         assertThat(graphic::elements).hasSize(2)
+    }
+
+    @Test
+    fun testPathsDifferingOnlyInDeadPaintMergeAfterCanonicalization() {
+        // Identical renders: neither path strokes anything, so their stroke widths
+        // are unobservable. MergePaths compares paint structurally, so it can only
+        // see that once RemoveRedundantPaintAttributes normalizes them.
+        val paths =
+            listOf(
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(0f, 0f)))),
+                    fill = Colors.BLACK,
+                    stroke = Colors.TRANSPARENT,
+                    strokeWidth = 0.7f,
+                ),
+                createPath(
+                    listOf(MoveTo(CommandVariant.ABSOLUTE, listOf(Point(10f, 10f)))),
+                    fill = Colors.BLACK,
+                    stroke = Colors.TRANSPARENT,
+                    strokeWidth = 2.9f,
+                ),
+            )
+
+        val unchanged = createGraphic(paths)
+        traverseBottomUp(unchanged) { it.accept(MergePaths(MergePaths.Constraints.None)) }
+        assertThat(unchanged::elements, "before canonicalization").hasSize(2)
+
+        val canonicalized = createGraphic(paths)
+        traverseTopDown(canonicalized) { it.accept(RemoveRedundantPaintAttributes()) }
+        traverseBottomUp(canonicalized) { it.accept(MergePaths(MergePaths.Constraints.None)) }
+
+        assertThat(canonicalized::elements, "after canonicalization").hasSize(1)
     }
 }
