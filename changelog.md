@@ -8,6 +8,10 @@
 change are printed and the process exits non-zero, making it suitable for CI.
 - `checkVectorGraphic` Gradle task, a verification counterpart to `shrinkVectorGraphic` that fails
 the build when vector graphics are not fully shrunk.
+- Paint attributes that can't affect rendering are removed. A fill rule is dropped when nothing is
+  filled, and the stroke width, cap, join, and miter limit are dropped when nothing is stroked —
+  either because the stroke paint is transparent or because its width is zero. A miter limit is
+  also dropped for joins that never read one. Beyond the bytes, this lets more paths merge.
 
 ### Changed
 
@@ -33,6 +37,8 @@ the build when vector graphics are not fully shrunk.
 - Gradle tasks no longer hang waiting for standard input when no configured input files exist.
 - Gradle plugin: the default `OutputFormat.UNCHANGED` no longer prints an "Unknown format
   unchanged" warning for every file.
+- Vector drawable output wrote a non-default stroke miter limit into `android:strokeLineJoin`,
+  overwriting the line join. It's now written to `android:strokeMiterLimit`.
 
 ### Security
 
