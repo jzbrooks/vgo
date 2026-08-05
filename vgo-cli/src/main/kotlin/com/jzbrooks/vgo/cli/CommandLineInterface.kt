@@ -33,6 +33,7 @@ class CommandLineInterface {
         val format = argReader.readOption("format")
         val noOptimization = argReader.readFlag("no-optimization")
         val check = argReader.readFlag("check")
+        val readStdin = argReader.readFlag("stdin")
 
         if (format == null && noOptimization) {
             System.err.println("Warning: skipping optimization without --format is a no-op.")
@@ -59,7 +60,26 @@ class CommandLineInterface {
             }
         }
 
-        val inputs = argReader.readArguments()
+        val arguments = argReader.readArguments()
+
+        if (readStdin && arguments.isNotEmpty()) {
+            return inputError("--stdin cannot be combined with file or directory arguments.")
+        }
+
+        if (readStdin && outputs.isNotEmpty()) {
+            return inputError("--stdin cannot be combined with --output.")
+        }
+
+        if (!readStdin && arguments.isEmpty() && !printVersion) {
+            return inputError("No input files or directories were provided.")
+        }
+
+        val inputs =
+            if (readStdin) {
+                generateSequence(::readlnOrNull).toList()
+            } else {
+                arguments
+            }
 
         val options =
             Vgo.Options(
@@ -112,9 +132,17 @@ Options:
   --indent value     write files with value columns of indentation
   --format value     write specified output format (svg, vd, iv)
   --no-optimization  skip graphic optimization
+  --stdin            read newline-delimited file paths from standard input
   --check            verify inputs are fully shrunk without writing; prints files that would change and exits non-zero
   --print-ir[=MODE]  print IR tree and exit without writing (auto [default], color, plain; use = to pass mode)
             """.trimIndent()
+
+        private fun inputError(message: String): Int {
+            System.err.println("Error: $message")
+            System.err.println()
+            System.err.println(HELP_MESSAGE)
+            return 64
+        }
 
         @JvmStatic
         fun main(args: Array<String>): Unit = exitProcess(CommandLineInterface().run(args))

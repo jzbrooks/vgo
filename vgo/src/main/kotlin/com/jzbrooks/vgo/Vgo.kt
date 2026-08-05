@@ -58,22 +58,7 @@ class Vgo(
             return 0
         }
 
-        val inputs =
-            if (options.input.isEmpty()) {
-                require(options.output.isEmpty())
-
-                buildList {
-                    var path = readlnOrNull()
-                    while (path != null) {
-                        add(path)
-                        path = readlnOrNull()
-                    }
-                }
-            } else {
-                options.input
-            }
-
-        val inputOutputMap = pairOutputs(inputs)
+        val inputOutputMap = pairOutputs(options.input)
         val files = inputOutputMap.count { (input, _) -> input.isFile }
         val containsDirectory = inputOutputMap.any { (input, _) -> input.isDirectory }
         printFileNames = options.printStats && (files > 1 || containsDirectory)

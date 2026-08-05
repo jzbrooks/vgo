@@ -48,6 +48,13 @@ class VgoTests {
     }
 
     @Test
+    fun `empty input completes successfully`() {
+        val exitCode = Vgo(Vgo.Options()).run()
+
+        assertThat(exitCode).isEqualTo(0)
+    }
+
+    @Test
     fun `in-place individual file statistics are reported with a directory input`(info: TestInfo) {
         val options =
             Vgo.Options(

@@ -3,10 +3,13 @@ package com.jzbrooks.vgo.plugin
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
+import assertk.assertions.isEmpty
+import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import assertk.assertions.prop
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -119,5 +122,33 @@ class VgoPluginTest {
             .isInstanceOf<CheckVectorGraphic>()
             .prop(CheckVectorGraphic::files)
             .containsExactly(input.absolutePath)
+    }
+
+    @Test
+    fun shrinkTaskWithNoInputsCompletesSuccessfully() {
+        val project: Project = ProjectBuilder.builder().build()
+        project.tasks.register("check")
+        project.pluginManager.apply("com.jzbrooks.vgo")
+        val extension = project.extensions.getByType(VgoPluginExtension::class.java)
+        extension.inputs.setFrom(project.files())
+        val task = project.tasks.getByName("shrinkVectorGraphic") as ShrinkVectorGraphic
+
+        task.shrink()
+
+        assertThat(task::inputFiles).prop("files") { it.files }.isEmpty()
+    }
+
+    @Test
+    fun checkTaskWithNoInputsCompletesSuccessfully() {
+        val project: Project = ProjectBuilder.builder().build()
+        project.tasks.register("check")
+        project.pluginManager.apply("com.jzbrooks.vgo")
+        val extension = project.extensions.getByType(VgoPluginExtension::class.java)
+        extension.inputs.setFrom(project.files())
+        val task = project.tasks.getByName("checkVectorGraphic") as CheckVectorGraphic
+
+        task.check()
+
+        assertThat(task::files).isEmpty()
     }
 }
