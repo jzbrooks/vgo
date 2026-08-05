@@ -77,7 +77,8 @@ Options:
   -v --version       print the version number
   --indent [value]   write files with value columns of indentation
   --format [value]   output format (svg, vd, iv)
-  --no-optimiation   skip graphic optimization
+  --no-optimization  skip graphic optimization
+  --stdin            read newline-delimited file paths from standard input
   --check            verify inputs are fully shrunk without writing; prints files that would change and exits non-zero
   --print-ir[=MODE]  print IR tree and exit without writing (auto [default], color, plain; use = to pass mode)  
 ```
@@ -89,7 +90,7 @@ Options:
 ### CLI
 ```
 # Optimize files specified from standard in
-> find ./**/ic_*.xml | vgo
+> find ./**/ic_*.xml | vgo --stdin
 
 # Optimize vector.xml and overwrite its contents
 > vgo vector.xml

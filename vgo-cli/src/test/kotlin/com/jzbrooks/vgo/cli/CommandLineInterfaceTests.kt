@@ -11,8 +11,10 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.InputStream
 import java.io.PrintStream
 import java.nio.file.Paths
 
@@ -23,11 +25,13 @@ class CommandLineInterfaceTests {
     private lateinit var systemError: ByteArrayOutputStream
     private lateinit var originalOut: PrintStream
     private lateinit var originalErr: PrintStream
+    private lateinit var originalIn: InputStream
 
     @BeforeEach
     fun redirect() {
         originalOut = System.out
         originalErr = System.err
+        originalIn = System.`in`
         systemOutput = ByteArrayOutputStream()
         systemError = ByteArrayOutputStream()
         System.setOut(PrintStream(systemOutput))
@@ -38,6 +42,7 @@ class CommandLineInterfaceTests {
     fun cleanup() {
         System.setOut(originalOut)
         System.setErr(originalErr)
+        System.setIn(originalIn)
         systemOutput.close()
         systemError.close()
     }
@@ -84,6 +89,62 @@ class CommandLineInterfaceTests {
         val output = systemOutput.toString()
         assertThat(output).contains("vgo")
         assertThat(output).contains("Options")
+    }
+
+    @Test
+    fun `missing input reports usage error and help without reading stdin`() {
+        System.setIn(
+            object : InputStream() {
+                override fun read(): Int = error("stdin should not be read without --stdin")
+            },
+        )
+
+        val exitCode = CommandLineInterface().run(emptyArray())
+
+        assertThat(exitCode).isEqualTo(64)
+        assertThat(systemError.toString()).contains("No input files or directories were provided")
+        assertThat(systemError.toString()).contains("Options")
+    }
+
+    @Test
+    fun `stdin flag reads newline-delimited input paths`() {
+        val inputPath = Paths.get("build/integrationTest/stdin-input.xml")
+        File(avocadoExampleRelativePath).copyTo(inputPath.toFile(), overwrite = true)
+        System.setIn(ByteArrayInputStream("$inputPath\n".toByteArray()))
+
+        val exitCode = CommandLineInterface().run(arrayOf("--stdin"))
+
+        assertThat(exitCode).isEqualTo(0)
+    }
+
+    @Test
+    fun `stdin flag accepts an empty stream`() {
+        System.setIn(ByteArrayInputStream(byteArrayOf()))
+
+        val exitCode = CommandLineInterface().run(arrayOf("--stdin"))
+
+        assertThat(exitCode).isEqualTo(0)
+    }
+
+    @Test
+    fun `stdin flag rejects positional inputs`() {
+        val exitCode = CommandLineInterface().run(arrayOf("--stdin", avocadoExampleRelativePath))
+
+        assertThat(exitCode).isEqualTo(64)
+        assertThat(systemError.toString()).contains("cannot be combined with file or directory arguments")
+        assertThat(systemError.toString()).contains("Options")
+    }
+
+    @Test
+    fun `stdin flag rejects output option`() {
+        val exitCode =
+            CommandLineInterface().run(
+                arrayOf("--stdin", "--output", "build/integrationTest/stdin-output.xml"),
+            )
+
+        assertThat(exitCode).isEqualTo(64)
+        assertThat(systemError.toString()).contains("cannot be combined with --output")
+        assertThat(systemError.toString()).contains("Options")
     }
 
     @Test

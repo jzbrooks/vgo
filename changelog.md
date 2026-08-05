@@ -11,6 +11,8 @@ the build when vector graphics are not fully shrunk.
 
 ### Changed
 
+- _Breaking:_ Standard-input processing is now explicit. Use `vgo --stdin` to read newline-delimited file
+  paths; invoking `vgo` without inputs now prints help and exits with a usage error.
 - Gradle plugin: the `vgo` extension now uses lazy Gradle types (`ConfigurableFileCollection`
   for `inputs`/`outputs`, `Property` for the remaining options), making it compatible with the
   configuration cache, isolated projects, and declarative-style assignment. `indent` is now an
@@ -28,6 +30,7 @@ the build when vector graphics are not fully shrunk.
 
 ### Fixed
 
+- Gradle tasks no longer hang waiting for standard input when no configured input files exist.
 - Gradle plugin: the default `OutputFormat.UNCHANGED` no longer prints an "Unknown format
   unchanged" warning for every file.
 
