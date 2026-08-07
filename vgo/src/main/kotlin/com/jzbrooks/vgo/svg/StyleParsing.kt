@@ -32,31 +32,40 @@ internal fun String.extractUrlReferenceOrNull(): String? {
 
 internal fun String.isUrlPaint(): Boolean = contains("url(")
 
-internal fun parseColorValue(
-    value: String,
-    default: Color,
-): Color {
+/**
+ * Parses a paint value into a color, or returns null when the value isn't paint the
+ * intermediate representation can model — a paint server reference, a keyword like
+ * `currentColor` that resolves outside the document, or a malformed literal.
+ */
+internal fun parseColorOrNull(value: String): Color? {
     if (value == "none") return Color(0x00000000u)
 
     val hex =
         if (value.startsWith("rgb")) {
-            val (r, g, b) =
+            val components =
                 value
                     .removePrefix("rgb(")
                     .trimEnd(')')
                     .split(',')
-                    .map { it.trim().toShort() }
+                    .map { it.trim().toShortOrNull() ?: return null }
 
+            if (components.size != 3) return null
+            val (r, g, b) = components
             "%02x%02x%02x".format(r, g, b)
         } else if (value.startsWith("#")) {
             val hex = value.trim('#')
             if (hex.length != 3) hex else ("${hex[0]}" + hex[0] + hex[1] + hex[1] + hex[2] + hex[2])
         } else {
-            return Colors.COLORS_BY_NAMES[value] ?: default
+            return Colors.COLORS_BY_NAMES[value]
         }
 
-    return Color(hex.toUInt(radix = 16) or 0xFF000000u)
+    return Color((hex.toUIntOrNull(radix = 16) ?: return null) or 0xFF000000u)
 }
+
+internal fun parseColorValue(
+    value: String,
+    default: Color,
+): Color = parseColorOrNull(value) ?: default
 
 internal fun Map<String, String>.extractColor(
     key: String,
