@@ -23,6 +23,7 @@ import com.jzbrooks.vgo.core.graphic.Polygon
 import com.jzbrooks.vgo.core.graphic.Polyline
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
+import com.jzbrooks.vgo.core.graphic.ForeignPaint
 import com.jzbrooks.vgo.core.graphic.effectiveFill
 import com.jzbrooks.vgo.core.graphic.effectiveStroke
 import com.jzbrooks.vgo.core.graphic.hasVisibleFillPaint
@@ -284,6 +285,9 @@ class ScalableVectorGraphicWriter(
         val strokeLineCap: Path.LineCap = Path.LineCap.BUTT,
         val strokeLineJoin: Path.LineJoin = Path.LineJoin.MITER,
         val strokeMiterLimit: Float = 4f,
+        // Paint an ancestor applies that no typed field describes. The paint properties
+        // above can't represent it, so it's tracked alongside them rather than within.
+        val foreignPaint: ForeignPaint = ForeignPaint.NONE,
     )
 
     private fun Map<String, String>.withoutImpliedPresentationAttrs(inherited: InheritedStyle): Map<String, String> {
@@ -292,22 +296,45 @@ class ScalableVectorGraphicWriter(
         return filter { (key, value) ->
             when (key) {
                 // Unresolved paint server references parse as the default color and
-                // would otherwise be mistaken for an implied attribute
-                "fill" -> value.isUrlPaint() || (extractColor("fill", inheritedFillColor) ?: inherited.fill) != inherited.fill
+                // would otherwise be mistaken for an implied attribute. Nothing is
+                // implied by paint no typed field describes either, so a declaration
+                // under one always carries meaning — dropping a fill="none" beneath an
+                // inherited gradient would hand the subtree that gradient.
+                "fill" -> {
+                    inherited.foreignPaint.fill ||
+                        value.isUrlPaint() ||
+                        (extractColor("fill", inheritedFillColor) ?: inherited.fill) != inherited.fill
+                }
 
-                "fill-rule" -> (extractFillRule("fill-rule") ?: inherited.fillRule) != inherited.fillRule
+                "fill-rule" -> {
+                    (extractFillRule("fill-rule") ?: inherited.fillRule) != inherited.fillRule
+                }
 
-                "stroke" -> value.isUrlPaint() || (extractColor("stroke", inheritedStrokeColor) ?: inherited.stroke) != inherited.stroke
+                "stroke" -> {
+                    inherited.foreignPaint.stroke ||
+                        value.isUrlPaint() ||
+                        (extractColor("stroke", inheritedStrokeColor) ?: inherited.stroke) != inherited.stroke
+                }
 
-                "stroke-width" -> this["stroke-width"]?.toFloatOrNull() != inherited.strokeWidth
+                "stroke-width" -> {
+                    this["stroke-width"]?.toFloatOrNull() != inherited.strokeWidth
+                }
 
-                "stroke-linecap" -> (extractLineCap("stroke-linecap") ?: inherited.strokeLineCap) != inherited.strokeLineCap
+                "stroke-linecap" -> {
+                    (extractLineCap("stroke-linecap") ?: inherited.strokeLineCap) != inherited.strokeLineCap
+                }
 
-                "stroke-linejoin" -> (extractLineJoin("stroke-linejoin") ?: inherited.strokeLineJoin) != inherited.strokeLineJoin
+                "stroke-linejoin" -> {
+                    (extractLineJoin("stroke-linejoin") ?: inherited.strokeLineJoin) != inherited.strokeLineJoin
+                }
 
-                "stroke-miterlimit" -> this["stroke-miterlimit"]?.toFloatOrNull() != inherited.strokeMiterLimit
+                "stroke-miterlimit" -> {
+                    this["stroke-miterlimit"]?.toFloatOrNull() != inherited.strokeMiterLimit
+                }
 
-                else -> true
+                else -> {
+                    true
+                }
             }
         }
     }
@@ -338,7 +365,7 @@ class ScalableVectorGraphicWriter(
         // here rather than trusting the IR value matters because SVG inherits: a path
         // under <g fill-rule="evenodd"> would otherwise be handed an explicit
         // fill-rule="nonzero" the moment the value is canonicalized.
-        if (element.hasVisibleFillPaint && element.fillRule != inherited.fillRule) {
+        if (element.hasVisibleFillPaint(inherited.foreignPaint) && element.fillRule != inherited.fillRule) {
             val fillRule =
                 when (element.fillRule) {
                     Path.FillRule.EVEN_ODD -> "evenodd"
@@ -370,7 +397,7 @@ class ScalableVectorGraphicWriter(
         // default of 1 paints a stroke that wasn't there. It also keeps the writer
         // honest on IR the transformations never touched: --no-optimization output, and
         // every id-bearing element RemoveRedundantPaintAttributes skips.
-        if (element.hasVisibleStrokePaint) {
+        if (element.hasVisibleStrokePaint(inherited.foreignPaint)) {
             if (element.strokeWidth != inherited.strokeWidth) {
                 setAttribute("stroke-width", commandPrinter.formatter.format(element.strokeWidth))
             }
@@ -419,6 +446,9 @@ class ScalableVectorGraphicWriter(
             strokeLineCap = merged.extractLineCap("stroke-linecap") ?: current.strokeLineCap,
             strokeLineJoin = merged.extractLineJoin("stroke-linejoin") ?: current.strokeLineJoin,
             strokeMiterLimit = merged["stroke-miterlimit"]?.toFloatOrNull() ?: current.strokeMiterLimit,
+            // Computed from what's actually written rather than from the element's own
+            // foreign attributes — a value the writer drops paints nothing to inherit.
+            foreignPaint = SvgPaintInheritance.descend(this, current.foreignPaint),
         )
     }
 

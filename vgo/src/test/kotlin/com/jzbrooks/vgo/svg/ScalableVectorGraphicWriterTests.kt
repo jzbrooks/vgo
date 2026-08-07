@@ -939,6 +939,85 @@ class ScalableVectorGraphicWriterTests {
         }
     }
 
+    @Test
+    fun testStrokeQualifiersWrittenUnderInheritedPaintReference() {
+        // The reader leaves an ancestor's paint server reference on the ancestor and hands
+        // the child the CSS initial value, so the child's typed stroke reads as dead even
+        // though the gradient paints it.
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(
+                            createPath(
+                                CommandString("M0,0L24,0Z").toCommandList(),
+                                stroke = Colors.TRANSPARENT,
+                                strokeWidth = 7f,
+                                strokeLineCap = Path.LineCap.ROUND,
+                            ),
+                        ),
+                        foreign = mutableMapOf("stroke" to "url(#gradient)"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val output = memoryStream.toDocument()
+            val group =
+                output.firstChild.childNodes
+                    .toList()
+                    .single { it.nodeName == "g" }
+
+            assertThat(group).attribute("stroke").isEqualTo("url(#gradient)")
+            assertThat(group.firstChild).all {
+                attribute("stroke-width").isEqualTo("7")
+                attribute("stroke-linecap").isEqualTo("round")
+            }
+        }
+    }
+
+    @Test
+    fun testStrokeQualifiersOmittedWhenAGroupOverridesInheritedPaint() {
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(
+                            Group(
+                                listOf(
+                                    createPath(
+                                        CommandString("M0,0L24,0Z").toCommandList(),
+                                        stroke = Colors.TRANSPARENT,
+                                        strokeWidth = 7f,
+                                        strokeLineCap = Path.LineCap.ROUND,
+                                    ),
+                                ),
+                                foreign = mutableMapOf("stroke" to "none"),
+                            ),
+                        ),
+                        foreign = mutableMapOf("stroke" to "url(#gradient)"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val output = memoryStream.toDocument()
+
+            assertThat(output.firstChild.firstChild.firstChild.firstChild).all {
+                doesNotHaveAttribute("stroke-width")
+                doesNotHaveAttribute("stroke-linecap")
+            }
+        }
+    }
+
     private fun createGraphicWithBrush(
         fill: Brush = Colors.BLACK,
         stroke: Brush = Colors.TRANSPARENT,

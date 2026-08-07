@@ -28,7 +28,7 @@ class SvgOptimizationRegistry :
             listOf(
                 ConvertShapesToPaths(),
                 RemoveTransparentPaths(),
-                RemoveRedundantPaintAttributes(),
+                RemoveRedundantPaintAttributes(SvgPaintInheritance),
                 BakeTransformations(),
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),

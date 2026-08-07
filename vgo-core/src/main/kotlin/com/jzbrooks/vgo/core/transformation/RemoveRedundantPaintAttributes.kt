@@ -11,12 +11,14 @@ import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Line
+import com.jzbrooks.vgo.core.graphic.PaintInheritance
 import com.jzbrooks.vgo.core.graphic.PaintedElement
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.Polygon
 import com.jzbrooks.vgo.core.graphic.Polyline
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
+import com.jzbrooks.vgo.core.graphic.ForeignPaint
 import com.jzbrooks.vgo.core.graphic.effectiveStroke
 import com.jzbrooks.vgo.core.graphic.hasVisibleFillPaint
 import com.jzbrooks.vgo.core.graphic.hasVisibleStrokePaint
@@ -30,11 +32,18 @@ import com.jzbrooks.vgo.core.graphic.usesMiterLimit
  * their values are unobservable. Canonicalizing them shrinks output, since writers
  * elide defaults, and it lets [MergePaths] combine paths that render identically
  * but disagree about paint nobody can see.
+ *
+ * Whether an element's paint is dead depends on its ancestors in formats that inherit
+ * paint, so [inheritance] supplies that rule.
  */
-class RemoveRedundantPaintAttributes : TopDownTransformer {
-    override fun visit(graphic: Graphic) = removeRedundantPaintAttributes(graphic)
+class RemoveRedundantPaintAttributes(
+    private val inheritance: PaintInheritance = PaintInheritance.NONE,
+) : TopDownTransformer {
+    // The whole tree is walked from the root because unmodelable paint accumulates as it
+    // descends, and the shared traversal has no way to carry that context between visits.
+    override fun visit(graphic: Graphic) = walk(graphic, ForeignPaint.NONE)
 
-    override fun visit(group: Group) = removeRedundantPaintAttributes(group)
+    override fun visit(group: Group) {}
 
     override fun visit(extra: Extra) {}
 
@@ -44,11 +53,27 @@ class RemoveRedundantPaintAttributes : TopDownTransformer {
 
     override fun visit(path: Path) {}
 
-    private fun removeRedundantPaintAttributes(containerElement: ContainerElement) {
-        containerElement.elements = containerElement.elements.map(::canonicalize)
+    private fun walk(
+        container: ContainerElement,
+        inherited: ForeignPaint,
+    ) {
+        val childInherited = inheritance.descend(container.foreign, inherited)
+
+        // Extra is passthrough — its own children are left exactly as they were read —
+        // but containers nested within it still canonicalize their children.
+        if (container !is Extra) {
+            container.elements = container.elements.map { canonicalize(it, childInherited) }
+        }
+
+        for (child in container.elements) {
+            if (child is ContainerElement) walk(child, childInherited)
+        }
     }
 
-    private fun canonicalize(element: Element): Element {
+    private fun canonicalize(
+        element: Element,
+        inherited: ForeignPaint,
+    ): Element {
         // A named element can be the target of an animation that makes paint
         // visible later, so its dead paint isn't reliably dead.
         if (element !is PaintedElement || element.id != null) return element
@@ -56,12 +81,12 @@ class RemoveRedundantPaintAttributes : TopDownTransformer {
         // A stroke paints nothing when it has no visible paint or no width. Clearing
         // both together keeps the pair consistent, which is what allows writers to
         // decide what to emit from the paint alone.
-        val strokeIsDead = !element.hasVisibleStrokePaint || element.strokeWidth == 0f
+        val strokeIsDead = !element.hasVisibleStrokePaint(inherited) || element.strokeWidth == 0f
         val strokeLineJoin = if (strokeIsDead) Path.LineJoin.MITER else element.strokeLineJoin
 
         val paint =
             Paint(
-                fillRule = if (element.hasVisibleFillPaint) element.fillRule else Path.FillRule.NON_ZERO,
+                fillRule = if (element.hasVisibleFillPaint(inherited)) element.fillRule else Path.FillRule.NON_ZERO,
                 stroke = if (strokeIsDead) Colors.TRANSPARENT else element.effectiveStroke,
                 strokeWidth = if (strokeIsDead) 0f else element.strokeWidth,
                 strokeLineCap = if (strokeIsDead) Path.LineCap.BUTT else element.strokeLineCap,

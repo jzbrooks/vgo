@@ -11,7 +11,11 @@ import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.LinearGradient
 import com.jzbrooks.vgo.core.TileMode
 import com.jzbrooks.vgo.core.graphic.Circle
+import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.PaintInheritance
 import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.ForeignPaint
 import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
 import org.junit.jupiter.api.Test
@@ -320,4 +324,160 @@ class RemoveRedundantPaintAttributesTests {
             .prop(Path::strokeWidth)
             .isEqualTo(2f)
     }
+
+    @Test
+    fun testStrokeQualifiersSurviveInheritedPaint() {
+        val graphic =
+            createGraphic(
+                listOf(
+                    Group(
+                        listOf(deadLookingStroke()),
+                        foreign = mutableMapOf("stroke" to "url(#gradient)"),
+                    ),
+                ),
+            )
+
+        RemoveRedundantPaintAttributes(paintServerInheritance).visit(graphic)
+
+        assertThat(graphic::elements).index(0).isInstanceOf<Group>().prop(Group::elements).index(0).isInstanceOf<Path>().all {
+            prop(Path::strokeWidth).isEqualTo(2f)
+            prop(Path::strokeLineCap).isEqualTo(Path.LineCap.ROUND)
+        }
+    }
+
+    @Test
+    fun testInheritedPaintAccumulatesThroughNestedGroups() {
+        val graphic =
+            createGraphic(
+                listOf(
+                    Group(
+                        listOf(Group(listOf(deadLookingStroke()))),
+                        foreign = mutableMapOf("stroke" to "url(#gradient)"),
+                    ),
+                ),
+            )
+
+        RemoveRedundantPaintAttributes(paintServerInheritance).visit(graphic)
+
+        assertThat(graphic::elements)
+            .index(0)
+            .isInstanceOf<Group>()
+            .prop(Group::elements)
+            .index(0)
+            .isInstanceOf<Group>()
+            .prop(Group::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::strokeWidth)
+            .isEqualTo(2f)
+    }
+
+    @Test
+    fun testModelablePaintClearsInheritedPaint() {
+        val graphic =
+            createGraphic(
+                listOf(
+                    Group(
+                        listOf(
+                            Group(
+                                listOf(deadLookingStroke()),
+                                foreign = mutableMapOf("stroke" to "none"),
+                            ),
+                        ),
+                        foreign = mutableMapOf("stroke" to "url(#gradient)"),
+                    ),
+                ),
+            )
+
+        RemoveRedundantPaintAttributes(paintServerInheritance).visit(graphic)
+
+        assertThat(graphic::elements)
+            .index(0)
+            .isInstanceOf<Group>()
+            .prop(Group::elements)
+            .index(0)
+            .isInstanceOf<Group>()
+            .prop(Group::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::strokeWidth)
+            .isEqualTo(0f)
+    }
+
+    @Test
+    fun testPaintIsNotInheritedForFormatsThatDontInheritIt() {
+        val graphic =
+            createGraphic(
+                listOf(
+                    Group(
+                        listOf(deadLookingStroke()),
+                        foreign = mutableMapOf("stroke" to "url(#gradient)"),
+                    ),
+                ),
+            )
+
+        RemoveRedundantPaintAttributes().visit(graphic)
+
+        assertThat(graphic::elements)
+            .index(0)
+            .isInstanceOf<Group>()
+            .prop(Group::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::strokeWidth)
+            .isEqualTo(0f)
+    }
+
+    @Test
+    fun testGroupsWithinPassthroughElementsAreCanonicalized() {
+        val graphic =
+            createGraphic(
+                listOf(
+                    Extra(
+                        "mask",
+                        listOf(deadLookingStroke(), Group(listOf(deadLookingStroke()))),
+                        null,
+                        mutableMapOf(),
+                    ),
+                ),
+            )
+
+        RemoveRedundantPaintAttributes().visit(graphic)
+
+        assertThat(graphic::elements).index(0).isInstanceOf<Extra>().all {
+            // The passthrough element's own children are left exactly as they were read
+            prop(Extra::elements)
+                .index(0)
+                .isInstanceOf<Path>()
+                .prop(Path::strokeWidth)
+                .isEqualTo(2f)
+            prop(Extra::elements)
+                .index(1)
+                .isInstanceOf<Group>()
+                .prop(Group::elements)
+                .index(0)
+                .isInstanceOf<Path>()
+                .prop(Path::strokeWidth)
+                .isEqualTo(0f)
+        }
+    }
+
+    // A stroke whose typed paint reads as dead, but whose qualifiers are worth keeping
+    // when an ancestor turns out to paint it.
+    private fun deadLookingStroke() =
+        createPath(
+            stroke = Colors.TRANSPARENT,
+            strokeWidth = 2f,
+            strokeLineCap = Path.LineCap.ROUND,
+        )
+
+    // Mirrors the SVG rule closely enough to exercise the transformation: a paint server
+    // reference sets the channel and any other declaration clears it.
+    private val paintServerInheritance =
+        PaintInheritance { foreign, current ->
+            ForeignPaint(
+                fill = foreign["fill"]?.startsWith("url(") ?: current.fill,
+                stroke = foreign["stroke"]?.startsWith("url(") ?: current.stroke,
+            )
+        }
 }
