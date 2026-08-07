@@ -1,18 +1,32 @@
 package com.jzbrooks.vgo.core.transformation
 
-import com.jzbrooks.vgo.core.Brush
-import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.graphic.ContainerElement
+import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.ForeignPaint
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.PaintInheritance
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.Shape
+import com.jzbrooks.vgo.core.graphic.hasVisibleFillPaint
+import com.jzbrooks.vgo.core.graphic.hasVisibleStrokePaint
 
-class RemoveTransparentPaths : TopDownTransformer {
-    override fun visit(graphic: Graphic) = removeTransparentPaths(graphic)
+/**
+ * Removes paths that can't produce pixels because neither their fill nor their stroke
+ * paints anything.
+ *
+ * Whether a path's paint is dead depends on its ancestors in formats that inherit paint,
+ * so [inheritance] supplies that rule.
+ */
+class RemoveTransparentPaths(
+    private val inheritance: PaintInheritance = PaintInheritance.NONE,
+) : TopDownTransformer {
+    // The whole tree is walked from the root because paint no typed field describes
+    // accumulates as it descends, and the shared traversal can't carry that context.
+    override fun visit(graphic: Graphic) = walk(graphic, ForeignPaint.NONE)
 
-    override fun visit(group: Group) = removeTransparentPaths(group)
+    override fun visit(group: Group) {}
 
     override fun visit(extra: Extra) {}
 
@@ -20,23 +34,27 @@ class RemoveTransparentPaths : TopDownTransformer {
 
     override fun visit(path: Path) {}
 
-    private fun removeTransparentPaths(containerElement: ContainerElement) {
-        containerElement.elements =
-            containerElement.elements.filter { element ->
-                element !is Path ||
-                    // If a path has an id, it might be used in an animation or otherwise referenced elsewhere
-                    element.id != null ||
-                    // Colors that aren't able to be parsed may remain in the foreign map
-                    element.foreign.keys.any { it.contains("color", ignoreCase = true) } ||
-                    // Unconverted paint server references (e.g. SVG fill="url(#gradient)")
-                    // remain in the foreign map
-                    element.foreign.values.any { it.contains("url(") } ||
-                    // If a path isn't transparent, allow it. Gradient paints are never
-                    // considered transparent here — we don't introspect their stops.
-                    !element.fill.isTransparentColor() ||
-                    !element.stroke.isTransparentColor()
-            }
+    private fun walk(
+        container: ContainerElement,
+        inherited: ForeignPaint,
+    ) {
+        val childInherited = inheritance.descend(container.foreign, inherited)
+
+        // Extra is passthrough — its own children are left exactly as they were read —
+        // but containers nested within it still drop paths that paint nothing.
+        if (container !is Extra) {
+            container.elements = container.elements.filter { it.paintsSomething(childInherited) }
+        }
+
+        for (child in container.elements) {
+            if (child is ContainerElement) walk(child, childInherited)
+        }
     }
 
-    private fun Brush.isTransparentColor(): Boolean = this is Color && alpha == 0.toUByte()
+    private fun Element.paintsSomething(inherited: ForeignPaint) =
+        this !is Path ||
+            // A path with an id might be used in an animation or otherwise referenced elsewhere
+            id != null ||
+            hasVisibleFillPaint(inherited) ||
+            hasVisibleStrokePaint(inherited)
 }

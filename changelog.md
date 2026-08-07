@@ -39,6 +39,9 @@ the build when vector graphics are not fully shrunk.
   unchanged" warning for every file.
 - Vector drawable output wrote a non-default stroke miter limit into `android:strokeLineJoin`,
   overwriting the line join. It's now written to `android:strokeMiterLimit`.
+- Paths whose only paint came from an ancestor were deleted as fully transparent. An SVG paint
+  server reference or an unrecognized color keyword on a `<g>` or `<svg>` paints its descendants,
+  but each path was judged on its own resolved paint alone.
 
 ### Security
 

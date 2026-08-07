@@ -15,6 +15,7 @@ import com.jzbrooks.vgo.core.graphic.ContainerElement
 import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Ellipse
 import com.jzbrooks.vgo.core.graphic.Extra
+import com.jzbrooks.vgo.core.graphic.ForeignPaint
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.Line
 import com.jzbrooks.vgo.core.graphic.PaintedElement
@@ -23,7 +24,6 @@ import com.jzbrooks.vgo.core.graphic.Polygon
 import com.jzbrooks.vgo.core.graphic.Polyline
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
-import com.jzbrooks.vgo.core.graphic.ForeignPaint
 import com.jzbrooks.vgo.core.graphic.effectiveFill
 import com.jzbrooks.vgo.core.graphic.effectiveStroke
 import com.jzbrooks.vgo.core.graphic.hasVisibleFillPaint

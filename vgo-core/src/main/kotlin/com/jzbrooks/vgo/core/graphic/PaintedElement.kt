@@ -108,9 +108,11 @@ private val Brush.isVisible: Boolean
  *
  * Deliberately over-approximate: substring matching also catches attributes that
  * merely mention a channel without painting it, like `stroke-dasharray`. Those
- * elements simply keep their paint attributes.
+ * elements simply keep their paint attributes. A color the element declares without
+ * naming a channel counts for both, since it's what a reference like SVG's
+ * `currentColor` resolves to.
  */
-private fun PaintedElement.hasUnmodeledPaint(channel: String): Boolean =
-    foreign.keys.any { it.contains(channel, ignoreCase = true) } ||
+private fun PaintedElement.hasForeignPaint(channel: String): Boolean =
+    foreign.keys.any { it.contains(channel, ignoreCase = true) || it.contains("color", ignoreCase = true) } ||
         foreign["style"]?.contains(channel, ignoreCase = true) == true ||
         foreign.values.any { it.contains("url(") }
