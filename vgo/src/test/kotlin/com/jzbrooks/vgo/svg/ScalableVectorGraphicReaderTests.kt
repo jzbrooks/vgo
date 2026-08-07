@@ -11,6 +11,7 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
@@ -973,6 +974,44 @@ class ScalableVectorGraphicReaderTests {
         assertThat(path::fill).isEqualTo(Colors.BLACK)
         assertThat(path.foreign["fill"]).isEqualTo("url(#g)")
         assertThat(graphic.elements.filterIsInstance<Extra>(), "extra elements").hasSize(1)
+    }
+
+    @Test
+    fun testPaintOverridingAnUnmodelableInheritedPaintIsKept() {
+        // stroke="none" and the default the reader falls back to when nothing was
+        // declared are the same typed value, so the override has to survive as a raw
+        // declaration or the path silently inherits the ancestor's currentColor stroke.
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24" stroke="currentColor">
+                |  <path d="M0,0L24,0Z" stroke="none"/>
+                |  <path d="M0,4L24,4Z"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val paths = graphic.elements.filterIsInstance<Path>()
+        assertThat(paths[0].foreign["stroke"]).isEqualTo("none")
+        assertThat(paths[1].foreign["stroke"]).isNull()
+    }
+
+    @Test
+    fun testPaintOverridingAModelableInheritedPaintIsNotKept() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24" stroke="red">
+                |  <path d="M0,0L24,0Z" stroke="none"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        assertThat(path::stroke).isEqualTo(Colors.TRANSPARENT)
+        assertThat(path.foreign["stroke"]).isNull()
     }
 
     private fun parseSvg(text: String): Graphic {
