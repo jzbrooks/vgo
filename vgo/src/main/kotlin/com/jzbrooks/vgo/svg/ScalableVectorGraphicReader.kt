@@ -293,10 +293,22 @@ private fun extractMergedPresentationAttributes(
         val ownStyle = styleProperties[key]
         val ownAttribute = nodeAttrMap[key]
         val own = ownStyle ?: ownAttribute
+        val source = if (ownStyle != null) PaintSource.STYLE else PaintSource.ATTRIBUTE
+
         if (own != null && own.isUrlPaint()) {
-            ownPaints[key] = OwnPaint(own, if (ownStyle != null) PaintSource.STYLE else PaintSource.ATTRIBUTE)
+            ownPaints[key] = OwnPaint(own, source)
             return default
         }
+
+        // An ancestor painting with a value the color parser can't model keeps painting
+        // this element unless it declares paint of its own — and that declaration is
+        // about to become a typed field indistinguishable from the default used when
+        // nothing was declared at all. Keep the raw value so the override survives.
+        val inheritedValue = inherited[key]
+        if (own != null && inheritedValue != null && parseColorOrNull(inheritedValue) == null) {
+            ownPaints[key] = OwnPaint(own, source)
+        }
+
         return merged.extractColor(key, default) ?: default
     }
 

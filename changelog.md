@@ -42,6 +42,10 @@ the build when vector graphics are not fully shrunk.
 - Paths whose only paint came from an ancestor were deleted as fully transparent. An SVG paint
   server reference or an unrecognized color keyword on a `<g>` or `<svg>` paints its descendants,
   but each path was judged on its own resolved paint alone.
+- SVG paint the color parser doesn't recognize — `currentColor` above all — was dropped from the
+  element that declared it, because it parses as the inherited color and so looked redundant.
+  Together with the deletion above, an icon in the common `<svg fill="none" stroke="currentColor">`
+  form optimized to an empty document.
 
 ### Security
 

@@ -295,14 +295,15 @@ class ScalableVectorGraphicWriter(
         val inheritedStrokeColor = inherited.stroke as? Color ?: Colors.TRANSPARENT
         return filter { (key, value) ->
             when (key) {
-                // Unresolved paint server references parse as the default color and
-                // would otherwise be mistaken for an implied attribute. Nothing is
-                // implied by paint no typed field describes either, so a declaration
-                // under one always carries meaning — dropping a fill="none" beneath an
-                // inherited gradient would hand the subtree that gradient.
+                // Paint the color parser can't model — a paint server reference, or a
+                // keyword like currentColor that resolves outside the document — falls
+                // back to the inherited color and would otherwise be mistaken for an
+                // implied attribute. Nothing is implied by such paint on an ancestor
+                // either, so a declaration under one always carries meaning: dropping a
+                // fill="none" beneath an inherited gradient hands the subtree that gradient.
                 "fill" -> {
                     inherited.foreignPaint.fill ||
-                        value.isUrlPaint() ||
+                        parseColorOrNull(value) == null ||
                         (extractColor("fill", inheritedFillColor) ?: inherited.fill) != inherited.fill
                 }
 
@@ -312,7 +313,7 @@ class ScalableVectorGraphicWriter(
 
                 "stroke" -> {
                     inherited.foreignPaint.stroke ||
-                        value.isUrlPaint() ||
+                        parseColorOrNull(value) == null ||
                         (extractColor("stroke", inheritedStrokeColor) ?: inherited.stroke) != inherited.stroke
                 }
 

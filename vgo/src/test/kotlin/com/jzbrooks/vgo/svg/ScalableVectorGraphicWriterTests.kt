@@ -1018,6 +1018,31 @@ class ScalableVectorGraphicWriterTests {
         }
     }
 
+    @Test
+    fun testUnmodelableColorKeywordIsWritten() {
+        // currentColor parses as the inherited default, so comparing colors would call
+        // it implied and strip it — taking the whole subtree's stroke with it.
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    Group(
+                        listOf(createPath(CommandString("M0,0L24,0Z").toCommandList())),
+                        foreign = mutableMapOf("stroke" to "currentColor"),
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg", "stroke" to "currentColor"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            val root = memoryStream.toDocument().firstChild
+            assertThat(root).attribute("stroke").isEqualTo("currentColor")
+            assertThat(root.firstChild).attribute("stroke").isEqualTo("currentColor")
+        }
+    }
+
     private fun createGraphicWithBrush(
         fill: Brush = Colors.BLACK,
         stroke: Brush = Colors.TRANSPARENT,
