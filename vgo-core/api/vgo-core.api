@@ -1034,6 +1034,8 @@ public final class com/jzbrooks/vgo/core/transformation/RemoveRedundantPaintAttr
 
 public final class com/jzbrooks/vgo/core/transformation/RemoveTransparentPaths : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/PaintInheritance;)V
+	public synthetic fun <init> (Lcom/jzbrooks/vgo/core/graphic/PaintInheritance;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V

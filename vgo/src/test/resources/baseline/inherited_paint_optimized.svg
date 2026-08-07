@@ -7,6 +7,7 @@
   </defs>
   <g stroke="url(#grad)">
     <path d="M0,0l10,10" fill="lime" stroke-linecap="round" stroke-width="7"/>
+    <path d="M0,20l10-6" fill="none" stroke-width="2"/>
     <g stroke="none">
       <path d="M12,12l8,8" fill="blue"/>
     </g>

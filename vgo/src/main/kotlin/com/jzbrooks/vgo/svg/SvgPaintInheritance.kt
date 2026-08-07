@@ -1,7 +1,7 @@
 package com.jzbrooks.vgo.svg
 
-import com.jzbrooks.vgo.core.graphic.PaintInheritance
 import com.jzbrooks.vgo.core.graphic.ForeignPaint
+import com.jzbrooks.vgo.core.graphic.PaintInheritance
 
 /**
  * SVG paint is an inherited presentation attribute, so paint the reader couldn't lift
