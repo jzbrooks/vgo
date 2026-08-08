@@ -25,13 +25,17 @@ import com.jzbrooks.vgo.core.graphic.hasVisibleStrokePaint
 import com.jzbrooks.vgo.core.graphic.usesMiterLimit
 
 /**
- * Resets paint properties that can't affect rendering to their defaults.
+ * Canonicalizes paint properties that can't affect rendering.
  *
  * A fill rule only qualifies a fill, and the stroke width, cap, join, and miter
  * limit only qualify a stroke — when the paint they qualify can't produce pixels,
- * their values are unobservable. Canonicalizing them shrinks output, since writers
- * elide defaults, and it lets [MergePaths] combine paths that render identically
+ * their values are unobservable. Replacing them with stable values shrinks output, since
+ * writers can elide them, and it lets [MergePaths] combine paths that render identically
  * but disagree about paint nobody can see.
+ *
+ * These canonical values are not necessarily a target format's defaults. Writers must
+ * avoid emitting an unobservable qualifier when doing so would override an inherited
+ * format value and make the canonical value observable.
  *
  * Whether an element's paint is dead depends on its ancestors in formats that inherit
  * paint, so [inheritance] supplies that rule.
@@ -39,13 +43,22 @@ import com.jzbrooks.vgo.core.graphic.usesMiterLimit
 class RemoveRedundantPaintAttributes(
     private val inheritance: PaintInheritance = PaintInheritance.NONE,
 ) : TopDownTransformer {
-    // The whole tree is walked from the root because unmodelable paint accumulates as it
-    // descends, and the shared traversal has no way to carry that context between visits.
-    override fun visit(graphic: Graphic) = walk(graphic, ForeignPaint.NONE)
+    private val inheritedPaint = ArrayDeque<ForeignPaint>()
 
-    override fun visit(group: Group) {}
+    override fun visit(graphic: Graphic) {
+        inheritedPaint.clear()
+        pushPaint(graphic)
+        canonicalizeChildren(graphic)
+    }
 
-    override fun visit(extra: Extra) {}
+    override fun visit(group: Group) {
+        pushPaint(group)
+        canonicalizeChildren(group)
+    }
+
+    override fun visit(extra: Extra) {
+        pushPaint(extra)
+    }
 
     // Paint properties are immutable, so elements are rewritten by their parent
     // container rather than in place.
@@ -53,21 +66,18 @@ class RemoveRedundantPaintAttributes(
 
     override fun visit(path: Path) {}
 
-    private fun walk(
-        container: ContainerElement,
-        inherited: ForeignPaint,
-    ) {
-        val childInherited = inheritance.descend(container.foreign, inherited)
+    override fun exit(container: ContainerElement) {
+        inheritedPaint.removeLast()
+        if (container is Graphic) check(inheritedPaint.isEmpty())
+    }
 
-        // Extra is passthrough — its own children are left exactly as they were read —
-        // but containers nested within it still canonicalize their children.
-        if (container !is Extra) {
-            container.elements = container.elements.map { canonicalize(it, childInherited) }
-        }
+    private fun pushPaint(container: ContainerElement) {
+        val parentPaint = inheritedPaint.lastOrNull() ?: ForeignPaint.NONE
+        inheritedPaint.addLast(inheritance.descend(container.foreign, parentPaint))
+    }
 
-        for (child in container.elements) {
-            if (child is ContainerElement) walk(child, childInherited)
-        }
+    private fun canonicalizeChildren(container: ContainerElement) {
+        container.elements = container.elements.map { canonicalize(it, inheritedPaint.last()) }
     }
 
     private fun canonicalize(

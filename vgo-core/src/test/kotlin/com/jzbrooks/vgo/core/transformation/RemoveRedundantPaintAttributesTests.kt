@@ -13,14 +13,23 @@ import com.jzbrooks.vgo.core.TileMode
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.ForeignPaint
+import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.PaintInheritance
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
+import com.jzbrooks.vgo.core.util.element.traverseTopDown
 import org.junit.jupiter.api.Test
 
 class RemoveRedundantPaintAttributesTests {
+    private fun transform(
+        graphic: Graphic,
+        transformer: RemoveRedundantPaintAttributes = RemoveRedundantPaintAttributes(),
+    ) {
+        traverseTopDown(graphic, listOf(transformer))
+    }
+
     @Test
     fun testFillRuleIsResetWhenFillIsTransparent() {
         val graphic =
@@ -35,7 +44,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements).index(0).isInstanceOf<Path>().all {
             prop(Path::fillRule).isEqualTo(Path.FillRule.NON_ZERO)
@@ -55,7 +64,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements)
             .index(0)
@@ -77,7 +86,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements)
             .index(0)
@@ -102,7 +111,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements).index(0).isInstanceOf<Path>().all {
             prop(Path::strokeWidth).isEqualTo(0f)
@@ -126,7 +135,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements).index(0).isInstanceOf<Path>().all {
             prop(Path::stroke).isEqualTo(Colors.TRANSPARENT)
@@ -147,7 +156,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements).index(0).isInstanceOf<Path>().all {
             prop(Path::strokeWidth).isEqualTo(0.7f)
@@ -169,7 +178,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements)
             .index(0)
@@ -192,7 +201,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements).index(0).isInstanceOf<Path>().all {
             prop(Path::strokeLineJoin).isEqualTo(Path.LineJoin.MITER_CLIP)
@@ -224,7 +233,7 @@ class RemoveRedundantPaintAttributesTests {
 
         val graphic = createGraphic(listOf(circle))
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements).index(0).isInstanceOf<Circle>().all {
             // A gradient fill is never treated as invisible, so the fill rule stays.
@@ -251,7 +260,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements).index(0).isInstanceOf<Path>().all {
             prop(Path::fillRule).isEqualTo(Path.FillRule.EVEN_ODD)
@@ -272,7 +281,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements)
             .index(0)
@@ -294,7 +303,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements)
             .index(0)
@@ -316,7 +325,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements)
             .index(0)
@@ -337,7 +346,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes(paintServerInheritance).visit(graphic)
+        transform(graphic, RemoveRedundantPaintAttributes(paintServerInheritance))
 
         assertThat(graphic::elements).index(0).isInstanceOf<Group>().prop(Group::elements).index(0).isInstanceOf<Path>().all {
             prop(Path::strokeWidth).isEqualTo(2f)
@@ -357,7 +366,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes(paintServerInheritance).visit(graphic)
+        transform(graphic, RemoveRedundantPaintAttributes(paintServerInheritance))
 
         assertThat(graphic::elements)
             .index(0)
@@ -370,6 +379,64 @@ class RemoveRedundantPaintAttributesTests {
             .isInstanceOf<Path>()
             .prop(Path::strokeWidth)
             .isEqualTo(2f)
+    }
+
+    @Test
+    fun testInheritedPaintDoesNotLeakBetweenSiblingGroups() {
+        val graphic =
+            createGraphic(
+                listOf(
+                    Group(
+                        listOf(deadLookingStroke()),
+                        foreign = mutableMapOf("stroke" to "url(#gradient)"),
+                    ),
+                    Group(listOf(deadLookingStroke())),
+                ),
+            )
+
+        transform(graphic, RemoveRedundantPaintAttributes(paintServerInheritance))
+
+        assertThat(graphic::elements).all {
+            index(0)
+                .isInstanceOf<Group>()
+                .prop(Group::elements)
+                .index(0)
+                .isInstanceOf<Path>()
+                .prop(Path::strokeWidth)
+                .isEqualTo(2f)
+            index(1)
+                .isInstanceOf<Group>()
+                .prop(Group::elements)
+                .index(0)
+                .isInstanceOf<Path>()
+                .prop(Path::strokeWidth)
+                .isEqualTo(0f)
+        }
+    }
+
+    @Test
+    fun testTransformerCanBeReusedAcrossGraphics() {
+        val transformer = RemoveRedundantPaintAttributes(paintServerInheritance)
+        val inheritedGraphic =
+            createGraphic(
+                listOf(deadLookingStroke()),
+                foreign = mutableMapOf("stroke" to "url(#gradient)"),
+            )
+        val independentGraphic = createGraphic(listOf(deadLookingStroke()))
+
+        transform(inheritedGraphic, transformer)
+        transform(independentGraphic, transformer)
+
+        assertThat(inheritedGraphic::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::strokeWidth)
+            .isEqualTo(2f)
+        assertThat(independentGraphic::elements)
+            .index(0)
+            .isInstanceOf<Path>()
+            .prop(Path::strokeWidth)
+            .isEqualTo(0f)
     }
 
     @Test
@@ -389,7 +456,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes(paintServerInheritance).visit(graphic)
+        transform(graphic, RemoveRedundantPaintAttributes(paintServerInheritance))
 
         assertThat(graphic::elements)
             .index(0)
@@ -416,7 +483,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements)
             .index(0)
@@ -442,7 +509,7 @@ class RemoveRedundantPaintAttributesTests {
                 ),
             )
 
-        RemoveRedundantPaintAttributes().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements).index(0).isInstanceOf<Extra>().all {
             // The passthrough element's own children are left exactly as they were read

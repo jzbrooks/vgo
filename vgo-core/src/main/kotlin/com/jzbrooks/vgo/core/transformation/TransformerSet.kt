@@ -10,11 +10,7 @@ abstract class TransformerSet(
 ) {
     fun apply(graphic: Graphic) {
         if (topDownTransformers.isNotEmpty()) {
-            traverseTopDown(graphic) { element ->
-                for (optimization in topDownTransformers) {
-                    element.accept(optimization)
-                }
-            }
+            traverseTopDown(graphic, topDownTransformers)
         }
 
         if (bottomUpTransformers.isNotEmpty()) {

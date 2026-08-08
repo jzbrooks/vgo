@@ -136,6 +136,11 @@ public final class com/jzbrooks/vgo/svg/SvgOptimizationRegistry : com/jzbrooks/v
 	public fun <init> ()V
 }
 
+public final class com/jzbrooks/vgo/svg/SvgPaintInheritance : com/jzbrooks/vgo/core/graphic/PaintInheritance {
+	public fun <init> ()V
+	public fun descend (Ljava/util/Map;Lcom/jzbrooks/vgo/core/graphic/ForeignPaint;)Lcom/jzbrooks/vgo/core/graphic/ForeignPaint;
+}
+
 public final class com/jzbrooks/vgo/svg/VectorDrawableConverterKt {
 	public static final fun toVectorDrawable (Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;)Lcom/jzbrooks/vgo/vd/VectorDrawable;
 }

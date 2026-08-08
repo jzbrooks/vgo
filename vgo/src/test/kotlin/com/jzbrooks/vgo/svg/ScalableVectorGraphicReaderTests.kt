@@ -5,13 +5,14 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsExactly
 import assertk.assertions.containsNone
+import assertk.assertions.doesNotContainKey
 import assertk.assertions.hasSize
 import assertk.assertions.index
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
-import assertk.assertions.isNull
+import assertk.assertions.key
 import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
@@ -273,7 +274,7 @@ class ScalableVectorGraphicReaderTests {
         val graphic = parse(document.firstChild)
         val path = graphic.elements.first() as Path
 
-        assertThat(path.foreign.keys, "foreign keys").containsNone("style")
+        assertThat(path::foreign).doesNotContainKey("style")
     }
 
     @Test
@@ -298,8 +299,8 @@ class ScalableVectorGraphicReaderTests {
         val graphic = parse(document.firstChild)
         val path = graphic.elements.first() as Path
 
-        assertThat(path::fill).isEqualTo(com.jzbrooks.vgo.core.Colors.BLACK)
-        assertThat(path::stroke).isEqualTo(com.jzbrooks.vgo.core.Colors.TRANSPARENT)
+        assertThat(path::fill).isEqualTo(Colors.BLACK)
+        assertThat(path::stroke).isEqualTo(Colors.TRANSPARENT)
     }
 
     @Test
@@ -1016,7 +1017,7 @@ class ScalableVectorGraphicReaderTests {
     @Test
     fun testTransparentKeywordResolvesToATransparentColor() {
         // It isn't in the named color table, so it would otherwise fall back to the
-        // channel default — painting a black fill — or pass through unmodeled.
+        // channel default — painting a black fill — or pass through as foreign paint.
         val graphic =
             parseSvg(
                 """
@@ -1029,7 +1030,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.filterIsInstance<Path>().first()
         assertThat(path::fill).isEqualTo(Colors.TRANSPARENT)
-        assertThat(path.foreign["fill"]).isNull()
+        assertThat(path::foreign).doesNotContainKey("fill")
     }
 
     @Test
@@ -1049,8 +1050,10 @@ class ScalableVectorGraphicReaderTests {
             )
 
         val paths = graphic.elements.filterIsInstance<Path>()
-        assertThat(paths[0].foreign["stroke"]).isEqualTo("none")
-        assertThat(paths[1].foreign["stroke"]).isNull()
+        assertThat(paths, "paths").all {
+            index(0).prop(Path::foreign).key("stroke").isEqualTo("none")
+            index(1).prop(Path::foreign).doesNotContainKey("stroke")
+        }
     }
 
     @Test
@@ -1067,7 +1070,7 @@ class ScalableVectorGraphicReaderTests {
 
         val path = graphic.elements.filterIsInstance<Path>().first()
         assertThat(path::stroke).isEqualTo(Colors.TRANSPARENT)
-        assertThat(path.foreign["stroke"]).isNull()
+        assertThat(path::foreign).doesNotContainKey("stroke")
     }
 
     private fun parseSvg(text: String): Graphic {

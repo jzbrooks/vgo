@@ -17,6 +17,10 @@ the build when vector graphics are not fully shrunk.
 
 ### Changed
 
+- _Breaking:_ `TopDownTransformer` now has an `exit(ContainerElement)` callback for cleaning up
+  ancestor-scoped state after a container's descendants. Apply top-down transformers with
+  `traverseTopDown(Graphic, List<TopDownTransformer>)` (as `TransformerSet` now does); invoking a
+  stateful transformer's `visit` methods directly no longer traverses an entire graphic.
 - _Breaking:_ Standard-input processing is now explicit. Use `vgo --stdin` to read newline-delimited file
   paths; invoking `vgo` without inputs now prints help and exits with a usage error.
 - Gradle plugin: the `vgo` extension now uses lazy Gradle types (`ConfigurableFileCollection`
