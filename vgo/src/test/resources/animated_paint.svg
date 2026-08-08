@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="24" height="24">
+    <path id="blinker" d="M3 12 L21 12" stroke="none" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="7"/>
+    <path d="M3 18 L21 18" stroke="none" stroke-width="6" stroke-linecap="round"/>
+    <animate xlink:href="#blinker" attributeName="stroke" to="red" dur="1s" repeatCount="indefinite"/>
+</svg>

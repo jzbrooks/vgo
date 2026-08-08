@@ -345,6 +345,13 @@ class ScalableVectorGraphicWriter(
         inherited: InheritedStyle,
         gradientIds: Map<Gradient, String>,
     ) {
+        // A named element can be the target of an animation or a <use> reference that
+        // makes paint visible later — both survive optimization as passthrough elements —
+        // so nothing about its paint is reliably unobservable. RemoveRedundantPaintAttributes
+        // leaves named elements alone for this reason, and eliding here anyway would undo
+        // that decision for exactly the elements it was protecting.
+        val paintMayChange = element.id != null
+
         when (val fill = element.effectiveFill) {
             inherited.fill -> {}
 
@@ -366,7 +373,9 @@ class ScalableVectorGraphicWriter(
         // here rather than trusting the IR value matters because SVG inherits: a path
         // under <g fill-rule="evenodd"> would otherwise be handed an explicit
         // fill-rule="nonzero" the moment the value is canonicalized.
-        if (element.hasVisibleFillPaint(inherited.foreignPaint) && element.fillRule != inherited.fillRule) {
+        if ((paintMayChange || element.hasVisibleFillPaint(inherited.foreignPaint)) &&
+            element.fillRule != inherited.fillRule
+        ) {
             val fillRule =
                 when (element.fillRule) {
                     Path.FillRule.EVEN_ODD -> "evenodd"
@@ -395,10 +404,9 @@ class ScalableVectorGraphicWriter(
         // Everything in here qualifies a stroke, so none of it is observable without one.
         // The guard keys on the paint alone — never on the width — because a visible
         // paint with stroke-width="0" still has to emit that 0, or SVG's inherited
-        // default of 1 paints a stroke that wasn't there. It also keeps the writer
-        // honest on IR the transformations never touched: --no-optimization output, and
-        // every id-bearing element RemoveRedundantPaintAttributes skips.
-        if (element.hasVisibleStrokePaint(inherited.foreignPaint)) {
+        // default of 1 paints a stroke that wasn't there. It also keeps the writer honest
+        // on IR the transformations never touched, such as --no-optimization output.
+        if (paintMayChange || element.hasVisibleStrokePaint(inherited.foreignPaint)) {
             if (element.strokeWidth != inherited.strokeWidth) {
                 setAttribute("stroke-width", commandPrinter.formatter.format(element.strokeWidth))
             }
@@ -427,8 +435,9 @@ class ScalableVectorGraphicWriter(
 
             // Guarded for the same reason as fill-rule: an ancestor's miter limit inherits,
             // so a round-joined path under <g stroke-miterlimit="1.5"> would be handed an
-            // explicit stroke-miterlimit="4" once the unread value is canonicalized.
-            if (element.usesMiterLimit && element.strokeMiterLimit != inherited.strokeMiterLimit) {
+            // explicit stroke-miterlimit="4" once the unread value is canonicalized. The
+            // join is animatable too, so a named element keeps its limit either way.
+            if ((paintMayChange || element.usesMiterLimit) && element.strokeMiterLimit != inherited.strokeMiterLimit) {
                 setAttribute("stroke-miterlimit", commandPrinter.formatter.format(element.strokeMiterLimit))
             }
         }

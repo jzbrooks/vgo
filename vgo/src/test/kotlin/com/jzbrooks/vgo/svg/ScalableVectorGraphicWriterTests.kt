@@ -1019,6 +1019,64 @@ class ScalableVectorGraphicWriterTests {
     }
 
     @Test
+    fun testStrokeQualifiersKeptForNamedElements() {
+        // An <animate> or <use> elsewhere in the document can target this path by id and
+        // make the stroke visible, so its qualifiers have to survive. The transformation
+        // skips named elements for the same reason.
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(
+                        CommandString("M0,0L24,0Z").toCommandList(),
+                        id = "blinker",
+                        stroke = Colors.TRANSPARENT,
+                        strokeWidth = 6f,
+                        strokeLineCap = Path.LineCap.ROUND,
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            assertThat(memoryStream.toDocument().firstChild.firstChild).all {
+                attribute("stroke-width").isEqualTo("6")
+                attribute("stroke-linecap").isEqualTo("round")
+            }
+        }
+    }
+
+    @Test
+    fun testMiterLimitKeptForNamedElementsWithJoinsThatIgnoreIt() {
+        // stroke-linejoin is animatable, so a join that ignores the limit today may read
+        // it later.
+        val graphic =
+            ScalableVectorGraphic(
+                listOf(
+                    createPath(
+                        CommandString("M0,0L24,0Z").toCommandList(),
+                        id = "blinker",
+                        stroke = Color(0xFF333333u),
+                        strokeLineJoin = Path.LineJoin.ROUND,
+                        strokeMiterLimit = 7f,
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns" to "http://www.w3.org/2000/svg"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            ScalableVectorGraphicWriter().write(graphic, memoryStream)
+
+            assertThat(memoryStream.toDocument().firstChild.firstChild)
+                .attribute("stroke-miterlimit")
+                .isEqualTo("7")
+        }
+    }
+
+    @Test
     fun testUnmodelableColorKeywordIsWritten() {
         // currentColor parses as the inherited default, so comparing colors would call
         // it implied and strip it — taking the whole subtree's stroke with it.
