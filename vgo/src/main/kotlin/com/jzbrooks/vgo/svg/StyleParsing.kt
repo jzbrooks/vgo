@@ -30,15 +30,15 @@ internal fun String.extractUrlReferenceOrNull(): String? {
     return match.groupValues[1]
 }
 
-internal fun String.isUrlPaint(): Boolean = contains("url(")
-
 /**
  * Parses a paint value into a color, or returns null when the value isn't paint the
  * intermediate representation can model — a paint server reference, a keyword like
  * `currentColor` that resolves outside the document, or a malformed literal.
  */
 internal fun parseColorOrNull(value: String): Color? {
-    if (value == "none") return Color(0x00000000u)
+    // Neither keyword is in the named color table, and both mean the same thing for
+    // paint. Without this they'd read as unmodelable and pass through verbatim.
+    if (value == "none" || value == "transparent") return Color(0x00000000u)
 
     val hex =
         if (value.startsWith("rgb")) {

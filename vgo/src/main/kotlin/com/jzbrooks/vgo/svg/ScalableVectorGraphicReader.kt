@@ -287,15 +287,19 @@ private fun extractMergedPresentationAttributes(
         key: String,
         default: Color,
     ): Brush {
-        // Only references on the element itself resolve — a reference inherited
-        // from an ancestor stays in the ancestor's foreign attributes and SVG
-        // paint inheritance keeps the output correct.
         val ownStyle = styleProperties[key]
         val ownAttribute = nodeAttrMap[key]
         val own = ownStyle ?: ownAttribute
         val source = if (ownStyle != null) PaintSource.STYLE else PaintSource.ATTRIBUTE
 
-        if (own != null && own.isUrlPaint()) {
+        // Paint the color parser can't model — a paint server reference, or a keyword
+        // like currentColor that resolves outside the document — has no typed
+        // representation. The raw value is kept so it survives into output, and the
+        // typed field holds the CSS initial value as a placeholder. Only declarations on
+        // the element itself are kept: one inherited from an ancestor stays in that
+        // ancestor's foreign attributes, where SVG paint inheritance applies it once
+        // rather than once per descendant.
+        if (own != null && parseColorOrNull(own) == null) {
             ownPaints[key] = OwnPaint(own, source)
             return default
         }

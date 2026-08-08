@@ -977,6 +977,62 @@ class ScalableVectorGraphicReaderTests {
     }
 
     @Test
+    fun testUnmodelableOwnPaintIsKept() {
+        // currentColor resolves against CSS the document doesn't carry, so there's no
+        // typed value for it. Without keeping the raw declaration the stroke is simply
+        // lost — the typed field is indistinguishable from having no stroke at all.
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <path d="M0,0L24,0Z" stroke="currentColor" stroke-width="2"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        assertThat(path::stroke).isEqualTo(Colors.TRANSPARENT)
+        assertThat(path.foreign["stroke"]).isEqualTo("currentColor")
+        assertThat(path::strokeWidth).isEqualTo(2f)
+    }
+
+    @Test
+    fun testUnmodelableOwnPaintInStyleIsKept() {
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <path d="M0,0L24,0Z" style="stroke:currentColor"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        assertThat(path.foreign["style"]).isNotNull().contains("stroke:currentColor")
+    }
+
+    @Test
+    fun testTransparentKeywordResolvesToATransparentColor() {
+        // It isn't in the named color table, so it would otherwise fall back to the
+        // channel default — painting a black fill — or pass through unmodeled.
+        val graphic =
+            parseSvg(
+                """
+                |<svg viewBox="0 0 24 24">
+                |  <path d="M0,0L24,0Z" fill="transparent"/>
+                |</svg>
+                |
+                """.trimMargin(),
+            )
+
+        val path = graphic.elements.filterIsInstance<Path>().first()
+        assertThat(path::fill).isEqualTo(Colors.TRANSPARENT)
+        assertThat(path.foreign["fill"]).isNull()
+    }
+
+    @Test
     fun testPaintOverridingAnUnmodelableInheritedPaintIsKept() {
         // stroke="none" and the default the reader falls back to when nothing was
         // declared are the same typed value, so the override has to survive as a raw
