@@ -85,6 +85,34 @@ Options:
 
 > `java -jar vgo` for Windows
 
+## vgo vs. SVGO benchmark
+
+Generated: 2026-08-08T01:08:39.241Z
+
+Corpus: `/Users/justin/projects/vgo/vgo/src/test/resources` (10 files, 16733816 bytes)
+
+Runs: 10; warmups: 3; batch size: 100
+
+| Tool | Version | Mean ± σ | Median | Min | Max | Output bytes | Saved | MiB/s | Relative |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| vgo | 5.0.0 | 3.266 s ± 0.035 s | 3.265 s | 3.226 s | 3.343 s | 11983741 | 28.39% | 4.89 | 1.00× |
+| svgo | 4.0.2 | 9.499 s ± 0.044 s | 9.494 s | 9.417 s | 9.574 s | 11123262 | 33.53% | 1.68 | 2.91× |
+
+| File | Original | vgo | SVGO | Smaller output |
+|---|---:|---:|---:|---|
+| android.svg | 822 | 716 | 679 | svgo |
+| dribbble_ball_mark.svg | 1874 | 1279 | 1207 | svgo |
+| eleven_below_single.svg | 141009 | 79899 | 62480 | svgo |
+| gradient_linear.svg | 700 | 505 | 562 | vgo |
+| great_wave.svg | 16497061 | 11814855 | 10973810 | svgo |
+| guacamole.svg | 4012 | 2845 | 2776 | svgo |
+| nasa.svg | 6592 | 6592 | 5667 | svgo |
+| simple_heart.svg | 244 | 177 | 169 | svgo |
+| tiger.svg | 68630 | 68630 | 68451 | svgo |
+| vgo.svg | 12872 | 8243 | 7461 | svgo |
+
+> Timing includes CLI startup, parsing, optimization, and writes. Corpus setup and validation are excluded. Structural validation does not prove visual equivalence.
+
 ## Examples
 
 ### CLI

@@ -5,5 +5,9 @@
 
 build/
 
+benchmark/node_modules/
+benchmark/.work/
+benchmark/results/
+
 .claude/CLAUDE.local.md
 .claude/settings.local.json
