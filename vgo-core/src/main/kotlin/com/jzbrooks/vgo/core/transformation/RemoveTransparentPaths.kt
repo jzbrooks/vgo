@@ -22,33 +22,39 @@ import com.jzbrooks.vgo.core.graphic.hasVisibleStrokePaint
 class RemoveTransparentPaths(
     private val inheritance: PaintInheritance = PaintInheritance.NONE,
 ) : TopDownTransformer {
-    // The whole tree is walked from the root because paint no typed field describes
-    // accumulates as it descends, and the shared traversal can't carry that context.
-    override fun visit(graphic: Graphic) = walk(graphic, ForeignPaint.NONE)
+    private val inheritedPaint = ArrayDeque<ForeignPaint>()
 
-    override fun visit(group: Group) {}
+    override fun visit(graphic: Graphic) {
+        inheritedPaint.clear()
+        pushPaint(graphic)
+        removeTransparentChildren(graphic)
+    }
 
-    override fun visit(extra: Extra) {}
+    override fun visit(group: Group) {
+        pushPaint(group)
+        removeTransparentChildren(group)
+    }
+
+    override fun visit(extra: Extra) {
+        pushPaint(extra)
+    }
+
+    private fun pushPaint(container: ContainerElement) {
+        val parentPaint = inheritedPaint.lastOrNull() ?: ForeignPaint.NONE
+        inheritedPaint.addLast(inheritance.descend(container.foreign, parentPaint))
+    }
+
+    override fun exit(container: ContainerElement) {
+        inheritedPaint.removeLast()
+        if (container is Graphic) check(inheritedPaint.isEmpty())
+    }
 
     override fun visit(shape: Shape) {}
 
     override fun visit(path: Path) {}
 
-    private fun walk(
-        container: ContainerElement,
-        inherited: ForeignPaint,
-    ) {
-        val childInherited = inheritance.descend(container.foreign, inherited)
-
-        // Extra is passthrough — its own children are left exactly as they were read —
-        // but containers nested within it still drop paths that paint nothing.
-        if (container !is Extra) {
-            container.elements = container.elements.filter { it.paintsSomething(childInherited) }
-        }
-
-        for (child in container.elements) {
-            if (child is ContainerElement) walk(child, childInherited)
-        }
+    private fun removeTransparentChildren(container: ContainerElement) {
+        container.elements = container.elements.filter { it.paintsSomething(inheritedPaint.last()) }
     }
 
     private fun Element.paintsSomething(inherited: ForeignPaint) =

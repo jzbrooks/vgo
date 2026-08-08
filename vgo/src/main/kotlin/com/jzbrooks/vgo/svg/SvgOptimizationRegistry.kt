@@ -27,8 +27,8 @@ class SvgOptimizationRegistry :
         topDownTransformers =
             listOf(
                 ConvertShapesToPaths(),
-                RemoveTransparentPaths(SvgPaintInheritance),
-                RemoveRedundantPaintAttributes(SvgPaintInheritance),
+                RemoveTransparentPaths(SvgPaintInheritance()),
+                RemoveRedundantPaintAttributes(SvgPaintInheritance()),
                 BakeTransformations(),
                 BreakoutImplicitCommands(),
                 CommandVariant(CommandVariant.Mode.Relative),

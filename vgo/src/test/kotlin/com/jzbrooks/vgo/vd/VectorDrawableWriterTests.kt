@@ -11,6 +11,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.prop
 import assertk.assertions.startsWith
 import com.jzbrooks.vgo.core.Color
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.GradientStop
 import com.jzbrooks.vgo.core.LinearGradient
 import com.jzbrooks.vgo.core.graphic.ClipPath
@@ -20,6 +21,7 @@ import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.math.Matrix3
 import com.jzbrooks.vgo.util.assertk.attribute
+import com.jzbrooks.vgo.util.assertk.doesNotHaveAttribute
 import com.jzbrooks.vgo.util.assertk.hasName
 import com.jzbrooks.vgo.util.assertk.hasNames
 import com.jzbrooks.vgo.util.assertk.hasValue
@@ -285,6 +287,42 @@ class VectorDrawableWriterTests {
             assertThat(output.firstChild.firstChild).all {
                 attribute("android:strokeLineJoin").isEqualTo("bevel")
                 attribute("android:strokeMiterLimit").startsWith("7")
+            }
+        }
+    }
+
+    @Test
+    fun testCanonicalDeadPaintAttributesAreOmitted() {
+        val drawable =
+            VectorDrawable(
+                listOf(
+                    createPath(
+                        CommandString("M 0 0 L 1 1 Z").toCommandList(),
+                        fill = Colors.TRANSPARENT,
+                        fillRule = Path.FillRule.NON_ZERO,
+                        stroke = Colors.TRANSPARENT,
+                        strokeWidth = 0f,
+                        strokeLineCap = Path.LineCap.BUTT,
+                        strokeLineJoin = Path.LineJoin.MITER,
+                        strokeMiterLimit = 4f,
+                    ),
+                ),
+                null,
+                mutableMapOf("xmlns:android" to "http://schemas.android.com/apk/res/android"),
+            )
+
+        ByteArrayOutputStream().use { memoryStream ->
+            VectorDrawableWriter().write(drawable, memoryStream)
+            val path = memoryStream.toDocument().firstChild.firstChild
+
+            assertThat(path).all {
+                doesNotHaveAttribute("android:fillColor")
+                doesNotHaveAttribute("android:fillType")
+                doesNotHaveAttribute("android:strokeColor")
+                doesNotHaveAttribute("android:strokeWidth")
+                doesNotHaveAttribute("android:strokeLineCap")
+                doesNotHaveAttribute("android:strokeLineJoin")
+                doesNotHaveAttribute("android:strokeMiterLimit")
             }
         }
     }

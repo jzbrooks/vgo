@@ -851,6 +851,7 @@ public final class com/jzbrooks/vgo/core/graphic/command/VerticalLineTo : com/jz
 
 public final class com/jzbrooks/vgo/core/transformation/BakeTransformations : com/jzbrooks/vgo/core/graphic/ElementVisitor, com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -863,6 +864,7 @@ public abstract interface class com/jzbrooks/vgo/core/transformation/BottomUpTra
 
 public final class com/jzbrooks/vgo/core/transformation/BreakoutImplicitCommands : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -881,6 +883,7 @@ public final class com/jzbrooks/vgo/core/transformation/CollapseGroups : com/jzb
 
 public final class com/jzbrooks/vgo/core/transformation/CommandVariant : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> (Lcom/jzbrooks/vgo/core/transformation/CommandVariant$Mode;)V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -918,6 +921,7 @@ public final class com/jzbrooks/vgo/core/transformation/CommandVariant$Mode$Rela
 
 public final class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> (Lcom/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Criterion;)V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -949,6 +953,7 @@ public final class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Crit
 public final class com/jzbrooks/vgo/core/transformation/ConvertShapesToPaths : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public static final field Companion Lcom/jzbrooks/vgo/core/transformation/ConvertShapesToPaths$Companion;
 	public fun <init> ()V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -996,6 +1001,7 @@ public final class com/jzbrooks/vgo/core/transformation/MergePaths$Constraints$P
 
 public final class com/jzbrooks/vgo/core/transformation/Polycommands : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -1014,6 +1020,7 @@ public final class com/jzbrooks/vgo/core/transformation/RemoveEmptyGroups : com/
 
 public final class com/jzbrooks/vgo/core/transformation/RemoveRedundantCommands : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> ()V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -1025,6 +1032,7 @@ public final class com/jzbrooks/vgo/core/transformation/RemoveRedundantPaintAttr
 	public fun <init> ()V
 	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/PaintInheritance;)V
 	public synthetic fun <init> (Lcom/jzbrooks/vgo/core/graphic/PaintInheritance;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -1036,6 +1044,7 @@ public final class com/jzbrooks/vgo/core/transformation/RemoveTransparentPaths :
 	public fun <init> ()V
 	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/PaintInheritance;)V
 	public synthetic fun <init> (Lcom/jzbrooks/vgo/core/graphic/PaintInheritance;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -1045,6 +1054,7 @@ public final class com/jzbrooks/vgo/core/transformation/RemoveTransparentPaths :
 
 public final class com/jzbrooks/vgo/core/transformation/SimplifyBezierCurveCommands : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public fun <init> (F)V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
@@ -1055,6 +1065,7 @@ public final class com/jzbrooks/vgo/core/transformation/SimplifyBezierCurveComma
 public final class com/jzbrooks/vgo/core/transformation/SimplifyLineCommands : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public field commands Ljava/util/List;
 	public fun <init> (F)V
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 	public final fun getCommands ()Ljava/util/List;
 	public final fun setCommands (Ljava/util/List;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
@@ -1065,6 +1076,11 @@ public final class com/jzbrooks/vgo/core/transformation/SimplifyLineCommands : c
 }
 
 public abstract interface class com/jzbrooks/vgo/core/transformation/TopDownTransformer : com/jzbrooks/vgo/core/graphic/ElementVisitor {
+	public fun exit (Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
+}
+
+public final class com/jzbrooks/vgo/core/transformation/TopDownTransformer$DefaultImpls {
+	public static fun exit (Lcom/jzbrooks/vgo/core/transformation/TopDownTransformer;Lcom/jzbrooks/vgo/core/graphic/ContainerElement;)V
 }
 
 public abstract class com/jzbrooks/vgo/core/transformation/TransformerSet {
@@ -1077,7 +1093,8 @@ public abstract interface annotation class com/jzbrooks/vgo/core/util/Experiment
 
 public final class com/jzbrooks/vgo/core/util/element/TraverseKt {
 	public static final fun traverseBottomUp (Lcom/jzbrooks/vgo/core/graphic/Element;Lkotlin/jvm/functions/Function1;)Lcom/jzbrooks/vgo/core/graphic/Element;
-	public static final fun traverseTopDown (Lcom/jzbrooks/vgo/core/graphic/Element;Lkotlin/jvm/functions/Function1;)Lcom/jzbrooks/vgo/core/graphic/Element;
+	public static final fun traverseElementTopDown (Lcom/jzbrooks/vgo/core/graphic/Element;Lkotlin/jvm/functions/Function1;)Lcom/jzbrooks/vgo/core/graphic/Element;
+	public static final fun traverseTopDown (Lcom/jzbrooks/vgo/core/graphic/Graphic;Ljava/util/List;)Lcom/jzbrooks/vgo/core/graphic/Graphic;
 }
 
 public final class com/jzbrooks/vgo/core/util/ir/DebuggingKt {

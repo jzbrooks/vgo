@@ -6,8 +6,11 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.single
+import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.ClipPath
 import com.jzbrooks.vgo.core.graphic.Group
+import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.command.CommandString
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.core.util.math.computeTransformation
@@ -114,14 +117,51 @@ class ImageVectorWriterTest {
         assertThat(groupCalls.single().argumentNames()).isEmpty()
     }
 
-    private fun writeAndCollectGroups(graphic: ImageVector): List<KtCallExpression> {
+    @Test
+    fun testCanonicalDeadPaintAttributesAreOmitted() {
+        val graphic =
+            ImageVector(
+                listOf(
+                    createPath(
+                        CommandString("M 0 0 L 24 24 Z").toCommandList(),
+                        fill = Colors.TRANSPARENT,
+                        fillRule = Path.FillRule.NON_ZERO,
+                        stroke = Colors.TRANSPARENT,
+                        strokeWidth = 0f,
+                        strokeLineCap = Path.LineCap.BUTT,
+                        strokeLineJoin = Path.LineJoin.MITER,
+                        strokeMiterLimit = 4f,
+                    ),
+                ),
+                id = null,
+                mutableMapOf(),
+                24f,
+                24f,
+                24f,
+                24f,
+            )
+
+        val pathCalls = writeAndCollectCalls(graphic, "path")
+
+        assertThat(pathCalls, "pathCalls")
+            .single()
+            .transform(".argumentNames()") { it.argumentNames() }
+            .isEmpty()
+    }
+
+    private fun writeAndCollectGroups(graphic: ImageVector): List<KtCallExpression> = writeAndCollectCalls(graphic, "group")
+
+    private fun writeAndCollectCalls(
+        graphic: ImageVector,
+        name: String,
+    ): List<KtCallExpression> {
         val bytes =
             ByteArrayOutputStream().use { memoryStream ->
                 ImageVectorWriter("test").write(graphic, memoryStream)
                 memoryStream.toByteArray()
             }
         val psiFile = ByteArrayInputStream(bytes).use { parseKotlinFile(disposable, it) }
-        return psiFile.collectCallsNamed("group")
+        return psiFile.collectCallsNamed(name)
     }
 
     companion object {

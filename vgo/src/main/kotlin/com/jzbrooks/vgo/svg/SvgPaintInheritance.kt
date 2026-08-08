@@ -15,7 +15,7 @@ import com.jzbrooks.vgo.core.graphic.PaintInheritance
  * transformations with it, and [ScalableVectorGraphicWriter] threads it through the
  * inherited style it already tracks.
  */
-internal object SvgPaintInheritance : PaintInheritance {
+class SvgPaintInheritance : PaintInheritance {
     override fun descend(
         foreign: Map<String, String>,
         current: ForeignPaint,
@@ -24,14 +24,14 @@ internal object SvgPaintInheritance : PaintInheritance {
         val declarations = foreign + (foreign["style"]?.parseStyleAttribute() ?: emptyMap())
 
         return ForeignPaint(
-            fill = declarations.paintIsUnmodelable("fill", current.fill),
-            stroke = declarations.paintIsUnmodelable("stroke", current.stroke),
+            fill = declarations.paintIsForeign("fill", current.fill),
+            stroke = declarations.paintIsForeign("stroke", current.stroke),
         )
     }
 
     // A declaration the color parser understands replaces whatever an ancestor was
     // painting, so it clears the flag as surely as an unmodelable one sets it.
-    private fun Map<String, String>.paintIsUnmodelable(
+    private fun Map<String, String>.paintIsForeign(
         key: String,
         current: Boolean,
     ): Boolean {

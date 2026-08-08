@@ -10,13 +10,22 @@ import assertk.assertions.prop
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.ForeignPaint
+import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.graphic.Group
 import com.jzbrooks.vgo.core.graphic.PaintInheritance
 import com.jzbrooks.vgo.core.util.element.createGraphic
 import com.jzbrooks.vgo.core.util.element.createPath
+import com.jzbrooks.vgo.core.util.element.traverseTopDown
 import org.junit.jupiter.api.Test
 
 class RemoveTransparentPathsTests {
+    private fun transform(
+        graphic: Graphic,
+        transformer: RemoveTransparentPaths = RemoveTransparentPaths(),
+    ) {
+        traverseTopDown(graphic, listOf(transformer))
+    }
+
     @Test
     fun testTransparentPathsAreRemoved() {
         val graphic =
@@ -31,7 +40,7 @@ class RemoveTransparentPathsTests {
                 ),
             )
 
-        RemoveTransparentPaths().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements, "graphic elements").hasSize(2)
     }
@@ -51,7 +60,7 @@ class RemoveTransparentPathsTests {
                 ),
             )
 
-        RemoveTransparentPaths().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements, "graphic elements").hasSize(3)
     }
@@ -71,7 +80,7 @@ class RemoveTransparentPathsTests {
                 ),
             )
 
-        RemoveTransparentPaths().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements, "graphic elements").hasSize(3)
     }
@@ -91,7 +100,7 @@ class RemoveTransparentPathsTests {
                 ),
             )
 
-        RemoveTransparentPaths().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements, "graphic elements").hasSize(3)
     }
@@ -117,7 +126,7 @@ class RemoveTransparentPathsTests {
                 ),
             )
 
-        RemoveTransparentPaths(paintServerInheritance).visit(graphic)
+        transform(graphic, RemoveTransparentPaths(paintServerInheritance))
 
         assertThat(graphic::elements)
             .index(0)
@@ -144,7 +153,7 @@ class RemoveTransparentPathsTests {
                 ),
             )
 
-        RemoveTransparentPaths().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements)
             .index(0)
@@ -170,7 +179,7 @@ class RemoveTransparentPathsTests {
                 ),
             )
 
-        RemoveTransparentPaths().visit(graphic)
+        transform(graphic)
 
         assertThat(graphic::elements).index(0).isInstanceOf<Extra>().all {
             // The passthrough element's own children are left exactly as they were read

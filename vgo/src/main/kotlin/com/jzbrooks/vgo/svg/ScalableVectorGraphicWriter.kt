@@ -42,6 +42,8 @@ class ScalableVectorGraphicWriter(
     private val indent: Int = 0,
     private val commandPrinter: ScalableVectorGraphicCommandPrinter = ScalableVectorGraphicCommandPrinter(3),
 ) {
+    private val paintInheritance = SvgPaintInheritance()
+
     fun write(
         graphic: ScalableVectorGraphic,
         stream: OutputStream,
@@ -458,7 +460,7 @@ class ScalableVectorGraphicWriter(
             strokeMiterLimit = merged["stroke-miterlimit"]?.toFloatOrNull() ?: current.strokeMiterLimit,
             // Computed from what's actually written rather than from the element's own
             // foreign attributes — a value the writer drops paints nothing to inherit.
-            foreignPaint = SvgPaintInheritance.descend(this, current.foreignPaint),
+            foreignPaint = paintInheritance.descend(this, current.foreignPaint),
         )
     }
 

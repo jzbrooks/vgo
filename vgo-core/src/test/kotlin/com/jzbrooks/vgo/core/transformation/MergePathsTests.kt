@@ -626,7 +626,7 @@ class MergePathsTests {
         assertThat(unchanged::elements, "before canonicalization").hasSize(2)
 
         val canonicalized = createGraphic(paths)
-        traverseTopDown(canonicalized) { it.accept(RemoveRedundantPaintAttributes()) }
+        traverseTopDown(canonicalized, listOf(RemoveRedundantPaintAttributes()))
         traverseBottomUp(canonicalized) { it.accept(MergePaths(MergePaths.Constraints.None)) }
 
         assertThat(canonicalized::elements, "after canonicalization").hasSize(1)

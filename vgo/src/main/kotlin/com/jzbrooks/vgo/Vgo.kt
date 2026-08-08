@@ -3,7 +3,6 @@
 package com.jzbrooks.vgo
 
 import com.jzbrooks.BuildConstants
-import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
 import com.jzbrooks.vgo.core.util.ir.IrColorScheme
 import com.jzbrooks.vgo.core.util.ir.IrPrinter
@@ -14,7 +13,6 @@ import com.jzbrooks.vgo.iv.toFileSpec
 import com.jzbrooks.vgo.iv.toSvg
 import com.jzbrooks.vgo.iv.toVectorDrawable
 import com.jzbrooks.vgo.svg.ScalableVectorGraphic
-import com.jzbrooks.vgo.svg.ScalableVectorGraphicCommandPrinter
 import com.jzbrooks.vgo.svg.ScalableVectorGraphicWriter
 import com.jzbrooks.vgo.svg.SvgOptimizationRegistry
 import com.jzbrooks.vgo.svg.toImageVector
