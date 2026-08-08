@@ -46,6 +46,8 @@ the build when vector graphics are not fully shrunk.
   element that declared it, because it parses as the inherited color and so looked redundant.
   Together with the deletion above, an icon in the common `<svg fill="none" stroke="currentColor">`
   form optimized to an empty document.
+- `fill="transparent"` and `stroke="transparent"` fell back to the channel default rather than
+  resolving to a transparent color, painting a black fill where the source painted nothing.
 
 ### Security
 

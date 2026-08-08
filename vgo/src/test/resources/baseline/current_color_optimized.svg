@@ -2,4 +2,5 @@
   <path d="M3,12h18"/>
   <path d="M12,3v18" stroke-width="3"/>
   <path d="M5,5l4,4" stroke="none" stroke-width="4"/>
+  <path d="M15,15l4,4" stroke="currentColor"/>
 </svg>
