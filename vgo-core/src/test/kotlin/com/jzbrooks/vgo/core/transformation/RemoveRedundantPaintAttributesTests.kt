@@ -211,9 +211,7 @@ class RemoveRedundantPaintAttributesTests {
 
     @Test
     fun testShapeBrushesSurviveCanonicalization() {
-        // Shape.copy() drops fillBrush/strokeBrush, and Shape narrows the deprecated
-        // stroke to Color, so the rewrite has to restore both by hand. Shapes reach the
-        // transform only when ConvertShapesToPaths isn't in the pipeline.
+        // Shapes reach the transform only when ConvertShapesToPaths isn't in the pipeline.
         val gradient = LinearGradient(0f, 0f, 1f, 1f, emptyList(), TileMode.CLAMP)
         val circle =
             Circle(
@@ -229,7 +227,7 @@ class RemoveRedundantPaintAttributesTests {
                 strokeLineCap = Path.LineCap.ROUND,
                 strokeLineJoin = Path.LineJoin.MITER,
                 strokeMiterLimit = 7f,
-            ).apply { fillBrush = gradient }
+            ).apply { fill = gradient }
 
         val graphic = createGraphic(listOf(circle))
 
@@ -238,8 +236,8 @@ class RemoveRedundantPaintAttributesTests {
         assertThat(graphic::elements).index(0).isInstanceOf<Circle>().all {
             // A gradient fill is never treated as invisible, so the fill rule stays.
             prop(Circle::fillRule).isEqualTo(Path.FillRule.EVEN_ODD)
-            prop(Circle::fillBrush).isEqualTo(gradient)
-            prop(Circle::strokeBrush).isEqualTo(Colors.TRANSPARENT)
+            prop(Circle::fill).isEqualTo(gradient)
+            prop(Circle::stroke).isEqualTo(Colors.TRANSPARENT)
             prop(Circle::strokeLineCap).isEqualTo(Path.LineCap.BUTT)
             prop(Circle::strokeMiterLimit).isEqualTo(4f)
         }

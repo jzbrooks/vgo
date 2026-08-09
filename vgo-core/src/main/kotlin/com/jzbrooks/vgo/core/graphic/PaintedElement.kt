@@ -15,20 +15,6 @@ interface PaintedElement : Element {
 }
 
 /**
- * The true fill paint. [Shape] surfaces gradients through [Shape.fillBrush];
- * its [fill] is a deprecated placeholder.
- */
-val PaintedElement.effectiveFill: Brush
-    get() = if (this is Shape) fillBrush else fill
-
-/**
- * The true stroke paint. [Shape] surfaces gradients through [Shape.strokeBrush];
- * its [PaintedElement.stroke] is a deprecated placeholder.
- */
-val PaintedElement.effectiveStroke: Brush
-    get() = if (this is Shape) strokeBrush else stroke
-
-/**
  * Paint an ancestor applies that the intermediate representation can't model, per
  * channel. A descendant of such an ancestor renders with that paint unless it declares
  * its own, so its typed fields — which the reader filled with a format default it had
@@ -67,7 +53,7 @@ fun interface PaintInheritance {
  * This describes the *paint* alone. It intentionally says nothing about geometry.
  */
 fun PaintedElement.hasVisibleFillPaint(inherited: ForeignPaint = ForeignPaint.NONE): Boolean =
-    inherited.fill || effectiveFill.isVisible || hasForeignPaint("fill")
+    inherited.fill || fill.isVisible || hasForeignPaint("fill")
 
 /**
  * Whether the stroke paint can produce pixels, which determines whether properties
@@ -78,7 +64,7 @@ fun PaintedElement.hasVisibleFillPaint(inherited: ForeignPaint = ForeignPaint.NO
  * width is nonzero.
  */
 fun PaintedElement.hasVisibleStrokePaint(inherited: ForeignPaint = ForeignPaint.NONE): Boolean =
-    inherited.stroke || effectiveStroke.isVisible || hasForeignPaint("stroke")
+    inherited.stroke || stroke.isVisible || hasForeignPaint("stroke")
 
 /**
  * Whether [PaintedElement.strokeMiterLimit] is observable. It's the length at which a miter join

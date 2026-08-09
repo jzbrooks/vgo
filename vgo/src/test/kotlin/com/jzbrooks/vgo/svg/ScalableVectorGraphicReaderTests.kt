@@ -476,7 +476,7 @@ class ScalableVectorGraphicReaderTests {
         val graphic = parse(document.firstChild)
         val rect = graphic.elements.first() as Rect
 
-        assertThat(rect::fillBrush).isEqualTo(Color(0xFFFF0000u))
+        assertThat(rect::fill).isEqualTo(Color(0xFFFF0000u))
         val style = rect.foreign["style"]
         assertThat(style).isNotNull()
         val styleProps = style!!.split(';').map { it.trim() }.toSet()
@@ -671,7 +671,7 @@ class ScalableVectorGraphicReaderTests {
             )
 
         val rect = graphic.elements.first() as Rect
-        val fill = rect.fillBrush as LinearGradient
+        val fill = rect.fill as LinearGradient
         assertThat(fill::startX).isEqualTo(10f)
         assertThat(fill::startY).isEqualTo(20f)
         assertThat(fill::endX).isEqualTo(110f)

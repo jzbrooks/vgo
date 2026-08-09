@@ -28,7 +28,7 @@ class ConvertShapesToPathsTests {
     fun testGradientBrushIsCarriedToPath() {
         val circle =
             createCircle().apply {
-                fillBrush = gradient
+                fill = gradient
             }
 
         val path = ConvertShapesToPaths.convertToPath(circle)

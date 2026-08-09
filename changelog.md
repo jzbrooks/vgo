@@ -17,6 +17,8 @@ the build when vector graphics are not fully shrunk.
 
 ### Changed
 
+- _Breaking:_ Shape `fill` and `stroke` properties now use `Brush`, allowing them to represent
+  gradient paints directly.
 - _Breaking:_ `TopDownTransformer` now has an `exit(ContainerElement)` callback for cleaning up
   ancestor-scoped state after a container's descendants. Apply top-down transformers with
   `traverseTopDown(Graphic, List<TopDownTransformer>)` (as `TransformerSet` now does); invoking a
@@ -35,6 +37,8 @@ the build when vector graphics are not fully shrunk.
   of silently succeeding.
 
 ### Deprecated
+
+- Shape `fillBrush` and `strokeBrush`; use `fill` and `stroke` instead.
 
 ### Removed
 

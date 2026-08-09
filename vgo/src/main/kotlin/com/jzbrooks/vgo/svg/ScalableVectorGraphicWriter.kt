@@ -24,8 +24,6 @@ import com.jzbrooks.vgo.core.graphic.Polygon
 import com.jzbrooks.vgo.core.graphic.Polyline
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
-import com.jzbrooks.vgo.core.graphic.effectiveFill
-import com.jzbrooks.vgo.core.graphic.effectiveStroke
 import com.jzbrooks.vgo.core.graphic.hasVisibleFillPaint
 import com.jzbrooks.vgo.core.graphic.hasVisibleStrokePaint
 import com.jzbrooks.vgo.core.graphic.usesMiterLimit
@@ -194,8 +192,8 @@ class ScalableVectorGraphicWriter(
 
         fun walk(element: Element) {
             if (element is PaintedElement) {
-                assign(element.effectiveFill)
-                assign(element.effectiveStroke)
+                assign(element.fill)
+                assign(element.stroke)
             }
             if (element is Group) {
                 for (clipPath in element.clipPaths) {
@@ -354,7 +352,7 @@ class ScalableVectorGraphicWriter(
         // that decision for exactly the elements it was protecting.
         val paintMayChange = element.id != null
 
-        when (val fill = element.effectiveFill) {
+        when (val fill = element.fill) {
             inherited.fill -> {}
 
             is Color -> {
@@ -386,7 +384,7 @@ class ScalableVectorGraphicWriter(
             setAttribute("fill-rule", fillRule)
         }
 
-        when (val stroke = element.effectiveStroke) {
+        when (val stroke = element.stroke) {
             inherited.stroke -> {}
 
             is Color -> {

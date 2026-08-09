@@ -126,7 +126,7 @@ public final class com/jzbrooks/vgo/core/TileMode : java/lang/Enum {
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Circle : com/jzbrooks/vgo/core/graphic/Shape {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;FFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;FFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)V
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component10 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
@@ -136,31 +136,31 @@ public final class com/jzbrooks/vgo/core/graphic/Circle : com/jzbrooks/vgo/core/
 	public final fun component3 ()F
 	public final fun component4 ()F
 	public final fun component5 ()F
-	public final fun component6-3SA-Bs8 ()I
+	public final fun component6 ()Lcom/jzbrooks/vgo/core/Brush;
 	public final fun component7 ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
-	public final fun component8-3SA-Bs8 ()I
+	public final fun component8 ()Lcom/jzbrooks/vgo/core/Brush;
 	public final fun component9 ()F
-	public final fun copy-ISDfJ7Q (Ljava/lang/String;Ljava/util/Map;FFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Circle;
-	public static synthetic fun copy-ISDfJ7Q$default (Lcom/jzbrooks/vgo/core/graphic/Circle;Ljava/lang/String;Ljava/util/Map;FFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Circle;
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;FFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Circle;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Circle;Ljava/lang/String;Ljava/util/Map;FFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Circle;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCx ()F
 	public final fun getCy ()F
-	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getFill-3SA-Bs8 ()I
+	public fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
 	public final fun getR ()F
-	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getStroke-3SA-Bs8 ()I
+	public fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
 	public fun getStrokeWidth ()F
 	public fun hashCode ()I
+	public fun setFill (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStroke (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
@@ -202,7 +202,7 @@ public abstract interface class com/jzbrooks/vgo/core/graphic/ElementVisitor {
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Ellipse : com/jzbrooks/vgo/core/graphic/Shape {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;FFFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;FFFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)V
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component10 ()F
@@ -214,31 +214,31 @@ public final class com/jzbrooks/vgo/core/graphic/Ellipse : com/jzbrooks/vgo/core
 	public final fun component4 ()F
 	public final fun component5 ()F
 	public final fun component6 ()F
-	public final fun component7-3SA-Bs8 ()I
+	public final fun component7 ()Lcom/jzbrooks/vgo/core/Brush;
 	public final fun component8 ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
-	public final fun component9-3SA-Bs8 ()I
-	public final fun copy-Z5aGK8Y (Ljava/lang/String;Ljava/util/Map;FFFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Ellipse;
-	public static synthetic fun copy-Z5aGK8Y$default (Lcom/jzbrooks/vgo/core/graphic/Ellipse;Ljava/lang/String;Ljava/util/Map;FFFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Ellipse;
+	public final fun component9 ()Lcom/jzbrooks/vgo/core/Brush;
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;FFFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Ellipse;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Ellipse;Ljava/lang/String;Ljava/util/Map;FFFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Ellipse;
 	public fun equals (Ljava/lang/Object;)Z
 	public final fun getCx ()F
 	public final fun getCy ()F
-	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getFill-3SA-Bs8 ()I
+	public fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
 	public final fun getRx ()F
 	public final fun getRy ()F
-	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getStroke-3SA-Bs8 ()I
+	public fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
 	public fun getStrokeWidth ()F
 	public fun hashCode ()I
+	public fun setFill (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStroke (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
@@ -311,7 +311,7 @@ public final class com/jzbrooks/vgo/core/graphic/Group : com/jzbrooks/vgo/core/g
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Line : com/jzbrooks/vgo/core/graphic/Shape {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;FFFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;FFFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)V
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component10 ()F
@@ -323,20 +323,18 @@ public final class com/jzbrooks/vgo/core/graphic/Line : com/jzbrooks/vgo/core/gr
 	public final fun component4 ()F
 	public final fun component5 ()F
 	public final fun component6 ()F
-	public final fun component7-3SA-Bs8 ()I
+	public final fun component7 ()Lcom/jzbrooks/vgo/core/Brush;
 	public final fun component8 ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
-	public final fun component9-3SA-Bs8 ()I
-	public final fun copy-Z5aGK8Y (Ljava/lang/String;Ljava/util/Map;FFFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Line;
-	public static synthetic fun copy-Z5aGK8Y$default (Lcom/jzbrooks/vgo/core/graphic/Line;Ljava/lang/String;Ljava/util/Map;FFFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Line;
+	public final fun component9 ()Lcom/jzbrooks/vgo/core/Brush;
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;FFFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Line;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Line;Ljava/lang/String;Ljava/util/Map;FFFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Line;
 	public fun equals (Ljava/lang/Object;)Z
-	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getFill-3SA-Bs8 ()I
+	public fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
-	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getStroke-3SA-Bs8 ()I
+	public fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
@@ -347,7 +345,9 @@ public final class com/jzbrooks/vgo/core/graphic/Line : com/jzbrooks/vgo/core/gr
 	public final fun getY1 ()F
 	public final fun getY2 ()F
 	public fun hashCode ()I
+	public fun setFill (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStroke (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
@@ -372,8 +372,6 @@ public abstract interface class com/jzbrooks/vgo/core/graphic/PaintedElement : c
 }
 
 public final class com/jzbrooks/vgo/core/graphic/PaintedElementKt {
-	public static final fun getEffectiveFill (Lcom/jzbrooks/vgo/core/graphic/PaintedElement;)Lcom/jzbrooks/vgo/core/Brush;
-	public static final fun getEffectiveStroke (Lcom/jzbrooks/vgo/core/graphic/PaintedElement;)Lcom/jzbrooks/vgo/core/Brush;
 	public static final fun getUsesMiterLimit (Lcom/jzbrooks/vgo/core/graphic/PaintedElement;)Z
 	public static final fun hasVisibleFillPaint (Lcom/jzbrooks/vgo/core/graphic/PaintedElement;Lcom/jzbrooks/vgo/core/graphic/ForeignPaint;)Z
 	public static synthetic fun hasVisibleFillPaint$default (Lcom/jzbrooks/vgo/core/graphic/PaintedElement;Lcom/jzbrooks/vgo/core/graphic/ForeignPaint;ILjava/lang/Object;)Z
@@ -441,83 +439,83 @@ public final class com/jzbrooks/vgo/core/graphic/Path$LineJoin : java/lang/Enum 
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Polygon : com/jzbrooks/vgo/core/graphic/Shape {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;Lcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)V
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component10 ()F
 	public final fun component2 ()Ljava/util/Map;
 	public final fun component3 ()Ljava/util/List;
-	public final fun component4-3SA-Bs8 ()I
+	public final fun component4 ()Lcom/jzbrooks/vgo/core/Brush;
 	public final fun component5 ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
-	public final fun component6-3SA-Bs8 ()I
+	public final fun component6 ()Lcom/jzbrooks/vgo/core/Brush;
 	public final fun component7 ()F
 	public final fun component8 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public final fun component9 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
-	public final fun copy-Bc2dgtw (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Polygon;
-	public static synthetic fun copy-Bc2dgtw$default (Lcom/jzbrooks/vgo/core/graphic/Polygon;Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Polygon;
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;Lcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Polygon;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Polygon;Ljava/lang/String;Ljava/util/Map;Ljava/util/List;Lcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Polygon;
 	public fun equals (Ljava/lang/Object;)Z
-	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getFill-3SA-Bs8 ()I
+	public fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
 	public final fun getPoints ()Ljava/util/List;
-	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getStroke-3SA-Bs8 ()I
+	public fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
 	public fun getStrokeWidth ()F
 	public fun hashCode ()I
+	public fun setFill (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStroke (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Polyline : com/jzbrooks/vgo/core/graphic/Shape {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;Lcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)V
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component10 ()F
 	public final fun component2 ()Ljava/util/Map;
 	public final fun component3 ()Ljava/util/List;
-	public final fun component4-3SA-Bs8 ()I
+	public final fun component4 ()Lcom/jzbrooks/vgo/core/Brush;
 	public final fun component5 ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
-	public final fun component6-3SA-Bs8 ()I
+	public final fun component6 ()Lcom/jzbrooks/vgo/core/Brush;
 	public final fun component7 ()F
 	public final fun component8 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public final fun component9 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
-	public final fun copy-Bc2dgtw (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Polyline;
-	public static synthetic fun copy-Bc2dgtw$default (Lcom/jzbrooks/vgo/core/graphic/Polyline;Ljava/lang/String;Ljava/util/Map;Ljava/util/List;ILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Polyline;
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;Ljava/util/List;Lcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Polyline;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Polyline;Ljava/lang/String;Ljava/util/Map;Ljava/util/List;Lcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Polyline;
 	public fun equals (Ljava/lang/Object;)Z
-	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getFill-3SA-Bs8 ()I
+	public fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
 	public fun getId ()Ljava/lang/String;
 	public final fun getPoints ()Ljava/util/List;
-	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getStroke-3SA-Bs8 ()I
+	public fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
 	public fun getStrokeMiterLimit ()F
 	public fun getStrokeWidth ()F
 	public fun hashCode ()I
+	public fun setFill (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStroke (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Rect : com/jzbrooks/vgo/core/graphic/Shape {
-	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Map;FFFFFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Ljava/util/Map;FFFFFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)V
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
 	public final fun component1 ()Ljava/lang/String;
 	public final fun component10 ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
-	public final fun component11-3SA-Bs8 ()I
+	public final fun component11 ()Lcom/jzbrooks/vgo/core/Brush;
 	public final fun component12 ()F
 	public final fun component13 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public final fun component14 ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
@@ -529,12 +527,11 @@ public final class com/jzbrooks/vgo/core/graphic/Rect : com/jzbrooks/vgo/core/gr
 	public final fun component6 ()F
 	public final fun component7 ()F
 	public final fun component8 ()F
-	public final fun component9-3SA-Bs8 ()I
-	public final fun copy-XFwoZIA (Ljava/lang/String;Ljava/util/Map;FFFFFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Rect;
-	public static synthetic fun copy-XFwoZIA$default (Lcom/jzbrooks/vgo/core/graphic/Rect;Ljava/lang/String;Ljava/util/Map;FFFFFFILcom/jzbrooks/vgo/core/graphic/Path$FillRule;IFLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Rect;
+	public final fun component9 ()Lcom/jzbrooks/vgo/core/Brush;
+	public final fun copy (Ljava/lang/String;Ljava/util/Map;FFFFFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;F)Lcom/jzbrooks/vgo/core/graphic/Rect;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/graphic/Rect;Ljava/lang/String;Ljava/util/Map;FFFFFFLcom/jzbrooks/vgo/core/Brush;Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;Lcom/jzbrooks/vgo/core/Brush;FLcom/jzbrooks/vgo/core/graphic/Path$LineCap;Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;FILjava/lang/Object;)Lcom/jzbrooks/vgo/core/graphic/Rect;
 	public fun equals (Ljava/lang/Object;)Z
-	public synthetic fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getFill-3SA-Bs8 ()I
+	public fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getFillRule ()Lcom/jzbrooks/vgo/core/graphic/Path$FillRule;
 	public fun getForeign ()Ljava/util/Map;
@@ -542,8 +539,7 @@ public final class com/jzbrooks/vgo/core/graphic/Rect : com/jzbrooks/vgo/core/gr
 	public fun getId ()Ljava/lang/String;
 	public final fun getRx ()F
 	public final fun getRy ()F
-	public synthetic fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
-	public fun getStroke-3SA-Bs8 ()I
+	public fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
 	public fun getStrokeLineCap ()Lcom/jzbrooks/vgo/core/graphic/Path$LineCap;
 	public fun getStrokeLineJoin ()Lcom/jzbrooks/vgo/core/graphic/Path$LineJoin;
@@ -553,21 +549,31 @@ public final class com/jzbrooks/vgo/core/graphic/Rect : com/jzbrooks/vgo/core/gr
 	public final fun getX ()F
 	public final fun getY ()F
 	public fun hashCode ()I
+	public fun setFill (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStroke (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 	public fun toString ()Ljava/lang/String;
 }
 
 public abstract interface class com/jzbrooks/vgo/core/graphic/Shape : com/jzbrooks/vgo/core/graphic/PaintedElement {
 	public fun accept (Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
-	public abstract fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
-	public abstract fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
-	public abstract fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
-	public abstract fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public abstract fun getFill ()Lcom/jzbrooks/vgo/core/Brush;
+	public fun getFillBrush ()Lcom/jzbrooks/vgo/core/Brush;
+	public abstract fun getStroke ()Lcom/jzbrooks/vgo/core/Brush;
+	public fun getStrokeBrush ()Lcom/jzbrooks/vgo/core/Brush;
+	public abstract fun setFill (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setFillBrush (Lcom/jzbrooks/vgo/core/Brush;)V
+	public abstract fun setStroke (Lcom/jzbrooks/vgo/core/Brush;)V
+	public fun setStrokeBrush (Lcom/jzbrooks/vgo/core/Brush;)V
 }
 
 public final class com/jzbrooks/vgo/core/graphic/Shape$DefaultImpls {
 	public static fun accept (Lcom/jzbrooks/vgo/core/graphic/Shape;Lcom/jzbrooks/vgo/core/graphic/ElementVisitor;)V
+	public static fun getFillBrush (Lcom/jzbrooks/vgo/core/graphic/Shape;)Lcom/jzbrooks/vgo/core/Brush;
+	public static fun getStrokeBrush (Lcom/jzbrooks/vgo/core/graphic/Shape;)Lcom/jzbrooks/vgo/core/Brush;
+	public static fun setFillBrush (Lcom/jzbrooks/vgo/core/graphic/Shape;Lcom/jzbrooks/vgo/core/Brush;)V
+	public static fun setStrokeBrush (Lcom/jzbrooks/vgo/core/graphic/Shape;Lcom/jzbrooks/vgo/core/Brush;)V
 }
 
 public final class com/jzbrooks/vgo/core/graphic/command/ClosePath : com/jzbrooks/vgo/core/graphic/command/Command {

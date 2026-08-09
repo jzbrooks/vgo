@@ -1,7 +1,6 @@
 package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.Brush
-import com.jzbrooks.vgo.core.Color
 import com.jzbrooks.vgo.core.Colors
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.ContainerElement
@@ -19,7 +18,6 @@ import com.jzbrooks.vgo.core.graphic.Polygon
 import com.jzbrooks.vgo.core.graphic.Polyline
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
-import com.jzbrooks.vgo.core.graphic.effectiveStroke
 import com.jzbrooks.vgo.core.graphic.hasVisibleFillPaint
 import com.jzbrooks.vgo.core.graphic.hasVisibleStrokePaint
 import com.jzbrooks.vgo.core.graphic.usesMiterLimit
@@ -97,7 +95,7 @@ class RemoveRedundantPaintAttributes(
         val paint =
             Paint(
                 fillRule = if (element.hasVisibleFillPaint(inherited)) element.fillRule else Path.FillRule.NON_ZERO,
-                stroke = if (strokeIsDead) Colors.TRANSPARENT else element.effectiveStroke,
+                stroke = if (strokeIsDead) Colors.TRANSPARENT else element.stroke,
                 strokeWidth = if (strokeIsDead) 0f else element.strokeWidth,
                 strokeLineCap = if (strokeIsDead) Path.LineCap.BUTT else element.strokeLineCap,
                 strokeLineJoin = strokeLineJoin,
@@ -138,93 +136,79 @@ class RemoveRedundantPaintAttributes(
     ) {
         fun matches(element: PaintedElement) =
             element.fillRule == fillRule &&
-                element.effectiveStroke == stroke &&
+                element.stroke == stroke &&
                 element.strokeWidth == strokeWidth &&
                 element.strokeLineCap == strokeLineCap &&
                 element.strokeLineJoin == strokeLineJoin &&
                 element.strokeMiterLimit == strokeMiterLimit
     }
 
-    // Shape.copy doesn't carry fillBrush/strokeBrush, so both are restored explicitly.
-    @Suppress("DEPRECATION")
-    private fun Shape.withPaint(paint: Paint): Shape {
-        val fillBrush = this.fillBrush
-        // Every Shape narrows the deprecated stroke to Color. It tracks the brush when
-        // the brush is a color and stays a placeholder when it's a gradient — in which
-        // case the stroke is alive and the brush is unchanged anyway.
-        val strokePlaceholder = paint.stroke as? Color ?: (stroke as Color)
-
-        val copy =
-            when (this) {
-                is Circle -> {
-                    copy(
-                        fillRule = paint.fillRule,
-                        stroke = strokePlaceholder,
-                        strokeWidth = paint.strokeWidth,
-                        strokeLineCap = paint.strokeLineCap,
-                        strokeLineJoin = paint.strokeLineJoin,
-                        strokeMiterLimit = paint.strokeMiterLimit,
-                    )
-                }
-
-                is Ellipse -> {
-                    copy(
-                        fillRule = paint.fillRule,
-                        stroke = strokePlaceholder,
-                        strokeWidth = paint.strokeWidth,
-                        strokeLineCap = paint.strokeLineCap,
-                        strokeLineJoin = paint.strokeLineJoin,
-                        strokeMiterLimit = paint.strokeMiterLimit,
-                    )
-                }
-
-                is Rect -> {
-                    copy(
-                        fillRule = paint.fillRule,
-                        stroke = strokePlaceholder,
-                        strokeWidth = paint.strokeWidth,
-                        strokeLineCap = paint.strokeLineCap,
-                        strokeLineJoin = paint.strokeLineJoin,
-                        strokeMiterLimit = paint.strokeMiterLimit,
-                    )
-                }
-
-                is Line -> {
-                    copy(
-                        fillRule = paint.fillRule,
-                        stroke = strokePlaceholder,
-                        strokeWidth = paint.strokeWidth,
-                        strokeLineCap = paint.strokeLineCap,
-                        strokeLineJoin = paint.strokeLineJoin,
-                        strokeMiterLimit = paint.strokeMiterLimit,
-                    )
-                }
-
-                is Polyline -> {
-                    copy(
-                        fillRule = paint.fillRule,
-                        stroke = strokePlaceholder,
-                        strokeWidth = paint.strokeWidth,
-                        strokeLineCap = paint.strokeLineCap,
-                        strokeLineJoin = paint.strokeLineJoin,
-                        strokeMiterLimit = paint.strokeMiterLimit,
-                    )
-                }
-
-                is Polygon -> {
-                    copy(
-                        fillRule = paint.fillRule,
-                        stroke = strokePlaceholder,
-                        strokeWidth = paint.strokeWidth,
-                        strokeLineCap = paint.strokeLineCap,
-                        strokeLineJoin = paint.strokeLineJoin,
-                        strokeMiterLimit = paint.strokeMiterLimit,
-                    )
-                }
+    private fun Shape.withPaint(paint: Paint): Shape =
+        when (this) {
+            is Circle -> {
+                copy(
+                    fillRule = paint.fillRule,
+                    stroke = paint.stroke,
+                    strokeWidth = paint.strokeWidth,
+                    strokeLineCap = paint.strokeLineCap,
+                    strokeLineJoin = paint.strokeLineJoin,
+                    strokeMiterLimit = paint.strokeMiterLimit,
+                )
             }
 
-        copy.fillBrush = fillBrush
-        copy.strokeBrush = paint.stroke
-        return copy
-    }
+            is Ellipse -> {
+                copy(
+                    fillRule = paint.fillRule,
+                    stroke = paint.stroke,
+                    strokeWidth = paint.strokeWidth,
+                    strokeLineCap = paint.strokeLineCap,
+                    strokeLineJoin = paint.strokeLineJoin,
+                    strokeMiterLimit = paint.strokeMiterLimit,
+                )
+            }
+
+            is Rect -> {
+                copy(
+                    fillRule = paint.fillRule,
+                    stroke = paint.stroke,
+                    strokeWidth = paint.strokeWidth,
+                    strokeLineCap = paint.strokeLineCap,
+                    strokeLineJoin = paint.strokeLineJoin,
+                    strokeMiterLimit = paint.strokeMiterLimit,
+                )
+            }
+
+            is Line -> {
+                copy(
+                    fillRule = paint.fillRule,
+                    stroke = paint.stroke,
+                    strokeWidth = paint.strokeWidth,
+                    strokeLineCap = paint.strokeLineCap,
+                    strokeLineJoin = paint.strokeLineJoin,
+                    strokeMiterLimit = paint.strokeMiterLimit,
+                )
+            }
+
+            is Polyline -> {
+                copy(
+                    fillRule = paint.fillRule,
+                    stroke = paint.stroke,
+                    strokeWidth = paint.strokeWidth,
+                    strokeLineCap = paint.strokeLineCap,
+                    strokeLineJoin = paint.strokeLineJoin,
+                    strokeMiterLimit = paint.strokeMiterLimit,
+                )
+            }
+
+            is Polygon -> {
+                copy(
+                    fillRule = paint.fillRule,
+                    stroke = paint.stroke,
+                    strokeWidth = paint.strokeWidth,
+                    strokeLineCap = paint.strokeLineCap,
+                    strokeLineJoin = paint.strokeLineJoin,
+                    strokeMiterLimit = paint.strokeMiterLimit,
+                )
+            }
+        }
 }

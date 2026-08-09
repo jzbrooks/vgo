@@ -348,8 +348,8 @@ private val PresentationAttributes.strokeColor: Color
 
 private fun <T : Shape> T.applyBrushes(presentation: PresentationAttributes): T =
     apply {
-        fillBrush = presentation.fill
-        strokeBrush = presentation.stroke
+        fill = presentation.fill
+        stroke = presentation.stroke
     }
 
 private fun <T : Element> T.resolveElementGradientPaints(
@@ -376,7 +376,7 @@ private fun <T : Element> T.resolveElementGradientPaints(
             element =
                 when (val current = element) {
                     is Path -> current.copy(fill = brush)
-                    is Shape -> current.apply { fillBrush = brush }
+                    is Shape -> current.apply { fill = brush }
                     else -> current
                 }
         }
@@ -390,7 +390,7 @@ private fun <T : Element> T.resolveElementGradientPaints(
             element =
                 when (val current = element) {
                     is Path -> current.copy(stroke = brush)
-                    is Shape -> current.apply { strokeBrush = brush }
+                    is Shape -> current.apply { stroke = brush }
                     else -> current
                 }
         }

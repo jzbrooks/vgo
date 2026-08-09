@@ -875,7 +875,7 @@ class ScalableVectorGraphicWriterTests {
                 Path.LineCap.BUTT,
                 Path.LineJoin.MITER,
                 4f,
-            ).apply { fillBrush = gradient }
+            ).apply { fill = gradient }
         val graphic =
             ScalableVectorGraphic(
                 listOf(rect),

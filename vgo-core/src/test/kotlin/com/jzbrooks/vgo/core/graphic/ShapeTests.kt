@@ -25,7 +25,7 @@ class ShapeTests {
 
     @Test
     fun testEqualityIncludesBrushes() {
-        val first = createRect().apply { fillBrush = gradient }
+        val first = createRect().apply { fill = gradient }
         val second = createRect()
 
         assertThat(first).isNotEqualTo(second)
@@ -34,8 +34,8 @@ class ShapeTests {
 
     @Test
     fun testShapesWithEqualBrushesAreEqual() {
-        val first = createRect().apply { fillBrush = gradient }
-        val second = createRect().apply { fillBrush = gradient.copy() }
+        val first = createRect().apply { fill = gradient }
+        val second = createRect().apply { fill = gradient.copy() }
 
         assertThat(first).isEqualTo(second)
         assertThat(first.hashCode(), "hash code").isEqualTo(second.hashCode())
