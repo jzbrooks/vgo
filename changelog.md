@@ -156,13 +156,13 @@ is a terminal.
 - `com.jzbrooks.vgo.core.transformation.MergePaths` more precisely checks if two paths overlap, which encourages merging
 - Only write modified graphics if the output is smaller
   - Previously, in some rare circumstances, vgo could write an output that was the same size as the input with path modifications and ultimately oscillate between those two representations on each subsequent run. 
-- When the `CommandVariant` transformation is applied with `CommandVariant.Mode.Compact`, prefer relative coordinates over absolute if the two representations are the same size to encourage image data stability.
+- When the `CommandVariant` transformation is applied with `CommandVariant.Mode.Compact`, prefer relative coordinates to absolute if the two representations are the same size to encourage image data stability.
 - Floating point precision is consistent between top level attributes and path data.
-- Use the version of kotlin gradle dsl coupled to the current gradle version
+- Use the version of kotlin Gradle DSL coupled to the current Gradle version
 
 ### Deprecated
 
-- `com.jzbrooks.vgo.core.Writer` accepted the internediate representation of the vector graphic as a parameter. The new file size check before writing required the IR to be rendered into the file representation that's written to an output stream. If it needs to be written, the IR needs to be rendered into the file representation _again_, which is not a cheap operation. Instead of using this interface, use format-specifc writers instead, which transact in the relevant data format that is directly written to the output stream.
+- `com.jzbrooks.vgo.core.Writer` accepted the intermediate representation of the vector graphic as a parameter. The new file size check before writing required the IR to be rendered into the file representation that's written to an output stream. If it needs to be written, the IR needs to be rendered into the file representation _again_, which is not a cheap operation. Instead of using this interface, use format-specific writers instead, which transact in the relevant data format that is directly written to the output stream.
 - `com.jzbrooks.vgo.plugin.ShrinkVectorArtwork` is renamed to `com.jzbrooks.vgo.plugin.ShrinkVectorGraphic`
 - The `shrinkVectorArtwork` gradle task created by the vgo plugin is renamed to `shrinkVectorGraphic`
 
@@ -177,7 +177,7 @@ is a terminal.
 
 ### Added
 
-- An option to disable optimizations for conversion-only use cases (`--no-optimization` cli flag and `com.jzbrooks.vgo.plugin.VgoPluginExtension.noOptimization` for the gradle plugin)
+- An option to disable optimizations for conversion-only use cases (`--no-optimization` cli flag and `com.jzbrooks.vgo.plugin.VgoPluginExtension.noOptimization` for the Gradle plugin)
 - _Experimental_ support for `ImageVector` generation and optimization
   - _No Clip Paths_: Clip paths are not supported in ImageVector generation. They will be ignored. 
   - _Overwriting files is not recommended_: Since the internal representation of ImageVectors is incomplete, overwriting source files may result in data loss.
@@ -318,7 +318,7 @@ is a terminal.
 ## 1.4.0 - 02.15.2021
 
 - Added: Gradle plugin
-- Improved: Reworked the gradle modules to better be published as a library (vgo-core) and thin application wrapper (vgo).
+- Improved: Reworked the Gradle modules to better be published as a library (vgo-core) and thin application wrapper (vgo).
 - Added: Sonatype publishing
 
 ## 1.3.0 - 01.18.2021
@@ -350,4 +350,4 @@ is a terminal.
 ## 1.1.0 - 06.20.2020
 
 - New: Remove redundant close path commands
-- Improvement: Use the Gradle Application Plugin to build application distrobutions, simplifying installation and making running the tool a little simpler.
+- Improvement: Use the Gradle Application Plugin to build application distributions, simplifying installation and making running the tool a little simpler.
