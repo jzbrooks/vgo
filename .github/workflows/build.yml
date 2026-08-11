@@ -106,6 +106,38 @@ jobs:
           name: pluginVerifier-result
           path: ${{ github.workspace }}/build/reports/pluginVerifier
 
+  publish-snapshot:
+    name: Snapshot Deployment
+    if: github.event_name == 'push'
+    needs: [ build, verify-plugin ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Fetch Sources
+        uses: actions/checkout@v7
+
+      - name: Set up a JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: 25
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: true
+
+      - name: Publish Snapshot to Maven Central
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.SONATYPE_TOKEN_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.SONATYPE_TOKEN_PASSWORD }}
+        run: >-
+          ./gradlew
+          -PVERSION_NAME=${{ needs.build.outputs.version }}-SNAPSHOT
+          -PRELEASE_SIGNING_ENABLED=false
+          publishToMavenCentral
+
   # Prepare a draft release for GitHub Releases page for the manual verification
   # If accepted and published, release workflow would be triggered
   releaseDraft:
