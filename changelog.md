@@ -40,8 +40,6 @@ the build when vector graphics are not fully shrunk.
 
 - Shape `fillBrush` and `strokeBrush`; use `fill` and `stroke` instead.
 
-### Removed
-
 ### Fixed
 
 - Gradle tasks no longer hang waiting for standard input when no configured input files exist.
@@ -58,8 +56,6 @@ the build when vector graphics are not fully shrunk.
   form optimized to an empty document.
 - `fill="transparent"` and `stroke="transparent"` fell back to the channel default rather than
   resolving to a transparent color, painting a black fill where the source painted nothing.
-
-### Security
 
 ## 4.1.0 - 2026-07-13
 
