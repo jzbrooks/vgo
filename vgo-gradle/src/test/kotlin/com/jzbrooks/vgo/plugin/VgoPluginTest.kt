@@ -120,8 +120,9 @@ class VgoPluginTest {
 
         assertThat(task)
             .isInstanceOf<CheckVectorGraphic>()
-            .prop(CheckVectorGraphic::files)
-            .containsExactly(input.absolutePath)
+            .prop(CheckVectorGraphic::inputFiles)
+            .prop("files") { it.files }
+            .containsOnly(input)
     }
 
     @Test
@@ -149,6 +150,6 @@ class VgoPluginTest {
 
         task.check()
 
-        assertThat(task::files).isEmpty()
+        assertThat(task::inputFiles).prop("files") { it.files }.isEmpty()
     }
 }

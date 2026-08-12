@@ -14,6 +14,7 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
 
     testImplementation(libs.assertk)
+    testImplementation(gradleTestKit())
 }
 
 gradlePlugin {

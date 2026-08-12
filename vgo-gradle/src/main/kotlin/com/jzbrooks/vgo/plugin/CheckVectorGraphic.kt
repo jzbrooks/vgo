@@ -3,31 +3,39 @@ package com.jzbrooks.vgo.plugin
 import com.jzbrooks.vgo.Vgo
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 import java.io.File
 
 @DisableCachingByDefault(because = "Verification task with no outputs")
-open class CheckVectorGraphic : DefaultTask() {
-    private val extension = project.extensions.getByType(VgoPluginExtension::class.java)
-
+abstract class CheckVectorGraphic : DefaultTask() {
     init {
         group = "verification"
         description = "Verifies vector graphic files are fully shrunk."
     }
 
-    @get:Input
-    val files: List<String> = extension.inputs.files.map(File::getAbsolutePath)
+    @get:InputFiles
+    @get:SkipWhenEmpty
+    @get:IgnoreEmptyDirectories
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val inputFiles: ConfigurableFileCollection
 
     @get:Input
-    val outputFormat = extension.format
+    abstract val outputFormat: Property<OutputFormat>
 
     @get:Input
-    val indent = extension.indent
+    abstract val indent: Property<Int>
 
     @get:Input
-    val noOptimization = extension.noOptimization
+    abstract val noOptimization: Property<Boolean>
 
     @TaskAction
     fun check() {
@@ -42,7 +50,7 @@ open class CheckVectorGraphic : DefaultTask() {
         val options =
             Vgo.Options(
                 indent = indent.get().takeIf { it > 0 },
-                input = files,
+                input = inputFiles.files.map(File::getAbsolutePath),
                 noOptimization = noOptimization.get(),
                 checkOnly = true,
             )

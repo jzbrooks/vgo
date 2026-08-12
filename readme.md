@@ -53,6 +53,7 @@ plugins {
 vgo {
     inputs = fileTree(projectDir) {
         include '**/res/drawable*/*.xml'
+        exclude '**/build/**'
     }
     outputs = inputs // omit to optimize files in place
     showStatistics = true
