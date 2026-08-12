@@ -6,19 +6,18 @@
 
 - `--check` verifies inputs are already fully shrunk without writing anything. Files that would
 change are printed and the process exits non-zero, making it suitable for CI.
-
 - `checkVectorGraphic` Gradle task, a verification counterpart to `shrinkVectorGraphic` that fails
 the build when vector graphics are not fully shrunk.
-  > [!Note]
-  > Optimization doesn't always reach a fixed point in one pass, so a freshly optimized file may
-need another pass before a check passes.
-
 - Paint attributes that can't affect rendering are removed. A fill rule is dropped when nothing is
   filled, and the stroke width, cap, join, and miter limit are dropped when nothing is stroked —
   either because the stroke paint is transparent or because its width is zero. A miter limit is
   also dropped for joins that never read one. Elements with an `id` keep everything, since an
   animation or a `<use>` reference can make their paint visible later. Beyond the bytes, this lets
   more paths merge.
+
+> [!NOTE]
+> Optimization doesn't always reach a fixed point in one pass, so a freshly optimized file may
+need another pass before a check passes.
 
 ### Changed
 
