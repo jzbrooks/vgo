@@ -26,6 +26,11 @@ The `shrinkVectorGraphic` task is added to your project on plugin application.
 The `checkVectorGraphic` task is also added, a verification counterpart that fails the build if any
 vector graphic is not fully shrunk (without modifying any files)
 
+> [!NOTE]
+> Optimization doesn't always reach a fixed point in one pass, so a graphic `shrinkVectorGraphic`
+> just wrote can still shrink a little on the next run. Run `shrinkVectorGraphic` until it stops
+> changing files before relying on `checkVectorGraphic` to pass.
+
 To incorporate the plugin in your build, configure maven central plugin resolution:
 ```groovy
 pluginManagement {
@@ -86,6 +91,11 @@ Options:
 ```
 
 > `java -jar vgo` for Windows
+
+> [!NOTE]
+> Optimization doesn't always reach a fixed point in one pass. A file vgo just wrote can still
+> shrink a little on a subsequent run, so `--check` may report a file that was optimized moments
+> ago. Rerun vgo until the output stops changing — usually one additional pass — before checking.
 
 ## vgo vs. SVGO benchmark
 
