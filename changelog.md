@@ -4,6 +4,20 @@
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 5.0.0 - 2026-08-12
+
+### Added
+
 - `--check` verifies inputs are already fully shrunk without writing anything. Files that would
 change are printed and the process exits non-zero, making it suitable for CI.
 - `checkVectorGraphic` Gradle task, a verification counterpart to `shrinkVectorGraphic` that fails
@@ -15,10 +29,6 @@ the build when vector graphics are not fully shrunk.
   animation or a `<use>` reference can make their paint visible later. Beyond the bytes, this lets
   more paths merge.
 
-> [!NOTE]
-> Optimization doesn't always reach a fixed point in one pass, so a freshly optimized file may
-need another pass before a check passes.
-
 ### Changed
 
 - _Breaking (API):_ Shape `fill` and `stroke` properties now use `Brush`, allowing them to represent
@@ -29,7 +39,7 @@ need another pass before a check passes.
   stateful transformer's `visit` methods directly no longer traverses an entire graphic.
 - _Breaking (CLI):_ Standard-input processing is now explicit. Use `vgo --stdin` to read newline-delimited file
   paths; invoking `vgo` without inputs now prints help and exits with a usage error.
-- _Breaking (Gradle plugin)_: the `vgo` extension now uses lazy Gradle types (`ConfigurableFileCollection`
+- _Breaking (Gradle plugin):_ the `vgo` extension now uses lazy Gradle types (`ConfigurableFileCollection`
   for `inputs`/`outputs`, `Property` for the remaining options), making it compatible with the
   configuration cache, isolated projects, and declarative-style assignment. `indent` is now an
   `Int` rather than a `Byte`.
