@@ -8,18 +8,14 @@ class VgoPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         val extension = target.extensions.create("vgo", VgoPluginExtension::class.java)
 
+        // Rooted at the conventional source directory rather than the project
+        // directory. Sweeping the whole project picks up resources generated into
+        // build directories and, when this project contains nested ones, their
+        // sources too — both of which belong to other tasks. Projects that keep
+        // artwork elsewhere configure `inputs` themselves.
         extension.inputs.convention(
-            target.fileTree(target.layout.projectDirectory) { tree ->
+            target.fileTree(target.layout.projectDirectory.dir("src")) { tree ->
                 tree.include("**/res/drawable*/*.xml")
-                // Build directories hold resources produced by other tasks. Consuming
-                // them here creates implicit task dependencies, and in nested builds
-                // those tasks belong to other projects entirely.
-
-                // covers nested projects' conventional build directories
-                tree.exclude("**/build/**")
-
-                // covers this project's, wherever it has been relocated
-                tree.exclude(BuildDirectoryExclusion(target.layout.buildDirectory))
             },
         )
         extension.showStatistics.convention(true)
@@ -31,10 +27,12 @@ class VgoPlugin : Plugin<Project> {
             task.inputFiles.setFrom(extension.inputs)
             // An empty output collection means "optimize in place" to the tool,
             // but the inputs must be declared as outputs for up-to-date checks
-            // and build cache entries to work.
+            // and build cache entries to work. These are resolved to plain files
+            // rather than passed along as a tree, because a tree declares its
+            // root directory as the output location and the filters are ignored.
             task.outputFiles.setFrom(
                 target.provider {
-                    if (extension.outputs.isEmpty) extension.inputs else extension.outputs
+                    if (extension.outputs.isEmpty) extension.inputs.files else extension.outputs.files
                 },
             )
             task.showStatistics.set(extension.showStatistics)

@@ -39,6 +39,66 @@ class VgoPluginFunctionalTest {
         assertThat(generated.readText()).isEqualTo(UNOPTIMIZED_DRAWABLE)
     }
 
+    @Test
+    fun nestedProjectSourceResourcesAreNotConsumed(
+        @TempDir projectDir: File,
+    ) {
+        projectDir.resolve("settings.gradle.kts").writeText(
+            """
+            rootProject.name = "app"
+            include(":ui-core")
+            """.trimIndent(),
+        )
+
+        projectDir.resolve("build.gradle.kts").writeText(
+            """
+            plugins {
+                base
+                id("com.jzbrooks.vgo")
+            }
+            """.trimIndent(),
+        )
+
+        // Stands in for AGP's packageDebugResources, which consumes the library's
+        // own hand-written res directory.
+        projectDir.resolve("ui-core").mkdirs()
+        projectDir.resolve("ui-core/build.gradle.kts").writeText(
+            """
+            abstract class PackageRes : DefaultTask() {
+                @get:InputDirectory
+                abstract val resDirectory: DirectoryProperty
+
+                @get:OutputFile
+                abstract val manifest: RegularFileProperty
+
+                @TaskAction
+                fun packageResources() {
+                    manifest.get().asFile.writeText(
+                        resDirectory.get().asFile.walkTopDown().filter { it.isFile }.joinToString { it.name }
+                    )
+                }
+            }
+
+            tasks.register<PackageRes>("packageRes") {
+                resDirectory.set(layout.projectDirectory.dir("src/main/res"))
+                manifest.set(layout.buildDirectory.file("packaged.txt"))
+            }
+            """.trimIndent(),
+        )
+
+        projectDir.resolve("ui-core/src/main/res/drawable").mkdirs()
+        projectDir.resolve("ui-core/src/main/res/drawable/nested.xml").writeText(UNOPTIMIZED_DRAWABLE)
+        projectDir.resolve("src/main/res/drawable").mkdirs()
+        projectDir.resolve("src/main/res/drawable/icon.xml").writeText(UNOPTIMIZED_DRAWABLE)
+
+        val result = runner(projectDir, "shrinkVectorGraphic", ":ui-core:packageRes").build()
+
+        assertThat(result.output).doesNotContain("implicit dependency")
+        assertThat(
+            projectDir.resolve("ui-core/src/main/res/drawable/nested.xml").readText(),
+        ).isEqualTo(UNOPTIMIZED_DRAWABLE)
+    }
+
     private fun runner(
         projectDir: File,
         vararg tasks: String,

@@ -45,21 +45,22 @@ Then, in the relevant project, add the plugin.
 > This is typically done by applying the Kotlin Gradle Plugin.
 
 ```groovy
+import com.jzbrooks.vgo.plugin.OutputFormat
+
 plugins {
     id 'com.jzbrooks.vgo'
 }
 
 // Default configuration shown
 vgo {
-    inputs = fileTree(projectDir) {
+    inputs.setFrom(fileTree('src') {
         include '**/res/drawable*/*.xml'
-        exclude '**/build/**'
-    }
-    outputs = inputs // omit to optimize files in place
-    showStatistics = true
-    format = OutputFormat.UNCHANGED
-    noOptimization = false
-    indent = 0
+    })
+    outputs.setFrom(inputs) // omit to optimize files in place
+    showStatistics.set(true)
+    format.set(OutputFormat.UNCHANGED)
+    noOptimization.set(false)
+    indent.set(0)
 }
 ```
 
@@ -136,16 +137,21 @@ Runs: 10; warmups: 3; batch size: 100
 
 ### Gradle Plugin
 ```kotlin
+import com.jzbrooks.vgo.plugin.OutputFormat
+
 // Optimize and convert svgs to vector drawables at build time
 vgo {
-    format = OutputFormat.VECTOR_DRAWABLE
-    inputs = fileTree(projectDir) {
-        include("icons/**/*.svg")
-    }
+    format.set(OutputFormat.VECTOR_DRAWABLE)
+    inputs.setFrom(
+        fileTree("icons") {
+            include("**/*.svg")
+        }
+    )
+
     val drawableDir = layout.projectDirectory.dir("src/main/res/drawable")
     outputs.setFrom(
         inputs.elements.map { svgs ->
-            svgs.map { svg -> drawableDir.file("${svg.asFile.nameWithoutExtension}.xml").asFile }
+            svgs.map { svg -> drawableDir.file("${svg.asFile.nameWithoutExtension}.xml") }
         }
     )
 }
