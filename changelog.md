@@ -21,15 +21,15 @@ need another pass before a check passes.
 
 ### Changed
 
-- _Breaking:_ Shape `fill` and `stroke` properties now use `Brush`, allowing them to represent
+- _Breaking (API):_ Shape `fill` and `stroke` properties now use `Brush`, allowing them to represent
   gradient paints directly.
-- _Breaking:_ `TopDownTransformer` now has an `exit(ContainerElement)` callback for cleaning up
+- _Breaking (API):_ `TopDownTransformer` now has an `exit(ContainerElement)` callback for cleaning up
   ancestor-scoped state after a container's descendants. Apply top-down transformers with
   `traverseTopDown(Graphic, List<TopDownTransformer>)` (as `TransformerSet` now does); invoking a
   stateful transformer's `visit` methods directly no longer traverses an entire graphic.
-- _Breaking:_ Standard-input processing is now explicit. Use `vgo --stdin` to read newline-delimited file
+- _Breaking (CLI):_ Standard-input processing is now explicit. Use `vgo --stdin` to read newline-delimited file
   paths; invoking `vgo` without inputs now prints help and exits with a usage error.
-- Gradle plugin: the `vgo` extension now uses lazy Gradle types (`ConfigurableFileCollection`
+- _Breaking (Gradle plugin)_: the `vgo` extension now uses lazy Gradle types (`ConfigurableFileCollection`
   for `inputs`/`outputs`, `Property` for the remaining options), making it compatible with the
   configuration cache, isolated projects, and declarative-style assignment. `indent` is now an
   `Int` rather than a `Byte`.
