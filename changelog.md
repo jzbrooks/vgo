@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- SVG path data now also takes advantage of using negative signs as parameter separators
 
 ### Deprecated
 

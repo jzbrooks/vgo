@@ -56,12 +56,7 @@ class ScalableVectorGraphicCommandPrinter(
                 },
             )
 
-        for ((index, parameter) in moveTo.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != moveTo.parameters.size - 1) {
-                builder.append(" ")
-            }
-        }
+        builder.appendParameters(moveTo.parameters, ::print)
 
         return builder.toString()
     }
@@ -75,12 +70,7 @@ class ScalableVectorGraphicCommandPrinter(
                 },
             )
 
-        for ((index, parameter) in lineTo.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != lineTo.parameters.size - 1) {
-                builder.append(" ")
-            }
-        }
+        builder.appendParameters(lineTo.parameters, ::print)
 
         return builder.toString()
     }
@@ -94,12 +84,7 @@ class ScalableVectorGraphicCommandPrinter(
                 },
             )
 
-        for ((index, parameter) in verticalLineTo.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != verticalLineTo.parameters.size - 1) {
-                builder.append(" ")
-            }
-        }
+        builder.appendParameters(verticalLineTo.parameters, ::print)
 
         return builder.toString()
     }
@@ -113,12 +98,7 @@ class ScalableVectorGraphicCommandPrinter(
                 },
             )
 
-        for ((index, parameter) in horizontalLineTo.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != horizontalLineTo.parameters.size - 1) {
-                builder.append(" ")
-            }
-        }
+        builder.appendParameters(horizontalLineTo.parameters, ::print)
 
         return builder.toString()
     }
@@ -132,12 +112,7 @@ class ScalableVectorGraphicCommandPrinter(
                 },
             )
 
-        for ((index, parameter) in cubicBezierCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != cubicBezierCurve.parameters.size - 1) {
-                builder.append(" ")
-            }
-        }
+        builder.appendParameters(cubicBezierCurve.parameters, ::print)
 
         return builder.toString()
     }
@@ -151,12 +126,7 @@ class ScalableVectorGraphicCommandPrinter(
                 },
             )
 
-        for ((index, parameter) in smoothCubicBezierCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != smoothCubicBezierCurve.parameters.size - 1) {
-                builder.append(" ")
-            }
-        }
+        builder.appendParameters(smoothCubicBezierCurve.parameters, ::print)
 
         return builder.toString()
     }
@@ -170,12 +140,7 @@ class ScalableVectorGraphicCommandPrinter(
                 },
             )
 
-        for ((index, parameter) in quadraticBezierCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != quadraticBezierCurve.parameters.size - 1) {
-                builder.append(" ")
-            }
-        }
+        builder.appendParameters(quadraticBezierCurve.parameters, ::print)
 
         return builder.toString()
     }
@@ -189,12 +154,7 @@ class ScalableVectorGraphicCommandPrinter(
                 },
             )
 
-        for ((index, parameter) in smoothQuadraticBezierCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != smoothQuadraticBezierCurve.parameters.size - 1) {
-                builder.append(" ")
-            }
-        }
+        builder.appendParameters(smoothQuadraticBezierCurve.parameters, ::print)
 
         return builder.toString()
     }
@@ -208,17 +168,23 @@ class ScalableVectorGraphicCommandPrinter(
                 },
             )
 
-        for ((index, parameter) in ellipticalArcCurve.parameters.withIndex()) {
-            builder.append(print(parameter))
-            if (index != ellipticalArcCurve.parameters.size - 1) {
-                builder.append(" ")
-            }
-        }
+        builder.appendParameters(ellipticalArcCurve.parameters, ::print)
 
         return builder.toString()
     }
 
     private fun print(float: Float) = formatter.format(float)
+
+    private fun <T> StringBuilder.appendParameters(
+        parameters: List<T>,
+        render: (T) -> String,
+    ) {
+        for ((index, parameter) in parameters.withIndex()) {
+            val value = render(parameter)
+            if (index > 0 && !value.startsWith('-')) append(' ')
+            append(value)
+        }
+    }
 
     private fun print(point: Point) =
         buildString {
