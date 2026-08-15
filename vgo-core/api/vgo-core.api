@@ -956,6 +956,17 @@ public final class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Crit
 	public fun toString ()Ljava/lang/String;
 }
 
+public final class com/jzbrooks/vgo/core/transformation/ConvertPathsToShapes : com/jzbrooks/vgo/core/transformation/BottomUpTransformer {
+	public fun <init> ()V
+	public fun <init> (F)V
+	public synthetic fun <init> (FILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Path;)V
+	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Shape;)V
+}
+
 public final class com/jzbrooks/vgo/core/transformation/ConvertShapesToPaths : com/jzbrooks/vgo/core/transformation/TopDownTransformer {
 	public static final field Companion Lcom/jzbrooks/vgo/core/transformation/ConvertShapesToPaths$Companion;
 	public fun <init> ()V
