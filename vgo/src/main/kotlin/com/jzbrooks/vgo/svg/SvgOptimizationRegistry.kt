@@ -24,7 +24,7 @@ class SvgOptimizationRegistry :
                 CollapseGroups(),
                 RemoveEmptyGroups(),
                 MergePaths(MergePaths.Constraints.None),
-                ConvertPathsToShapes(),
+                ConvertPathsToShapes(ScalableVectorGraphicCommandPrinter(3)),
             ),
         topDownTransformers =
             listOf(

@@ -959,7 +959,8 @@ public final class com/jzbrooks/vgo/core/transformation/ConvertCurvesToArcs$Crit
 public final class com/jzbrooks/vgo/core/transformation/ConvertPathsToShapes : com/jzbrooks/vgo/core/transformation/BottomUpTransformer {
 	public fun <init> ()V
 	public fun <init> (F)V
-	public synthetic fun <init> (FILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (FLkotlin/jvm/functions/Function2;)V
+	public synthetic fun <init> (FLkotlin/jvm/functions/Function2;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
 	public fun visit (Lcom/jzbrooks/vgo/core/graphic/Group;)V
