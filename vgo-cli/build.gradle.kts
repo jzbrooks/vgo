@@ -71,6 +71,7 @@ tasks {
             group = "build"
 
             inputs.file(layout.buildDirectory.file("libs/debug/vgo-cli.jar"))
+            inputs.file(layout.projectDirectory.file("optimize.pro"))
             outputs.file(layout.buildDirectory.file("libs/vgo.jar"))
 
             val javaHome = System.getProperty("java.home")
