@@ -1,20 +1,19 @@
-package com.jzbrooks.vgo.core.graphic
+package com.jzbrooks.vgo.svg
 
-import com.jzbrooks.vgo.core.graphic.command.FakeCommandPrinter
+import com.jzbrooks.vgo.core.graphic.Circle
+import com.jzbrooks.vgo.core.graphic.Ellipse
+import com.jzbrooks.vgo.core.graphic.Line
+import com.jzbrooks.vgo.core.graphic.Path
+import com.jzbrooks.vgo.core.graphic.Polygon
+import com.jzbrooks.vgo.core.graphic.Polyline
+import com.jzbrooks.vgo.core.graphic.Rect
+import com.jzbrooks.vgo.core.graphic.Shape
+import com.jzbrooks.vgo.core.graphic.ElementPrinter
 import com.jzbrooks.vgo.core.util.math.Point
-import java.math.RoundingMode
-import java.text.DecimalFormat
 
-class FakeShapePrinter : ShapePrinter {
-    private val commandPrinter = FakeCommandPrinter()
-
-    private val formatter =
-        DecimalFormat().apply {
-            maximumFractionDigits = 2
-            isDecimalSeparatorAlwaysShown = false
-            roundingMode = RoundingMode.HALF_UP
-        }
-
+class ScalableVectorGraphicElementPrinter(
+    private val commandPrinter: ScalableVectorGraphicCommandPrinter,
+) : ElementPrinter {
     override fun print(path: Path): String =
         buildString {
             append("<path d=\"")
@@ -34,8 +33,13 @@ class FakeShapePrinter : ShapePrinter {
             }
 
             is Rect -> {
-                "<rect x=\"${print(shape.x)}\" y=\"${print(shape.y)}\" " +
-                    "width=\"${print(shape.width)}\" height=\"${print(shape.height)}\"/>"
+                buildString {
+                    append("<rect x=\"${print(shape.x)}\" y=\"${print(shape.y)}\" ")
+                    append("width=\"${print(shape.width)}\" height=\"${print(shape.height)}\"")
+                    if (shape.rx > 0f) append(" rx=\"${print(shape.rx)}\"")
+                    if (shape.ry > 0f) append(" ry=\"${print(shape.ry)}\"")
+                    append("/>")
+                }
             }
 
             is Line -> {
@@ -52,7 +56,7 @@ class FakeShapePrinter : ShapePrinter {
             }
         }
 
-    private fun print(value: Float) = formatter.format(value)
+    private fun print(value: Float) = commandPrinter.formatter.format(value)
 
     private fun print(points: List<Point>) = points.joinToString(" ") { "${print(it.x)},${print(it.y)}" }
 }

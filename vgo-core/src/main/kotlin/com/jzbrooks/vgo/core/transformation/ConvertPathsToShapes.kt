@@ -10,7 +10,7 @@ import com.jzbrooks.vgo.core.graphic.Line
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
-import com.jzbrooks.vgo.core.graphic.ShapePrinter
+import com.jzbrooks.vgo.core.graphic.ElementPrinter
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
@@ -31,7 +31,7 @@ class ConvertPathsToShapes(
 
         /** Convert when the shapes print smaller than the path they were recovered from. */
         data class SmallerOutput(
-            val printer: ShapePrinter,
+            val printer: ElementPrinter,
         ) : Criterion
     }
 

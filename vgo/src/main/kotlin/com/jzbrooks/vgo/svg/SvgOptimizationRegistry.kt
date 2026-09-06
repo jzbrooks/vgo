@@ -26,7 +26,7 @@ class SvgOptimizationRegistry :
                 MergePaths(MergePaths.Constraints.None),
                 ConvertPathsToShapes(
                     ConvertPathsToShapes.Criterion.SmallerOutput(
-                        ScalableVectorGraphicShapePrinter(ScalableVectorGraphicCommandPrinter(3)),
+                        ScalableVectorGraphicElementPrinter(ScalableVectorGraphicCommandPrinter(3)),
                     ),
                 ),
             ),

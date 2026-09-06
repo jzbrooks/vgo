@@ -11,7 +11,7 @@ import assertk.assertions.prop
 import assertk.assertions.single
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.Ellipse
-import com.jzbrooks.vgo.core.graphic.FakeShapePrinter
+import com.jzbrooks.vgo.core.graphic.FakeElementPrinter
 import com.jzbrooks.vgo.core.graphic.Line
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.Rect
@@ -123,7 +123,7 @@ class ConvertPathsToShapesTests {
         val path = createPath(CommandString("M0,0h24v24h-24Z").toCommandList())
         val graphic = createGraphic(listOf(path))
 
-        ConvertPathsToShapes(ConvertPathsToShapes.Criterion.SmallerOutput(FakeShapePrinter())).visit(graphic)
+        ConvertPathsToShapes(ConvertPathsToShapes.Criterion.SmallerOutput(FakeElementPrinter())).visit(graphic)
 
         assertThat(graphic.elements.single()).isEqualTo(path)
     }
@@ -133,7 +133,7 @@ class ConvertPathsToShapesTests {
         val path = createPath(CommandString("M5,10a5,5,0,1,1,10,0a5,5,0,1,1-10,0").toCommandList())
         val graphic = createGraphic(listOf(path))
 
-        ConvertPathsToShapes(ConvertPathsToShapes.Criterion.SmallerOutput(FakeShapePrinter())).visit(graphic)
+        ConvertPathsToShapes(ConvertPathsToShapes.Criterion.SmallerOutput(FakeElementPrinter())).visit(graphic)
 
         assertThat(graphic::elements).single().isInstanceOf<Circle>().all {
             prop(Circle::cx).isEqualTo(10f)

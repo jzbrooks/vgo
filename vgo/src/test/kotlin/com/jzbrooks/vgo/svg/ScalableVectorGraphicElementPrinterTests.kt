@@ -15,8 +15,8 @@ import com.jzbrooks.vgo.core.util.math.Point
 import com.jzbrooks.vgo.util.element.createPath
 import org.junit.jupiter.api.Test
 
-class ScalableVectorGraphicShapePrinterTests {
-    private val printer = ScalableVectorGraphicShapePrinter(ScalableVectorGraphicCommandPrinter(3))
+class ScalableVectorGraphicElementPrinterTests {
+    private val printer = ScalableVectorGraphicElementPrinter(ScalableVectorGraphicCommandPrinter(3))
 
     @Test
     fun `prints path command data within a path element`() {
