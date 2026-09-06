@@ -11,6 +11,7 @@ import assertk.assertions.prop
 import assertk.assertions.single
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.Ellipse
+import com.jzbrooks.vgo.core.graphic.FakeShapePrinter
 import com.jzbrooks.vgo.core.graphic.Line
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.Rect
@@ -118,12 +119,26 @@ class ConvertPathsToShapesTests {
     }
 
     @Test
-    fun `keeps path when recovered shapes are rejected`() {
+    fun `keeps path when shapes print larger than the path`() {
         val path = createPath(CommandString("M0,0h24v24h-24Z").toCommandList())
         val graphic = createGraphic(listOf(path))
 
-        ConvertPathsToShapes(shouldConvert = { _, _ -> false }).visit(graphic)
+        ConvertPathsToShapes(ConvertPathsToShapes.Criterion.SmallerOutput(FakeShapePrinter())).visit(graphic)
 
         assertThat(graphic.elements.single()).isEqualTo(path)
+    }
+
+    @Test
+    fun `converts path when shapes print smaller than the path`() {
+        val path = createPath(CommandString("M5,10a5,5,0,1,1,10,0a5,5,0,1,1-10,0").toCommandList())
+        val graphic = createGraphic(listOf(path))
+
+        ConvertPathsToShapes(ConvertPathsToShapes.Criterion.SmallerOutput(FakeShapePrinter())).visit(graphic)
+
+        assertThat(graphic::elements).single().isInstanceOf<Circle>().all {
+            prop(Circle::cx).isEqualTo(10f)
+            prop(Circle::cy).isEqualTo(10f)
+            prop(Circle::r).isEqualTo(5f)
+        }
     }
 }

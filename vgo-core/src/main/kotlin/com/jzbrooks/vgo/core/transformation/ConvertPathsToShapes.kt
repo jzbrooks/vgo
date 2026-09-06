@@ -2,7 +2,6 @@ package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.ContainerElement
-import com.jzbrooks.vgo.core.graphic.Element
 import com.jzbrooks.vgo.core.graphic.Ellipse
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -11,8 +10,8 @@ import com.jzbrooks.vgo.core.graphic.Line
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
+import com.jzbrooks.vgo.core.graphic.ShapePrinter
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
-import com.jzbrooks.vgo.core.graphic.command.CommandPrinter
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve
 import com.jzbrooks.vgo.core.graphic.command.HorizontalLineTo
@@ -20,29 +19,21 @@ import com.jzbrooks.vgo.core.graphic.command.LineTo
 import com.jzbrooks.vgo.core.graphic.command.MoveTo
 import com.jzbrooks.vgo.core.graphic.command.VerticalLineTo
 import com.jzbrooks.vgo.core.util.math.Point
-import java.math.RoundingMode
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-import java.util.Locale
 import kotlin.math.abs
 
 class ConvertPathsToShapes(
-    val commandPrinter: CommandPrinter,
+    private val criterion: Criterion = Criterion.Always,
+    private val tolerance: Float = 1e-3f,
 ) : BottomUpTransformer {
-    // This is temporary and should be removed in the next round of breaking changes.
-    // The real fix for this is that `CommandPrinter` exposes its formatter on the interface.
-    // So that core transformations don't have to know about the different formats.
-    // This is safe for now because it is only used for SVGs.
-    @Deprecated("Upstream this into CommandPrinter")
-    private val formatter =
-        DecimalFormat().apply {
-            maximumFractionDigits = 3
-            isDecimalSeparatorAlwaysShown = false
-            isGroupingUsed = false
-            roundingMode = RoundingMode.HALF_UP
-            minimumIntegerDigits = 0
-            decimalFormatSymbols = DecimalFormatSymbols(Locale.US)
-        }
+    sealed interface Criterion {
+        /** Convert every recovered shape. */
+        data object Always : Criterion
+
+        /** Convert when the shapes print smaller than the path they were recovered from. */
+        data class SmallerOutput(
+            val printer: ShapePrinter,
+        ) : Criterion
+    }
 
     override fun visit(graphic: Graphic) = convertPaths(graphic)
 
@@ -85,7 +76,7 @@ class ConvertPathsToShapes(
             index = match.nextIndex
         }
 
-        return shapes.takeIf { it.isNotEmpty() && shapesAreShorterThanPath(path, it) }
+        return shapes.takeIf { it.isNotEmpty() && isWorthConverting(path, it) }
     }
 
     private fun matchEllipse(
@@ -267,54 +258,20 @@ class ConvertPathsToShapes(
     private fun close(
         first: Float,
         second: Float,
-    ): Boolean = abs(first - second) <= 1e-3
+    ): Boolean = abs(first - second) <= tolerance
 
-    @Suppress("DEPRECATION")
-    private fun shapesAreShorterThanPath(
+    private fun isWorthConverting(
         path: Path,
         shapes: List<Shape>,
-    ): Boolean {
-        if (shapes.all { it is Circle }) return true
-
-        val pathLength = path.commands.sumOf { commandPrinter.print(it).length } + 12
-        val shapeLength =
-            shapes.sumOf { shape ->
-                when (shape) {
-                    is Circle -> {
-                        "<circle cx=\"${formatter.format(
-                            shape.cx,
-                        )}\" cy=\"${formatter.format(shape.cy)}\" r=\"${formatter.format(shape.r)}\"/>".length
-                    }
-
-                    is Ellipse -> {
-                        "<ellipse cx=\"${formatter.format(
-                            shape.cx,
-                        )}\" cy=\"${formatter.format(
-                            shape.cy,
-                        )}\" rx=\"${formatter.format(shape.rx)}\" ry=\"${formatter.format(shape.ry)}\"/>".length
-                    }
-
-                    is Rect -> {
-                        "<rect height=\"${formatter.format(
-                            shape.height,
-                        )}\" width=\"${formatter.format(
-                            shape.width,
-                        )}\" x=\"${formatter.format(shape.x)}\" y=\"${formatter.format(shape.y)}\"/>".length
-                    }
-
-                    is Line -> {
-                        "<line x1=\"${formatter.format(
-                            shape.x1,
-                        )}\" x2=\"${formatter.format(
-                            shape.x2,
-                        )}\" y1=\"${formatter.format(shape.y1)}\" y2=\"${formatter.format(shape.y2)}\"/>".length
-                    }
-
-                    else -> {
-                        Int.MAX_VALUE
-                    }
-                }
+    ): Boolean =
+        when (criterion) {
+            is Criterion.Always -> {
+                true
             }
-        return shapeLength < pathLength
-    }
+
+            is Criterion.SmallerOutput -> {
+                val printer = criterion.printer
+                shapes.sumOf { printer.print(it).length } < printer.print(path).length
+            }
+        }
 }
