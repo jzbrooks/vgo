@@ -58,6 +58,17 @@ jobs:
         name: vgo_core_test_results
         path: vgo-core/build/reports/tests/test/
 
+    # Uploaded even when the build fails, since a red end-to-end run is the
+    # case where the report is worth reading.
+    - name: archive vgo cli test results
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: vgo_cli_test_results
+        path: |
+          vgo-cli/build/reports/tests/test/
+          vgo-cli/build/reports/tests/e2eTest/
+
     - name: release binary
       run: ./gradlew binary
 
