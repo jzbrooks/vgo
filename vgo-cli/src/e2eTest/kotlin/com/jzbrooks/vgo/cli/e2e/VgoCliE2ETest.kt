@@ -8,6 +8,7 @@ import assertk.assertions.hasText
 import assertk.assertions.isEqualTo
 import assertk.assertions.isLessThan
 import assertk.assertions.startsWith
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
@@ -120,6 +121,40 @@ class VgoCliE2ETest {
         assertThat(invocation.exitCode, "$invocation").isEqualTo(0)
         assertThat(output.readText()).startsWith("<vector")
         assertParses(output)
+    }
+
+    // ImageVector.
+    //
+    // Both of these fail on the shipped binary today: R8 rewrites the Kotlin
+    // compiler's embedded IntelliJ core badly enough that K1 PSI setup dies in
+    // KotlinCoreEnvironment.createForProduction, before any vgo code runs. They
+    // pass against the debug jar, so this is packaging, not logic. See the note
+    // at the top of optimize.pro.
+
+    @Disabled("ImageVector support is broken in the R8 optimized binary; see optimize.pro")
+    @Test
+    fun `imagevector optimization matches the library baseline`() {
+        assertMatchesBaseline("imagevector/star.kt", "baseline/star_optimized.kt")
+    }
+
+    @Disabled("ImageVector support is broken in the R8 optimized binary; see optimize.pro")
+    @Test
+    fun `vector drawable converts to an imagevector`() {
+        val input = VgoBinary.stage("avocado_example.xml", workingDirectory)
+        val output = workingDirectory.resolve("converted.kt")
+
+        val invocation =
+            VgoBinary.run(
+                input.toString(),
+                "-o",
+                output.toString(),
+                "--format",
+                "iv",
+                workingDirectory = workingDirectory,
+            )
+
+        assertThat(invocation.exitCode, "$invocation").isEqualTo(0)
+        assertThat(output.readText()).contains("ImageVector.Builder")
     }
 
     // The CLI surface, across a process boundary
@@ -291,7 +326,7 @@ class VgoCliE2ETest {
         baseline: String,
     ) {
         val input = VgoBinary.stage(asset, workingDirectory)
-        val output = workingDirectory.resolve("optimized-$asset")
+        val output = workingDirectory.resolve("optimized-${input.fileName}")
 
         val invocation =
             VgoBinary.run(
