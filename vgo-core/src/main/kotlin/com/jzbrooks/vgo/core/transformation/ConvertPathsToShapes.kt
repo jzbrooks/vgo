@@ -2,6 +2,7 @@ package com.jzbrooks.vgo.core.transformation
 
 import com.jzbrooks.vgo.core.graphic.Circle
 import com.jzbrooks.vgo.core.graphic.ContainerElement
+import com.jzbrooks.vgo.core.graphic.ElementPrinter
 import com.jzbrooks.vgo.core.graphic.Ellipse
 import com.jzbrooks.vgo.core.graphic.Extra
 import com.jzbrooks.vgo.core.graphic.Graphic
@@ -10,7 +11,6 @@ import com.jzbrooks.vgo.core.graphic.Line
 import com.jzbrooks.vgo.core.graphic.Path
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
-import com.jzbrooks.vgo.core.graphic.ElementPrinter
 import com.jzbrooks.vgo.core.graphic.command.ClosePath
 import com.jzbrooks.vgo.core.graphic.command.CommandVariant
 import com.jzbrooks.vgo.core.graphic.command.EllipticalArcCurve

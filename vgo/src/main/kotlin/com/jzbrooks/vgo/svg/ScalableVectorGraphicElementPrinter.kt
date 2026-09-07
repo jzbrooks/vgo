@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.svg
 
 import com.jzbrooks.vgo.core.graphic.Circle
+import com.jzbrooks.vgo.core.graphic.ElementPrinter
 import com.jzbrooks.vgo.core.graphic.Ellipse
 import com.jzbrooks.vgo.core.graphic.Line
 import com.jzbrooks.vgo.core.graphic.Path
@@ -8,7 +9,6 @@ import com.jzbrooks.vgo.core.graphic.Polygon
 import com.jzbrooks.vgo.core.graphic.Polyline
 import com.jzbrooks.vgo.core.graphic.Rect
 import com.jzbrooks.vgo.core.graphic.Shape
-import com.jzbrooks.vgo.core.graphic.ElementPrinter
 import com.jzbrooks.vgo.core.util.math.Point
 
 class ScalableVectorGraphicElementPrinter(
