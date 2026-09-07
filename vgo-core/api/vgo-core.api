@@ -193,6 +193,11 @@ public abstract interface class com/jzbrooks/vgo/core/graphic/Element {
 	public abstract fun getId ()Ljava/lang/String;
 }
 
+public abstract interface class com/jzbrooks/vgo/core/graphic/ElementPrinter {
+	public abstract fun print (Lcom/jzbrooks/vgo/core/graphic/Path;)Ljava/lang/String;
+	public abstract fun print (Lcom/jzbrooks/vgo/core/graphic/Shape;)Ljava/lang/String;
+}
+
 public abstract interface class com/jzbrooks/vgo/core/graphic/ElementVisitor {
 	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/Extra;)V
 	public abstract fun visit (Lcom/jzbrooks/vgo/core/graphic/Graphic;)V
@@ -574,11 +579,6 @@ public final class com/jzbrooks/vgo/core/graphic/Shape$DefaultImpls {
 	public static fun getStrokeBrush (Lcom/jzbrooks/vgo/core/graphic/Shape;)Lcom/jzbrooks/vgo/core/Brush;
 	public static fun setFillBrush (Lcom/jzbrooks/vgo/core/graphic/Shape;Lcom/jzbrooks/vgo/core/Brush;)V
 	public static fun setStrokeBrush (Lcom/jzbrooks/vgo/core/graphic/Shape;Lcom/jzbrooks/vgo/core/Brush;)V
-}
-
-public abstract interface class com/jzbrooks/vgo/core/graphic/ShapePrinter {
-	public abstract fun print (Lcom/jzbrooks/vgo/core/graphic/Path;)Ljava/lang/String;
-	public abstract fun print (Lcom/jzbrooks/vgo/core/graphic/Shape;)Ljava/lang/String;
 }
 
 public final class com/jzbrooks/vgo/core/graphic/command/ClosePath : com/jzbrooks/vgo/core/graphic/command/Command {
@@ -983,12 +983,12 @@ public final class com/jzbrooks/vgo/core/transformation/ConvertPathsToShapes$Cri
 }
 
 public final class com/jzbrooks/vgo/core/transformation/ConvertPathsToShapes$Criterion$SmallerOutput : com/jzbrooks/vgo/core/transformation/ConvertPathsToShapes$Criterion {
-	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/ShapePrinter;)V
-	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/ShapePrinter;
-	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/ShapePrinter;)Lcom/jzbrooks/vgo/core/transformation/ConvertPathsToShapes$Criterion$SmallerOutput;
-	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/transformation/ConvertPathsToShapes$Criterion$SmallerOutput;Lcom/jzbrooks/vgo/core/graphic/ShapePrinter;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/transformation/ConvertPathsToShapes$Criterion$SmallerOutput;
+	public fun <init> (Lcom/jzbrooks/vgo/core/graphic/ElementPrinter;)V
+	public final fun component1 ()Lcom/jzbrooks/vgo/core/graphic/ElementPrinter;
+	public final fun copy (Lcom/jzbrooks/vgo/core/graphic/ElementPrinter;)Lcom/jzbrooks/vgo/core/transformation/ConvertPathsToShapes$Criterion$SmallerOutput;
+	public static synthetic fun copy$default (Lcom/jzbrooks/vgo/core/transformation/ConvertPathsToShapes$Criterion$SmallerOutput;Lcom/jzbrooks/vgo/core/graphic/ElementPrinter;ILjava/lang/Object;)Lcom/jzbrooks/vgo/core/transformation/ConvertPathsToShapes$Criterion$SmallerOutput;
 	public fun equals (Ljava/lang/Object;)Z
-	public final fun getPrinter ()Lcom/jzbrooks/vgo/core/graphic/ShapePrinter;
+	public final fun getPrinter ()Lcom/jzbrooks/vgo/core/graphic/ElementPrinter;
 	public fun hashCode ()I
 	public fun toString ()Ljava/lang/String;
 }

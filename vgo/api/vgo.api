@@ -119,14 +119,14 @@ public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicCommandPrinter : co
 	public fun print (Lcom/jzbrooks/vgo/core/graphic/command/Command;)Ljava/lang/String;
 }
 
-public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicReaderKt {
-	public static final fun parse (Lorg/w3c/dom/Node;)Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;
-}
-
-public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicShapePrinter : com/jzbrooks/vgo/core/graphic/ShapePrinter {
+public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicElementPrinter : com/jzbrooks/vgo/core/graphic/ElementPrinter {
 	public fun <init> (Lcom/jzbrooks/vgo/svg/ScalableVectorGraphicCommandPrinter;)V
 	public fun print (Lcom/jzbrooks/vgo/core/graphic/Path;)Ljava/lang/String;
 	public fun print (Lcom/jzbrooks/vgo/core/graphic/Shape;)Ljava/lang/String;
+}
+
+public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicReaderKt {
+	public static final fun parse (Lorg/w3c/dom/Node;)Lcom/jzbrooks/vgo/svg/ScalableVectorGraphic;
 }
 
 public final class com/jzbrooks/vgo/svg/ScalableVectorGraphicWriter {
