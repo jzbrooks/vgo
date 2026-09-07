@@ -3,6 +3,13 @@
 ## Unreleased
 
 ### Added
+- SVG output recovers native shapes from path data. Once paths have merged, subpaths that draw a
+  circle, an ellipse, an axis-aligned rectangle, or a single straight line are written as
+  `<circle>`, `<ellipse>`, `<rect>`, or `<line>` whenever those elements print smaller than the
+  path they came from. The new `ConvertPathsToShapes` transformation implements this, deciding with
+  an `ElementPrinter` for the document format — `ScalableVectorGraphicElementPrinter` for SVG.
+- `vgo-core` ships proguard rules in its artifact, so projects that shrink with r8 pick up the
+  keep rules vgo needs without configuring them by hand.
 
 ### Changed
 - SVG path data now also takes advantage of using negative signs as parameter separators
