@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
 import assertk.assertions.exists
+import assertk.assertions.hasSize
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import org.junit.jupiter.api.AfterEach
@@ -177,6 +179,62 @@ class VgoTests {
         val output = File(outputPath).readText()
         assertThat(output).contains("<linearGradient")
         assertThat(output).contains("url(#gradient0)")
+    }
+
+    @Test
+    fun `a graphic that cannot shrink is reported as copied to its output path`(info: TestInfo) {
+        val input = File("build/test-results/${info.displayName}/bug_117.xml")
+        val outputPath = "build/test-results/${info.displayName}/copy.xml"
+
+        // bug_117.xml is already at a fixed point, so optimizing it can't
+        // produce a smaller file.
+        File("src/test/resources/bug_117.xml").copyTo(input, overwrite = true)
+
+        val vgo =
+            Vgo(
+                Vgo.Options(
+                    input = listOf(input.path),
+                    output = listOf(outputPath),
+                    indent = 2,
+                ),
+            )
+        vgo.run()
+
+        assertThat(vgo.copiedFiles).hasSize(1)
+        assertThat(vgo.copiedFiles.single().reason).isEqualTo(Vgo.CopiedFile.Reason.OPTIMIZATION_NOT_SMALLER)
+        assertThat(File(outputPath).readText()).isEqualTo(input.readText())
+    }
+
+    @Test
+    fun `a non-vector file is reported as copied to its output path`(info: TestInfo) {
+        val input = File("build/test-results/inPlaceModification/${info.displayName}/non_vector.xml")
+        val outputPath = "build/test-results/${info.displayName}/non_vector.xml"
+
+        val vgo =
+            Vgo(
+                Vgo.Options(
+                    input = listOf(input.path),
+                    output = listOf(outputPath),
+                ),
+            )
+        vgo.run()
+
+        assertThat(vgo.copiedFiles).hasSize(1)
+        assertThat(vgo.copiedFiles.single().reason).isEqualTo(Vgo.CopiedFile.Reason.NOT_A_VECTOR_GRAPHIC)
+        assertThat(File(outputPath).readText()).isEqualTo(input.readText())
+    }
+
+    @Test
+    fun `in-place optimization reports no copies`(info: TestInfo) {
+        val options =
+            Vgo.Options(
+                input = listOf("build/test-results/inPlaceModification/${info.displayName}"),
+            )
+
+        val vgo = Vgo(options)
+        vgo.run()
+
+        assertThat(vgo.copiedFiles).isEmpty()
     }
 
     @Test
