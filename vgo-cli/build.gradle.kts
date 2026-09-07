@@ -102,9 +102,15 @@ tasks {
             description = "Runs r8 on the jar application."
             group = "build"
 
+            val keepRules = layout.projectDirectory.file("optimize.pro")
+
             inputs.file(layout.buildDirectory.file("libs/debug/vgo-cli.jar"))
+
             inputs.file(layout.projectDirectory.file("optimize.pro"))
             inputs.files(extractContributedProguardRules)
+
+            inputs.file(keepRules).withPropertyName("keepRules")
+
             outputs.file(layout.buildDirectory.file("libs/vgo.jar"))
 
             val javaHome = System.getProperty("java.home")
@@ -120,7 +126,7 @@ tasks {
                 "--output",
                 layout.buildDirectory.file("libs/vgo.jar").get(),
                 "--pg-conf",
-                "optimize.pro",
+                keepRules.asFile,
                 layout.buildDirectory.file("libs/debug/vgo-cli.jar").get(),
             )
 
