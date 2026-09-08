@@ -1,12 +1,28 @@
+import org.gradle.kotlin.dsl.support.serviceOf
+
 plugins {
     id("vgo.kotlin-conventions")
 }
 
 val r8: Configuration = configurations.create("r8")
 
+// Proguard rules published alongside vgo's own artifacts. Third party rules are
+// deliberately excluded so that optimize.pro remains the sole authority on how
+// dependencies are optimized here.
+val contributedProguardRules: Configuration =
+    configurations.create("contributedProguardRules") {
+        isCanBeConsumed = false
+        isTransitive = false
+    }
+
+val proguardRulesDirectory = layout.buildDirectory.dir("intermediates/proguard-rules")
+
 dependencies {
     implementation(project(":vgo"))
+    contributedProguardRules(project(":vgo"))
+
     implementation(project(":vgo-core"))
+    contributedProguardRules(project(":vgo-core"))
 
     implementation(libs.android.sdk.common)
     implementation(libs.kotlin.compiler.embeddable)
@@ -65,12 +81,30 @@ tasks {
         destinationDirectory.set(layout.buildDirectory.dir("libs/debug"))
     }
 
+    // The android gradle plugin extracts these for its consumers. The r8 command
+    // line tool doesn't, so they're gathered from the dependency jars here instead.
+    val extractContributedProguardRules =
+        register<Sync>("extractContributedProguardRules") {
+            description = "Collects proguard rules contributed by vgo artifacts."
+
+            val archives = serviceOf<ArchiveOperations>()
+            from(contributedProguardRules.elements.map { jars -> jars.map(archives::zipTree) }) {
+                include("META-INF/proguard/*.pro")
+            }
+
+            includeEmptyDirs = false
+            eachFile { path = name }
+            into(proguardRulesDirectory)
+        }
+
     val optimize =
         register<JavaExec>("optimize") {
             description = "Runs r8 on the jar application."
             group = "build"
 
             inputs.file(layout.buildDirectory.file("libs/debug/vgo-cli.jar"))
+            inputs.file(layout.projectDirectory.file("optimize.pro"))
+            inputs.files(extractContributedProguardRules)
             outputs.file(layout.buildDirectory.file("libs/vgo.jar"))
 
             val javaHome = System.getProperty("java.home")
@@ -88,6 +122,19 @@ tasks {
                 "--pg-conf",
                 "optimize.pro",
                 layout.buildDirectory.file("libs/debug/vgo-cli.jar").get(),
+            )
+
+            val rulesDirectory = proguardRulesDirectory
+            argumentProviders.add(
+                CommandLineArgumentProvider {
+                    rulesDirectory
+                        .get()
+                        .asFile
+                        .listFiles()
+                        .orEmpty()
+                        .sorted()
+                        .flatMap { rules -> listOf("--pg-conf", rules.path) }
+                },
             )
 
             dependsOn(jar)

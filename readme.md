@@ -99,29 +99,32 @@ Options:
 
 ## vgo vs. SVGO benchmark
 
-Generated: 2026-08-08T01:08:39.241Z
+Generated: 2026-09-08T00:10:57.065Z
 
-Corpus: `/Users/justin/projects/vgo/vgo/src/test/resources` (10 files, 16733816 bytes)
+Corpus: `/Users/justin/projects/vgo/vgo/src/test/resources` (13 files, 16735323 bytes)
 
 Runs: 10; warmups: 3; batch size: 100
 
 | Tool | Version | Mean ± σ | Median | Min | Max | Output bytes | Saved | MiB/s | Relative |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| vgo | 5.0.0 | 3.266 s ± 0.035 s | 3.265 s | 3.226 s | 3.343 s | 11983741 | 28.39% | 4.89 | 1.00× |
-| svgo | 4.0.2 | 9.499 s ± 0.044 s | 9.494 s | 9.417 s | 9.574 s | 11123262 | 33.53% | 1.68 | 2.91× |
+| vgo | 5.0.0 | 3.406 s ± 0.032 s | 3.401 s | 3.367 s | 3.489 s | 11870774 | 29.07% | 4.69 | 1.00× |
+| svgo | 4.1.0 | 9.540 s ± 0.121 s | 9.500 s | 9.431 s | 9.819 s | 11124430 | 33.53% | 1.67 | 2.80× |
 
 | File | Original | vgo | SVGO | Smaller output |
 |---|---:|---:|---:|---|
-| android.svg | 822 | 716 | 679 | svgo |
-| dribbble_ball_mark.svg | 1874 | 1279 | 1207 | svgo |
-| eleven_below_single.svg | 141009 | 79899 | 62480 | svgo |
+| android.svg | 822 | 714 | 679 | svgo |
+| animated_paint.svg | 462 | 369 | 371 | vgo |
+| current_color.svg | 392 | 339 | 319 | svgo |
+| dribbble_ball_mark.svg | 1874 | 1271 | 1207 | svgo |
+| eleven_below_single.svg | 141009 | 79520 | 62480 | svgo |
 | gradient_linear.svg | 700 | 505 | 562 | vgo |
-| great_wave.svg | 16497061 | 11814855 | 10973810 | svgo |
-| guacamole.svg | 4012 | 2845 | 2776 | svgo |
-| nasa.svg | 6592 | 6592 | 5667 | svgo |
+| great_wave.svg | 16497061 | 11701857 | 10973810 | svgo |
+| guacamole.svg | 4012 | 2788 | 2776 | svgo |
+| inherited_paint.svg | 653 | 491 | 478 | svgo |
+| nasa.svg | 6592 | 6060 | 5667 | svgo |
 | simple_heart.svg | 244 | 177 | 169 | svgo |
 | tiger.svg | 68630 | 68630 | 68451 | svgo |
-| vgo.svg | 12872 | 8243 | 7461 | svgo |
+| vgo.svg | 12872 | 8053 | 7461 | svgo |
 
 > Timing includes CLI startup, parsing, optimization, and writes. Corpus setup and validation are excluded. Structural validation does not prove visual equivalence.
 
