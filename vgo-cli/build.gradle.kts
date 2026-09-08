@@ -38,6 +38,42 @@ dependencies {
     testImplementation(libs.assertk)
 }
 
+testing {
+    suites {
+        register<JvmTestSuite>("e2eTest") {
+            useJUnitJupiter(libs.versions.junit)
+
+            dependencies {
+                implementation(libs.assertk)
+            }
+
+            targets.all {
+                testTask.configure {
+                    description = "Runs the packaged CLI binary as a subprocess."
+                    group = LifecycleBasePlugin.VERIFICATION_GROUP
+
+                    val binaryFile = layout.buildDirectory.file("libs/vgo")
+                    val optimizedJar = layout.buildDirectory.file("libs/vgo.jar")
+                    val corpus = layout.settingsDirectory.dir("vgo/src/test/resources")
+
+                    inputs.file(binaryFile).withPropertyName("vgoBinary")
+                    inputs
+                        .dir(corpus)
+                        .withPropertyName("corpus")
+                        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+                    systemProperty("vgo.binary", binaryFile.get().asFile.absolutePath)
+                    systemProperty("vgo.jar", optimizedJar.get().asFile.absolutePath)
+                    systemProperty("vgo.corpus", corpus.asFile.absolutePath)
+                    systemProperty("vgo.version", providers.gradleProperty("VERSION_NAME").get())
+
+                    dependsOn("binary")
+                }
+            }
+        }
+    }
+}
+
 tasks {
     jar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -102,9 +138,15 @@ tasks {
             description = "Runs r8 on the jar application."
             group = "build"
 
+            val keepRules = layout.projectDirectory.file("optimize.pro")
+
             inputs.file(layout.buildDirectory.file("libs/debug/vgo-cli.jar"))
+
             inputs.file(layout.projectDirectory.file("optimize.pro"))
             inputs.files(extractContributedProguardRules)
+
+            inputs.file(keepRules).withPropertyName("keepRules")
+
             outputs.file(layout.buildDirectory.file("libs/vgo.jar"))
 
             val javaHome = System.getProperty("java.home")
@@ -120,7 +162,7 @@ tasks {
                 "--output",
                 layout.buildDirectory.file("libs/vgo.jar").get(),
                 "--pg-conf",
-                "optimize.pro",
+                keepRules.asFile,
                 layout.buildDirectory.file("libs/debug/vgo-cli.jar").get(),
             )
 
@@ -160,5 +202,9 @@ tasks {
             }
             binaryFile.setExecutable(true, false)
         }
+    }
+
+    named("check") {
+        dependsOn(testing.suites.named("e2eTest"))
     }
 }

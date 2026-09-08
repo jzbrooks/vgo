@@ -13,6 +13,7 @@
 
 ### Changed
 - SVG path data now also takes advantage of using negative signs as parameter separators
+- E2E tests cover the vgo cli after r8 optimization
 
 ### Deprecated
 
