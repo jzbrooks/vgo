@@ -38,6 +38,42 @@ dependencies {
     testImplementation(libs.assertk)
 }
 
+testing {
+    suites {
+        register<JvmTestSuite>("e2eTest") {
+            useJUnitJupiter(libs.versions.junit)
+
+            dependencies {
+                implementation(libs.assertk)
+            }
+
+            targets.all {
+                testTask.configure {
+                    description = "Runs the packaged CLI binary as a subprocess."
+                    group = LifecycleBasePlugin.VERIFICATION_GROUP
+
+                    val binaryFile = layout.buildDirectory.file("libs/vgo")
+                    val optimizedJar = layout.buildDirectory.file("libs/vgo.jar")
+                    val corpus = layout.settingsDirectory.dir("vgo/src/test/resources")
+
+                    inputs.file(binaryFile).withPropertyName("vgoBinary")
+                    inputs
+                        .dir(corpus)
+                        .withPropertyName("corpus")
+                        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+                    systemProperty("vgo.binary", binaryFile.get().asFile.absolutePath)
+                    systemProperty("vgo.jar", optimizedJar.get().asFile.absolutePath)
+                    systemProperty("vgo.corpus", corpus.asFile.absolutePath)
+                    systemProperty("vgo.version", providers.gradleProperty("VERSION_NAME").get())
+
+                    dependsOn("binary")
+                }
+            }
+        }
+    }
+}
+
 tasks {
     jar {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -167,46 +203,8 @@ tasks {
             binaryFile.setExecutable(true, false)
         }
     }
-}
 
-val binary = tasks.named("binary")
-
-testing {
-    suites {
-        register<JvmTestSuite>("e2eTest") {
-            useJUnitJupiter(libs.versions.junit)
-
-            dependencies {
-                implementation(libs.assertk)
-            }
-
-            targets.all {
-                testTask.configure {
-                    description = "Runs the packaged CLI binary as a subprocess."
-                    group = LifecycleBasePlugin.VERIFICATION_GROUP
-
-                    val binaryFile = layout.buildDirectory.file("libs/vgo")
-                    val optimizedJar = layout.buildDirectory.file("libs/vgo.jar")
-                    val corpus = layout.settingsDirectory.dir("vgo/src/test/resources")
-
-                    inputs.file(binaryFile).withPropertyName("vgoBinary")
-                    inputs
-                        .dir(corpus)
-                        .withPropertyName("corpus")
-                        .withPathSensitivity(PathSensitivity.RELATIVE)
-
-                    systemProperty("vgo.binary", binaryFile.get().asFile.absolutePath)
-                    systemProperty("vgo.jar", optimizedJar.get().asFile.absolutePath)
-                    systemProperty("vgo.corpus", corpus.asFile.absolutePath)
-                    systemProperty("vgo.version", providers.gradleProperty("VERSION_NAME").get())
-
-                    dependsOn(binary)
-                }
-            }
-        }
+    named("check") {
+        dependsOn(testing.suites.named("e2eTest"))
     }
-}
-
-tasks.named("check") {
-    dependsOn(testing.suites.named("e2eTest"))
 }
