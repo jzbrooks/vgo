@@ -3,18 +3,7 @@ package com.jzbrooks.vgo.util
 import com.android.ide.common.vectordrawable.Svg2Vector
 import com.jzbrooks.vgo.core.graphic.Graphic
 import com.jzbrooks.vgo.core.util.ExperimentalVgoApi
-import org.jetbrains.kotlin.K1Deprecation
-import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
-import org.jetbrains.kotlin.cli.common.messages.PrintingMessageCollector
-import org.jetbrains.kotlin.cli.create
-import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
-import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
-import org.jetbrains.kotlin.com.intellij.psi.PsiManager
-import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.idea.KotlinFileType
-import org.jetbrains.kotlin.psi.KtFile
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -25,7 +14,7 @@ import com.jzbrooks.vgo.vd.parse as vdParse
 
 fun parse(file: File): Graphic? = parse(file, null)
 
-@OptIn(ExperimentalVgoApi::class, K1Deprecation::class)
+@OptIn(ExperimentalVgoApi::class)
 internal fun parse(
     file: File,
     format: String? = null,
@@ -38,23 +27,7 @@ internal fun parse(
             val disposable = Disposer.newDisposable()
 
             try {
-                val configuration =
-                    CompilerConfiguration.create(
-                        messageCollector = PrintingMessageCollector(System.err, MessageRenderer.PLAIN_FULL_PATHS, false),
-                    )
-
-                val environment =
-                    KotlinCoreEnvironment.createForProduction(
-                        disposable,
-                        configuration,
-                        EnvironmentConfigFiles.JVM_CONFIG_FILES,
-                    )
-
-                val project = environment.project
-                val virtualFile = LightVirtualFile(file.name, KotlinFileType.INSTANCE, text)
-                val psiFile = PsiManager.getInstance(project).findFile(virtualFile) as KtFile
-
-                composableParse(psiFile)
+                composableParse(parseKotlinSource(disposable, file.name, text))
             } finally {
                 Disposer.dispose(disposable)
             }
