@@ -1,6 +1,7 @@
 package com.jzbrooks.vgo.plugin
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
@@ -99,6 +100,38 @@ class VgoPluginFunctionalTest {
         ).isEqualTo(UNOPTIMIZED_DRAWABLE)
     }
 
+    @Test
+    fun filesCopiedToTheOutputPathUnchangedAreReported(
+        @TempDir projectDir: File,
+    ) {
+        projectDir.resolve("settings.gradle.kts").writeText("""rootProject.name = "app"""")
+
+        projectDir.resolve("build.gradle.kts").writeText(
+            """
+            plugins {
+                base
+                id("com.jzbrooks.vgo")
+            }
+
+            vgo {
+                outputs.setFrom(layout.buildDirectory.file("vgo/notes.xml"))
+            }
+            """.trimIndent(),
+        )
+
+        // Not a vector graphic, so the shrink task passes it through untouched.
+        projectDir.resolve("src/main/res/drawable").mkdirs()
+        projectDir.resolve("src/main/res/drawable/notes.xml").writeText(NON_VECTOR_RESOURCE)
+
+        val result = runner(projectDir, "shrinkVectorGraphic").build()
+
+        assertThat(result.task(":shrinkVectorGraphic")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
+        assertThat(result.output).contains(
+            "build${File.separator}vgo${File.separator}notes.xml copied unchanged (not a vector graphic)",
+        )
+        assertThat(projectDir.resolve("build/vgo/notes.xml").readText()).isEqualTo(NON_VECTOR_RESOURCE)
+    }
+
     private fun runner(
         projectDir: File,
         vararg tasks: String,
@@ -107,7 +140,7 @@ class VgoPluginFunctionalTest {
         .withProjectDir(projectDir)
         .withTestKitDir(File("build/testkit").absoluteFile)
         .withPluginClasspath()
-        .withArguments(*tasks, "--configuration-cache")
+        .withArguments(*tasks, "--configuration-cache", "--info")
 
     private fun writeNestedBuild(projectDir: File) {
         projectDir.resolve("settings.gradle.kts").writeText(
@@ -154,6 +187,13 @@ class VgoPluginFunctionalTest {
     }
 
     companion object {
+        private val NON_VECTOR_RESOURCE =
+            """
+            <resources>
+                <string name="label">vgo</string>
+            </resources>
+            """.trimIndent()
+
         private val UNOPTIMIZED_DRAWABLE =
             """
             <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="24dp" android:height="24dp" android:viewportWidth="24" android:viewportHeight="24">

@@ -97,6 +97,12 @@ Options:
 > shrink a little on a subsequent run, so `--check` may report a file that was optimized moments
 > ago. Rerun vgo until the output stops changing — usually one additional pass — before checking.
 
+> [!NOTE]
+> When optimizing wouldn't make a file smaller, or when an input isn't a vector graphic at all, vgo
+> writes the input through unchanged rather than a larger file. Runs that write to a separate output
+> path report each such file, so a copy is never mistaken for an optimization. In-place runs leave
+> those files alone and say nothing.
+
 ## vgo vs. SVGO benchmark
 
 Generated: 2026-09-08T00:10:57.065Z

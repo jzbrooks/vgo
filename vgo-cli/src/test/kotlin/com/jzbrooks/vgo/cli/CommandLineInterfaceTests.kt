@@ -21,6 +21,7 @@ import java.nio.file.Paths
 class CommandLineInterfaceTests {
     private val avocadoExampleRelativePath = Paths.get("src/test/resources/avocado_example.xml").toString()
     private val heartExampleRelativePath = Paths.get("src/test/resources/simple_heart.xml").toString()
+    private val fixedPointRelativePath = Paths.get("src/test/resources/fixed_point.xml").toString()
     private lateinit var systemOutput: ByteArrayOutputStream
     private lateinit var systemError: ByteArrayOutputStream
     private lateinit var originalOut: PrintStream
@@ -206,6 +207,21 @@ class CommandLineInterfaceTests {
         val report = systemOutput.toString()
         assertThat(report).contains(avocadoExampleRelativePath)
         assertThat(report).contains(heartExampleRelativePath)
+    }
+
+    @Test
+    fun `files copied to the output path unchanged are reported without the stats flag`() {
+        val copyPath = "build/integrationTest/copy-report-copy.xml"
+
+        // fixed_point.xml is already fully shrunk at this indentation, so vgo
+        // copies it rather than writing a file that isn't any smaller.
+        val exitCode = CommandLineInterface().run(arrayOf(fixedPointRelativePath, "-o", copyPath, "--indent", "2"))
+
+        assertThat(exitCode).isEqualTo(0)
+        assertThat(systemOutput.toString()).contains(
+            "$copyPath copied unchanged (optimization did not reduce size)",
+        )
+        assertThat(File(copyPath).readText()).isEqualTo(File(fixedPointRelativePath).readText())
     }
 
     @Test

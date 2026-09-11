@@ -116,7 +116,14 @@ class CommandLineInterface {
                     },
             )
 
-        return Vgo(options).run()
+        val vgo = Vgo(options)
+        val exitCode = vgo.run()
+
+        for (copy in vgo.copiedFiles) {
+            println(copy.describe())
+        }
+
+        return exitCode
     }
 
     companion object {

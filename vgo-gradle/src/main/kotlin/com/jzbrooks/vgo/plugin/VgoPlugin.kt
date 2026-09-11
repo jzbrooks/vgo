@@ -39,6 +39,7 @@ class VgoPlugin : Plugin<Project> {
             task.outputFormat.set(extension.format)
             task.indent.set(extension.indent)
             task.noOptimization.set(extension.noOptimization)
+            task.projectDirectory.set(target.layout.projectDirectory)
         }
 
         val checkTask =
