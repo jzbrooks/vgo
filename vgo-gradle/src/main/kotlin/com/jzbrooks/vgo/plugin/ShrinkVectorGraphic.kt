@@ -72,8 +72,9 @@ abstract class ShrinkVectorGraphic : DefaultTask() {
         // Reported before the failure check so a partially completed run still
         // explains the files it passed through untouched.
         val projectPath = projectDirectory.get().asFile.toPath()
+        logger.info("Optimization did not shrink these files:")
         for (copy in vgo.copiedFiles) {
-            logger.info(copy.describe(displayPath(projectPath, copy.output.toPath())))
+            logger.info("\t${displayPath(projectPath, copy)}")
         }
 
         if (exitCode != 0) {

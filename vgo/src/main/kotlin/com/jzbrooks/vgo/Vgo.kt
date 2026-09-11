@@ -54,8 +54,8 @@ class Vgo(
      * Inputs that were written to a different output path byte-for-byte,
      * available once [run] returns.
      */
-    val copiedFiles: List<CopiedFile>
-        field = mutableListOf<CopiedFile>()
+    val copiedFiles: List<Path>
+        field = mutableListOf<Path>()
 
     fun run(): Int {
         if (options.printVersion) {
@@ -215,7 +215,7 @@ class Vgo(
                         countingStream.size
                     } else {
                         if (input == output) return
-                        copyUnchanged(input, output, CopiedFile.Reason.OPTIMIZATION_NOT_SMALLER)
+                        copyUnchanged(input, output)
                     }
                 }
 
@@ -240,7 +240,7 @@ class Vgo(
                         countingStream.size
                     } else {
                         if (input == output) return
-                        copyUnchanged(input, output, CopiedFile.Reason.OPTIMIZATION_NOT_SMALLER)
+                        copyUnchanged(input, output)
                     }
                 }
 
@@ -274,12 +274,17 @@ class Vgo(
                         countingStream.size
                     } else {
                         if (input == output) return
-                        copyUnchanged(input, output, CopiedFile.Reason.OPTIMIZATION_NOT_SMALLER)
+                        copyUnchanged(input, output)
                     }
                 }
 
                 null if input != output -> {
-                    copyUnchanged(input, output, CopiedFile.Reason.NOT_A_VECTOR_GRAPHIC)
+                    input.inputStream().use { inputStream ->
+                        output.outputStream().use { outputStream ->
+                            inputStream.copyTo(outputStream)
+                        }
+                    }
+                    input.length().toULong()
                 }
 
                 else -> {
@@ -311,7 +316,6 @@ class Vgo(
     private fun copyUnchanged(
         input: File,
         output: File,
-        reason: CopiedFile.Reason,
     ): ULong {
         input.inputStream().use { inputStream ->
             output.outputStream().use { outputStream ->
@@ -319,7 +323,7 @@ class Vgo(
             }
         }
 
-        copiedFiles.add(CopiedFile(output, reason))
+        copiedFiles.add(input.toPath())
 
         return input.length().toULong()
     }
@@ -424,24 +428,6 @@ class Vgo(
 
     private val Map.Entry<File, Path>.isDirectoryPair
         get() = key.isDirectory && (value.isDirectory() || !value.exists())
-
-    /** An input that was written to [output] unchanged rather than optimized. */
-    data class CopiedFile(
-        val output: File,
-        val reason: Reason,
-    ) {
-        fun describe(path: String = output.path) = "$path copied unchanged (${reason.description})"
-
-        enum class Reason(
-            val description: String,
-        ) {
-            /** Optimizing the graphic wouldn't have made the file any smaller. */
-            OPTIMIZATION_NOT_SMALLER("optimization did not reduce size"),
-
-            /** The file isn't a vector graphic vgo can read, so it passed through. */
-            NOT_A_VECTOR_GRAPHIC("not a vector graphic"),
-        }
-    }
 
     data class Options(
         val printVersion: Boolean = false,

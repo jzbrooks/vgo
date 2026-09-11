@@ -119,8 +119,9 @@ class CommandLineInterface {
         val vgo = Vgo(options)
         val exitCode = vgo.run()
 
+        System.err.println("Optimization did not shrink these files:")
         for (copy in vgo.copiedFiles) {
-            println(copy.describe())
+            System.err.println("\t$copy")
         }
 
         return exitCode

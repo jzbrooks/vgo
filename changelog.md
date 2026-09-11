@@ -10,22 +10,13 @@
   an `ElementPrinter` for the document format — `ScalableVectorGraphicElementPrinter` for SVG.
 - `vgo-core` ships proguard rules in its artifact, so projects that shrink with r8 pick up the
   keep rules vgo needs without configuring them by hand.
-- vgo now reports files it copied to the output path unchanged, along with the reason. Either
-  optimization wouldn't have made the file smaller or the file isn't a vector graphic. The CLI
-  prints these to standard out and the `shrinkVectorGraphic` task logs them. In-place runs, which
-  leave such files alone rather than copying them, stay quiet.
+- vgo now reports files it copied to the output path unchanged when optimization wouldn't
+  have made the file smaller. The CLI prints these to standard err and the `shrinkVectorGraphic`
+  task logs them. In-place runs, which leave such files alone rather than copying them, stay quiet.
 
 ### Changed
 - SVG path data now also takes advantage of using negative signs as parameter separators
 - E2E tests cover the vgo cli after r8 optimization
-
-### Deprecated
-
-### Removed
-
-### Fixed
-
-### Security
 
 ## 5.0.0 - 2026-08-12
 
