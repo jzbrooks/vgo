@@ -84,11 +84,10 @@ abstract class ShrinkVectorGraphic : DefaultTask() {
     private fun displayPath(
         projectPath: Path,
         path: Path,
-    ): String {
-        return if (path.startsWith(projectPath)) {
+    ): String =
+        if (path.startsWith(projectPath)) {
             projectPath.relativize(path).toString()
         } else {
             path.toString()
         }
-    }
 }
