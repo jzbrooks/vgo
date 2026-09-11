@@ -140,7 +140,7 @@ class VgoPluginFunctionalTest {
         .withProjectDir(projectDir)
         .withTestKitDir(File("build/testkit").absoluteFile)
         .withPluginClasspath()
-        .withArguments(*tasks, "--configuration-cache")
+        .withArguments(*tasks, "--configuration-cache", "--info")
 
     private fun writeNestedBuild(projectDir: File) {
         projectDir.resolve("settings.gradle.kts").writeText(
