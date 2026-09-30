@@ -218,8 +218,9 @@ class CommandLineInterfaceTests {
         val exitCode = CommandLineInterface().run(arrayOf(fixedPointRelativePath, "-o", copyPath, "--indent", "2"))
 
         assertThat(exitCode).isEqualTo(0)
-        assertThat(systemOutput.toString()).contains(
-            "$copyPath copied unchanged (optimization did not reduce size)",
+        assertThat(systemError.toString()).contains(
+            "Optimization did not shrink these files:",
+            "\t$fixedPointRelativePath",
         )
         assertThat(File(copyPath).readText()).isEqualTo(File(fixedPointRelativePath).readText())
     }

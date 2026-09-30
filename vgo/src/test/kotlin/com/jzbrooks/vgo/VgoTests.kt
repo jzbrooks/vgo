@@ -2,9 +2,9 @@ package com.jzbrooks.vgo
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsExactly
 import assertk.assertions.doesNotContain
 import assertk.assertions.exists
-import assertk.assertions.hasSize
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
@@ -182,7 +182,7 @@ class VgoTests {
     }
 
     @Test
-    fun `a graphic that cannot shrink is reported as copied to its output path`(info: TestInfo) {
+    fun `a graphic that cannot shrink is reported as copied`(info: TestInfo) {
         val input = File("build/test-results/${info.displayName}/bug_117.xml")
         val outputPath = "build/test-results/${info.displayName}/copy.xml"
 
@@ -200,13 +200,12 @@ class VgoTests {
             )
         vgo.run()
 
-        assertThat(vgo.copiedFiles).hasSize(1)
-        assertThat(vgo.copiedFiles.single().reason).isEqualTo(Vgo.CopiedFile.Reason.OPTIMIZATION_NOT_SMALLER)
+        assertThat(vgo.copiedFiles).containsExactly(input.toPath())
         assertThat(File(outputPath).readText()).isEqualTo(input.readText())
     }
 
     @Test
-    fun `a non-vector file is reported as copied to its output path`(info: TestInfo) {
+    fun `a non-vector file is copied to its output path without being reported`(info: TestInfo) {
         val input = File("build/test-results/inPlaceModification/${info.displayName}/non_vector.xml")
         val outputPath = "build/test-results/${info.displayName}/non_vector.xml"
 
@@ -219,8 +218,7 @@ class VgoTests {
             )
         vgo.run()
 
-        assertThat(vgo.copiedFiles).hasSize(1)
-        assertThat(vgo.copiedFiles.single().reason).isEqualTo(Vgo.CopiedFile.Reason.NOT_A_VECTOR_GRAPHIC)
+        assertThat(vgo.copiedFiles).isEmpty()
         assertThat(File(outputPath).readText()).isEqualTo(input.readText())
     }
 

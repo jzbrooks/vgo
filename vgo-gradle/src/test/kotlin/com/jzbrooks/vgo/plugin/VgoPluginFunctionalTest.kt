@@ -114,22 +114,24 @@ class VgoPluginFunctionalTest {
             }
 
             vgo {
-                outputs.setFrom(layout.buildDirectory.file("vgo/notes.xml"))
+                outputs.setFrom(layout.buildDirectory.file("vgo/icon.xml"))
+                indent = 2
             }
             """.trimIndent(),
         )
 
-        // Not a vector graphic, so the shrink task passes it through untouched.
+        // Already fully shrunk at this indentation, so the shrink task copies it.
         projectDir.resolve("src/main/res/drawable").mkdirs()
-        projectDir.resolve("src/main/res/drawable/notes.xml").writeText(NON_VECTOR_RESOURCE)
+        projectDir.resolve("src/main/res/drawable/icon.xml").writeText(FIXED_POINT_DRAWABLE)
 
         val result = runner(projectDir, "shrinkVectorGraphic").build()
 
         assertThat(result.task(":shrinkVectorGraphic")?.outcome).isEqualTo(TaskOutcome.SUCCESS)
         assertThat(result.output).contains(
-            "build${File.separator}vgo${File.separator}notes.xml copied unchanged (not a vector graphic)",
+            "Optimization did not shrink these files:",
+            "\t" + listOf("src", "main", "res", "drawable", "icon.xml").joinToString(File.separator),
         )
-        assertThat(projectDir.resolve("build/vgo/notes.xml").readText()).isEqualTo(NON_VECTOR_RESOURCE)
+        assertThat(projectDir.resolve("build/vgo/icon.xml").readText()).isEqualTo(FIXED_POINT_DRAWABLE)
     }
 
     private fun runner(
@@ -187,12 +189,12 @@ class VgoPluginFunctionalTest {
     }
 
     companion object {
-        private val NON_VECTOR_RESOURCE =
+        private val FIXED_POINT_DRAWABLE =
             """
-            <resources>
-                <string name="label">vgo</string>
-            </resources>
-            """.trimIndent()
+            <vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24dp" android:viewportHeight="24" android:viewportWidth="41" android:width="41dp">
+              <path android:fillColor="#ff3008" android:pathData="M39.043,6.335a10.182,10.182,0,0,0,-9.008-5.429H1.558c-0.548-0-0.968,0.455-0.968,1.007 0,0.26 0.097,0.52 0.29,0.683L7.079,8.87a2.926,2.926,0,0,0,2.067,0.878h20.082c1.421,0 2.615,1.138 2.615,2.568 0,1.431-1.13,2.634-2.55,2.634H15.442c-0.549,0-0.969,0.455-0.969,1.007 0,0.26 0.097,0.521 0.291,0.683l6.166,6.274a2.926,2.926,0,0,0,2.067,0.878h6.263c8.169,0 14.336-8.777 9.783-17.457Z"/>
+            </vector>
+            """.trimIndent() + "\n"
 
         private val UNOPTIMIZED_DRAWABLE =
             """
