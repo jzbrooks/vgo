@@ -123,7 +123,10 @@ class OptimizeWithVgoAction : AnAction() {
     private fun isSupported(file: VirtualFile): Boolean {
         if (file.isDirectory) return false
         return when (file.extension?.lowercase()) {
-            "svg" -> true
+            "svg" -> {
+                true
+            }
+
             "xml" -> {
                 try {
                     file.inputStream.use(::hasVectorRoot)
@@ -132,7 +135,9 @@ class OptimizeWithVgoAction : AnAction() {
                 }
             }
 
-            else -> false
+            else -> {
+                false
+            }
         }
     }
 
