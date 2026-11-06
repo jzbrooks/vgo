@@ -44,6 +44,12 @@ repositories {
     }
 }
 
+// The IntelliJ Platform plugin targets JVM 21 for Kotlin here, so Java has to match it.
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 dependencies {
     implementation(project(":vgo"))
 
