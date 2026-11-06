@@ -1,6 +1,5 @@
 <idea-plugin>
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.xml</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup id="vgo" displayType="BALLOON"/>

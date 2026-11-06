@@ -53,6 +53,15 @@ java {
 dependencies {
     implementation(project(":vgo"))
 
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter.api)
+    testImplementation(libs.junit.platform.launcher)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    // The IntelliJ Platform test setup loads JUnit 4 classes, even for Jupiter tests.
+    testRuntimeOnly(libs.junit4)
+
+    testImplementation(libs.assertk)
+
     intellijPlatform {
         intellijIdeaCommunity("2024.3")
     }

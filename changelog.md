@@ -18,6 +18,10 @@
 - SVG path data now also takes advantage of using negative signs as parameter separators
 - E2E tests cover the vgo cli after r8 optimization
 
+### Fixed
+- The IntelliJ plugin no longer depends on the IDE's XML support, which moved from the platform
+  into a bundled plugin in 2026.3 and failed plugin verification
+
 ## 5.0.0 - 2026-08-12
 
 ### Added

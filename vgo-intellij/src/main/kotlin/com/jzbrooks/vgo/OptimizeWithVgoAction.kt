@@ -12,18 +12,44 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiFile
-import com.intellij.psi.xml.XmlFile
 import com.jzbrooks.vgo.Vgo
 import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.InputStream
 import java.io.PrintStream
+import javax.xml.stream.XMLInputFactory
+import javax.xml.stream.XMLStreamConstants
+import javax.xml.stream.XMLStreamException
+
+/**
+ * Reads no further than the root element, so this stays cheap enough for action updates. Parsing
+ * with the JDK rather than XML PSI spares the plugin a dependency on the IDE's XML support, which
+ * moved from the platform into a bundled plugin in 2026.3.
+ */
+internal fun hasVectorRoot(input: InputStream): Boolean {
+    val factory =
+        XMLInputFactory.newDefaultFactory().apply {
+            setProperty(XMLInputFactory.SUPPORT_DTD, false)
+            setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false)
+        }
+
+    return try {
+        val reader = factory.createXMLStreamReader(input)
+        while (reader.hasNext() && reader.next() != XMLStreamConstants.START_ELEMENT) {
+            // Skip the prolog
+        }
+        reader.isStartElement && reader.localName == "vector"
+    } catch (_: XMLStreamException) {
+        false
+    }
+}
 
 class OptimizeWithVgoAction : AnAction() {
     override fun getActionUpdateThread(): ActionUpdateThread = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
         val file = e.getData(CommonDataKeys.VIRTUAL_FILE)
-        e.presentation.isEnabledAndVisible = file != null && isSupported(file, e.getData(CommonDataKeys.PSI_FILE))
+        e.presentation.isEnabledAndVisible = file != null && isSupported(file)
     }
 
     override fun actionPerformed(e: AnActionEvent) {
@@ -94,14 +120,18 @@ class OptimizeWithVgoAction : AnAction() {
         group.createNotification("vgo", content, NotificationType.INFORMATION).notify(project)
     }
 
-    private fun isSupported(
-        file: VirtualFile,
-        psiFile: PsiFile?,
-    ): Boolean {
+    private fun isSupported(file: VirtualFile): Boolean {
         if (file.isDirectory) return false
         return when (file.extension?.lowercase()) {
             "svg" -> true
-            "xml" if psiFile is XmlFile -> psiFile.rootTag?.name == "vector"
+            "xml" -> {
+                try {
+                    file.inputStream.use(::hasVectorRoot)
+                } catch (_: IOException) {
+                    false
+                }
+            }
+
             else -> false
         }
     }
